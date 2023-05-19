@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "rollup": "rollup -c --bundleConfigAsCjs"
+    "rollup": "rollup -c --bundleConfigAsCjs",
+    "prepare": "npm run rollup",
+    "install": "npm run rollup"
   },
   "keywords": [],
   "author": "",
