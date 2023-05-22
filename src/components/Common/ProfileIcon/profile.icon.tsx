@@ -1,5 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { Buffer } from 'buffer';
+import './profile.icon.scss';
 
 export interface ProfileIconProps {
   icon: any;

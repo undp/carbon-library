@@ -22,6 +22,8 @@ import {
     Table,
   } from 'antd';
   import React,{ useContext, useEffect, useState } from 'react';
+  import './companyManagement.scss';
+  import '../../Styles/common.table.scss';
   import RoleIcon from '../Common/RoleIcon/role.icon';
   import {
     CertBGColor,
