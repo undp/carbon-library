@@ -38,13 +38,12 @@ import {
   import { CompanyTableDataType } from '../../Definitions/companyManagement.definitions';
   import { Action } from '../../Definitions/enums/action.enum';
   import { Company } from '../../Definitions/entities/Company';
+  import {companyManagementColumns} from '../../Definitions/enums/company.management.columns'
   
   const { Search } = Input;
   const { Option } = Select;
-  console.log('d1 CompanyManagementComponent ***');
   export const CompanyManagementComponent = (props:any) => {
-    console.log('d1 CompanyManagementComponent',props);
-    const {t, AbilityContext, navigate, post} = props;
+    const {t, AbilityContext, navigate, post, visibleColumns} = props;
     const [totalCompany, setTotalCompany] = useState<number>();
     const [loading, setLoading] = useState<boolean>(false);
     const [tableData, setTableData] = useState<CompanyTableDataType[]>([]);
@@ -111,7 +110,7 @@ import {
       {
         title: '',
         dataIndex: 'logo',
-        key: 'logo',
+        key: companyManagementColumns.logo,
         width: '20px',
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
@@ -129,7 +128,7 @@ import {
       {
         title: t('company:name'),
         dataIndex: 'name',
-        key: 'name',
+        key: companyManagementColumns.name,
         sorter: true,
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
@@ -150,7 +149,7 @@ import {
       {
         title: t('company:taxId'),
         dataIndex: 'taxId',
-        key: 'taxId',
+        key: companyManagementColumns.taxId,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -160,7 +159,7 @@ import {
       {
         title: t('company:companyRole'),
         dataIndex: 'companyRole',
-        key: 'companyRole',
+        key: companyManagementColumns.companyRole,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -170,7 +169,7 @@ import {
       {
         title: t('company:numberOfProgrammes'),
         dataIndex: 'programmeCount',
-        key: 'programmeCount',
+        key: companyManagementColumns.programmeCount,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -180,15 +179,15 @@ import {
       {
         title: t('company:creditBalance'),
         dataIndex: 'creditBalance',
-        key: 'creditBalance',
+        key: companyManagementColumns.creditBalance,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
           return item !== null ? addCommSep(item) : '-';
         },
       },
-    ];
-    // }
+    ].filter(column => visibleColumns.includes(column.key));
+    
   
     const filterOr = () => {
       if (
