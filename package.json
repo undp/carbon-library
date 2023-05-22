@@ -18,8 +18,12 @@
     "@rollup/plugin-typescript": "^11.1.1",
     "@types/react": "^18.2.6",
     "antd": "^5.5.0",
+    "buffer": "^6.0.3",
+    "node-sass": "^9.0.0",
     "rollup": "^3.22.0",
     "rollup-plugin-dts": "^5.3.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
     "tslib": "^2.5.2",
     "typescript": "^5.0.4"
   },
