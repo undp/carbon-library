@@ -41,15 +41,15 @@ import {
   import {companyManagementColumns} from '../../Definitions/enums/company.management.columns'
   
   const { Search } = Input;
-  const { Option } = Select;
+
   export const CompanyManagementComponent = (props:any) => {
-    const {t, AbilityContext, navigate, post, visibleColumns} = props;
+    const {t, AbilityContext, post, visibleColumns, onNavigateToCompanyProfile, onClickAddCompany} = props;
     const [totalCompany, setTotalCompany] = useState<number>();
     const [loading, setLoading] = useState<boolean>(false);
     const [tableData, setTableData] = useState<CompanyTableDataType[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
-    const [searchByTermOrganisation, setSearchByTermOrganisation] = useState<any>('name');
+    const [searchByTermOrganisation] = useState<any>('name');
     const [searchValueOrganisations, setSearchValueOrganisations] = useState<string>('');
     const [networksearchOrganisations, setNetworkSearchOrganisations] = useState<string>('');
     const [filterVisible, setFilterVisible] = useState<boolean>(false);
@@ -102,10 +102,6 @@ import {
       setFilterVisible(true);
     };
   
-    const searchByTermHandler = (event: any) => {
-      setSearchByTermOrganisation(event?.target?.value);
-    };
-  
     const columns = [
       {
         title: '',
@@ -141,7 +137,7 @@ import {
         onCell: (record: any, rowIndex: any) => {
           return {
             onClick: (ev: any) => {
-              navigate('/companyProfile/view', { state: { record } });
+              onNavigateToCompanyProfile(record);
             },
           };
         },
@@ -270,7 +266,6 @@ import {
         setTotalCompany(response.response.data.total);
         setLoading(false);
       } catch (error: any) {
-        console.log('Error in getting company', error);
         message.open({
           type: 'error',
           content: error.message,
@@ -365,7 +360,7 @@ import {
                     size="large"
                     block
                     icon={<PlusOutlined />}
-                    onClick={() => navigate('/companyManagement/addCompany')}
+                    onClick={onClickAddCompany}
                   >
                     {t('company:addCompany')}
                   </Button>
