@@ -22,6 +22,8 @@ import {
     Table,
   } from 'antd';
   import React,{ useContext, useEffect, useState } from 'react';
+  import './companyManagement.scss';
+  import '../../Styles/common.table.scss';
   import RoleIcon from '../Common/RoleIcon/role.icon';
   import {
     CertBGColor,
@@ -32,23 +34,22 @@ import {
     GovColor,
   } from '../../Styles/role.color.constants';
   import ProfileIcon from '../Common/ProfileIcon/profile.icon';
-  import { addCommSep } from '../../Definitions/programme.definitions';
-  import { CompanyTableDataType } from '../../Definitions/companyManagement.definitions';
-  import { Action } from '../../Definitions/enums/action.enum';
-  import { Company } from '../../Definitions/entities/Company';
+  import { addCommSep } from '../../Definitions/Definitions/programme.definitions';
+  import { CompanyTableDataType } from '../../Definitions/Definitions/companyManagement.definitions';
+  import { Action } from '../../Definitions/Enums/action.enum';
+  import { Company } from '../../Definitions/Entities/company';
+  import {companyManagementColumns} from '../../Definitions/Enums/company.management.columns.enum'
   
   const { Search } = Input;
-  const { Option } = Select;
-  console.log('d1 CompanyManagementComponent ***');
+
   export const CompanyManagementComponent = (props:any) => {
-    console.log('d1 CompanyManagementComponent',props);
-    const {t, AbilityContext, navigate, post} = props;
+    const {t, AbilityContext, post, visibleColumns, onNavigateToCompanyProfile, onClickAddCompany} = props;
     const [totalCompany, setTotalCompany] = useState<number>();
     const [loading, setLoading] = useState<boolean>(false);
     const [tableData, setTableData] = useState<CompanyTableDataType[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
-    const [searchByTermOrganisation, setSearchByTermOrganisation] = useState<any>('name');
+    const [searchByTermOrganisation] = useState<any>('name');
     const [searchValueOrganisations, setSearchValueOrganisations] = useState<string>('');
     const [networksearchOrganisations, setNetworkSearchOrganisations] = useState<string>('');
     const [filterVisible, setFilterVisible] = useState<boolean>(false);
@@ -101,15 +102,11 @@ import {
       setFilterVisible(true);
     };
   
-    const searchByTermHandler = (event: any) => {
-      setSearchByTermOrganisation(event?.target?.value);
-    };
-  
     const columns = [
       {
         title: '',
         dataIndex: 'logo',
-        key: 'logo',
+        key: companyManagementColumns.logo,
         width: '20px',
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
@@ -127,7 +124,7 @@ import {
       {
         title: t('company:name'),
         dataIndex: 'name',
-        key: 'name',
+        key: companyManagementColumns.name,
         sorter: true,
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
@@ -140,7 +137,7 @@ import {
         onCell: (record: any, rowIndex: any) => {
           return {
             onClick: (ev: any) => {
-              navigate('/companyProfile/view', { state: { record } });
+              onNavigateToCompanyProfile(record);
             },
           };
         },
@@ -148,7 +145,7 @@ import {
       {
         title: t('company:taxId'),
         dataIndex: 'taxId',
-        key: 'taxId',
+        key: companyManagementColumns.taxId,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -158,7 +155,7 @@ import {
       {
         title: t('company:companyRole'),
         dataIndex: 'companyRole',
-        key: 'companyRole',
+        key: companyManagementColumns.companyRole,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -168,7 +165,7 @@ import {
       {
         title: t('company:numberOfProgrammes'),
         dataIndex: 'programmeCount',
-        key: 'programmeCount',
+        key: companyManagementColumns.programmeCount,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -178,15 +175,15 @@ import {
       {
         title: t('company:creditBalance'),
         dataIndex: 'creditBalance',
-        key: 'creditBalance',
+        key: companyManagementColumns.creditBalance,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
           return item !== null ? addCommSep(item) : '-';
         },
       },
-    ];
-    // }
+    ].filter(column => visibleColumns.includes(column.key));
+    
   
     const filterOr = () => {
       if (
@@ -269,7 +266,6 @@ import {
         setTotalCompany(response.response.data.total);
         setLoading(false);
       } catch (error: any) {
-        console.log('Error in getting company', error);
         message.open({
           type: 'error',
           content: error.message,
@@ -364,7 +360,7 @@ import {
                     size="large"
                     block
                     icon={<PlusOutlined />}
-                    onClick={() => navigate('/companyManagement/addCompany')}
+                    onClick={onClickAddCompany}
                   >
                     {t('company:addCompany')}
                   </Button>

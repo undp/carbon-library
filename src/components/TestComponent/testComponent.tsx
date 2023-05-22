@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import './TestComponent.scss'
+import './testComponent.scss'
 
 export const TestComponent = () => {
   const [name] = useState('test Component');
