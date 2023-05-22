@@ -1,1 +1,1 @@
-export * from './enums/company.management.columns';
+export * from './Enums/company.management.columns.enum';
