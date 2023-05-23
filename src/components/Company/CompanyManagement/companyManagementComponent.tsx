@@ -23,7 +23,7 @@ import {
   } from 'antd';
   import React,{ useContext, useEffect, useState } from 'react';
   import './companyManagementComponent.scss';
-  import '../../Styles/common.table.scss';
+  import '../../../Styles/common.table.scss';
   import RoleIcon from '../../Common/RoleIcon/role.icon';
   import {
     CertBGColor,
