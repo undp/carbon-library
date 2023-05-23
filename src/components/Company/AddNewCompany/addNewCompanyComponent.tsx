@@ -13,7 +13,7 @@ import { CompanyRole } from '../../../Definitions/Definitions/programme.definiti
 import { UserProps } from '../../../Definitions/Definitions/userInformationContext.definitions';
 import validator from 'validator';
 
-const addNewCompanyComponent = (props:any) => {
+export const addNewCompanyComponent = (props:any) => {
   const {t, onNavigateToCompanyManagement, maximumImageSize, useConnection, useUserContext, useLocation} = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -679,5 +679,3 @@ const addNewCompanyComponent = (props:any) => {
     </div>
   );
 };
-
-export default addNewCompanyComponent;
