@@ -7,7 +7,7 @@ import {
   SafetyOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import './addNewCompany.scss';
+import './addNewCompanyComponent.scss';
 import { RcFile, UploadFile } from 'antd/lib/upload';
 import { CompanyRole } from '../../../Definitions/Definitions/programme.definitions';
 import { UserProps } from '../../../Definitions/Definitions/userInformationContext.definitions';
