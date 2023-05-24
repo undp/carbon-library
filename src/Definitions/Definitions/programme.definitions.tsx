@@ -1,13 +1,17 @@
-import { DateTime } from 'luxon';
-import { ProgrammeTransfer } from '../Entities/ProgrammeTransfer';
-import { GovBGColor, CertBGColor, DevBGColor } from '../../Styles/role.color.constants';
+import { DateTime } from "luxon";
+import { ProgrammeTransfer } from "../Entities/ProgrammeTransfer";
+import {
+  GovBGColor,
+  CertBGColor,
+  DevBGColor,
+} from "../../Styles/role.color.constants";
 
 export enum ProgrammeStage {
-  AwaitingAuthorization = 'Pending',
-  Authorised = 'Authorised',
+  AwaitingAuthorization = "Pending",
+  Authorised = "Authorised",
   // Transferred = 'Transferred',
   // Retired = 'Retired',
-  Rejected = 'Rejected',
+  Rejected = "Rejected",
   // Frozen = 'Frozen',
 }
 
@@ -18,43 +22,50 @@ export enum ProgrammeStage {
 //   // Frozen = 'Frozen',
 // }
 
+export enum Role {
+  Root = "Root",
+  Admin = "Admin",
+  Manager = "Manager",
+  ViewOnly = "ViewOnly",
+}
+
 export enum RetireType {
-  CROSS_BORDER = '0',
-  LEGAL_ACTION = '1',
-  OTHER = '2',
+  CROSS_BORDER = "0",
+  LEGAL_ACTION = "1",
+  OTHER = "2",
 }
 
 export enum CreditTransferStage {
-  Pending = 'Pending',
-  Approved = 'Accepted',
-  Rejected = 'Rejected',
-  Cancelled = 'Cancelled',
-  Recognised = 'Recognised',
-  NotRecognised = 'NotRecognised',
+  Pending = "Pending",
+  Approved = "Accepted",
+  Rejected = "Rejected",
+  Cancelled = "Cancelled",
+  Recognised = "Recognised",
+  NotRecognised = "NotRecognised",
 }
 
 export enum TxType {
-  CREATE = '0',
-  REJECT = '1',
-  ISSUE = '2',
-  TRANSFER = '3',
-  CERTIFY = '4',
-  RETIRE = '5',
-  REVOKE = '6',
-  FREEZE = '7',
-  AUTH = '8',
-  UNFREEZE = '9',
+  CREATE = "0",
+  REJECT = "1",
+  ISSUE = "2",
+  TRANSFER = "3",
+  CERTIFY = "4",
+  RETIRE = "5",
+  REVOKE = "6",
+  FREEZE = "7",
+  AUTH = "8",
+  UNFREEZE = "9",
 }
 
 export enum SectoralScope {
-  'Energy Industry' = '1',
-  'Energy Distribution' = '2',
-  'Agriculture' = '15',
+  "Energy Industry" = "1",
+  "Energy Distribution" = "2",
+  "Agriculture" = "15",
 }
 
 export enum TypeOfMitigation {
-  AGRICULTURE = 'Agriculture',
-  SOLAR = 'Solar',
+  AGRICULTURE = "Agriculture",
+  SOLAR = "Solar",
 }
 
 export const getStageEnumVal = (value: string) => {
@@ -73,7 +84,10 @@ export const getCreditStageVal = (value: string) => {
   return Object.values(CreditTransferStage)[index];
 };
 
-export const getStageTransferEnumVal = (value: string, transfer: ProgrammeTransfer) => {
+export const getStageTransferEnumVal = (
+  value: string,
+  transfer: ProgrammeTransfer
+) => {
   // if (transfer.isRetirement) {
   //   if (value === ProgrammeTransferStage.APPROVED) {
   //     return 'Recongnised';
@@ -93,13 +107,13 @@ export const getStageTransferEnumVal = (value: string, transfer: ProgrammeTransf
 export const getStageTagType = (stage: ProgrammeStage) => {
   switch (getStageEnumVal(stage)) {
     case ProgrammeStage.AwaitingAuthorization:
-      return 'error';
+      return "error";
     case ProgrammeStage.Authorised:
-      return 'processing';
+      return "processing";
     // case ProgrammeStage.Transferred:
     //   return 'success';
     default:
-      return 'default';
+      return "default";
   }
 };
 
@@ -117,17 +131,17 @@ export const getTransferStageTagType = (
   // }
   switch (getCreditStageVal(stage)) {
     case CreditTransferStage.Rejected:
-      return 'error';
+      return "error";
     case CreditTransferStage.Approved:
-      return 'processing';
+      return "processing";
     case CreditTransferStage.Pending:
-      return 'success';
+      return "success";
     case CreditTransferStage.Recognised:
-      return 'purple';
+      return "purple";
     case CreditTransferStage.NotRecognised:
-      return 'orange';
+      return "orange";
     default:
-      return 'default';
+      return "default";
   }
 };
 
@@ -136,10 +150,10 @@ export class UnitField {
 }
 
 export enum CompanyRole {
-  CERTIFIER = 'Certifier',
-  PROGRAMME_DEVELOPER = 'ProgrammeDeveloper',
-  MRV = 'MRV',
-  GOVERNMENT = 'Government',
+  CERTIFIER = "Certifier",
+  PROGRAMME_DEVELOPER = "ProgrammeDeveloper",
+  MRV = "MRV",
+  GOVERNMENT = "Government",
 }
 
 export interface ProgrammeProperties {
@@ -198,11 +212,13 @@ export const getGeneralFields = (programme: Programme) => {
     title: programme.title,
     serialNo: programme.serialNo,
     currentStatus: programme.currentStage,
-    applicationType: 'Programme Developer',
+    applicationType: "Programme Developer",
     sector: programme.sector,
     sectoralScope:
       Object.keys(SectoralScope)[
-        Object.values(SectoralScope).indexOf(programme.sectoralScope as SectoralScope)
+        Object.values(SectoralScope).indexOf(
+          programme.sectoralScope as SectoralScope
+        )
       ],
     startDate: DateTime.fromSeconds(Number(programme.startTime)),
     endDate: DateTime.fromSeconds(Number(programme.endTime)),
@@ -215,27 +231,27 @@ export const addCommSep = (value: any) => {
     Number(value)
       // .toString()
       .toFixed(2)
-      .replace('.00', '')
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      .replace(".00", "")
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   );
 };
 
 export const addCommSepRound = (value: any) => {
   return Number(value)
     .toFixed(2)
-    .replace('.00', '')
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    .replace(".00", "")
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
 export const addRoundNumber = (value: any) => {
-  return Number(value.toFixed(2).replace('.00', ''));
+  return Number(value.toFixed(2).replace(".00", ""));
 };
 
 export const addSpaces = (text: string) => {
   if (!text) {
     return text;
   }
-  return text.replace(/([A-Z])/g, ' $1').trim();
+  return text.replace(/([A-Z])/g, " $1").trim();
 };
 
 export const getFinancialFields = (programme: Programme) => {
@@ -243,7 +259,7 @@ export const getFinancialFields = (programme: Programme) => {
     programmeCost: addCommSep(programme.programmeProperties.programmeCostUSD),
     financingType: addSpaces(programme.programmeProperties.sourceOfFunding),
     grantEquivalent: new UnitField(
-      'USD',
+      "USD",
       addCommSep(programme.programmeProperties.grantEquivalentAmount)
     ),
     carbonPrice: addCommSep(programme.programmeProperties.carbonPriceUSDPerTon),
@@ -251,9 +267,9 @@ export const getFinancialFields = (programme: Programme) => {
 };
 
 export const getCompanyBgColor = (item: string) => {
-  if (item === 'Government') {
+  if (item === "Government") {
     return GovBGColor;
-  } else if (item === 'Certifier') {
+  } else if (item === "Certifier") {
     return CertBGColor;
   }
   return DevBGColor;
@@ -261,16 +277,16 @@ export const getCompanyBgColor = (item: string) => {
 
 export const getRetirementTypeString = (retirementType: string | null) => {
   if (retirementType === null) {
-    return '-';
+    return "-";
   }
 
   switch (retirementType) {
-    case '0':
-      return 'CROSS BORDER TRANSFER';
-    case '1':
-      return 'LEGAL ACTION';
-    case '2':
-      return 'OTHER';
+    case "0":
+      return "CROSS BORDER TRANSFER";
+    case "1":
+      return "LEGAL ACTION";
+    case "2":
+      return "OTHER";
   }
 };
 
