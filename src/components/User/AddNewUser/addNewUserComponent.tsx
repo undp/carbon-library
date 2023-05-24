@@ -12,7 +12,7 @@ import {
 } from "antd";
 import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import "./addUser.scss";
+import "./addNewUserComponent.scss";
 import "../../../Styles/common.form.scss";
 import { EyeOutlined, StarOutlined, ToolOutlined } from "@ant-design/icons";
 import { User } from "../../../Definitions/Entities/user";
@@ -25,7 +25,7 @@ import ChangePasswordModel from "../../Common/Models/changePasswordModel";
 
 const { Option } = Select;
 
-const AddUser = (props: any) => {
+export const AddNewUserComponent = (props: any) => {
   const {
     t,
     onNavigateToUserManagement,
@@ -461,5 +461,3 @@ const AddUser = (props: any) => {
     </div>
   );
 };
-
-export default AddUser;
