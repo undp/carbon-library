@@ -1,7 +1,7 @@
 import { BankOutlined } from "@ant-design/icons";
 import { Button, Card, Col, message, Row, Skeleton } from "antd";
 import { plainToClass } from "class-transformer";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { Company } from "../../../Definitions/Entities/company";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
@@ -9,7 +9,6 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
-import React from "react";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
