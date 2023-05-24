@@ -1,4 +1,4 @@
-export enum companyManagementColumns {
+export enum CompanyManagementColumns {
     logo,
     name,
     taxId,

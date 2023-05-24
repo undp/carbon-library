@@ -38,7 +38,7 @@ import {
   import { CompanyTableDataType } from '../../../Definitions/Definitions/companyManagement.definitions';
   import { Action } from '../../../Definitions/Enums/action.enum';
   import { Company } from '../../../Definitions/Entities/company';
-  import {companyManagementColumns} from '../../../Definitions/Enums/company.management.columns.enum'
+  import {CompanyManagementColumns} from '../../../Definitions/Enums/company.management.columns.enum'
   
   const { Search } = Input;
 
@@ -106,7 +106,7 @@ import {
       {
         title: '',
         dataIndex: 'logo',
-        key: companyManagementColumns.logo,
+        key: CompanyManagementColumns.logo,
         width: '20px',
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
@@ -124,7 +124,7 @@ import {
       {
         title: t('company:name'),
         dataIndex: 'name',
-        key: companyManagementColumns.name,
+        key: CompanyManagementColumns.name,
         sorter: true,
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
@@ -145,7 +145,7 @@ import {
       {
         title: t('company:taxId'),
         dataIndex: 'taxId',
-        key: companyManagementColumns.taxId,
+        key: CompanyManagementColumns.taxId,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -155,7 +155,7 @@ import {
       {
         title: t('company:companyRole'),
         dataIndex: 'companyRole',
-        key: companyManagementColumns.companyRole,
+        key: CompanyManagementColumns.companyRole,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -165,7 +165,7 @@ import {
       {
         title: t('company:numberOfProgrammes'),
         dataIndex: 'programmeCount',
-        key: companyManagementColumns.programmeCount,
+        key: CompanyManagementColumns.programmeCount,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -175,7 +175,7 @@ import {
       {
         title: t('company:creditBalance'),
         dataIndex: 'creditBalance',
-        key: companyManagementColumns.creditBalance,
+        key: CompanyManagementColumns.creditBalance,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {

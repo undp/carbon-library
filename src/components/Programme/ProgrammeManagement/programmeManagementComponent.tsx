@@ -12,7 +12,7 @@ import {
   } from 'antd';
   import React, { useEffect, useState } from 'react';
   import './programmeManagementComponent.scss';
-  import '../Common/common.table.scss';
+  import '../../../Styles/common.table.scss';
   import { UserTableDataType } from '../../../Definitions/Definitions/userManagement.definitions';
   import { TooltipColor } from '../../../Styles/role.color.constants';
   import ProfileIcon from '../../Common/ProfileIcon/profile.icon';
@@ -26,11 +26,12 @@ import {
     sumArray,
   } from '../../../Definitions/Definitions/programme.definitions';
   import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+  import {ProgrammeManagementColumns} from '../../../Definitions/Enums/programme.management.columns.enum';
   
   const { Search } = Input;
   
   export const ProgrammeManagementComponent = (props:any) => {
-    const {t, useUserContext, useConnection, onNavigateToProgrammeView} = props;
+    const {t, visibleColumns, useUserContext, useConnection, onNavigateToProgrammeView} = props;
     const { get, delete: del, post } = useConnection();
     const [totalProgramme, setTotalProgramme] = useState<number>();
     const [loading, setLoading] = useState<boolean>(false);
@@ -99,7 +100,7 @@ import {
       {
         title: t('programme:title'),
         dataIndex: 'title',
-        key: 'title',
+        key: ProgrammeManagementColumns.title,
         sorter: true,
         align: 'left' as const,
         render: (item: any) => {
@@ -116,7 +117,7 @@ import {
       {
         title: t('common:company'),
         dataIndex: 'company',
-        key: 'company',
+        key: ProgrammeManagementColumns.company,
         align: 'left' as const,
         render: (item: any, itemObj: any) => {
           const elements = item.map((obj: any) => {
@@ -139,13 +140,13 @@ import {
         title: t('programme:sector'),
         dataIndex: 'sector',
         sorter: true,
-        key: 'sector',
+        key: ProgrammeManagementColumns.sector,
         align: 'left' as const,
       },
       {
         title: t('programme:status'),
         dataIndex: 'currentStage',
-        key: 'currentStage',
+        key: ProgrammeManagementColumns.currentStage,
         sorter: true,
         align: 'center' as const,
         render: (item: any) => {
@@ -167,7 +168,7 @@ import {
       {
         title: t('programme:issued'),
         dataIndex: 'creditIssued',
-        key: 'creditIssued',
+        key: ProgrammeManagementColumns.creditIssued,
         sorter: true,
         align: 'right' as const,
         render: (item: any) => {
@@ -177,7 +178,7 @@ import {
       {
         title: t('programme:balance'),
         dataIndex: 'creditBalance',
-        key: 'creditBalance',
+        key: ProgrammeManagementColumns.creditBalance,
         sorter: true,
         align: 'right' as const,
         render: (item: any) => {
@@ -187,7 +188,7 @@ import {
       {
         title: t('programme:transferred'),
         dataIndex: 'creditTransferred',
-        key: 'creditTransferred',
+        key: ProgrammeManagementColumns.creditTransferred,
         sorter: true,
         align: 'right' as const,
         render: (item: any) => {
@@ -197,7 +198,7 @@ import {
       {
         title: t('programme:certifiers'),
         dataIndex: 'certifierId',
-        key: 'certifierId',
+        key: ProgrammeManagementColumns.certifierId,
         align: 'left' as const,
         sorter: true,
         render: (item: any, itemObj: any) => {
@@ -232,11 +233,10 @@ import {
       {
         title: t('programme:serialNoh'),
         dataIndex: 'serialNo',
-        key: 'serialNo',
+        key: ProgrammeManagementColumns.serialNo,
         align: 'left' as const,
       },
-    ];
-    // }
+    ].filter(column => visibleColumns.includes(column.key));
   
     const getAllProgramme = async () => {
       setLoading(true);
@@ -308,10 +308,6 @@ import {
     useEffect(() => {
       getAllProgramme();
     }, [currentPage, pageSize, sortField, sortOrder, search]);
-  
-    // useEffect(() => {
-    //   setCurrentPage(0);
-    // }, [statusFilter, dataFilter]);
   
     const onChange: PaginationProps['onChange'] = (page, size) => {
       setCurrentPage(page);
