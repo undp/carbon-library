@@ -1,34 +1,44 @@
-import { BankOutlined } from '@ant-design/icons';
-import { Button, Card, Col, message, Row, Skeleton } from 'antd';
-import { plainToClass } from 'class-transformer';
-import { useContext, useEffect, useState } from 'react';
-import { Action } from '../../../Definitions/Enums/action.enum';
-import { Company } from '../../../Definitions/Entities/company';
-import CompanyRoleIcon from '../../Common/CompanyRoleIcon/companyRoleIcon';
-import UserActionConfirmationModel from '../../Components/Models/UserActionConfirmationModel';
-import './companyProfileComponent.scss';
-import * as Icon from 'react-bootstrap-icons';
-import OrganisationStatus from '../../Common/OrganisationStatus/organisationStatus';
-import React from 'react';
+import { BankOutlined } from "@ant-design/icons";
+import { Button, Card, Col, message, Row, Skeleton } from "antd";
+import { plainToClass } from "class-transformer";
+import { useContext, useEffect, useState } from "react";
+import { Action } from "../../../Definitions/Enums/action.enum";
+import { Company } from "../../../Definitions/Entities/company";
+import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
+import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
+import "./companyProfileComponent.scss";
+import * as Icon from "react-bootstrap-icons";
+import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
+import React from "react";
 
-export const CompanyProfileComponent = (props:any) => {
-    const {t, AbilityContext, useLocation, useConnection, onNavigateToCompanyManagement, onNavigateToCompanyEdit} = props;
+export const CompanyProfileComponent = (props: any) => {
+  const {
+    t,
+    AbilityContext,
+    useLocation,
+    useConnection,
+    onNavigateToCompanyManagement,
+    onNavigateToCompanyEdit,
+  } = props;
   const { get, put } = useConnection();
   const [companyDetails, setCompanyDetails] = useState<any>([]);
   const { state } = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [actionInfo, setActionInfo] = useState<any>({});
-  const [openDeauthorisationModal, setOpenDeauthorisationModal] = useState(false);
+  const [openDeauthorisationModal, setOpenDeauthorisationModal] =
+    useState(false);
   const [openReactivateModal, setOpenReactivateModal] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<any>('');
-  const [userRole, setUserRole] = useState<any>('');
-  const [companyRole, setCompanyRole] = useState<any>('');
-  const ability = useContext(AbilityContext);
+  const [errorMsg, setErrorMsg] = useState<any>("");
+  const [userRole, setUserRole] = useState<any>("");
+  const [companyRole, setCompanyRole] = useState<any>("");
+  const ability: any = useContext(AbilityContext);
 
   const getCompanyDetails = async (companyId: string) => {
     try {
       setIsLoading(true);
-      const response = await get(`national/organisation/profile?id=${companyId}`);
+      const response = await get(
+        `national/organisation/profile?id=${companyId}`
+      );
       if (response.data) {
         setCompanyDetails(response.data);
         setIsLoading(false);
@@ -41,9 +51,9 @@ export const CompanyProfileComponent = (props:any) => {
       onNavigateToCompanyManagement();
     } else {
       getCompanyDetails(state.record.companyId);
-      const userRoleValue = localStorage.getItem('userRole') as string;
+      const userRoleValue = localStorage.getItem("userRole") as string;
       setUserRole(userRoleValue);
-      setCompanyRole(localStorage.getItem('companyRole') as string);
+      setCompanyRole(localStorage.getItem("companyRole") as string);
     }
   }, []);
 
@@ -58,10 +68,10 @@ export const CompanyProfileComponent = (props:any) => {
       );
       setOpenDeauthorisationModal(false);
       message.open({
-        type: 'success',
-        content: t('companyProfile:deauthorisationSuccess'),
+        type: "success",
+        content: t("companyProfile:deauthorisationSuccess"),
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       getCompanyDetails(companyDetails.companyId);
     } catch (exception: any) {
@@ -82,10 +92,10 @@ export const CompanyProfileComponent = (props:any) => {
       );
       setOpenReactivateModal(false);
       message.open({
-        type: 'success',
-        content: t('companyProfile:reactivationSuccess'),
+        type: "success",
+        content: t("companyProfile:reactivationSuccess"),
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       getCompanyDetails(companyDetails.companyId);
     } catch (exception: any) {
@@ -105,25 +115,25 @@ export const CompanyProfileComponent = (props:any) => {
 
   const onDeauthoriseOrganisation = () => {
     setActionInfo({
-      action: `${t('companyProfile:deauthorise')}`,
-      headerText: `${t('companyProfile:deauthoriseConfirmHeaderText')}`,
-      text: `${t('companyProfile:deauthoriseConfirmText')}`,
-      type: 'danger',
+      action: `${t("companyProfile:deauthorise")}`,
+      headerText: `${t("companyProfile:deauthoriseConfirmHeaderText")}`,
+      text: `${t("companyProfile:deauthoriseConfirmText")}`,
+      type: "danger",
       icon: <Icon.BuildingDash />,
     });
-    setErrorMsg('');
+    setErrorMsg("");
     setOpenDeauthorisationModal(true);
   };
 
   const onReActivateOrganisation = () => {
     setActionInfo({
-      action: `${t('companyProfile:reActivate')}`,
-      headerText: `${t('companyProfile:reActivateConfirmHeaderText')}`,
-      text: `${t('companyProfile:reActivateConfirmText')}`,
-      type: 'primary',
+      action: `${t("companyProfile:reActivate")}`,
+      headerText: `${t("companyProfile:reActivateConfirmHeaderText")}`,
+      text: `${t("companyProfile:reActivateConfirmText")}`,
+      type: "primary",
       icon: <Icon.BuildingCheck />,
     });
-    setErrorMsg('');
+    setErrorMsg("");
     setOpenReactivateModal(true);
   };
 
@@ -131,40 +141,44 @@ export const CompanyProfileComponent = (props:any) => {
     <div className="content-container company-profile">
       <div className="title-bar">
         <div>
-          <div className="body-title">{t('companyProfile:title')}</div>
-          <div className="body-sub-title">{t('companyProfile:subTitle')}</div>
+          <div className="body-title">{t("companyProfile:title")}</div>
+          <div className="body-sub-title">{t("companyProfile:subTitle")}</div>
         </div>
         <div className="flex-display">
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
           !isLoading &&
           parseInt(companyDetails.state) !== 0 ? (
-            <Button danger className="btn-danger" onClick={onDeauthoriseOrganisation}>
-              {t('companyProfile:deauthorise')}
+            <Button
+              danger
+              className="btn-danger"
+              onClick={onDeauthoriseOrganisation}
+            >
+              {t("companyProfile:deauthorise")}
             </Button>
           ) : (
-            ''
+            ""
           )}
 
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
           !isLoading &&
           parseInt(companyDetails.state) !== 1 ? (
             <Button className="btn-activate" onClick={onReActivateOrganisation}>
-              {t('companyProfile:reActivate')}
+              {t("companyProfile:reActivate")}
             </Button>
           ) : (
-            ''
+            ""
           )}
 
-          {ability.can(Action.Update, plainToClass(Company, companyDetails)) && !isLoading && (
-            <Button
-              className="mg-left-1"
-              type="primary"
-              onClick={() => onNavigateToCompanyEdit(companyDetails)
-              }
-            >
-              {t('common:edit')}
-            </Button>
-          )}
+          {ability.can(Action.Update, plainToClass(Company, companyDetails)) &&
+            !isLoading && (
+              <Button
+                className="mg-left-1"
+                type="primary"
+                onClick={() => onNavigateToCompanyEdit(companyDetails)}
+              >
+                {t("common:edit")}
+              </Button>
+            )}
         </div>
       </div>
 
@@ -174,13 +188,20 @@ export const CompanyProfileComponent = (props:any) => {
             <Card className="card-container">
               <Skeleton loading={isLoading} active>
                 <Row justify="center">
-                  <img className="profile-img" alt="profile image" src={companyDetails.logo} />
+                  <img
+                    className="profile-img"
+                    alt="profile image"
+                    src={companyDetails.logo}
+                  />
                 </Row>
                 <Row justify="center">
-                  <div className="padding-top-1 company-name">{companyDetails.name}</div>
+                  <div className="padding-top-1 company-name">
+                    {companyDetails.name}
+                  </div>
                 </Row>
                 <Row justify="center">
                   <OrganisationStatus
+                    t={t}
                     organisationStatus={parseInt(companyDetails.state)}
                   ></OrganisationStatus>
                 </Row>
@@ -195,29 +216,29 @@ export const CompanyProfileComponent = (props:any) => {
                     <BankOutlined />
                   </span>
                   <span className="title-text">
-                    {t('companyProfile:organisationDetailsHeading')}
+                    {t("companyProfile:organisationDetailsHeading")}
                   </span>
                 </div>
                 <Skeleton loading={isLoading} active>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:name')}
+                      {t("companyProfile:name")}
                     </Col>
                     <Col span={12} className="field-value">
-                      {companyDetails.name ? companyDetails.name : '-'}
+                      {companyDetails.name ? companyDetails.name : "-"}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:taxId')}
+                      {t("companyProfile:taxId")}
                     </Col>
                     <Col span={12} className="field-value nextline-overflow">
-                      {companyDetails.taxId ? companyDetails.taxId : '-'}
+                      {companyDetails.taxId ? companyDetails.taxId : "-"}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:companyRole')}
+                      {t("companyProfile:companyRole")}
                     </Col>
                     <Col span={12} className="field-value">
                       <CompanyRoleIcon role={companyDetails.companyRole} />
@@ -225,69 +246,73 @@ export const CompanyProfileComponent = (props:any) => {
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:email')}
+                      {t("companyProfile:email")}
                     </Col>
                     <Col span={12} className="field-value nextline-overflow">
-                      {companyDetails.email ? companyDetails.email : '-'}
+                      {companyDetails.email ? companyDetails.email : "-"}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:phoneNo')}
+                      {t("companyProfile:phoneNo")}
                     </Col>
                     <Col span={12} className="field-value">
-                      {companyDetails.phoneNo ? companyDetails.phoneNo : '-'}
+                      {companyDetails.phoneNo ? companyDetails.phoneNo : "-"}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:website')}
+                      {t("companyProfile:website")}
                     </Col>
                     <Col span={12} className="field-value ellipsis-overflow">
                       {companyDetails.website ? (
-                        <a target={'blank'} href={companyDetails.website}>
+                        <a target={"blank"} href={companyDetails.website}>
                           {companyDetails.website}
                         </a>
                       ) : (
-                        '-'
+                        "-"
                       )}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:address')}
+                      {t("companyProfile:address")}
                     </Col>
                     <Col span={12} className="field-value">
-                      {companyDetails.address ? companyDetails.address : '-'}
+                      {companyDetails.address ? companyDetails.address : "-"}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:programmeCount')}
+                      {t("companyProfile:programmeCount")}
                     </Col>
                     <Col span={12} className="field-value">
-                      {companyDetails.programmeCount ? companyDetails.programmeCount : '-'}
+                      {companyDetails.programmeCount
+                        ? companyDetails.programmeCount
+                        : "-"}
                     </Col>
                   </Row>
                   <Row className="field">
                     <Col span={12} className="field-key">
-                      {t('companyProfile:creditBalance')}
+                      {t("companyProfile:creditBalance")}
                     </Col>
                     <Col span={12} className="field-value">
-                      {companyDetails.creditBalance ? companyDetails.creditBalance : '-'}
+                      {companyDetails.creditBalance
+                        ? companyDetails.creditBalance
+                        : "-"}
                     </Col>
                   </Row>
                   {parseInt(companyDetails.state) === 0 ? (
                     <Row className="field">
                       <Col span={12} className="field-key">
-                        {t('companyProfile:remarks')}
+                        {t("companyProfile:remarks")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {companyDetails.remarks ? companyDetails.remarks : '-'}
+                        {companyDetails.remarks ? companyDetails.remarks : "-"}
                       </Col>
                     </Row>
                   ) : (
-                    ''
+                    ""
                   )}
                 </Skeleton>
               </div>
@@ -297,6 +322,7 @@ export const CompanyProfileComponent = (props:any) => {
       </div>
 
       <UserActionConfirmationModel
+        t={t}
         actionInfo={actionInfo}
         onActionConfirmed={onDeauthoriseOrgConfirmed}
         onActionCanceled={onDeauthoriseOrgCanceled}
@@ -306,6 +332,7 @@ export const CompanyProfileComponent = (props:any) => {
       />
 
       <UserActionConfirmationModel
+        t={t}
         actionInfo={actionInfo}
         onActionConfirmed={onReactivateOrgConfirmed}
         onActionCanceled={onReactivateOrgCanceled}

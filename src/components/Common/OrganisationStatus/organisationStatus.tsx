@@ -3,6 +3,7 @@ import './organisationStatus.scss';
 
 export interface OrganisationStatusProps {
   organisationStatus: number;
+  t: any;
 }
 
 const OrganisationStatus = (props: OrganisationStatusProps) => {

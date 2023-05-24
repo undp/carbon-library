@@ -13,7 +13,7 @@ import {
   import React, { useEffect, useState } from 'react';
   import './programmeManagementComponent.scss';
   import '../Common/common.table.scss';
-  import { TableDataType } from '../../../Definitions/Definitions/userManagement.definitions';
+  import { UserTableDataType } from '../../../Definitions/Definitions/userManagement.definitions';
   import { TooltipColor } from '../../../Styles/role.color.constants';
   import ProfileIcon from '../../Common/ProfileIcon/profile.icon';
   import { CheckboxValueType } from 'antd/lib/checkbox/Group';
@@ -34,7 +34,7 @@ import {
     const { get, delete: del, post } = useConnection();
     const [totalProgramme, setTotalProgramme] = useState<number>();
     const [loading, setLoading] = useState<boolean>(false);
-    const [tableData, setTableData] = useState<TableDataType[]>([]);
+    const [tableData, setTableData] = useState<UserTableDataType[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
     const [search, setSearch] = useState<string>();
