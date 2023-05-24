@@ -22,9 +22,9 @@ import {
     Table,
   } from 'antd';
   import React,{ useContext, useEffect, useState } from 'react';
-  import './companyManagement.scss';
-  import '../../Styles/common.table.scss';
-  import RoleIcon from '../Common/RoleIcon/role.icon';
+  import './companyManagementComponent.scss';
+  import '../../../Styles/common.table.scss';
+  import RoleIcon from '../../Common/RoleIcon/role.icon';
   import {
     CertBGColor,
     CertColor,
@@ -32,13 +32,13 @@ import {
     DevColor,
     GovBGColor,
     GovColor,
-  } from '../../Styles/role.color.constants';
-  import ProfileIcon from '../Common/ProfileIcon/profile.icon';
-  import { addCommSep } from '../../Definitions/Definitions/programme.definitions';
-  import { CompanyTableDataType } from '../../Definitions/Definitions/companyManagement.definitions';
-  import { Action } from '../../Definitions/Enums/action.enum';
-  import { Company } from '../../Definitions/Entities/company';
-  import {companyManagementColumns} from '../../Definitions/Enums/company.management.columns.enum'
+  } from '../../../Styles/role.color.constants';
+  import ProfileIcon from '../../Common/ProfileIcon/profile.icon';
+  import { addCommSep } from '../../../Definitions/Definitions/programme.definitions';
+  import { CompanyTableDataType } from '../../../Definitions/Definitions/companyManagement.definitions';
+  import { Action } from '../../../Definitions/Enums/action.enum';
+  import { Company } from '../../../Definitions/Entities/company';
+  import {companyManagementColumns} from '../../../Definitions/Enums/company.management.columns.enum'
   
   const { Search } = Input;
 

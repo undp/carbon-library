@@ -1,3 +1,4 @@
-export * from "./TestComponent/testComponent";
-export * from "./Company/companyManagement";
-export * from "./User/userManagement";
+export * from './Company/CompanyManagement/companyManagementComponent';
+export * from './Company/AddNewCompany/addNewCompanyComponent';
+export * from "./Company/CompanyProfile/companyProfileComponent";
+export * from "./User/userManagementComponent";
