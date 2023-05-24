@@ -34,7 +34,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { PersonDash } from "react-bootstrap-icons";
 import "./userManagementComponent.scss";
-import "../../Styles/common.table.scss";
+import "../../../Styles/common.table.scss";
 import { UserTableDataType } from "../../../Definitions/Definitions/userManagement.definitions";
 import RoleIcon from "../../Common/RoleIcon/role.icon";
 import {
