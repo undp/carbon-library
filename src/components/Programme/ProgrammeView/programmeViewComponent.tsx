@@ -15,7 +15,7 @@ import {
   Space,
   Form,
 } from 'antd';
-import './programmeView.scss';
+import './programmeViewComponent.scss';
 import { isBase64 } from '../../Common/ProfileIcon/profile.icon';
 import Chart from 'react-apexcharts';
 import InfoView from '../../Common/InfoView/info.view';
