@@ -66,14 +66,14 @@ export const UserManagementComponent = (props: any) => {
   const {
     t,
     AbilityContext,
-    post,
-    del,
+    useConnection,
     visibleColumns,
     onNavigateToUpdateUser,
     onClickAddUser,
     userInfoState,
   } = props;
   const [formModal] = Form.useForm();
+  const { post, delete: del } = useConnection();
   const [totalUser, setTotalUser] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [tableData, setTableData] = useState<UserTableDataType[]>([]);
