@@ -68,7 +68,7 @@ export const UserProfileComponent = (props: any) => {
               className="mg-left-1 mg-bottom-1"
               type="primary"
               onClick={() => {
-                onNavigateUpdateUser(organisationDetails, userDetails);
+                onNavigateUpdateUser();
               }}
             >
               {t("userProfile:edit")}
