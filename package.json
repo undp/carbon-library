@@ -27,7 +27,6 @@
     "mapbox-gl": "^2.14.1",
     "node-sass": "^9.0.0",
     "postcss": "^8.4.23",
-    "react-apexcharts": "^1.4.0",
     "react-bootstrap-icons": "^1.10.3",
     "react-phone-number-input": "^3.2.23",
     "rollup": "^3.22.0",
