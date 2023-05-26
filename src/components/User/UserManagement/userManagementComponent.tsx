@@ -34,9 +34,9 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { PersonDash } from "react-bootstrap-icons";
 import "./userManagementComponent.scss";
-import "../../Styles/common.table.scss";
-import { UserTableDataType } from "../../Definitions/Definitions/userManagement.definitions";
-import RoleIcon from "../Common/RoleIcon/role.icon";
+import "../../../Styles/common.table.scss";
+import { UserTableDataType } from "../../../Definitions/Definitions/userManagement.definitions";
+import RoleIcon from "../../Common/RoleIcon/role.icon";
 import {
   AdminBGColor,
   AdminColor,
@@ -52,13 +52,13 @@ import {
   RootColor,
   ViewBGColor,
   ViewColor,
-} from "../../Styles/role.color.constants";
-import ProfileIcon from "../Common/ProfileIcon/profile.icon";
-import { User } from "../../Definitions/Entities/user";
+} from "../../../Styles/role.color.constants";
+import ProfileIcon from "../../Common/ProfileIcon/profile.icon";
+import { User } from "../../../Definitions/Entities/user";
 import { plainToClass } from "class-transformer";
-import { Action } from "../../Definitions/Enums/action.enum";
-import UserActionConfirmationModel from "../Common/Models/userActionConfirmationModel";
-import { UserManagementColumns } from "../../Definitions/Enums/user.management.columns.enum";
+import { Action } from "../../../Definitions/Enums/action.enum";
+import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
+import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
 
 const { Search } = Input;
 
@@ -66,14 +66,14 @@ export const UserManagementComponent = (props: any) => {
   const {
     t,
     AbilityContext,
-    post,
-    del,
+    useConnection,
     visibleColumns,
     onNavigateToUpdateUser,
     onClickAddUser,
     userInfoState,
   } = props;
   const [formModal] = Form.useForm();
+  const { post, delete: del } = useConnection();
   const [totalUser, setTotalUser] = useState<number>();
   const [loading, setLoading] = useState<boolean>(false);
   const [tableData, setTableData] = useState<UserTableDataType[]>([]);
