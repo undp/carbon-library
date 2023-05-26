@@ -3,3 +3,4 @@ export * from "./Company/AddNewCompany/addNewCompanyComponent";
 export * from "./Company/CompanyProfile/companyProfileComponent";
 export * from "./User/UserManagement/userManagementComponent";
 export * from "./User/AddNewUser/addNewUserComponent";
+export * from "./User/UserProfile/userProfileComponent";

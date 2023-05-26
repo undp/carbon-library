@@ -7,7 +7,7 @@ import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import LanguageSelection from "../../Common/LanguageSelection/languageSelection";
 import React from "react";
 
-const UserProfile = (props: any) => {
+export const UserProfileComponent = (props: any) => {
   const {
     t,
     i18n,
@@ -257,5 +257,3 @@ const UserProfile = (props: any) => {
     </div>
   );
 };
-
-export default UserProfile;
