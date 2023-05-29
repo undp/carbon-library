@@ -9,7 +9,7 @@
 
     // Added
     "jsx": "react", 
-    "module": "commonjs",  
+    "module": "ESNext",  
     "declaration": true,
     "declarationDir": "types",
     "sourceMap": true,

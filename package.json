@@ -21,6 +21,7 @@
     "@types/react": "^18.2.6",
     "@types/validator": "^13.7.17",
     "antd": "^5.5.0",
+    "apexcharts": "^3.40.0",
     "buffer": "^6.0.3",
     "class-transformer": "^0.5.1",
     "luxon": "^3.3.0",
