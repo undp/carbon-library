@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "shared-services": {
+      "type": "library",
+      "root": "libs/shared-services",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared-services/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared-services/tsconfig.lib.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "webpack": true
+  }
+}
