@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import './programmeViewComponent.scss';
 import { isBase64 } from '../../Common/ProfileIcon/profile.icon';
-//import Chart from 'react-apexcharts';
+import Chart from 'react-apexcharts';
 import InfoView from '../../Common/InfoView/info.view';
 import * as Icon from 'react-bootstrap-icons';
 import {
@@ -221,9 +221,9 @@ export const ProgrammeViewComponent = (props:any) => {
     // ['Authorised', 'Issued', 'Transferred', 'Retired', 'Frozen']
 
     const dt = getPieChartData(d);
-    // ApexCharts.exec('creditChart', 'updateSeries', {
-    //   series: dt,
-    // });
+    ApexCharts.exec('creditChart', 'updateSeries', {
+      series: dt,
+    });
   };
   const genCerts = (d: any, certifiedTime: any) => {
     if (d === undefined) {
@@ -1375,7 +1375,7 @@ export const ProgrammeViewComponent = (props:any) => {
                     <span className="title-text">{t('view:credits')}</span>
                   </div>
                   <div className="map-content">
-                    {/* <Chart
+                    <Chart
                       id={'creditChart'}
                       options={{
                         labels: ['Authorised', 'Issued', 'Transferred', 'Retired', 'Frozen'],
@@ -1447,7 +1447,7 @@ export const ProgrammeViewComponent = (props:any) => {
                       type="donut"
                       width="100%"
                       fontFamily="inter"
-                    /> */}
+                    />
                     {userInfoState?.userRole !== 'ViewOnly' &&
                       userInfoState?.companyRole !== 'Certifier' && (
                         <div className="flex-display action-btns">
