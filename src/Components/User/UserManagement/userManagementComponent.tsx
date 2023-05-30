@@ -642,7 +642,7 @@ export const UserManagementComponent = (props: any) => {
       if (sorter.columnKey === "company") {
         setSortField("company.name");
       } else {
-        setSortField(sorter.columnKey);
+        setSortField(sorter.field);
       }
     } else {
       setSortField("id");
