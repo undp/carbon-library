@@ -1,4 +1,4 @@
-import React,{ useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Row,
   Col,
@@ -14,12 +14,12 @@ import {
   Radio,
   Space,
   Form,
-} from 'antd';
-import './programmeViewComponent.scss';
-import { isBase64 } from '../../Common/ProfileIcon/profile.icon';
-import Chart from 'react-apexcharts';
-import InfoView from '../../Common/InfoView/info.view';
-import * as Icon from 'react-bootstrap-icons';
+} from "antd";
+import "./programmeViewComponent.scss";
+import { isBase64 } from "../../Common/ProfileIcon/profile.icon";
+import Chart from "react-apexcharts";
+import InfoView from "../../Common/InfoView/info.view";
+import * as Icon from "react-bootstrap-icons";
 import {
   BlockOutlined,
   BuildOutlined,
@@ -36,7 +36,7 @@ import {
   PushpinOutlined,
   SafetyOutlined,
   TransactionOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 import {
   addCommSep,
   addSpaces,
@@ -54,8 +54,8 @@ import {
   TxType,
   TypeOfMitigation,
   UnitField,
-} from '../../../Definitions/Definitions/programme.definitions';
-import RoleIcon from '../../Common/RoleIcon/role.icon';
+} from "../../../Definitions/Definitions/programme.definitions";
+import RoleIcon from "../../Common/RoleIcon/role.icon";
 import {
   CertBGColor,
   CertColor,
@@ -67,25 +67,43 @@ import {
   RootColor,
   ViewBGColor,
   ViewColor,
-} from '../../../Styles/role.color.constants';
-import { DateTime } from 'luxon';
-import TextArea from 'antd/lib/input/TextArea';
-import { HandThumbsUp, ShieldCheck } from 'react-bootstrap-icons';
-import { creditUnit, dateFormat, dateTimeFormat } from '../../../Definitions/Definitions/common.definitions';
-import ProgrammeIssueForm from '../../Common/Models/programmeIssueForm';
-import ProgrammeTransferForm from '../../Common/Models/programmeTransferForm';
-import ProgrammeRetireForm from '../../Common/Models/programmeRetireForm';
-import ProgrammeRevokeForm from '../../Common/Models/programmeRevokeForm';
-import OrganisationStatus from '../../Common/OrganisationStatus/organisationStatus';
-import Loading from '../../Common/Loading/loading';
-import { CompanyState } from '../../../Definitions/Enums/company.state.enum';
-import { ProgrammeTransfer } from '../../../Definitions/Entities/programmeTransfer';
-import TimelineBody from '../../Common/TimelineBody/timelineBody';
-import MapComponent from '../../Common/Maps/mapComponent';
-import { MapTypes, MarkerData } from '../../../Definitions/Definitions/mapComponent.definitions';
+} from "../../../Styles/role.color.constants";
+import { DateTime } from "luxon";
+import TextArea from "antd/lib/input/TextArea";
+import { HandThumbsUp, ShieldCheck } from "react-bootstrap-icons";
+import {
+  creditUnit,
+  dateFormat,
+  dateTimeFormat,
+} from "../../../Definitions/Definitions/common.definitions";
+import ProgrammeIssueForm from "../../Common/Models/programmeIssueForm";
+import ProgrammeTransferForm from "../../Common/Models/programmeTransferForm";
+import ProgrammeRetireForm from "../../Common/Models/programmeRetireForm";
+import ProgrammeRevokeForm from "../../Common/Models/programmeRevokeForm";
+import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
+import { Loading } from "../../Common/Loading/loading";
+import { CompanyState } from "../../../Definitions/Enums/company.state.enum";
+import { ProgrammeTransfer } from "../../../Definitions/Entities/programmeTransfer";
+import TimelineBody from "../../Common/TimelineBody/timelineBody";
+import MapComponent from "../../Common/Maps/mapComponent";
+import {
+  MapTypes,
+  MarkerData,
+} from "../../../Definitions/Definitions/mapComponent.definitions";
 
-export const ProgrammeViewComponent = (props:any) => {
-    const {t,useConnection,useLocation,useNavigate,Geocoding, useUserContext, useSettingsContext, mapType, mapBoxAccessToken, countryCode} = props;
+export const ProgrammeViewComponent = (props: any) => {
+  const {
+    t,
+    useConnection,
+    useLocation,
+    useNavigate,
+    Geocoding,
+    useUserContext,
+    useSettingsContext,
+    mapType,
+    mapBoxAccessToken,
+    countryCode,
+  } = props;
   const { get, put, post } = useConnection();
 
   const { userInfoState } = useUserContext();
@@ -111,11 +129,17 @@ export const ProgrammeViewComponent = (props:any) => {
     setOpenModal(true);
   };
 
-  const locationColors = ['#6ACDFF', '#FF923D', '#CDCDCD', '#FF8183', '#B7A4FE'];
+  const locationColors = [
+    "#6ACDFF",
+    "#FF923D",
+    "#CDCDCD",
+    "#FF8183",
+    "#B7A4FE",
+  ];
 
   const getTxRefValues = (value: string, position: number, sep?: string) => {
     if (sep === undefined) {
-      sep = '#';
+      sep = "#";
     }
     const parts = value.split(sep);
     if (parts.length - 1 < position) {
@@ -150,7 +174,7 @@ export const ProgrammeViewComponent = (props:any) => {
     let lat = 0;
     let long = 0;
     for (const l of list) {
-      if (l === null || l === 'null') {
+      if (l === null || l === "null") {
         continue;
       }
       count += 1;
@@ -162,7 +186,10 @@ export const ProgrammeViewComponent = (props:any) => {
 
   const drawMap = () => {
     setTimeout(async () => {
-      if (data?.geographicalLocationCordintes && data?.geographicalLocationCordintes.length > 0) {
+      if (
+        data?.geographicalLocationCordintes &&
+        data?.geographicalLocationCordintes.length > 0
+      ) {
         setCenterPoint(getCenter(data?.geographicalLocationCordintes));
         const markerList = [];
         for (const iloc in data?.geographicalLocationCordintes) {
@@ -183,7 +210,8 @@ export const ProgrammeViewComponent = (props:any) => {
           accessToken = mapBoxAccessToken;
         }
 
-        if (!accessToken || !data!.programmeProperties.geographicalLocation) return;
+        if (!accessToken || !data!.programmeProperties.geographicalLocation)
+          return;
 
         for (const address of data!.programmeProperties.geographicalLocation) {
           const response = await Geocoding({ accessToken: accessToken })
@@ -191,8 +219,8 @@ export const ProgrammeViewComponent = (props:any) => {
               query: address,
               autocomplete: false,
               limit: 1,
-              types: ['region', 'district'],
-              countries: [countryCode || 'NG'],
+              types: ["region", "district"],
+              countries: [countryCode || "NG"],
             })
             .send();
 
@@ -202,7 +230,7 @@ export const ProgrammeViewComponent = (props:any) => {
             !response.body.features ||
             !response.body.features.length
           ) {
-            console.error('Invalid response:');
+            console.error("Invalid response:");
             console.error(response);
             return;
           }
@@ -221,7 +249,7 @@ export const ProgrammeViewComponent = (props:any) => {
     // ['Authorised', 'Issued', 'Transferred', 'Retired', 'Frozen']
 
     const dt = getPieChartData(d);
-    ApexCharts.exec('creditChart', 'updateSeries', {
+    ApexCharts.exec("creditChart", "updateSeries", {
       series: dt,
     });
   };
@@ -234,17 +262,24 @@ export const ProgrammeViewComponent = (props:any) => {
         <div className="">
           <div className="cert-info">
             {isBase64(cert.logo) ? (
-              <img alt="certifier logo" src={'data:image/jpeg;base64,' + cert.logo} />
+              <img
+                alt="certifier logo"
+                src={"data:image/jpeg;base64," + cert.logo}
+              />
             ) : cert.logo ? (
               <img alt="certifier logo" src={cert.logo} />
             ) : cert.name ? (
-              <div className="cert-logo">{cert.name.charAt(0).toUpperCase()}</div>
+              <div className="cert-logo">
+                {cert.name.charAt(0).toUpperCase()}
+              </div>
             ) : (
-              <div className="cert-logo">{'A'}</div>
+              <div className="cert-logo">{"A"}</div>
             )}
             <div className="text-center cert-name">{cert.name}</div>
             {certifiedTime[cert.companyId] && (
-              <div className="text-center cert-date">{certifiedTime[cert.companyId]}</div>
+              <div className="text-center cert-date">
+                {certifiedTime[cert.companyId]}
+              </div>
             )}
           </div>
         </div>
@@ -255,13 +290,13 @@ export const ProgrammeViewComponent = (props:any) => {
 
   const getProgrammeById = async (programmeId: string) => {
     try {
-      const response: any = await post('national/programme/query', {
+      const response: any = await post("national/programme/query", {
         page: 1,
         size: 2,
         filterAnd: [
           {
-            key: 'programmeId',
-            operation: '=',
+            key: "programmeId",
+            operation: "=",
             value: programmeId,
           },
         ],
@@ -269,15 +304,15 @@ export const ProgrammeViewComponent = (props:any) => {
       if (response.data && response.data.length > 0) {
         const d = response.data[0];
         setData(d);
-        navigate('.', { state: { record: d } });
+        navigate(".", { state: { record: d } });
       }
     } catch (error: any) {
-      console.log('Error in getting programme', error);
+      console.log("Error in getting programme", error);
       message.open({
-        type: 'error',
+        type: "error",
         content: error.message,
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     }
     setLoadingAll(false);
@@ -293,29 +328,31 @@ export const ProgrammeViewComponent = (props:any) => {
 
   const formatString = (langTag: string, vargs: any[]) => {
     const str = t(langTag);
-    const parts = str.split('{}');
+    const parts = str.split("{}");
     let insertAt = 1;
     for (const arg of vargs) {
       parts.splice(insertAt, 0, arg);
       insertAt += 2;
     }
-    return parts.join('');
+    return parts.join("");
   };
 
   const getTxActivityLog = (transfers: ProgrammeTransfer[], txDetails: any) => {
     const hist: any = {};
     for (const transfer of transfers) {
       txDetails[transfer.requestId!] = transfer;
-      const createdTime = Number(transfer.createdTime ? transfer.createdTime : transfer.txTime!);
+      const createdTime = Number(
+        transfer.createdTime ? transfer.createdTime : transfer.txTime!
+      );
       let d: any;
       if (!transfer.isRetirement) {
         d = {
-          status: 'process',
-          title: t('view:tlInitTitle'),
+          status: "process",
+          title: t("view:tlInitTitle"),
           subTitle: DateTime.fromMillis(createdTime).toFormat(dateTimeFormat),
           description: (
             <TimelineBody
-              text={formatString('view:tlInitDesc', [
+              text={formatString("view:tlInitDesc", [
                 addCommSep(transfer.creditAmount),
                 creditUnit,
                 transfer.sender[0]?.name,
@@ -335,25 +372,25 @@ export const ProgrammeViewComponent = (props:any) => {
         };
       } else {
         d = {
-          status: 'process',
-          title: t('view:tlRetInit'),
+          status: "process",
+          title: t("view:tlRetInit"),
           subTitle: DateTime.fromMillis(createdTime).toFormat(dateTimeFormat),
           description: (
             <TimelineBody
-              text={formatString('view:tlRetInitDesc', [
+              text={formatString("view:tlRetInitDesc", [
                 addCommSep(transfer.creditAmount),
                 creditUnit,
                 transfer.sender[0]?.name,
                 `${
                   transfer.toCompanyMeta?.countryName
                     ? `to ${transfer.toCompanyMeta?.countryName} `
-                    : ''
+                    : ""
                 }`,
                 transfer.retirementType === RetireType.CROSS_BORDER
-                  ? 'cross border transfer'
+                  ? "cross border transfer"
                   : transfer.retirementType === RetireType.LEGAL_ACTION
-                  ? 'legal action'
-                  : 'other',
+                  ? "legal action"
+                  : "other",
                 transfer.requester[0]?.name,
               ])}
               remark={transfer.comment}
@@ -376,13 +413,21 @@ export const ProgrammeViewComponent = (props:any) => {
         transfer.status === CreditTransferStage.NotRecognised
       ) {
         const dx: any = {
-          status: 'process',
-          title: t(transfer.isRetirement ? 'view:tlRetRejectTitle' : 'view:tlRejectTitle'),
-          subTitle: DateTime.fromMillis(Number(transfer.txTime!)).toFormat(dateTimeFormat),
+          status: "process",
+          title: t(
+            transfer.isRetirement
+              ? "view:tlRetRejectTitle"
+              : "view:tlRejectTitle"
+          ),
+          subTitle: DateTime.fromMillis(Number(transfer.txTime!)).toFormat(
+            dateTimeFormat
+          ),
           description: (
             <TimelineBody
               text={formatString(
-                transfer.isRetirement ? 'view:tlTxRetRejectDesc' : 'view:tlTxRejectDesc',
+                transfer.isRetirement
+                  ? "view:tlTxRetRejectDesc"
+                  : "view:tlTxRejectDesc",
                 [
                   addCommSep(transfer.creditAmount),
                   creditUnit,
@@ -390,17 +435,21 @@ export const ProgrammeViewComponent = (props:any) => {
                   transfer.isRetirement && transfer.toCompanyMeta?.countryName
                     ? transfer.toCompanyMeta?.countryName
                     : transfer.receiver[0]?.name,
-                  transfer.isRetirement ? transfer.receiver[0]?.name : transfer.sender[0]?.name,
+                  transfer.isRetirement
+                    ? transfer.receiver[0]?.name
+                    : transfer.sender[0]?.name,
                 ]
               )}
-              remark={transfer.txRef?.split('#')[0]}
+              remark={transfer.txRef?.split("#")[0]}
               via={transfer.userName}
               t={t}
             />
           ),
           icon: (
             <span
-              className={`step-icon ${transfer.isRetirement ? 'retire-step' : 'transfer-step'}`}
+              className={`step-icon ${
+                transfer.isRetirement ? "retire-step" : "transfer-step"
+              }`}
             >
               <Icon.XOctagon />
             </span>
@@ -408,22 +457,31 @@ export const ProgrammeViewComponent = (props:any) => {
         };
         addElement(dx, Number(transfer.txTime!), hist);
       } else if (transfer.status === CreditTransferStage.Cancelled) {
-        const systemCancel = transfer.txRef && transfer.txRef.indexOf('#SUSPEND_AUTO_CANCEL#') >= 0;
+        const systemCancel =
+          transfer.txRef &&
+          transfer.txRef.indexOf("#SUSPEND_AUTO_CANCEL#") >= 0;
         const lowCreditSystemCancel =
-          transfer.txRef && transfer.txRef.indexOf('#LOW_CREDIT_AUTO_CANCEL#') >= 0;
+          transfer.txRef &&
+          transfer.txRef.indexOf("#LOW_CREDIT_AUTO_CANCEL#") >= 0;
 
         const dx: any = {
-          status: 'process',
-          title: t(transfer.isRetirement ? 'view:tlRetCancelTitle' : 'view:tlTxCancelTitle'),
-          subTitle: DateTime.fromMillis(Number(transfer.txTime!)).toFormat(dateTimeFormat),
+          status: "process",
+          title: t(
+            transfer.isRetirement
+              ? "view:tlRetCancelTitle"
+              : "view:tlTxCancelTitle"
+          ),
+          subTitle: DateTime.fromMillis(Number(transfer.txTime!)).toFormat(
+            dateTimeFormat
+          ),
           description: (
             <TimelineBody
               text={formatString(
                 systemCancel
-                  ? 'view:tlTxCancelSystemDesc'
+                  ? "view:tlTxCancelSystemDesc"
                   : lowCreditSystemCancel
-                  ? 'view:tlTxLowCreditCancelSystemDesc'
-                  : 'view:tlTxCancelDesc',
+                  ? "view:tlTxLowCreditCancelSystemDesc"
+                  : "view:tlTxCancelDesc",
                 [
                   addCommSep(transfer.creditAmount),
                   creditUnit,
@@ -432,21 +490,23 @@ export const ProgrammeViewComponent = (props:any) => {
                     ? transfer.toCompanyMeta.countryName
                     : transfer.receiver[0]?.name,
                   systemCancel
-                    ? transfer.txRef?.split('#')[4]
+                    ? transfer.txRef?.split("#")[4]
                     : lowCreditSystemCancel
-                    ? ''
+                    ? ""
                     : transfer.requester[0]?.name,
-                  transfer.txRef?.split('#')[5],
+                  transfer.txRef?.split("#")[5],
                 ]
               )}
-              remark={transfer.txRef?.split('#')[0]}
+              remark={transfer.txRef?.split("#")[0]}
               via={transfer.userName}
               t={t}
             />
           ),
           icon: (
             <span
-              className={`step-icon ${transfer.isRetirement ? 'retire-step' : 'transfer-step'}`}
+              className={`step-icon ${
+                transfer.isRetirement ? "retire-step" : "transfer-step"
+              }`}
             >
               <Icon.ExclamationOctagon />
             </span>
@@ -461,12 +521,17 @@ export const ProgrammeViewComponent = (props:any) => {
   const getProgrammeHistory = async (programmeId: string) => {
     setLoadingHistory(true);
     try {
-      const historyPromise = get(`national/programme/getHistory?programmeId=${programmeId}`);
+      const historyPromise = get(
+        `national/programme/getHistory?programmeId=${programmeId}`
+      );
       const transferPromise = get(
         `national/programme/transfersByProgrammeId?programmeId=${programmeId}`
       );
 
-      const [response, transfers] = await Promise.all([historyPromise, transferPromise]);
+      const [response, transfers] = await Promise.all([
+        historyPromise,
+        transferPromise,
+      ]);
 
       const txDetails: any = {};
       const txList = await getTxActivityLog(transfers.data, txDetails);
@@ -477,12 +542,14 @@ export const ProgrammeViewComponent = (props:any) => {
         let el = undefined;
         if (activity.data.txType === TxType.CREATE) {
           el = {
-            status: 'process',
-            title: t('view:tlCreate'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlCreate"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlCreateDesc', [
+                text={formatString("view:tlCreateDesc", [
                   addCommSep(activity.data.creditEst),
                   creditUnit,
                 ])}
@@ -497,15 +564,19 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.AUTH) {
           el = {
-            status: 'process',
-            title: t('view:tlAuth'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlAuth"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlAuthDesc', [
+                text={formatString("view:tlAuthDesc", [
                   addCommSep(activity.data.creditEst),
                   creditUnit,
-                  DateTime.fromMillis(activity.data.endTime * 1000).toFormat(dateFormat),
+                  DateTime.fromMillis(activity.data.endTime * 1000).toFormat(
+                    dateFormat
+                  ),
                   activity.data.serialNo,
                   getTxRefValues(activity.data.txRef, 1),
                 ])}
@@ -522,12 +593,14 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.ISSUE) {
           el = {
-            status: 'process',
-            title: t('view:tlIssue'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlIssue"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlIssueDesc', [
+                text={formatString("view:tlIssueDesc", [
                   addCommSep(activity.data.creditChange),
                   creditUnit,
                   getTxRefValues(activity.data.txRef, 1),
@@ -545,12 +618,16 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.REJECT) {
           el = {
-            status: 'process',
-            title: t('view:tlReject'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlReject"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlRejectDesc', [getTxRefValues(activity.data.txRef, 1)])}
+                text={formatString("view:tlRejectDesc", [
+                  getTxRefValues(activity.data.txRef, 1),
+                ])}
                 remark={getTxRefValues(activity.data.txRef, 3)}
                 via={activity.data.userName}
                 t={t}
@@ -564,12 +641,14 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.TRANSFER) {
           el = {
-            status: 'process',
-            title: t('view:tlTransfer'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlTransfer"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlTransferDesc', [
+                text={formatString("view:tlTransferDesc", [
                   addCommSep(activity.data.creditChange),
                   creditUnit,
                   getTxRefValues(activity.data.txRef, 6),
@@ -590,17 +669,21 @@ export const ProgrammeViewComponent = (props:any) => {
         } else if (activity.data.txType === TxType.REVOKE) {
           const type = getTxRefValues(activity.data.txRef, 4);
           let revokeComp = undefined;
-          if (type === 'SUSPEND_REVOKE') {
+          if (type === "SUSPEND_REVOKE") {
             revokeComp = getTxRefValues(activity.data.txRef, 5);
           }
           el = {
-            status: 'process',
-            title: t('view:tlRevoke'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlRevoke"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlRevokeDesc', [
-                  revokeComp !== undefined ? `due to the deactivation of ${revokeComp}` : '',
+                text={formatString("view:tlRevokeDesc", [
+                  revokeComp !== undefined
+                    ? `due to the deactivation of ${revokeComp}`
+                    : "",
                   getTxRefValues(activity.data.txRef, 1),
                 ])}
                 remark={getTxRefValues(activity.data.txRef, 3)}
@@ -616,12 +699,16 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.CERTIFY) {
           el = {
-            status: 'process',
-            title: t('view:tlCertify'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlCertify"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlCertifyDesc', [getTxRefValues(activity.data.txRef, 1)])}
+                text={formatString("view:tlCertifyDesc", [
+                  getTxRefValues(activity.data.txRef, 1),
+                ])}
                 remark={getTxRefValues(activity.data.txRef, 3)}
                 via={activity.data.userName}
                 t={t}
@@ -635,23 +722,27 @@ export const ProgrammeViewComponent = (props:any) => {
           };
           const cid = getTxRefValues(activity.data.txRef, 2);
           if (cid) {
-            certifiedTime[cid] = DateTime.fromMillis(activity.data.txTime).toFormat('dd LLLL yyyy');
+            certifiedTime[cid] = DateTime.fromMillis(
+              activity.data.txTime
+            ).toFormat("dd LLLL yyyy");
           }
         } else if (activity.data.txType === TxType.RETIRE) {
           const reqID = getTxRefValues(activity.data.txRef, 7);
           const tx = reqID ? txDetails[reqID!] : undefined;
           const crossCountry = tx ? tx.toCompanyMeta?.countryName : undefined;
           el = {
-            status: 'process',
-            title: t('view:tlRetire'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlRetire"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlRetireDesc', [
+                text={formatString("view:tlRetireDesc", [
                   addCommSep(activity.data.creditChange),
                   creditUnit,
                   getTxRefValues(activity.data.txRef, 6),
-                  `${crossCountry ? 'to ' + crossCountry : ''} `,
+                  `${crossCountry ? "to " + crossCountry : ""} `,
                   getRetirementTypeString(tx?.retirementType)?.toLowerCase(),
                   getTxRefValues(activity.data.txRef, 1),
                 ])}
@@ -668,12 +759,14 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.FREEZE) {
           el = {
-            status: 'process',
-            title: t('view:tlFrozen'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlFrozen"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlFrozenDesc', [
+                text={formatString("view:tlFrozenDesc", [
                   addCommSep(activity.data.creditChange),
                   creditUnit,
                   getTxRefValues(activity.data.txRef, 4),
@@ -692,12 +785,14 @@ export const ProgrammeViewComponent = (props:any) => {
           };
         } else if (activity.data.txType === TxType.UNFREEZE) {
           el = {
-            status: 'process',
-            title: t('view:tlUnFrozen'),
-            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(dateTimeFormat),
+            status: "process",
+            title: t("view:tlUnFrozen"),
+            subTitle: DateTime.fromMillis(activity.data.txTime).toFormat(
+              dateTimeFormat
+            ),
             description: (
               <TimelineBody
-                text={formatString('view:tlUnFrozenDesc', [
+                text={formatString("view:tlUnFrozenDesc", [
                   addCommSep(activity.data.creditChange),
                   creditUnit,
                   getTxRefValues(activity.data.txRef, 4),
@@ -740,12 +835,12 @@ export const ProgrammeViewComponent = (props:any) => {
       setCertTimes(certifiedTime);
       genCerts(state.record, certifiedTime);
     } catch (error: any) {
-      console.log('Error in getting programme', error);
+      console.log("Error in getting programme", error);
       message.open({
-        type: 'error',
+        type: "error",
         content: error.message,
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       setLoadingHistory(false);
     }
@@ -755,12 +850,16 @@ export const ProgrammeViewComponent = (props:any) => {
   const updateProgrammeData = (response: any) => {
     setData(response.data);
     state.record = response.data;
-    navigate('.', { state: { record: response.data } });
+    navigate(".", { state: { record: response.data } });
     genCerts(response.data, certTimes);
     genPieData(response.data);
   };
 
-  const getSuccessMsg = (response: any, initMsg: string, successMsg: string) => {
+  const getSuccessMsg = (
+    response: any,
+    initMsg: string,
+    successMsg: string
+  ) => {
     return response.data instanceof Array ? initMsg : successMsg;
   };
 
@@ -770,7 +869,7 @@ export const ProgrammeViewComponent = (props:any) => {
       response.data.certifier = data.certifier;
       setData(response.data);
       state.record = response.data;
-      navigate('.', { state: { record: response.data } });
+      navigate(".", { state: { record: response.data } });
       genCerts(response.data, certTimes);
       genPieData(response.data);
     }
@@ -786,7 +885,10 @@ export const ProgrammeViewComponent = (props:any) => {
     body.programmeId = data?.programmeId;
     let error;
     try {
-      const response: any = await httpMode(`national/programme/${endpoint}`, body);
+      const response: any = await httpMode(
+        `national/programme/${endpoint}`,
+        body
+      );
       if (response.statusCode < 300 || response.status < 300) {
         if (!response.data.certifier) {
           response.data.certifier = [];
@@ -796,10 +898,13 @@ export const ProgrammeViewComponent = (props:any) => {
         error = undefined;
         successCB(response);
         message.open({
-          type: 'success',
-          content: typeof successMsg !== 'function' ? successMsg : successMsg(response),
+          type: "success",
+          content:
+            typeof successMsg !== "function"
+              ? successMsg
+              : successMsg(response),
           duration: 3,
-          style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
       } else {
         error = response.message;
@@ -823,21 +928,21 @@ export const ProgrammeViewComponent = (props:any) => {
       };
     }
     try {
-      if (action !== 'Transfer') {
+      if (action !== "Transfer") {
         setConfirmLoading(true);
         const response: any = await put(
           `national/programme/${
-            action === 'Reject'
-              ? 'reject'
-              : action === 'Authorise'
-              ? 'authorize'
-              : action === 'Certify'
-              ? 'certify'
-              : action === 'Issue'
-              ? 'issue'
-              : action === 'Revoke'
-              ? 'revoke'
-              : 'retire'
+            action === "Reject"
+              ? "reject"
+              : action === "Authorise"
+              ? "authorize"
+              : action === "Certify"
+              ? "certify"
+              : action === "Issue"
+              ? "issue"
+              : action === "Revoke"
+              ? "revoke"
+              : "retire"
           }`,
           body
         );
@@ -847,17 +952,17 @@ export const ProgrammeViewComponent = (props:any) => {
           }
 
           if (
-            action === 'Authorise' ||
-            action === 'Certify' ||
-            action === 'Revoke' ||
-            action === 'Issue'
+            action === "Authorise" ||
+            action === "Certify" ||
+            action === "Revoke" ||
+            action === "Issue"
           ) {
             setData(response.data);
             state.record = response.data;
-            navigate('.', { state: { record: response.data } });
+            navigate(".", { state: { record: response.data } });
             genCerts(response.data, certTimes);
             genPieData(response.data);
-          } else if (action === 'Reject') {
+          } else if (action === "Reject") {
             data!.currentStage = ProgrammeStage.Rejected;
             setData(data);
           }
@@ -866,28 +971,28 @@ export const ProgrammeViewComponent = (props:any) => {
           setComment(undefined);
           error = undefined;
           message.open({
-            type: 'success',
+            type: "success",
             content:
-              action === 'Reject'
-                ? t('view:successReject')
-                : action === 'Authorise'
-                ? t('view:successAuth')
-                : action === 'Issue'
-                ? 'Successfully issued'
-                : action === 'Certify'
-                ? 'Successfully certified'
-                : action === 'Revoke'
-                ? t('view:successRevokeCertifcate')
-                : t('view:successRetire'),
+              action === "Reject"
+                ? t("view:successReject")
+                : action === "Authorise"
+                ? t("view:successAuth")
+                : action === "Issue"
+                ? "Successfully issued"
+                : action === "Certify"
+                ? "Successfully certified"
+                : action === "Revoke"
+                ? t("view:successRevokeCertifcate")
+                : t("view:successRetire"),
             duration: 3,
-            style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
           });
         } else {
           message.open({
-            type: 'error',
+            type: "error",
             content: response.message,
             duration: 3,
-            style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
           });
           error = response.message;
         }
@@ -899,10 +1004,10 @@ export const ProgrammeViewComponent = (props:any) => {
       }
     } catch (e: any) {
       message.open({
-        type: 'error',
+        type: "error",
         content: e.message,
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       setConfirmLoading(false);
       error = e.message;
@@ -917,7 +1022,7 @@ export const ProgrammeViewComponent = (props:any) => {
 
     const info: any = {};
     Object.entries(map).forEach(([k, v]) => {
-      const text = t('view:' + k);
+      const text = t("view:" + k);
       if (v instanceof UnitField) {
         info[text + ` (${v.unit})`] = v.value;
       } else {
@@ -929,11 +1034,11 @@ export const ProgrammeViewComponent = (props:any) => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const programmeId = queryParams.get('id');
+    const programmeId = queryParams.get("id");
     if (programmeId) {
       getProgrammeById(programmeId);
     } else if (!state) {
-      navigate('/programmeManagement/viewAll', { replace: true });
+      navigate("/programmeManagement/viewAll", { replace: true });
     } else {
       if (!state.record) {
         if (state.id) {
@@ -976,7 +1081,9 @@ export const ProgrammeViewComponent = (props:any) => {
   data.companyId.forEach((obj: any, index: number) => {
     percentages.push({
       company: companies[obj],
-      percentage: data.proponentPercentage ? data.proponentPercentage[index] : 100,
+      percentage: data.proponentPercentage
+        ? data.proponentPercentage[index]
+        : 100,
     });
   });
   percentages.sort((a: any, b: any) => b.percentage - a.percentage);
@@ -986,23 +1093,36 @@ export const ProgrammeViewComponent = (props:any) => {
       <div className="">
         <div className="company-info">
           {isBase64(ele.company.logo) ? (
-            <img alt="company logo" src={'data:image/jpeg;base64,' + ele.company.logo} />
+            <img
+              alt="company logo"
+              src={"data:image/jpeg;base64," + ele.company.logo}
+            />
           ) : ele.company.logo ? (
             <img alt="company logo" src={ele.company.logo} />
           ) : ele.company.name ? (
-            <div className="programme-logo">{ele.company.name.charAt(0).toUpperCase()}</div>
+            <div className="programme-logo">
+              {ele.company.name.charAt(0).toUpperCase()}
+            </div>
           ) : (
-            <div className="programme-logo">{'A'}</div>
+            <div className="programme-logo">{"A"}</div>
           )}
           <div className="text-center programme-name">{ele.company.name}</div>
           <div className="progress-bar">
             <div>
-              <div className="float-left">{t('view:ownership')}</div>
+              <div className="float-left">{t("view:ownership")}</div>
               <div className="float-right">{ele.percentage}%</div>
             </div>
-            <Progress percent={ele.percentage} strokeWidth={7} status="active" showInfo={false} />
+            <Progress
+              percent={ele.percentage}
+              strokeWidth={7}
+              status="active"
+              showInfo={false}
+            />
           </div>
-          <OrganisationStatus organisationStatus={parseInt(ele.company.state)} t={t}></OrganisationStatus>
+          <OrganisationStatus
+            organisationStatus={parseInt(ele.company.state)}
+            t={t}
+          ></OrganisationStatus>
         </div>
       </div>
     );
@@ -1010,25 +1130,25 @@ export const ProgrammeViewComponent = (props:any) => {
   // genCerts(data);
   const actionBtns = [];
 
-  if (userInfoState?.userRole !== 'ViewOnly') {
-    if (data.currentStage.toString() === 'AwaitingAuthorization') {
+  if (userInfoState?.userRole !== "ViewOnly") {
+    if (data.currentStage.toString() === "AwaitingAuthorization") {
       if (userInfoState?.companyRole === CompanyRole.GOVERNMENT) {
         actionBtns.push(
           <Button
             danger
             onClick={() => {
               setActionInfo({
-                action: 'Reject',
-                text: t('view:popupText'),
-                type: 'danger',
-                title: `${t('view:rejectTitle')} - ${data.title}?`,
+                action: "Reject",
+                text: t("view:popupText"),
+                type: "danger",
+                title: `${t("view:rejectTitle")} - ${data.title}?`,
                 remark: true,
                 icon: <Icon.ClipboardX />,
               });
               showModal();
             }}
           >
-            {t('view:reject')}
+            {t("view:reject")}
           </Button>
         );
         actionBtns.push(
@@ -1036,27 +1156,27 @@ export const ProgrammeViewComponent = (props:any) => {
             type="primary"
             onClick={() => {
               setActionInfo({
-                action: 'Authorise',
-                text: t('view:popupText'),
-                title: `${t('view:authTitle')} - ${data.title}?`,
-                type: 'primary',
+                action: "Authorise",
+                text: t("view:popupText"),
+                title: `${t("view:authTitle")} - ${data.title}?`,
+                type: "primary",
                 remark: false,
                 icon: <Icon.ClipboardCheck />,
                 contentComp: (
                   <ProgrammeIssueForm
                     enableIssue={false}
                     programme={data}
-                    subText={t('view:popupText')}
+                    subText={t("view:popupText")}
                     onCancel={() => {
                       setOpenModal(false);
                       setComment(undefined);
                     }}
-                    actionBtnText={t('view:authorise')}
+                    actionBtnText={t("view:authorise")}
                     onFinish={(body: any) =>
                       onPopupAction(
                         body,
-                        'authorize',
-                        t('view:successAuth'),
+                        "authorize",
+                        t("view:successAuth"),
                         put,
                         updateProgrammeData
                       )
@@ -1068,7 +1188,7 @@ export const ProgrammeViewComponent = (props:any) => {
               showModal();
             }}
           >
-            {t('view:authorise')}
+            {t("view:authorise")}
           </Button>
         );
       }
@@ -1083,27 +1203,27 @@ export const ProgrammeViewComponent = (props:any) => {
               type="primary"
               onClick={() => {
                 setActionInfo({
-                  action: 'Issue',
-                  text: t('view:popupText'),
-                  title: `${t('view:issueTitle')} - ${data.title}?`,
-                  type: 'primary',
+                  action: "Issue",
+                  text: t("view:popupText"),
+                  title: `${t("view:issueTitle")} - ${data.title}?`,
+                  type: "primary",
                   remark: false,
                   icon: <Icon.Award />,
                   contentComp: (
                     <ProgrammeIssueForm
                       enableIssue={true}
                       programme={data}
-                      subText={t('view:popupText')}
+                      subText={t("view:popupText")}
                       onCancel={() => {
                         setOpenModal(false);
                         setComment(undefined);
                       }}
-                      actionBtnText={t('view:issue')}
+                      actionBtnText={t("view:issue")}
                       onFinish={(body: any) =>
                         onPopupAction(
                           body,
-                          'issue',
-                          t('view:successIssue'),
+                          "issue",
+                          t("view:successIssue"),
                           put,
                           updateProgrammeData
                         )
@@ -1115,7 +1235,7 @@ export const ProgrammeViewComponent = (props:any) => {
                 showModal();
               }}
             >
-              {t('view:issue')}
+              {t("view:issue")}
             </Button>
           );
         }
@@ -1169,17 +1289,17 @@ export const ProgrammeViewComponent = (props:any) => {
           type="primary"
           onClick={() => {
             setActionInfo({
-              action: 'Certify',
+              action: "Certify",
               text: ``,
-              title: `${t('view:certifyTitle')} - ${data.title}?`,
-              type: 'success',
+              title: `${t("view:certifyTitle")} - ${data.title}?`,
+              type: "success",
               remark: false,
               icon: <ShieldCheck />,
             });
             showModal();
           }}
         >
-          {t('view:certify')}
+          {t("view:certify")}
         </Button>
       );
     }
@@ -1189,7 +1309,9 @@ export const ProgrammeViewComponent = (props:any) => {
       data.certifier &&
       data.certifier.length > 0 &&
       ((userInfoState?.companyRole === CompanyRole.CERTIFIER &&
-        data.certifier.map((e) => e.companyId).includes(userInfoState?.companyId)) ||
+        data.certifier
+          .map((e) => e.companyId)
+          .includes(userInfoState?.companyId)) ||
         userInfoState?.companyRole === CompanyRole.GOVERNMENT)
     ) {
       actionBtns.push(
@@ -1197,31 +1319,33 @@ export const ProgrammeViewComponent = (props:any) => {
           danger
           onClick={() => {
             setActionInfo({
-              action: 'Revoke',
-              title: `${t('view:revokeTitle')} - ${data.title}?`,
+              action: "Revoke",
+              title: `${t("view:revokeTitle")} - ${data.title}?`,
               text: ``,
-              type: 'danger',
+              type: "danger",
               remark: true,
               icon: <Icon.ShieldExclamation />,
               contentComp: (
                 <ProgrammeRevokeForm
                   programme={data}
-                  subText={t('view:popupText')}
+                  subText={t("view:popupText")}
                   onCancel={() => {
                     setOpenModal(false);
                     setComment(undefined);
                   }}
-                  actionBtnText={t('view:revoke')}
+                  actionBtnText={t("view:revoke")}
                   onFinish={(body: any) =>
                     onPopupAction(
                       body,
-                      'revoke',
-                      t('view:successRevokeCertifcate'),
+                      "revoke",
+                      t("view:successRevokeCertifcate"),
                       put,
                       updateProgrammeData
                     )
                   }
-                  showCertifiers={userInfoState.companyRole === CompanyRole.GOVERNMENT}
+                  showCertifiers={
+                    userInfoState.companyRole === CompanyRole.GOVERNMENT
+                  }
                   t={t}
                 />
               ),
@@ -1229,7 +1353,7 @@ export const ProgrammeViewComponent = (props:any) => {
             showModal();
           }}
         >
-          {t('view:revoke')}
+          {t("view:revoke")}
         </Button>
       );
     }
@@ -1238,19 +1362,27 @@ export const ProgrammeViewComponent = (props:any) => {
   // }
   const generalInfo: any = {};
   Object.entries(getGeneralFields(data)).forEach(([k, v]) => {
-    const text = t('view:' + k);
-    if (k === 'currentStatus') {
+    const text = t("view:" + k);
+    if (k === "currentStatus") {
       generalInfo[text] = (
-        <Tag color={getStageTagType(v as ProgrammeStage)}>{getStageEnumVal(v as string)}</Tag>
+        <Tag color={getStageTagType(v as ProgrammeStage)}>
+          {getStageEnumVal(v as string)}
+        </Tag>
       );
-    } else if (k === 'sector') {
+    } else if (k === "sector") {
       generalInfo[text] = (
-        <Tag color={v === 'Agriculture' ? 'success' : 'processing'}>{v as string}</Tag>
+        <Tag color={v === "Agriculture" ? "success" : "processing"}>
+          {v as string}
+        </Tag>
       );
-    } else if (k === 'applicationType') {
+    } else if (k === "applicationType") {
       generalInfo[text] = (
         <span>
-          <RoleIcon icon={<ExperimentOutlined />} bg={DevBGColor} color={DevColor} />
+          <RoleIcon
+            icon={<ExperimentOutlined />}
+            bg={DevBGColor}
+            color={DevColor}
+          />
           <span>{v as string}</span>
         </span>
       );
@@ -1285,9 +1417,14 @@ export const ProgrammeViewComponent = (props:any) => {
         // addCommSep(data.solarProperties.energyGeneration) +
         // ' ' +
         // data.solarProperties.energyGenerationUnit;
-      } else if (calculations.consumerGroup && typeof calculations.consumerGroup === 'string') {
+      } else if (
+        calculations.consumerGroup &&
+        typeof calculations.consumerGroup === "string"
+      ) {
         calculations.consumerGroup = (
-          <Tag color={'processing'}>{addSpaces(calculations.consumerGroup)}</Tag>
+          <Tag color={"processing"}>
+            {addSpaces(calculations.consumerGroup)}
+          </Tag>
         );
       }
       delete calculations.energyGenerationUnit;
@@ -1298,28 +1435,38 @@ export const ProgrammeViewComponent = (props:any) => {
   }
 
   const getFileName = (filepath: string) => {
-    const index = filepath.indexOf('?');
+    const index = filepath.indexOf("?");
     if (index > 0) {
       filepath = filepath.substring(0, index);
     }
     const lastCharcter = filepath.charAt(filepath.length - 1);
-    if (lastCharcter === '/') {
+    if (lastCharcter === "/") {
       filepath = filepath.slice(0, -1);
     }
-    return filepath.substring(filepath.lastIndexOf('/') + 1);
+    return filepath.substring(filepath.lastIndexOf("/") + 1);
   };
 
   const fileItemContent = (filePath: any) => {
     return (
       <Row className="field" key={filePath}>
         <Col span={12} className="field-key">
-          <a target="_blank" href={filePath} rel="noopener noreferrer" className="file-name">
+          <a
+            target="_blank"
+            href={filePath}
+            rel="noopener noreferrer"
+            className="file-name"
+          >
             {getFileName(filePath)}
           </a>
         </Col>
         <Col span={12} className="field-value">
-          <a target="_blank" href={filePath} rel="noopener noreferrer" className="file-name">
-            <Icon.Link45deg style={{ verticalAlign: 'middle' }} />
+          <a
+            target="_blank"
+            href={filePath}
+            rel="noopener noreferrer"
+            className="file-name"
+          >
+            <Icon.Link45deg style={{ verticalAlign: "middle" }} />
           </a>
         </Col>
       </Row>
@@ -1342,11 +1489,11 @@ export const ProgrammeViewComponent = (props:any) => {
     <div className="content-container programme-view">
       <div className="title-bar">
         <div>
-          <div className="body-title">{t('view:details')}</div>
-          <div className="body-sub-title">{t('view:desc')}</div>
+          <div className="body-title">{t("view:details")}</div>
+          <div className="body-sub-title">{t("view:desc")}</div>
         </div>
         <div className="flex-display action-btns">
-          {userInfoState?.userRole !== 'ViewOnly' && actionBtns}
+          {userInfoState?.userRole !== "ViewOnly" && actionBtns}
         </div>
       </div>
       <div className="content-body">
@@ -1362,53 +1509,66 @@ export const ProgrammeViewComponent = (props:any) => {
                       </span>
                     }
                   </span>
-                  <span className="title-text">{t('view:programmeOwner')}</span>
+                  <span className="title-text">{t("view:programmeOwner")}</span>
                 </div>
                 <div className="centered-card">{elements}</div>
               </div>
             </Card>
-            {getStageEnumVal(data.currentStage) === ProgrammeStage.Authorised ? (
+            {getStageEnumVal(data.currentStage) ===
+            ProgrammeStage.Authorised ? (
               <Card className="card-container">
                 <div className="info-view">
                   <div className="title">
                     <span className="title-icon">{<BlockOutlined />}</span>
-                    <span className="title-text">{t('view:credits')}</span>
+                    <span className="title-text">{t("view:credits")}</span>
                   </div>
                   <div className="map-content">
                     <Chart
-                      id={'creditChart'}
+                      id={"creditChart"}
                       options={{
-                        labels: ['Authorised', 'Issued', 'Transferred', 'Retired', 'Frozen'],
+                        labels: [
+                          "Authorised",
+                          "Issued",
+                          "Transferred",
+                          "Retired",
+                          "Frozen",
+                        ],
                         legend: {
-                          position: 'bottom',
+                          position: "bottom",
                         },
-                        colors: ['#6ACDFF', '#D2FDBB', '#CDCDCD', '#FF8183', '#B7A4FE'],
+                        colors: [
+                          "#6ACDFF",
+                          "#D2FDBB",
+                          "#CDCDCD",
+                          "#FF8183",
+                          "#B7A4FE",
+                        ],
                         tooltip: {
                           fillSeriesColor: false,
                         },
                         states: {
                           normal: {
                             filter: {
-                              type: 'none',
+                              type: "none",
                               value: 0,
                             },
                           },
                           hover: {
                             filter: {
-                              type: 'none',
+                              type: "none",
                               value: 0,
                             },
                           },
                           active: {
                             allowMultipleDataPointsSelection: true,
                             filter: {
-                              type: 'darken',
+                              type: "darken",
                               value: 0.7,
                             },
                           },
                         },
                         stroke: {
-                          colors: ['#00'],
+                          colors: ["#00"],
                         },
                         plotOptions: {
                           pie: {
@@ -1419,8 +1579,8 @@ export const ProgrammeViewComponent = (props:any) => {
                                 total: {
                                   showAlways: true,
                                   show: true,
-                                  label: 'Total',
-                                  formatter: () => '' + data.creditEst,
+                                  label: "Total",
+                                  formatter: () => "" + data.creditEst,
                                 },
                               },
                             },
@@ -1434,10 +1594,10 @@ export const ProgrammeViewComponent = (props:any) => {
                             breakpoint: 480,
                             options: {
                               chart: {
-                                width: '15vw',
+                                width: "15vw",
                               },
                               legend: {
-                                position: 'bottom',
+                                position: "bottom",
                               },
                             },
                           },
@@ -1448,10 +1608,11 @@ export const ProgrammeViewComponent = (props:any) => {
                       width="100%"
                       fontFamily="inter"
                     />
-                    {userInfoState?.userRole !== 'ViewOnly' &&
-                      userInfoState?.companyRole !== 'Certifier' && (
+                    {userInfoState?.userRole !== "ViewOnly" &&
+                      userInfoState?.companyRole !== "Certifier" && (
                         <div className="flex-display action-btns">
-                          {data.currentStage.toString() === ProgrammeStage.Authorised &&
+                          {data.currentStage.toString() ===
+                            ProgrammeStage.Authorised &&
                             data.creditBalance -
                               (data.creditFrozen
                                 ? data.creditFrozen.reduce(
@@ -1462,7 +1623,8 @@ export const ProgrammeViewComponent = (props:any) => {
                               0 &&
                             !isTransferFrozen && (
                               <div>
-                                {((userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+                                {((userInfoState?.companyRole ===
+                                  CompanyRole.GOVERNMENT &&
                                   !isAllOwnersDeactivated) ||
                                   (data.companyId
                                     .map((e) => Number(e))
@@ -1474,10 +1636,10 @@ export const ProgrammeViewComponent = (props:any) => {
                                       danger
                                       onClick={() => {
                                         setActionInfo({
-                                          action: 'Retire',
-                                          text: t('view:popupText'),
-                                          title: t('view:retireTitle'),
-                                          type: 'primary',
+                                          action: "Retire",
+                                          text: t("view:popupText"),
+                                          title: t("view:retireTitle"),
+                                          type: "primary",
                                           remark: true,
                                           icon: <Icon.Save />,
                                           contentComp: (
@@ -1486,22 +1648,26 @@ export const ProgrammeViewComponent = (props:any) => {
                                                 userInfoState?.companyRole !==
                                                 CompanyRole.GOVERNMENT
                                               }
-                                              myCompanyId={userInfoState?.companyId}
+                                              myCompanyId={
+                                                userInfoState?.companyId
+                                              }
                                               programme={data}
                                               onCancel={() => {
                                                 setOpenModal(false);
                                                 setComment(undefined);
                                               }}
-                                              actionBtnText={t('view:retire')}
+                                              actionBtnText={t("view:retire")}
                                               onFinish={(body: any) =>
                                                 onPopupAction(
                                                   body,
-                                                  'retire',
+                                                  "retire",
                                                   (response: any) =>
                                                     getSuccessMsg(
                                                       response,
-                                                      t('view:successRetireInit'),
-                                                      t('view:successRetire')
+                                                      t(
+                                                        "view:successRetireInit"
+                                                      ),
+                                                      t("view:successRetire")
                                                     ),
                                                   put,
                                                   updateCreditInfo
@@ -1515,39 +1681,43 @@ export const ProgrammeViewComponent = (props:any) => {
                                         showModal();
                                       }}
                                     >
-                                      {t('view:retire')}
+                                      {t("view:retire")}
                                     </Button>
                                     <Button
                                       type="primary"
                                       onClick={() => {
                                         setActionInfo({
-                                          action: 'Send',
-                                          text: '',
-                                          title: t('view:sendCreditTitle'),
-                                          type: 'primary',
+                                          action: "Send",
+                                          text: "",
+                                          title: t("view:sendCreditTitle"),
+                                          type: "primary",
                                           remark: true,
                                           icon: <Icon.BoxArrowRight />,
                                           contentComp: (
                                             <ProgrammeTransferForm
-                                              companyRole={userInfoState!.companyRole}
-                                              receiverLabelText={t('view:to')}
-                                              userCompanyId={userInfoState?.companyId}
+                                              companyRole={
+                                                userInfoState!.companyRole
+                                              }
+                                              receiverLabelText={t("view:to")}
+                                              userCompanyId={
+                                                userInfoState?.companyId
+                                              }
                                               programme={data}
-                                              subText={t('view:popupText')}
+                                              subText={t("view:popupText")}
                                               onCancel={() => {
                                                 setOpenModal(false);
                                                 setComment(undefined);
                                               }}
-                                              actionBtnText={t('view:send')}
+                                              actionBtnText={t("view:send")}
                                               onFinish={(body: any) =>
                                                 onPopupAction(
                                                   body,
-                                                  'transferRequest',
+                                                  "transferRequest",
                                                   (response: any) =>
                                                     getSuccessMsg(
                                                       response,
-                                                      t('view:successSendInit'),
-                                                      t('view:successSend')
+                                                      t("view:successSendInit"),
+                                                      t("view:successSend")
                                                     ),
                                                   post,
                                                   updateCreditInfo
@@ -1561,7 +1731,7 @@ export const ProgrammeViewComponent = (props:any) => {
                                         showModal();
                                       }}
                                     >
-                                      {t('view:send')}
+                                      {t("view:send")}
                                     </Button>
                                   </span>
                                 )}
@@ -1573,34 +1743,39 @@ export const ProgrammeViewComponent = (props:any) => {
                                       type="primary"
                                       onClick={() => {
                                         setActionInfo({
-                                          action: 'Request',
-                                          text: '',
-                                          title: t('view:transferTitle'),
-                                          type: 'primary',
+                                          action: "Request",
+                                          text: "",
+                                          title: t("view:transferTitle"),
+                                          type: "primary",
                                           remark: true,
                                           icon: <Icon.BoxArrowInRight />,
                                           contentComp: (
                                             <ProgrammeTransferForm
-                                              companyRole={userInfoState!.companyRole}
-                                              userCompanyId={userInfoState?.companyId}
-                                              receiverLabelText={t('view:by')}
+                                              companyRole={
+                                                userInfoState!.companyRole
+                                              }
+                                              userCompanyId={
+                                                userInfoState?.companyId
+                                              }
+                                              receiverLabelText={t("view:by")}
                                               disableToCompany={true}
                                               toCompanyDefault={{
-                                                label: userInfoState?.companyName,
+                                                label:
+                                                  userInfoState?.companyName,
                                                 value: userInfoState?.companyId,
                                               }}
                                               programme={data}
-                                              subText={t('view:popupText')}
+                                              subText={t("view:popupText")}
                                               onCancel={() => {
                                                 setOpenModal(false);
                                                 setComment(undefined);
                                               }}
-                                              actionBtnText={t('view:request')}
+                                              actionBtnText={t("view:request")}
                                               onFinish={(body: any) =>
                                                 onPopupAction(
                                                   body,
-                                                  'transferRequest',
-                                                  t('view:successRequest'),
+                                                  "transferRequest",
+                                                  t("view:successRequest"),
                                                   post,
                                                   updateCreditInfo
                                                 )
@@ -1613,7 +1788,7 @@ export const ProgrammeViewComponent = (props:any) => {
                                         showModal();
                                       }}
                                     >
-                                      {t('view:transfer')}
+                                      {t("view:transfer")}
                                     </Button>
                                   )}
                               </div>
@@ -1632,8 +1807,14 @@ export const ProgrammeViewComponent = (props:any) => {
                   <div className="info-view only-head">
                     <div className="title">
                       <span className="title-icon">{<Icon.Grid />}</span>
-                      <span className="title-text">{t('view:programmeMaterial')}</span>
-                      <div>{getFileContent(data.programmeProperties.programmeMaterials)}</div>
+                      <span className="title-text">
+                        {t("view:programmeMaterial")}
+                      </span>
+                      <div>
+                        {getFileContent(
+                          data.programmeProperties.programmeMaterials
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -1643,9 +1824,17 @@ export const ProgrammeViewComponent = (props:any) => {
                 <Card className="card-container">
                   <div className="info-view">
                     <div className="title">
-                      <span className="title-icon">{<Icon.FileEarmarkText />}</span>
-                      <span className="title-text">{t('view:projectMaterial')}</span>
-                      <div>{getFileContent(data.programmeProperties.projectMaterial)}</div>
+                      <span className="title-icon">
+                        {<Icon.FileEarmarkText />}
+                      </span>
+                      <span className="title-text">
+                        {t("view:projectMaterial")}
+                      </span>
+                      <div>
+                        {getFileContent(
+                          data.programmeProperties.projectMaterial
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -1654,7 +1843,7 @@ export const ProgrammeViewComponent = (props:any) => {
               <div>
                 <InfoView
                   data={mapArrayToi18n(getFinancialFields(data))}
-                  title={t('view:financial')}
+                  title={t("view:financial")}
                   icon={
                     <span className="b-icon">
                       <Icon.Cash />
@@ -1667,7 +1856,11 @@ export const ProgrammeViewComponent = (props:any) => {
           <Col md={24} lg={14}>
             <Card className="card-container">
               <div>
-                <InfoView data={generalInfo} title={t('view:general')} icon={<BulbOutlined />} />
+                <InfoView
+                  data={generalInfo}
+                  title={t("view:general")}
+                  icon={<BulbOutlined />}
+                />
               </div>
             </Card>
             {mapType !== MapTypes.None ? (
@@ -1675,7 +1868,7 @@ export const ProgrammeViewComponent = (props:any) => {
                 <div className="info-view">
                   <div className="title">
                     <span className="title-icon">{<Icon.PinMap />}</span>
-                    <span className="title-text">{t('view:location')}</span>
+                    <span className="title-text">{t("view:location")}</span>
                   </div>
                   <div className="map-content">
                     <MapComponent
@@ -1688,36 +1881,43 @@ export const ProgrammeViewComponent = (props:any) => {
                     ></MapComponent>
                     <Row className="region-list">
                       {data.programmeProperties.geographicalLocation &&
-                        data.programmeProperties.geographicalLocation.map((e: any, idx: number) => (
-                          <Col className="loc-tag">
-                            {data.geographicalLocationCordintes &&
-                              data.geographicalLocationCordintes[idx] !== null &&
-                              data.geographicalLocationCordintes[idx] !== undefined && (
-                                <span
-                                  style={{
-                                    color: locationColors[(idx + 1) % locationColors.length],
-                                  }}
-                                  className="loc-icon"
-                                >
-                                  {<Icon.GeoAltFill />}
-                                </span>
-                              )}
-                            <span className="loc-text">{e}</span>
-                          </Col>
-                        ))}
+                        data.programmeProperties.geographicalLocation.map(
+                          (e: any, idx: number) => (
+                            <Col className="loc-tag">
+                              {data.geographicalLocationCordintes &&
+                                data.geographicalLocationCordintes[idx] !==
+                                  null &&
+                                data.geographicalLocationCordintes[idx] !==
+                                  undefined && (
+                                  <span
+                                    style={{
+                                      color:
+                                        locationColors[
+                                          (idx + 1) % locationColors.length
+                                        ],
+                                    }}
+                                    className="loc-icon"
+                                  >
+                                    {<Icon.GeoAltFill />}
+                                  </span>
+                                )}
+                              <span className="loc-text">{e}</span>
+                            </Col>
+                          )
+                        )}
                     </Row>
                   </div>
                 </div>
               </Card>
             ) : (
-              ''
+              ""
             )}
             {calculations && (
               <Card className="card-container">
                 <div>
                   <InfoView
                     data={mapArrayToi18n(calculations)}
-                    title={t('view:calculation')}
+                    title={t("view:calculation")}
                     icon={<BulbOutlined />}
                   />
                 </div>
@@ -1728,7 +1928,9 @@ export const ProgrammeViewComponent = (props:any) => {
                 <div className="info-view">
                   <div className="title">
                     <span className="title-icon">{<SafetyOutlined />}</span>
-                    <span className="title-text">{t('view:certification')}</span>
+                    <span className="title-text">
+                      {t("view:certification")}
+                    </span>
                   </div>
                   <div className="cert-content">{certs}</div>
                 </div>
@@ -1740,13 +1942,17 @@ export const ProgrammeViewComponent = (props:any) => {
               <div className="info-view">
                 <div className="title">
                   <span className="title-icon">{<ClockCircleOutlined />}</span>
-                  <span className="title-text">{t('view:timeline')}</span>
+                  <span className="title-text">{t("view:timeline")}</span>
                 </div>
                 <div className="content">
                   {loadingHistory ? (
                     <Skeleton />
                   ) : (
-                    <Steps current={0} direction="vertical" items={historyData} />
+                    <Steps
+                      current={0}
+                      direction="vertical"
+                      items={historyData}
+                    />
                   )}
                 </div>
               </div>
@@ -1761,7 +1967,7 @@ export const ProgrammeViewComponent = (props:any) => {
             <div>{actionInfo.title}</div>
           </div>
         }
-        className={'popup-' + actionInfo.type}
+        className={"popup-" + actionInfo.type}
         open={openModal}
         width={Math.min(430, window.innerWidth)}
         centered={true}
@@ -1780,7 +1986,7 @@ export const ProgrammeViewComponent = (props:any) => {
             <Form layout="vertical">
               <Form.Item
                 className="mg-bottom-0"
-                label={t('view:remarks')}
+                label={t("view:remarks")}
                 name="remarks"
                 required={actionInfo.remark}
               >
@@ -1799,10 +2005,12 @@ export const ProgrammeViewComponent = (props:any) => {
                     setComment(undefined);
                   }}
                 >
-                  {t('view:cancel')}
+                  {t("view:cancel")}
                 </Button>
                 <Button
-                  disabled={actionInfo.remark && (!comment || comment.trim() === '')}
+                  disabled={
+                    actionInfo.remark && (!comment || comment.trim() === "")
+                  }
                   type="primary"
                   loading={confirmLoading}
                   onClick={() => onAction(actionInfo.action)}
@@ -1817,4 +2025,3 @@ export const ProgrammeViewComponent = (props:any) => {
     </div>
   );
 };
-
