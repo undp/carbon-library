@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import { Lock } from "react-bootstrap-icons";
 import { Alert, Button, Form, Input, Modal } from "antd";
+import "./models.common.scss";
 
 export interface ChangePasswordProps {
   t: any;
