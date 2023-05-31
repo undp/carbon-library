@@ -7,3 +7,7 @@ export * from "./Programme/ProgrammeView/programmeViewComponent";
 export * from "./User/AddNewUser/addNewUserComponent";
 export * from "./User/UserProfile/userProfileComponent";
 export * from "./Common/Loading/loading";
+export * from "./Common/LegendItem/legendItem";
+export * from "./Common/Maps/mapComponent";
+export * from "./Common/Maps/mapboxComponent";
+export * from "./Common/StasticCard/stasticCard";
