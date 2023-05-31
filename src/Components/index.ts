@@ -6,3 +6,4 @@ export * from "./Programme/ProgrammeManagement/programmeManagementComponent";
 export * from "./Programme/ProgrammeView/programmeViewComponent";
 export * from "./User/AddNewUser/addNewUserComponent";
 export * from "./User/UserProfile/userProfileComponent";
+export * from "./Common/Loading/loading";
