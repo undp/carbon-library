@@ -6,3 +6,8 @@ export * from "./Definitions/userInformationContext.definitions";
 export * from "./Definitions/userForgotPassword.definitions";
 export * from "./Definitions/settings.definitions";
 export * from "./Definitions/programme.definitions";
+export * from "./Definitions/addUser.definitions";
+export * from "./Definitions/connectionContext.definitions";
+export * from "./Definitions/layout.header";
+export * from "./Definitions/layout.sider.definitions";
+export * from "./Definitions/mapComponent.definitions";
