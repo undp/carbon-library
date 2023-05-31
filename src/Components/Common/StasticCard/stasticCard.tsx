@@ -14,7 +14,7 @@ export interface StasticCardItemProps {
   companyRole: any;
 }
 
-const StasticCard: FC<StasticCardItemProps> = (props: StasticCardItemProps) => {
+export const StasticCard: FC<StasticCardItemProps> = (props: StasticCardItemProps) => {
   const { value, title, updatedDate, icon, loading, companyRole } = props;
 
   return (
@@ -56,4 +56,3 @@ const StasticCard: FC<StasticCardItemProps> = (props: StasticCardItemProps) => {
   );
 };
 
-export default StasticCard;
