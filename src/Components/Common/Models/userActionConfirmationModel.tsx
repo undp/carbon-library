@@ -2,7 +2,7 @@ import React from "react";
 import { Alert, Form, Modal, Button } from "antd";
 import { FC, useEffect, useState } from "react";
 import TextArea from "antd/lib/input/TextArea";
-import '../../../Styles/app.scss';
+import "../../../Styles/app.scss";
 
 export interface UserActionProps {
   t: any;
