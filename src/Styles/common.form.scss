@@ -1,68 +1,71 @@
 @import "./common.form.colors.scss";
+@import "./variables.scss";
 
-.create-user-container {
-  .common-form-class {
-    .ant-form-item-label > label {
-      color: $common-form-label;
-      font-family: "Inter-Regular";
-      font-size: 1rem;
-    }
-    .ant-input {
-      height: 3.2rem;
-      background: #ffffff;
-      box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.06);
-      border-radius: 0.3rem;
-      border: none;
-      padding-left: 1.5rem;
-    }
-    .ant-input::placeholder {
-      color: $common-form-placeholder !important;
-      font-family: "Inter-Regular";
-      font-size: 1rem;
-    }
-    .ant-select-selector {
-      height: 3.5rem;
-      background: #ffffff;
-      box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.06);
-      border-radius: 0.3rem;
-      border: none;
-      padding-left: 1.5rem;
-      flex-direction: row;
-      align-items: center;
-    }
-    .ant-select-selection-search {
-      flex-direction: row !important;
-      align-items: center !important;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      padding-left: 0.8vw;
-    }
-    .ant-form-item-explain-error {
-      padding-left: 1.5rem;
-      margin-top: 0.6rem;
+.antd-carbon-overwrites {
+  .ant-form-item-label > label {
+    flex-direction: row-reverse !important;
+    color: rgba(58, 53, 65, 0.5);
+  }
+
+  .ant-form-item-label
+    > label.ant-form-item-required:not(
+      .ant-form-item-required-mark-optional
+    )::before {
+    margin-left: 0.2rem !important;
+    color: $error-color !important;
+  }
+
+  .ant-picker {
+    border-radius: 5px !important;
+    height: 35px !important;
+  }
+
+  .PhoneInput {
+    .PhoneInputCountry {
+      border: 1px solid #d9d9d9 !important;
+      border-radius: 5px !important;
+      padding: 0 1rem 0 1rem;
     }
     .PhoneInputInput {
-      height: 3.5rem;
-      background: #ffffff;
-      box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.06);
-      border-radius: 0.3rem;
-      border: none;
-      padding-left: 1.5rem;
-      flex-direction: row;
-      align-items: center;
-      color: $common-form-label;
-      font-family: "Inter-Regular";
-      font-size: 1rem;
+      flex: 1 1;
+      min-width: 0;
+      border-radius: 5px !important;
+      height: 40px;
+      border: 1px solid #d9d9d9 !important;
+      outline: none;
     }
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus {
-      -webkit-text-fill-color: $common-form-label;
-      -webkit-box-shadow: 0 0 0 30px white inset !important;
-    }
-    .PhoneInputInput:focus {
-      outline: none !important;
+  }
+
+  .filter-title {
+    color: $common-filter-color;
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .ant-radio-wrapper {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 22px;
+    color: $common-filter-color;
+  }
+
+  .ant-list-item {
+    color: $common-filter-color;
+  }
+
+  .PhoneInput {
+    .PhoneInputInput:focus-visible,
+    .PhoneInputInput:hover {
+      flex: 1 1;
+      min-width: 0;
+      border-radius: 5px !important;
+      height: 40px;
+      border-right: 1px solid #40a9ff !important;
+      outline: 1px solid #40a9ff;
     }
   }
 }

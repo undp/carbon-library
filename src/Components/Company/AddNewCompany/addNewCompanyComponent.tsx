@@ -8,7 +8,7 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import "./addNewCompanyComponent.scss";
-import "../../../Styles/common.antd.scss";
+import "../../../Styles/common.form.scss";
 import { RcFile, UploadFile } from "antd/lib/upload";
 import { CompanyRole } from "../../../Definitions/Definitions/programme.definitions";
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
@@ -200,7 +200,7 @@ export const AddNewCompanyComponent = (props:any) => {
         ? 'dev'
         : 'gov';
     return (
-      <div className="company-details-form-container">
+      <div className="company-details-form-container antd-carbon-overwrites">
         <div className="company-details-form">
           <Form
             name="company-details"
@@ -510,7 +510,7 @@ export const AddNewCompanyComponent = (props:any) => {
 
   const CompanyAdminDetailsForm = () => {
     return (
-      <div className="company-details-form-container">
+      <div className="company-details-form-container antd-carbon-overwrites">
         <Form
           name="company-admin-details"
           className="company-details-form"
