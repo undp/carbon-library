@@ -219,7 +219,7 @@ export const AddNewUserComponent = (props: any) => {
   }, []);
 
   return (
-    <div className="add-user-main-container create-user-container">
+    <div className="add-user-main-container">
       <div className="title-container">
         <div className="titles">
           <div className="main">
