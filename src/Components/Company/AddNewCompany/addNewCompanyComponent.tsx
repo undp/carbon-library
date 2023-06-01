@@ -629,7 +629,7 @@ export const AddNewCompanyComponent = (props:any) => {
   };
 
   return (
-    <div className="add-company-main-container">
+    <div className="add-company-main-container create-user-container">
       <div className="title-container">
         <div className="main">
           {isUpdate ? t('addCompany:editCompany') : t('addCompany:addNewCompany')}
