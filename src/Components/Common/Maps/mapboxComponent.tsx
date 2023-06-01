@@ -7,7 +7,7 @@ import {
 } from '../../../Definitions/Definitions/mapComponent.definitions';
 import './MapboxComponent.scss';
 
-const MapboxComponent = (props: MapComponentProps) => {
+export const MapboxComponent = (props: MapComponentProps) => {
   const mapContainerRef = useRef(null);
   const {
     center,
@@ -119,4 +119,3 @@ const MapboxComponent = (props: MapComponentProps) => {
   );
 };
 
-export default MapboxComponent;
