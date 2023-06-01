@@ -13,7 +13,7 @@ import {
 import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "./addNewUserComponent.scss";
-import "../../../Styles/common.form.scss";
+import "../../../Styles/common.antd.scss";
 import { EyeOutlined, StarOutlined, ToolOutlined } from "@ant-design/icons";
 import { User } from "../../../Definitions/Entities/user";
 import * as Icon from "react-bootstrap-icons";
