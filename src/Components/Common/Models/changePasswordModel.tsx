@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import { Lock } from "react-bootstrap-icons";
 import { Alert, Button, Form, Input, Modal } from "antd";
-import "../../../Styles/common.models.scss";
 
 export interface ChangePasswordProps {
   t: any;
@@ -38,9 +37,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
         </div>
       }
       open={openModal}
-      className={
-        "popup-success password-reset-model antd-model-styles-overwrites"
-      }
+      className={"popup-success password-reset-model"}
       centered={true}
       destroyOnClose={true}
       footer={null}

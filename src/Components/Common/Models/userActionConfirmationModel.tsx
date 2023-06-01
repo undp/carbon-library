@@ -1,7 +1,6 @@
 import React from "react";
 import { Alert, Form, Modal, Button } from "antd";
 import { FC, useEffect, useState } from "react";
-import "../../../Styles/common.models.scss";
 import TextArea from "antd/lib/input/TextArea";
 
 export interface UserActionProps {
@@ -40,7 +39,7 @@ const UserActionConfirmationModel: FC<UserActionProps> = (
           <div>{actionInfo.headerText}</div>
         </div>
       }
-      className={"popup-" + actionInfo.type + " antd-model-styles-overwrites"}
+      className={"popup-" + actionInfo.type}
       open={openModal}
       width={Math.min(400, window.innerWidth)}
       centered={true}
