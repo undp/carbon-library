@@ -14,6 +14,7 @@ import {
   Radio,
   Space,
   Form,
+  Input
 } from "antd";
 import "./programmeViewComponent.scss";
 import { isBase64 } from "../../Common/ProfileIcon/profile.icon";
@@ -69,7 +70,6 @@ import {
   ViewColor,
 } from "../../../Styles/role.color.constants";
 import { DateTime } from "luxon";
-import TextArea from "antd/lib/input/TextArea";
 import { HandThumbsUp, ShieldCheck } from "react-bootstrap-icons";
 import {
   creditUnit,
@@ -90,6 +90,7 @@ import {
   MapTypes,
   MarkerData,
 } from "../../../Definitions/Definitions/mapComponent.definitions";
+const { TextArea } = Input;
 
 export const ProgrammeViewComponent = (props: any) => {
   const {
