@@ -66,6 +66,9 @@ export const CompanyManagementComponent = (props: any) => {
   const [sortOrder, setSortOrder] = useState<string>("");
   const [sortField, setSortField] = useState<string>("");
 
+  console.log('ability',ability);
+  console.log('ability.can', ability.can(Action.Create, Company));
+
   document.addEventListener("mousedown", (event: any) => {
     const organisationFilterArea1 = document.querySelector(".filter-bar");
     const organisationFilterArea2 = document.querySelector(".filter-dropdown");
