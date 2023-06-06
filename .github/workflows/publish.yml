@@ -23,7 +23,6 @@ jobs:
         env:
           CI_COMMIT_MESSAGE: Continuous Integration Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
-      - run: yarn add wait-on --dev
       - run: yarn run build
       - run: npm publish --access public
         env:
