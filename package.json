@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "rollup": "rollup -c --bundleConfigAsCjs"
+    "kill-rollup": "ps aux | grep rollup | awk '{print $2}' | xargs kill -9 &",
+    "postbuild": "wait-on dist/cjs/index.js dist/esm/index.js dist/cjs/types dist/esm/types && sleep 5 && yarn kill-rollup",
+    "build": "rollup -c --bundleConfigAsCjs &"
   },
   "keywords": [],
   "author": "",

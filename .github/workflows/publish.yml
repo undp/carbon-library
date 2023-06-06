@@ -23,7 +23,7 @@ jobs:
         env:
           CI_COMMIT_MESSAGE: Continuous Integration Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
-      - run: yarn run rollup
+      - run: yarn run build
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
