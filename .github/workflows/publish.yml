@@ -16,10 +16,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install
       - run: |
-          yarn release-it
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
-          git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+          yarn version --patch
           git push --follow-tags
         env:
           CI_COMMIT_MESSAGE: Continuous Integration Version Update
