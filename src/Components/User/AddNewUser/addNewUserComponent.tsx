@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -33,7 +33,7 @@ export const AddNewUserComponent = (props: any) => {
     useConnection,
     useUserContext,
     useLocation,
-    AbilityContext,
+    ability,
   } = props;
   const { post, put, delete: del } = useConnection();
   const [formOne] = Form.useForm();
@@ -49,7 +49,6 @@ export const AddNewUserComponent = (props: any) => {
   const [openPasswordChangeModal, setopenPasswordChangeModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<any>("");
   const { userInfoState } = useUserContext();
-  const ability: any = useContext(AbilityContext);
 
   const onAddUser = async (values: any) => {
     setLoading(true);
