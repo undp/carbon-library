@@ -1,7 +1,7 @@
 import { BankOutlined } from "@ant-design/icons";
 import { Button, Card, Col, message, Row, Skeleton } from "antd";
 import { plainToClass } from "class-transformer";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { Company } from "../../../Definitions/Entities/company";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
@@ -13,7 +13,7 @@ import OrganisationStatus from "../../Common/OrganisationStatus/organisationStat
 export const CompanyProfileComponent = (props: any) => {
   const {
     t,
-    AbilityContext,
+    ability,
     useLocation,
     useConnection,
     onNavigateToCompanyManagement,
@@ -30,7 +30,6 @@ export const CompanyProfileComponent = (props: any) => {
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [userRole, setUserRole] = useState<any>("");
   const [companyRole, setCompanyRole] = useState<any>("");
-  const ability: any = useContext(AbilityContext);
 
   const getCompanyDetails = async (companyId: string) => {
     try {
