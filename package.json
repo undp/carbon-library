@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "release-it": "yarn version --patch && git push --follow-tags",
+    "release-it": "yarn version --patch",
     "rollup": "rollup -c --bundleConfigAsCjs"
   },
   "keywords": [],
