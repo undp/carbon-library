@@ -33,7 +33,7 @@ export const AddNewUserComponent = (props: any) => {
     useConnection,
     useUserContext,
     useLocation,
-    ability,
+    useAbilityContext,
   } = props;
   const { post, put, delete: del } = useConnection();
   const [formOne] = Form.useForm();
@@ -49,6 +49,7 @@ export const AddNewUserComponent = (props: any) => {
   const [openPasswordChangeModal, setopenPasswordChangeModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<any>("");
   const { userInfoState } = useUserContext();
+  const ability = useAbilityContext();
 
   const onAddUser = async (values: any) => {
     setLoading(true);

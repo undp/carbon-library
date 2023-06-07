@@ -44,7 +44,7 @@ const { Search } = Input;
 export const CompanyManagementComponent = (props: any) => {
   const {
     t,
-    ability,
+    useAbilityContext,
     post,
     visibleColumns,
     onNavigateToCompanyProfile,
@@ -65,6 +65,7 @@ export const CompanyManagementComponent = (props: any) => {
     useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("");
   const [sortField, setSortField] = useState<string>("");
+  const ability = useAbilityContext();
 
   document.addEventListener("mousedown", (event: any) => {
     const organisationFilterArea1 = document.querySelector(".filter-bar");
