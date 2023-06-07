@@ -65,7 +65,7 @@ const { Search } = Input;
 export const UserManagementComponent = (props: any) => {
   const {
     t,
-    ability,
+    useAbilityContext,
     useConnection,
     visibleColumns,
     onNavigateToUpdateUser,
@@ -94,6 +94,7 @@ export const UserManagementComponent = (props: any) => {
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [openDeleteConfirmationModal, setOpenDeleteConfirmationModal] =
     useState(false);
+  const ability = useAbilityContext();
 
   document.addEventListener("mousedown", (event: any) => {
     const userFilterArea1 = document.querySelector(".filter-bar");

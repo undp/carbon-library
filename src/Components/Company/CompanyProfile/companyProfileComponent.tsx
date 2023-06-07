@@ -13,7 +13,7 @@ import OrganisationStatus from "../../Common/OrganisationStatus/organisationStat
 export const CompanyProfileComponent = (props: any) => {
   const {
     t,
-    ability,
+    useAbilityContext,
     useLocation,
     useConnection,
     onNavigateToCompanyManagement,
@@ -30,6 +30,7 @@ export const CompanyProfileComponent = (props: any) => {
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [userRole, setUserRole] = useState<any>("");
   const [companyRole, setCompanyRole] = useState<any>("");
+  const ability = useAbilityContext();
 
   const getCompanyDetails = async (companyId: string) => {
     try {
