@@ -11,3 +11,7 @@ export * from "./Definitions/connectionContext.definitions";
 export * from "./Definitions/layout.header";
 export * from "./Definitions/layout.sider.definitions";
 export * from "./Definitions/mapComponent.definitions";
+export * from "./Entities/company";
+export * from "./Entities/baseEntity";
+export * from "./Entities/programmeTransfer";
+export * from "./Entities/user";
