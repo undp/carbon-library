@@ -1,4 +1,4 @@
 export enum CompanyState {
-    SUSPENDED = 0,
-    ACTIVE = 1,
-  }
+  SUSPENDED = 0,
+  ACTIVE = 1,
+}

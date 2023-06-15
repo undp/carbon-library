@@ -1,4 +1,4 @@
-import { BaseEntity } from "./baseEntity";
+import { BaseEntity } from './baseEntity';
 
 export class User implements BaseEntity {
   id?: number;

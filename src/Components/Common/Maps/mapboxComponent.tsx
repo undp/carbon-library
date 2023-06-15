@@ -5,7 +5,7 @@ import {
   MapComponentProps,
   MarkerData,
 } from '../../../Definitions/Definitions/mapComponent.definitions';
-import './MapboxComponent.scss';
+import './mapboxComponent.scss';
 
 export const MapboxComponent = (props: MapComponentProps) => {
   const mapContainerRef = useRef(null);

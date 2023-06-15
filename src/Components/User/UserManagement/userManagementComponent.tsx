@@ -31,7 +31,7 @@ import {
   Typography,
   Form,
 } from "antd";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PersonDash } from "react-bootstrap-icons";
 import "./userManagementComponent.scss";
 import "../../../Styles/common.table.scss";
@@ -65,7 +65,7 @@ const { Search } = Input;
 export const UserManagementComponent = (props: any) => {
   const {
     t,
-    AbilityContext,
+    useAbilityContext,
     useConnection,
     visibleColumns,
     onNavigateToUpdateUser,
@@ -90,11 +90,11 @@ export const UserManagementComponent = (props: any) => {
   const [sortField, setSortField] = useState<string>("");
   const [deleteUserModalRecord, setDeleteUserModalRecord] = useState<any>();
   //   const { i18n, t } = useTranslation(["user"]);
-  const ability: any = useContext(AbilityContext);
   const [actionInfo, setActionInfo] = useState<any>({});
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [openDeleteConfirmationModal, setOpenDeleteConfirmationModal] =
     useState(false);
+  const ability = useAbilityContext();
 
   document.addEventListener("mousedown", (event: any) => {
     const userFilterArea1 = document.querySelector(".filter-bar");

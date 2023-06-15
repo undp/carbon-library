@@ -1,8 +1,8 @@
 import React from "react";
-import { Alert, Form, Modal, Button } from "antd";
+import { Alert, Form, Modal, Button, Input } from "antd";
 import { FC, useEffect, useState } from "react";
-import TextArea from "antd/lib/input/TextArea";
 import "../../../Styles/app.scss";
+const { TextArea } = Input;
 
 export interface UserActionProps {
   t: any;

@@ -20,7 +20,7 @@ import {
   Space,
   Table,
 } from "antd";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./companyManagementComponent.scss";
 import "../../../Styles/common.table.scss";
 import RoleIcon from "../../Common/RoleIcon/role.icon";
@@ -44,7 +44,7 @@ const { Search } = Input;
 export const CompanyManagementComponent = (props: any) => {
   const {
     t,
-    AbilityContext,
+    useAbilityContext,
     post,
     visibleColumns,
     onNavigateToCompanyProfile,
@@ -65,7 +65,7 @@ export const CompanyManagementComponent = (props: any) => {
     useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("");
   const [sortField, setSortField] = useState<string>("");
-  const ability: any = useContext(AbilityContext);
+  const ability = useAbilityContext();
 
   document.addEventListener("mousedown", (event: any) => {
     const organisationFilterArea1 = document.querySelector(".filter-bar");
