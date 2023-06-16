@@ -41,7 +41,6 @@ export const ProgrammeManagementComponent = (props: any) => {
     useUserContext,
     useConnection,
     onNavigateToProgrammeView,
-    AbilityContext,
     onClickAddProgramme,
   } = props;
   const { get, delete: del, post } = useConnection();
@@ -56,7 +55,6 @@ export const ProgrammeManagementComponent = (props: any) => {
   const [dataFilter, setDataFilter] = useState<any>();
   const [sortOrder, setSortOrder] = useState<string>();
   const [sortField, setSortField] = useState<string>();
-  const ability: any = useContext(AbilityContext);
   const { userInfoState } = useUserContext();
 
   const statusOptions = Object.keys(ProgrammeStage).map((k, index) => ({
