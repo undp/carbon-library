@@ -24,9 +24,9 @@ export const UserProfileComponent = (props: any) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const signOut = (): void => {
-    onNavigateLogin();
     updateToken();
     removeUserInfo();
+    onNavigateLogin();
   };
 
   const getUserProfileDetails = async () => {
