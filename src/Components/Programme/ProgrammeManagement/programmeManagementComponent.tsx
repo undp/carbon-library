@@ -213,6 +213,25 @@ export const ProgrammeManagementComponent = (props: any) => {
         return item ? addCommSep(sumArray(item)) : "-";
       },
     },
+
+    {
+      title: t("programme:emissionsReductionExpected"),
+      dataIndex: "emissionsReductionExpected",
+      key: ProgrammeManagementColumns.emissionsReductionExpected,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? item : "-";
+      },
+    },
+    {
+      title: t("programme:emissionsReductionAchieved"),
+      dataIndex: "emissionsReductionAchieved",
+      key: ProgrammeManagementColumns.emissionsReductionAchieved,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? item : "-";
+      },
+    },
     {
       title: t("programme:certifiers"),
       dataIndex: "certifierId",
@@ -221,7 +240,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       sorter: true,
       render: (item: any, itemObj: any) => {
         if (item === null) {
-          return;
+          return "-";
         }
         const cMap: any = {};
         for (const c of itemObj.certifier) {
@@ -253,24 +272,6 @@ export const ProgrammeManagementComponent = (props: any) => {
       dataIndex: "serialNo",
       key: ProgrammeManagementColumns.serialNo,
       align: "left" as const,
-    },
-    {
-      title: t("programme:emissionsReductionExpected"),
-      dataIndex: "emissionsReductionExpected",
-      key: ProgrammeManagementColumns.emissionsReductionExpected,
-      align: "right" as const,
-      render: (item: any) => {
-        return item ? item : "-";
-      },
-    },
-    {
-      title: t("programme:emissionsReductionAchieved"),
-      dataIndex: "emissionsReductionAchieved",
-      key: ProgrammeManagementColumns.emissionsReductionAchieved,
-      align: "right" as const,
-      render: (item: any) => {
-        return item ? item : "-";
-      },
     },
   ].filter((column) => visibleColumns.includes(column.key));
 
