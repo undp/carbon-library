@@ -256,6 +256,24 @@ export const ProgrammeManagementComponent = (props: any) => {
       key: ProgrammeManagementColumns.serialNo,
       align: "left" as const,
     },
+    {
+      title: t("programme:emissionsReductionExpected"),
+      dataIndex: "emissionsReductionExpected",
+      key: ProgrammeManagementColumns.emissionsReductionExpected,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? item : "-";
+      },
+    },
+    {
+      title: t("programme:emissionsReductionAchieved"),
+      dataIndex: "emissionsReductionAchieved",
+      key: ProgrammeManagementColumns.emissionsReductionAchieved,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? item : "-";
+      },
+    },
   ].filter((column) => visibleColumns.includes(column.key));
 
   const getAllProgramme = async () => {
