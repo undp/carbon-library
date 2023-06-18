@@ -19,7 +19,7 @@ export const isBase64 = (str: string) => {
   }
 };
 
-const ProfileIcon: FC<ProfileIconProps> = (props: ProfileIconProps) => {
+export const ProfileIcon: FC<ProfileIconProps> = (props: ProfileIconProps) => {
   const { icon, bg, name } = props;
 
   return (
@@ -36,4 +36,3 @@ const ProfileIcon: FC<ProfileIconProps> = (props: ProfileIconProps) => {
     </span>
   );
 };
-export default ProfileIcon;

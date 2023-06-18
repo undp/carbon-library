@@ -53,12 +53,12 @@ import {
   ViewBGColor,
   ViewColor,
 } from "../../../Styles/role.color.constants";
-import ProfileIcon from "../../Common/ProfileIcon/profile.icon";
 import { User } from "../../../Definitions/Entities/user";
 import { plainToClass } from "class-transformer";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
+import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 
 const { Search } = Input;
 

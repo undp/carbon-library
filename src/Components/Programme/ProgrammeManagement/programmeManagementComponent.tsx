@@ -16,7 +16,6 @@ import "./programmeManagementComponent.scss";
 import "../../../Styles/common.table.scss";
 import { UserTableDataType } from "../../../Definitions/Definitions/userManagement.definitions";
 import { TooltipColor } from "../../../Styles/role.color.constants";
-import ProfileIcon from "../../Common/ProfileIcon/profile.icon";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import {
   addCommSep,
@@ -31,6 +30,7 @@ import { ProgrammeManagementColumns } from "../../../Definitions/Enums/programme
 import { User } from "../../../Definitions/Entities/user";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { PlusOutlined } from "@ant-design/icons";
+import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 
 const { Search } = Input;
 
