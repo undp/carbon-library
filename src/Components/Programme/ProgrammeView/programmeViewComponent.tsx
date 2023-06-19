@@ -56,7 +56,7 @@ import {
   TypeOfMitigation,
   UnitField,
 } from "../../../Definitions/Definitions/programme.definitions";
-import RoleIcon from "../../Common/RoleIcon/role.icon";
+import { RoleIcon } from "../../Common/RoleIcon/role.icon";
 import {
   CertBGColor,
   CertColor,

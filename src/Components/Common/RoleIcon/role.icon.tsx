@@ -7,7 +7,7 @@ export interface RoleIconProps {
   color: string;
 }
 
-const RoleIcon: FC<RoleIconProps> = (props: RoleIconProps) => {
+export const RoleIcon: FC<RoleIconProps> = (props: RoleIconProps) => {
   const { icon, bg, color } = props;
 
   return (
@@ -16,4 +16,3 @@ const RoleIcon: FC<RoleIconProps> = (props: RoleIconProps) => {
     </span>
   );
 };
-export default RoleIcon;

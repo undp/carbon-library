@@ -15,7 +15,7 @@ import {
   ViewBGColor,
   ViewColor,
 } from "../../../Styles/role.color.constants";
-import RoleIcon from "../RoleIcon/role.icon";
+import { RoleIcon } from "../RoleIcon/role.icon";
 
 export interface UserRoleIconProps {
   role: string;
