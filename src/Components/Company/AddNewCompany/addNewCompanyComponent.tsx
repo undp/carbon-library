@@ -1,6 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Input, Radio, Row, Steps, Tooltip, Upload, message } from 'antd';
-import PhoneInput, { formatPhoneNumberIntl } from 'react-phone-number-input';
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Radio,
+  Row,
+  Select,
+  Steps,
+  Tooltip,
+  Upload,
+  message,
+} from "antd";
+import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import {
   BankOutlined,
   ExperimentOutlined,
@@ -14,8 +26,16 @@ import { CompanyRole } from "../../../Definitions/Definitions/programme.definiti
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
 import validator from "validator";
 
-export const AddNewCompanyComponent = (props:any) => {
-  const {t, onNavigateToCompanyManagement, maximumImageSize, useConnection, useUserContext, useLocation} = props;
+export const AddNewCompanyComponent = (props: any) => {
+  const {
+    t,
+    onNavigateToCompanyManagement,
+    maximumImageSize,
+    useConnection,
+    useUserContext,
+    useLocation,
+    regionField,
+  } = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
   const [stepOneData, setStepOneData] = useState<any>();
@@ -28,6 +48,8 @@ export const AddNewCompanyComponent = (props:any) => {
   const { state } = useLocation();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [countries, setCountries] = useState<[]>([]);
+  const [loadingList, setLoadingList] = useState<boolean>(false);
+  const [regionsList, setRegionsList] = useState<any[]>([]);
 
   const getCountryList = async () => {
     const response = await get('national/organisation/countries');
@@ -39,17 +61,36 @@ export const AddNewCompanyComponent = (props:any) => {
     }
   };
 
+  const getRegionList = async () => {
+    setLoadingList(true);
+    try {
+      const response = await post("national/organisation/regions", {
+        page: 1,
+        size: 100,
+      });
+      if (response.data) {
+        const regionNames = response.data.map((item: any) => item.regionName);
+        setRegionsList(["National", ...regionNames]);
+      }
+    } catch (error: any) {
+      console.log("Error in getting regions list", error);
+    } finally {
+      setLoadingList(false);
+    }
+  };
+
   useEffect(() => {
     setIsUpdate(state?.record ? true : false);
     getCountryList();
+    getRegionList();
     if (state?.record?.logo) {
       setFileList([
         {
-          uid: '1',
+          uid: "1",
           name: `${state?.record?.name}.png`,
-          status: 'done',
+          status: "done",
           url: state?.record?.logo,
-          type: 'image/png',
+          type: "image/png",
         },
       ]);
     }
@@ -73,6 +114,16 @@ export const AddNewCompanyComponent = (props:any) => {
 
   const onFinishStepOne = (values: any) => {
     nextOne(values);
+  };
+
+  const onChangeRegion = (values: any[]) => {
+    if (values.includes("National")) {
+      const buyerCountryValues = regionsList;
+      const newBuyerValues = buyerCountryValues?.filter(
+        (item: any) => item !== "National"
+      );
+      formOne.setFieldValue("regions", [...newBuyerValues]);
+    }
   };
 
   const getBase64 = (file: RcFile): Promise<string> =>
@@ -135,14 +186,27 @@ export const AddNewCompanyComponent = (props:any) => {
     formOneValues.phoneNo = formatPhoneNumberIntl(formOneValues.phoneNo);
 
     try {
-      const values: any = {
+      let values: any = {};
+      if (regionField) {
+        values = {
         companyId: state?.record?.companyId,
         name: formOneValues.name,
         email: formOneValues.email,
         phoneNo: formOneValues.phoneNo,
         address: formOneValues.address,
+          regions: formOneValues.regions,
         companyRole: state?.record?.companyRole,
       };
+      } else {
+        values = {
+          companyId: state?.record?.companyId,
+          name: formOneValues.name,
+          email: formOneValues.email,
+          phoneNo: formOneValues.phoneNo,
+          address: formOneValues.address,
+          companyRole: state?.record?.companyRole,
+        };
+      }
 
       if (state?.record?.companyRole !== CompanyRole.GOVERNMENT) {
         values.taxId = formOneValues.taxId;
@@ -459,21 +523,46 @@ export const AddNewCompanyComponent = (props:any) => {
                       countries={countries}
                     />
                   </Form.Item>
+                  {regionField && (
+                  <Form.Item
+                    label={t("region")}
+                      name="regions"
+                    initialValue={state?.record?.region}
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t("region")} ${t("isRequired")}`,
+                      },
+                    ]}
+                  >
+                    <Select
+                      mode="multiple"
+                      size="large"
+                      maxTagCount={2}
+                      onChange={onChangeRegion}
+                      loading={loadingList}
+                    >
+                      {regionsList.map((region: any) => (
+                        <Select.Option value={region}>{region}</Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  )}
                   <Form.Item
                     name="address"
                     label="Address"
                     initialValue={state?.record?.address}
                     rules={[
-                      { required: true, message: '' },
+                      { required: true, message: "" },
                       {
                         validator: async (rule, value) => {
                           if (
-                            String(value).trim() === '' ||
+                            String(value).trim() === "" ||
                             String(value).trim() === undefined ||
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`Address ${t('isRequired')}`);
+                            throw new Error(`Address ${t("isRequired")}`);
                           }
                         },
                       },
