@@ -122,7 +122,7 @@ export const AddNewCompanyComponent = (props: any) => {
       const newBuyerValues = buyerCountryValues?.filter(
         (item: any) => item !== "National"
       );
-      formOne.setFieldValue("region", [...newBuyerValues]);
+      formOne.setFieldValue("regions", [...newBuyerValues]);
     }
   };
 
@@ -194,7 +194,7 @@ export const AddNewCompanyComponent = (props: any) => {
         email: formOneValues.email,
         phoneNo: formOneValues.phoneNo,
         address: formOneValues.address,
-        region: formOneValues.region,
+          regions: formOneValues.regions,
         companyRole: state?.record?.companyRole,
       };
       } else {
@@ -526,7 +526,7 @@ export const AddNewCompanyComponent = (props: any) => {
                   {regionField && (
                   <Form.Item
                     label={t("region")}
-                    name="region"
+                      name="regions"
                     initialValue={state?.record?.region}
                     rules={[
                       {
