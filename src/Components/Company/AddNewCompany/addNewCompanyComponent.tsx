@@ -523,28 +523,6 @@ export const AddNewCompanyComponent = (props: any) => {
                       countries={countries}
                     />
                   </Form.Item>
-                  <Form.Item
-                    name="address"
-                    label="Address"
-                    initialValue={state?.record?.address}
-                    rules={[
-                      { required: true, message: '' },
-                      {
-                        validator: async (rule, value) => {
-                          if (
-                            String(value).trim() === '' ||
-                            String(value).trim() === undefined ||
-                            value === null ||
-                            value === undefined
-                          ) {
-                            throw new Error(`Address ${t('isRequired')}`);
-                          }
-                        },
-                      },
-                    ]}
-                  >
-                    <Input.TextArea rows={3} maxLength={100} />
-                  </Form.Item>
                   {regionField && (
                   <Form.Item
                     label={t("region")}
@@ -570,6 +548,28 @@ export const AddNewCompanyComponent = (props: any) => {
                     </Select>
                   </Form.Item>
                   )}
+                  <Form.Item
+                    name="address"
+                    label="Address"
+                    initialValue={state?.record?.address}
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: async (rule, value) => {
+                          if (
+                            String(value).trim() === "" ||
+                            String(value).trim() === undefined ||
+                            value === null ||
+                            value === undefined
+                          ) {
+                            throw new Error(`Address ${t("isRequired")}`);
+                          }
+                        },
+                      },
+                    ]}
+                  >
+                    <Input.TextArea rows={3} maxLength={100} />
+                  </Form.Item>
                 </div>
               </Col>
             </Row>
