@@ -527,7 +527,7 @@ export const AddNewCompanyComponent = (props: any) => {
                   <Form.Item
                     label={t("region")}
                       name="regions"
-                    initialValue={state?.record?.region}
+                      initialValue={state?.record?.regions}
                     rules={[
                       {
                         required: true,
