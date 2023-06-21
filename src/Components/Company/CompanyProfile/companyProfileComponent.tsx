@@ -18,6 +18,7 @@ export const CompanyProfileComponent = (props: any) => {
     useConnection,
     onNavigateToCompanyManagement,
     onNavigateToCompanyEdit,
+    regionField,
   } = props;
   const { get, put } = useConnection();
   const [companyDetails, setCompanyDetails] = useState<any>([]);
@@ -281,6 +282,18 @@ export const CompanyProfileComponent = (props: any) => {
                       {companyDetails.address ? companyDetails.address : "-"}
                     </Col>
                   </Row>
+                  {regionField && (
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:region")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {companyDetails.regions
+                          ? companyDetails.regions.join(", ")
+                          : "-"}
+                      </Col>
+                    </Row>
+                  )}
                   <Row className="field">
                     <Col span={12} className="field-key">
                       {t("companyProfile:programmeCount")}
