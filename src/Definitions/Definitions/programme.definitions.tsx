@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { ProgrammeTransfer } from '../Entities/programmeTransfer';
+import { ProgrammeTransfer } from "../Entities/programmeTransfer";
 import {
   GovBGColor,
   CertBGColor,
@@ -249,6 +249,9 @@ export const addRoundNumber = (value: any) => {
 
 export const addSpaces = (text: string) => {
   if (!text) {
+    return text;
+  }
+  if (text === text.toUpperCase()) {
     return text;
   }
   return text.replace(/([A-Z])/g, " $1").trim();
