@@ -216,7 +216,7 @@ export const ProgrammeManagementComponent = (props: any) => {
 
     {
       title: t("programme:emissionsReductionExpected"),
-      dataIndex: "emissionsReductionExpected",
+      dataIndex: "emissionReductionExpected",
       key: ProgrammeManagementColumns.emissionReductionExpected,
       align: "right" as const,
       render: (item: any) => {
@@ -225,7 +225,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     },
     {
       title: t("programme:emissionsReductionAchieved"),
-      dataIndex: "emissionsReductionAchieved",
+      dataIndex: "emissionReductionAchieved",
       key: ProgrammeManagementColumns.emissionReductionAchieved,
       align: "right" as const,
       render: (item: any) => {
