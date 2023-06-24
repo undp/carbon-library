@@ -8,6 +8,6 @@ export enum ProgrammeManagementColumns {
   creditTransferred,
   certifierId,
   serialNo,
-  emissionsReductionExpected,
-  emissionsReductionAchieved,
+  emissionReductionExpected,
+  emissionReductionAchieved
 }
