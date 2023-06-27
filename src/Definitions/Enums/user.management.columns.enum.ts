@@ -1,10 +1,10 @@
 export enum UserManagementColumns {
-    logo,
-    name,
-    email,
-    phoneNo,
-    company,
-    companyRole,
-    role,
-    actions,
+    logo = 'logo',
+    name = 'name',
+    email = 'email',
+    phoneNo = 'phoneNo',
+    company = 'company',
+    companyRole = 'companyRole',
+    role = 'role',
+    actions = 'actions',
   }

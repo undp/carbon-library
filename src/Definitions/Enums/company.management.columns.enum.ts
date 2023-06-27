@@ -1,8 +1,8 @@
 export enum CompanyManagementColumns {
-    logo,
-    name,
-    taxId,
-    companyRole,
-    programmeCount,
-    creditBalance
+    logo = 'logo',
+    name = 'name',
+    taxId = 'taxId',
+    companyRole = 'companyRole',
+    programmeCount = 'programmeCount',
+    creditBalance = 'creditBalance'
 }

@@ -1,13 +1,13 @@
 export enum ProgrammeManagementColumns {
-  title,
-  company,
-  sector,
-  currentStage,
-  creditIssued,
-  creditBalance,
-  creditTransferred,
-  certifierId,
-  serialNo,
-  emissionReductionExpected,
-  emissionReductionAchieved
+  title = 'title',
+  company = 'company',
+  sector = 'sector',
+  currentStage = 'currentStage',
+  creditIssued = 'creditIssued',
+  creditBalance = 'creditBalance',
+  creditTransferred = 'creditTransferred',
+  certifierId = 'certifierId',
+  serialNo = 'serialNo',
+  emissionReductionExpected = 'emissionReductionExpected',
+  emissionReductionAchieved = 'emissionReductionAchieved'
 }
