@@ -35,6 +35,7 @@ export const AddNewCompanyComponent = (props: any) => {
     useUserContext,
     useLocation,
     regionField,
+    lang,
   } = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -67,6 +68,13 @@ export const AddNewCompanyComponent = (props: any) => {
       const response = await post("national/organisation/regions", {
         page: 1,
         size: 100,
+        filterAnd: [
+          {
+            key: "lang",
+            operation: "=",
+            value: lang,
+          },
+        ],
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
@@ -540,7 +548,6 @@ export const AddNewCompanyComponent = (props: any) => {
                       size="large"
                       maxTagCount={2}
                       onChange={onChangeRegion}
-                      loading={loadingList}
                     >
                       {regionsList.map((region: any) => (
                         <Select.Option value={region}>{region}</Select.Option>
