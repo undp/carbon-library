@@ -84,7 +84,7 @@ export const UserProfileComponent = (props: any) => {
       {!userDetails ||
         (!organisationDetails && (
           <div className="content-body">
-            <Skeleton active></Skeleton>
+            <Skeleton active loading={true}></Skeleton>
           </div>
         ))}
       {userDetails && organisationDetails && (
