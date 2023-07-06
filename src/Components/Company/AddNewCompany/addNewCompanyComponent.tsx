@@ -57,7 +57,6 @@ export const AddNewCompanyComponent = (props: any) => {
       const alpha2Names = response.data.map((item: any) => {
         return item.alpha2;
       });
-      console.log("company getCountryList", alpha2Names);
       setCountries(alpha2Names);
     }
   };
@@ -515,13 +514,13 @@ export const AddNewCompanyComponent = (props: any) => {
                     ]}
                   >
                     <PhoneInput
-                      placeholder="Phone number 111"
+                      placeholder="Phone number"
                       international
                       value={formatPhoneNumberIntl(contactNoInput)}
                       defaultCountry="LK"
                       countryCallingCodeEditable={false}
                       onChange={(v) => {}}
-                      //countries={countries}
+                      countries={countries}
                     />
                   </Form.Item>
                   {regionField && (

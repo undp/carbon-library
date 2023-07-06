@@ -58,7 +58,6 @@ export const AddNewUserComponent = (props: any) => {
       const alpha2Names = response.data.map((item: any) => {
         return item.alpha2;
       });
-      console.log("User setCountries", alpha2Names);
       setCountries(alpha2Names);
     }
   };
