@@ -53,11 +53,12 @@ export const AddNewUserComponent = (props: any) => {
   const [countries, setCountries] = useState<[]>([]);
 
   const getCountryList = async () => {
-    const response = await get('national/organisation/countries');
+    const response = await get("national/organisation/countries");
     if (response.data) {
       const alpha2Names = response.data.map((item: any) => {
         return item.alpha2;
       });
+      console.log("User setCountries", alpha2Names);
       setCountries(alpha2Names);
     }
   };

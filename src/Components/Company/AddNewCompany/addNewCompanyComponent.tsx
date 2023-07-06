@@ -57,6 +57,7 @@ export const AddNewCompanyComponent = (props: any) => {
       const alpha2Names = response.data.map((item: any) => {
         return item.alpha2;
       });
+      console.log("company getCountryList", alpha2Names);
       setCountries(alpha2Names);
     }
   };
