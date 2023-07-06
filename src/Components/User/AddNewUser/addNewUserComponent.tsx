@@ -35,7 +35,7 @@ export const AddNewUserComponent = (props: any) => {
     useLocation,
     useAbilityContext,
   } = props;
-  const { post, put, delete: del } = useConnection();
+  const { post, put, delete: del, get } = useConnection();
   const [formOne] = Form.useForm();
   const { state } = useLocation();
   const { updateToken } = useConnection();
@@ -50,6 +50,17 @@ export const AddNewUserComponent = (props: any) => {
   const [errorMsg, setErrorMsg] = useState<any>("");
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
+  const [countries, setCountries] = useState<[]>([]);
+
+  const getCountryList = async () => {
+    const response = await get('national/organisation/countries');
+    if (response.data) {
+      const alpha2Names = response.data.map((item: any) => {
+        return item.alpha2;
+      });
+      setCountries(alpha2Names);
+    }
+  };
 
   const onAddUser = async (values: any) => {
     setLoading(true);
@@ -215,6 +226,7 @@ export const AddNewUserComponent = (props: any) => {
 
   useEffect(() => {
     console.log("state -- val --- ", { ...state });
+    getCountryList();
     setIsUpdate(state?.record ? true : false);
   }, []);
 
@@ -424,6 +436,7 @@ export const AddNewUserComponent = (props: any) => {
                     defaultCountry="LK"
                     countryCallingCodeEditable={false}
                     onChange={(v) => {}}
+                    countries={countries}
                   />
                 </Form.Item>
               </div>
