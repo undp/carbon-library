@@ -520,7 +520,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       defaultCountry="LK"
                       countryCallingCodeEditable={false}
                       onChange={(v) => {}}
-                      countries={countries}
+                      //countries={countries}
                     />
                   </Form.Item>
                   {regionField && (
