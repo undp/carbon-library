@@ -421,26 +421,28 @@ export const AddNewUserComponent = (props: any) => {
                     </div>
                   </Radio.Group>
                 </Form.Item>
-                <Form.Item
-                  name="phoneNo"
-                  label={t("addUser:phoneNo")}
-                  initialValue={state?.record?.phoneNo}
-                  rules={[
-                    {
-                      required: false,
-                    },
-                  ]}
-                >
-                  <PhoneInput
-                    placeholder={t("addUser:phoneNo")}
-                    international
-                    // value={contactNoInput}
-                    defaultCountry="LK"
-                    countryCallingCodeEditable={false}
-                    onChange={(v) => {}}
-                    countries={countries}
-                  />
-                </Form.Item>
+                {countries.length > 0 && (
+                  <Form.Item
+                    name="phoneNo"
+                    label={t("addUser:phoneNo")}
+                    initialValue={state?.record?.phoneNo}
+                    rules={[
+                      {
+                        required: false,
+                      },
+                    ]}
+                  >
+                    <PhoneInput
+                      placeholder={t("addUser:phoneNo")}
+                      international
+                      // value={contactNoInput}
+                      defaultCountry="LK"
+                      countryCallingCodeEditable={false}
+                      onChange={(v) => {}}
+                      countries={countries}
+                    />
+                  </Form.Item>
+                )}
               </div>
             </Col>
           </Row>
