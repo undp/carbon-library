@@ -436,7 +436,7 @@ export const AddNewUserComponent = (props: any) => {
                     defaultCountry="LK"
                     countryCallingCodeEditable={false}
                     onChange={(v) => {}}
-                    countries={countries}
+                    countries={["RU", "UA", "KZ"]}
                   />
                 </Form.Item>
               </div>
