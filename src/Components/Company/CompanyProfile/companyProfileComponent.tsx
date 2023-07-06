@@ -170,7 +170,8 @@ export const CompanyProfileComponent = (props: any) => {
           )}
 
           {ability.can(Action.Update, plainToClass(Company, companyDetails)) &&
-            !isLoading && companyDetails && (
+            !isLoading &&
+            companyDetails && (
               <Button
                 className="mg-left-1"
                 type="primary"
@@ -181,157 +182,165 @@ export const CompanyProfileComponent = (props: any) => {
             )}
         </div>
       </div>
-
-      <div className="content-body">
-        <Row gutter={16}>
-          <Col md={24} lg={8}>
-            <Card className="card-container">
-              <Skeleton loading={isLoading} active>
-                <Row justify="center">
-                  <img
-                    className="profile-img"
-                    alt="profile image"
-                    src={companyDetails.logo}
-                  />
-                </Row>
-                <Row justify="center">
-                  <div className="padding-top-1 company-name">
-                    {companyDetails.name}
-                  </div>
-                </Row>
-                <Row justify="center">
-                  <OrganisationStatus
-                    t={t}
-                    organisationStatus={parseInt(companyDetails.state)}
-                  ></OrganisationStatus>
-                </Row>
-              </Skeleton>
-            </Card>
-          </Col>
-          <Col md={24} lg={16}>
-            <Card className="card-container">
-              <div className="info-view">
-                <div className="title">
-                  <span className="title-icon">
-                    <BankOutlined />
-                  </span>
-                  <span className="title-text">
-                    {t("companyProfile:organisationDetailsHeading")}
-                  </span>
-                </div>
+      {!companyDetails && (
+        <div className="content-body">
+          <Skeleton active></Skeleton>
+        </div>
+      )}
+      {companyDetails && (
+        <div className="content-body">
+          <Row gutter={16}>
+            <Col md={24} lg={8}>
+              <Card className="card-container">
                 <Skeleton loading={isLoading} active>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:name")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {companyDetails.name ? companyDetails.name : "-"}
-                    </Col>
+                  <Row justify="center">
+                    <img
+                      className="profile-img"
+                      alt="profile image"
+                      src={companyDetails.logo}
+                    />
                   </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:taxId")}
-                    </Col>
-                    <Col span={12} className="field-value nextline-overflow">
-                      {companyDetails.taxId ? companyDetails.taxId : "-"}
-                    </Col>
+                  <Row justify="center">
+                    <div className="padding-top-1 company-name">
+                      {companyDetails.name}
+                    </div>
                   </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:companyRole")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      <CompanyRoleIcon role={companyDetails.companyRole} />
-                    </Col>
+                  <Row justify="center">
+                    <OrganisationStatus
+                      t={t}
+                      organisationStatus={parseInt(companyDetails.state)}
+                    ></OrganisationStatus>
                   </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:email")}
-                    </Col>
-                    <Col span={12} className="field-value nextline-overflow">
-                      {companyDetails.email ? companyDetails.email : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:phoneNo")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {companyDetails.phoneNo ? companyDetails.phoneNo : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:website")}
-                    </Col>
-                    <Col span={12} className="field-value ellipsis-overflow">
-                      {companyDetails.website ? (
-                        <a target={"blank"} href={companyDetails.website}>
-                          {companyDetails.website}
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:address")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {companyDetails.address ? companyDetails.address : "-"}
-                    </Col>
-                  </Row>
-                  {regionField && (
+                </Skeleton>
+              </Card>
+            </Col>
+            <Col md={24} lg={16}>
+              <Card className="card-container">
+                <div className="info-view">
+                  <div className="title">
+                    <span className="title-icon">
+                      <BankOutlined />
+                    </span>
+                    <span className="title-text">
+                      {t("companyProfile:organisationDetailsHeading")}
+                    </span>
+                  </div>
+                  <Skeleton loading={isLoading} active>
                     <Row className="field">
                       <Col span={12} className="field-key">
-                        {t("companyProfile:region")}
+                        {t("companyProfile:name")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {companyDetails.regions
-                          ? companyDetails.regions.join(", ")
+                        {companyDetails.name ? companyDetails.name : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:taxId")}
+                      </Col>
+                      <Col span={12} className="field-value nextline-overflow">
+                        {companyDetails.taxId ? companyDetails.taxId : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:companyRole")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        <CompanyRoleIcon role={companyDetails.companyRole} />
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:email")}
+                      </Col>
+                      <Col span={12} className="field-value nextline-overflow">
+                        {companyDetails.email ? companyDetails.email : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:phoneNo")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {companyDetails.phoneNo ? companyDetails.phoneNo : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:website")}
+                      </Col>
+                      <Col span={12} className="field-value ellipsis-overflow">
+                        {companyDetails.website ? (
+                          <a target={"blank"} href={companyDetails.website}>
+                            {companyDetails.website}
+                          </a>
+                        ) : (
+                          "-"
+                        )}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:address")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {companyDetails.address ? companyDetails.address : "-"}
+                      </Col>
+                    </Row>
+                    {regionField && (
+                      <Row className="field">
+                        <Col span={12} className="field-key">
+                          {t("companyProfile:region")}
+                        </Col>
+                        <Col span={12} className="field-value">
+                          {companyDetails.regions
+                            ? companyDetails.regions.join(", ")
+                            : "-"}
+                        </Col>
+                      </Row>
+                    )}
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:programmeCount")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {companyDetails.programmeCount
+                          ? companyDetails.programmeCount
                           : "-"}
                       </Col>
                     </Row>
-                  )}
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:programmeCount")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {companyDetails.programmeCount
-                        ? companyDetails.programmeCount
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("companyProfile:creditBalance")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {companyDetails.creditBalance
-                        ? companyDetails.creditBalance
-                        : "-"}
-                    </Col>
-                  </Row>
-                  {parseInt(companyDetails.state) === 0 ? (
                     <Row className="field">
                       <Col span={12} className="field-key">
-                        {t("companyProfile:remarks")}
+                        {t("companyProfile:creditBalance")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {companyDetails.remarks ? companyDetails.remarks : "-"}
+                        {companyDetails.creditBalance
+                          ? companyDetails.creditBalance
+                          : "-"}
                       </Col>
                     </Row>
-                  ) : (
-                    ""
-                  )}
-                </Skeleton>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                    {parseInt(companyDetails.state) === 0 ? (
+                      <Row className="field">
+                        <Col span={12} className="field-key">
+                          {t("companyProfile:remarks")}
+                        </Col>
+                        <Col span={12} className="field-value">
+                          {companyDetails.remarks
+                            ? companyDetails.remarks
+                            : "-"}
+                        </Col>
+                      </Row>
+                    ) : (
+                      ""
+                    )}
+                  </Skeleton>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      )}
 
       <UserActionConfirmationModel
         t={t}

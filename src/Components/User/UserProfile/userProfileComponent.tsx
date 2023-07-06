@@ -17,7 +17,8 @@ export const UserProfileComponent = (props: any) => {
     useUserContext,
   } = props;
   const { get } = useConnection();
-  const [organisationDetails, setOrganisationDetails] = useState<any>(undefined);
+  const [organisationDetails, setOrganisationDetails] =
+    useState<any>(undefined);
   const [userDetails, setUserDetails] = useState<any>(undefined);
   const { updateToken } = useConnection();
   const { removeUserInfo } = useUserContext();
@@ -80,182 +81,195 @@ export const UserProfileComponent = (props: any) => {
         </Col>
       </Row>
 
-      <div className="content-body">
-        <Row gutter={16}>
-          <Col md={24} lg={8}>
-            <Card className="card-container">
-              <Row justify="center">
-                <Skeleton loading={isLoading} active>
-                  <img
-                    className="profile-img"
-                    alt="profile-img"
-                    src={organisationDetails.logo}
-                  />
-                </Skeleton>
-              </Row>
-              <Row justify="center">
-                <div className=" company-name mg-top-1">
-                  {organisationDetails.name}
+      {!userDetails ||
+        (!organisationDetails && (
+          <div className="content-body">
+            <Skeleton active></Skeleton>
+          </div>
+        ))}
+      {userDetails && organisationDetails && (
+        <div className="content-body">
+          <Row gutter={16}>
+            <Col md={24} lg={8}>
+              <Card className="card-container">
+                <Row justify="center">
+                  <Skeleton loading={isLoading} active>
+                    <img
+                      className="profile-img"
+                      alt="profile-img"
+                      src={organisationDetails.logo}
+                    />
+                  </Skeleton>
+                </Row>
+                <Row justify="center">
+                  <div className=" company-name mg-top-1">
+                    {organisationDetails.name}
+                  </div>
+                </Row>
+              </Card>
+            </Col>
+            <Col md={24} lg={16}>
+              <Card className="card-container">
+                <div className="info-view">
+                  <div className="title">
+                    <span className="title-icon">
+                      <UserOutlined />
+                    </span>
+                    <span className="title-text">
+                      {t("userProfile:userDetailsHeading")}
+                    </span>
+                  </div>
+                  <Skeleton loading={isLoading} active>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:name")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {userDetails.name ? userDetails.name : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:email")}
+                      </Col>
+                      <Col span={12} className="field-value nextline-overflow">
+                        {userDetails.email ? userDetails.email : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:role")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        <UserRoleIcon role={userDetails.role} />
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:phoneNo")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {userDetails.phoneNo ? userDetails.phoneNo : "-"}
+                      </Col>
+                    </Row>
+                  </Skeleton>
                 </div>
-              </Row>
-            </Card>
-          </Col>
-          <Col md={24} lg={16}>
-            <Card className="card-container">
-              <div className="info-view">
-                <div className="title">
-                  <span className="title-icon">
-                    <UserOutlined />
-                  </span>
-                  <span className="title-text">
-                    {t("userProfile:userDetailsHeading")}
-                  </span>
+              </Card>
+              <Card className="card-container">
+                <div className="info-view">
+                  <div className="title">
+                    <span className="title-icon">
+                      <BankOutlined />
+                    </span>
+                    <span className="title-text">
+                      {t("userProfile:organisationDetailsHeading")}
+                    </span>
+                  </div>
+                  <Skeleton loading={isLoading} active>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:name")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.name
+                          ? organisationDetails.name
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:taxId")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.taxId
+                          ? organisationDetails.taxId
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:companyRole")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        <CompanyRoleIcon
+                          role={organisationDetails.companyRole}
+                        />
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:email")}
+                      </Col>
+                      <Col span={12} className="field-value nextline-overflow">
+                        {organisationDetails.email
+                          ? organisationDetails.email
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:phoneNo")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.phoneNo
+                          ? organisationDetails.phoneNo
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:website")}
+                      </Col>
+                      <Col span={12} className="field-value ellipsis-overflow">
+                        {organisationDetails.website ? (
+                          <a
+                            target={"blank"}
+                            href={organisationDetails.website}
+                          >
+                            {organisationDetails.website}
+                          </a>
+                        ) : (
+                          "-"
+                        )}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:address")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.address
+                          ? organisationDetails.address
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:programmeCount")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.programmeCount
+                          ? organisationDetails.programmeCount
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("userProfile:creditBalance")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.creditBalance
+                          ? organisationDetails.creditBalance
+                          : "-"}
+                      </Col>
+                    </Row>
+                  </Skeleton>
                 </div>
-                <Skeleton loading={isLoading} active>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:name")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {userDetails.name ? userDetails.name : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:email")}
-                    </Col>
-                    <Col span={12} className="field-value nextline-overflow">
-                      {userDetails.email ? userDetails.email : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:role")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      <UserRoleIcon role={userDetails.role} />
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:phoneNo")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {userDetails.phoneNo ? userDetails.phoneNo : "-"}
-                    </Col>
-                  </Row>
-                </Skeleton>
-              </div>
-            </Card>
-            <Card className="card-container">
-              <div className="info-view">
-                <div className="title">
-                  <span className="title-icon">
-                    <BankOutlined />
-                  </span>
-                  <span className="title-text">
-                    {t("userProfile:organisationDetailsHeading")}
-                  </span>
-                </div>
-                <Skeleton loading={isLoading} active>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:name")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {organisationDetails.name
-                        ? organisationDetails.name
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:taxId")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {organisationDetails.taxId
-                        ? organisationDetails.taxId
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:companyRole")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      <CompanyRoleIcon role={organisationDetails.companyRole} />
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:email")}
-                    </Col>
-                    <Col span={12} className="field-value nextline-overflow">
-                      {organisationDetails.email
-                        ? organisationDetails.email
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:phoneNo")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {organisationDetails.phoneNo
-                        ? organisationDetails.phoneNo
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:website")}
-                    </Col>
-                    <Col span={12} className="field-value ellipsis-overflow">
-                      {organisationDetails.website ? (
-                        <a target={"blank"} href={organisationDetails.website}>
-                          {organisationDetails.website}
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:address")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {organisationDetails.address
-                        ? organisationDetails.address
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:programmeCount")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {organisationDetails.programmeCount
-                        ? organisationDetails.programmeCount
-                        : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="field">
-                    <Col span={12} className="field-key">
-                      {t("userProfile:creditBalance")}
-                    </Col>
-                    <Col span={12} className="field-value">
-                      {organisationDetails.creditBalance
-                        ? organisationDetails.creditBalance
-                        : "-"}
-                    </Col>
-                  </Row>
-                </Skeleton>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      )}
     </div>
   );
 };
