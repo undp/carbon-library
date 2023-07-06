@@ -53,11 +53,13 @@ export const AddNewUserComponent = (props: any) => {
   const [countries, setCountries] = useState<[]>([]);
 
   const getCountryList = async () => {
+    console.log("getCountryList");
     const response = await get("national/organisation/countries");
     if (response.data) {
       const alpha2Names = response.data.map((item: any) => {
         return item.alpha2;
       });
+      console.log("alpha2Names", alpha2Names);
       setCountries(alpha2Names);
     }
   };
@@ -436,7 +438,7 @@ export const AddNewUserComponent = (props: any) => {
                     defaultCountry="LK"
                     countryCallingCodeEditable={false}
                     onChange={(v) => {}}
-                    countries={["RU", "UA", "KZ"]}
+                    countries={countries}
                   />
                 </Form.Item>
               </div>
