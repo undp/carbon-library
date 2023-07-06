@@ -81,8 +81,8 @@ export const UserProfileComponent = (props: any) => {
         </Col>
       </Row>
 
-      {!userDetails ||
-        (!organisationDetails && (
+      {(!userDetails ||
+        (!organisationDetails) && (
           <div className="content-body">
             <Skeleton active loading={true}></Skeleton>
           </div>
