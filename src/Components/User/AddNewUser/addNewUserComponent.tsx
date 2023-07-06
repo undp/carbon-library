@@ -41,6 +41,7 @@ export const AddNewUserComponent = (props: any) => {
   const { state } = useLocation();
   const { updateToken } = useConnection();
   const { removeUserInfo } = useUserContext();
+  const [loading, setLoading] = useState<boolean>(false);
   const [actionInfo, setActionInfo] = useState<any>({});
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,9 +52,11 @@ export const AddNewUserComponent = (props: any) => {
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
   const [countries, setCountries] = useState<[]>([]);
+  const [isCountryListLoading, setIsCountryListLoading] = useState(false);
+
 
   const getCountryList = async () => {
-    setIsLoading(true);
+    setIsCountryListLoading(true);
     try {
       const response = await get("national/organisation/countries");
       if (response.data) {
@@ -71,12 +74,12 @@ export const AddNewUserComponent = (props: any) => {
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
-      setIsLoading(false);
+      setIsCountryListLoading(false);
     }
   };
 
   const onAddUser = async (values: any) => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       if (values.phoneNo) {
         values.phoneNo = formatPhoneNumberIntl(values.phoneNo);
@@ -92,7 +95,7 @@ export const AddNewUserComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         onNavigateToUserManagement();
-        setIsLoading(false);
+        setLoading(false);
       }
     } catch (error: any) {
       console.log("Error in user creation", error);
@@ -103,12 +106,12 @@ export const AddNewUserComponent = (props: any) => {
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const onUpdateUser = async () => {
-    setIsLoading(true);
+    setLoading(true);
     const formOneValues = formOne.getFieldsValue();
     formOneValues.phoneNo = formatPhoneNumberIntl(formOneValues.phoneNo);
     try {
@@ -137,7 +140,7 @@ export const AddNewUserComponent = (props: any) => {
         });
         onNavigateToUserManagement();
         state.record = {};
-        setIsLoading(false);
+        setLoading(false);
       }
     } catch (error: any) {
       console.log("Error in user update", error);
@@ -147,7 +150,7 @@ export const AddNewUserComponent = (props: any) => {
         duration: 3,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -432,7 +435,7 @@ export const AddNewUserComponent = (props: any) => {
                     </div>
                   </Radio.Group>
                 </Form.Item>
-                <Skeleton loading={isLoading} active>
+                <Skeleton loading={isCountryListLoading} active>
                   {countries.length > 0 && (
                     <Form.Item
                       name="phoneNo"
@@ -462,7 +465,7 @@ export const AddNewUserComponent = (props: any) => {
           <div className="actions">
             <Form.Item>
               <div className="create-user-btn-container">
-                <Button type="primary" htmlType="submit" loading={isLoading}>
+                <Button type="primary" htmlType="submit" loading={loading}>
                   {isUpdate ? t("addUser:update") : t("addUser:submit")}
                 </Button>
               </div>
