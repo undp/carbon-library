@@ -432,7 +432,7 @@ export const AddNewUserComponent = (props: any) => {
                     </div>
                   </Radio.Group>
                 </Form.Item>
-                <Skeleton loading={isLoading} active paragraph={{ rows: 2 }}>
+                <Skeleton>
                   {countries.length > 0 && (
                     <Form.Item
                       name="phoneNo"
