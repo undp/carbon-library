@@ -15,6 +15,13 @@ export enum ProgrammeStage {
   // Frozen = 'Frozen',
 }
 
+export enum ProgrammeStageMRV {
+  AwaitingAuthorization = "Pending",
+  Authorised = "Authorised",
+  Approved = "Approved",
+  Rejected = "Rejected",
+}
+
 // export enum ProgrammeTransferStage {
 //   APPROVED = 'Approved',
 //   REJECTED = 'Rejected',
@@ -112,6 +119,19 @@ export const getStageTagType = (stage: ProgrammeStage) => {
       return "processing";
     // case ProgrammeStage.Transferred:
     //   return 'success';
+    default:
+      return "default";
+  }
+};
+
+export const getStageTagTypeMRV = (stage: ProgrammeStageMRV) => {
+  switch (getStageEnumVal(stage)) {
+    case ProgrammeStageMRV.AwaitingAuthorization:
+      return "error";
+    case ProgrammeStageMRV.Authorised:
+      return "processing";
+    case ProgrammeStageMRV.Approved:
+      return "purple";
     default:
       return "default";
   }

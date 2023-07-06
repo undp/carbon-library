@@ -67,10 +67,17 @@ export const AddNewCompanyComponent = (props: any) => {
       const response = await post("national/organisation/regions", {
         page: 1,
         size: 100,
+        filterAnd: [
+          {
+            key: "lang",
+            operation: "=",
+            value: "en",
+          },
+        ],
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList(["National", ...regionNames]);
+        setRegionsList([t("national"), ...regionNames]);
       }
     } catch (error: any) {
       console.log("Error in getting regions list", error);
@@ -117,10 +124,10 @@ export const AddNewCompanyComponent = (props: any) => {
   };
 
   const onChangeRegion = (values: any[]) => {
-    if (values.includes("National")) {
+    if (values.includes(t("national"))) {
       const buyerCountryValues = regionsList;
       const newBuyerValues = buyerCountryValues?.filter(
-        (item: any) => item !== "National"
+        (item: any) => item !== t("national")
       );
       formOne.setFieldValue("regions", [...newBuyerValues]);
     }
@@ -540,7 +547,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       size="large"
                       maxTagCount={2}
                       onChange={onChangeRegion}
-                      loading={loadingList}
+                        loading={loadingList}
                     >
                       {regionsList.map((region: any) => (
                         <Select.Option value={region}>{region}</Select.Option>

@@ -22,7 +22,9 @@ import {
   getCompanyBgColor,
   getStageEnumVal,
   getStageTagType,
+  getStageTagTypeMRV,
   ProgrammeStage,
+  ProgrammeStageMRV,
   sumArray,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -42,6 +44,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     useConnection,
     onNavigateToProgrammeView,
     onClickAddProgramme,
+    enableAddProgramme,
   } = props;
   const { get, delete: del, post } = useConnection();
   const [totalProgramme, setTotalProgramme] = useState<number>();
@@ -57,8 +60,10 @@ export const ProgrammeManagementComponent = (props: any) => {
   const [sortField, setSortField] = useState<string>();
   const { userInfoState } = useUserContext();
 
-  const statusOptions = Object.keys(ProgrammeStage).map((k, index) => ({
-    label: Object.values(ProgrammeStage)[index],
+  const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
+
+  const statusOptions = Object.keys(stageObject).map((k, index) => ({
+    label: Object.values(stageObject)[index],
     value: k,
   }));
 
@@ -169,7 +174,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       align: "center" as const,
       render: (item: any) => {
         return (
-          <Tag className="clickable" color={getStageTagType(item)}>
+          <Tag className="clickable" color={getStageTagTypeMRV(item)}>
             {getStageEnumVal(item)}
           </Tag>
         );
