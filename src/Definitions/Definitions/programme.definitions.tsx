@@ -131,7 +131,7 @@ export const getStageTagTypeMRV = (stage: ProgrammeStageMRV) => {
     case ProgrammeStageMRV.Authorised:
       return "processing";
     case ProgrammeStageMRV.Approved:
-      return "#9155FD";
+      return "purple";
     default:
       return "default";
   }

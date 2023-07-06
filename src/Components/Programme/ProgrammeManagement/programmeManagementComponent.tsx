@@ -22,6 +22,7 @@ import {
   getCompanyBgColor,
   getStageEnumVal,
   getStageTagType,
+  getStageTagTypeMRV,
   ProgrammeStage,
   ProgrammeStageMRV,
   sumArray,
@@ -173,7 +174,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       align: "center" as const,
       render: (item: any) => {
         return (
-          <Tag className="clickable" color={getStageTagType(item)}>
+          <Tag className="clickable" color={getStageTagTypeMRV(item)}>
             {getStageEnumVal(item)}
           </Tag>
         );
