@@ -35,7 +35,6 @@ export const AddNewCompanyComponent = (props: any) => {
     useUserContext,
     useLocation,
     regionField,
-    lang,
   } = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -72,13 +71,13 @@ export const AddNewCompanyComponent = (props: any) => {
           {
             key: "lang",
             operation: "=",
-            value: lang,
+            value: "en",
           },
         ],
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList(["National", ...regionNames]);
+        setRegionsList([t("national"), ...regionNames]);
       }
     } catch (error: any) {
       console.log("Error in getting regions list", error);
@@ -125,10 +124,10 @@ export const AddNewCompanyComponent = (props: any) => {
   };
 
   const onChangeRegion = (values: any[]) => {
-    if (values.includes("National")) {
+    if (values.includes(t("national"))) {
       const buyerCountryValues = regionsList;
       const newBuyerValues = buyerCountryValues?.filter(
-        (item: any) => item !== "National"
+        (item: any) => item !== t("national")
       );
       formOne.setFieldValue("regions", [...newBuyerValues]);
     }
@@ -548,6 +547,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       size="large"
                       maxTagCount={2}
                       onChange={onChangeRegion}
+                        loading={loadingList}
                     >
                       {regionsList.map((region: any) => (
                         <Select.Option value={region}>{region}</Select.Option>
