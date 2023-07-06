@@ -17,8 +17,8 @@ export const UserProfileComponent = (props: any) => {
     useUserContext,
   } = props;
   const { get } = useConnection();
-  const [organisationDetails, setOrganisationDetails] = useState<any>([]);
-  const [userDetails, setUserDetails] = useState<any>([]);
+  const [organisationDetails, setOrganisationDetails] = useState<any>(undefined);
+  const [userDetails, setUserDetails] = useState<any>(undefined);
   const { updateToken } = useConnection();
   const { removeUserInfo } = useUserContext();
   const [isLoading, setIsLoading] = useState(false);

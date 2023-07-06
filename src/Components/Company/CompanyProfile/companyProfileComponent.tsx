@@ -21,7 +21,7 @@ export const CompanyProfileComponent = (props: any) => {
     regionField,
   } = props;
   const { get, put } = useConnection();
-  const [companyDetails, setCompanyDetails] = useState<any>([]);
+  const [companyDetails, setCompanyDetails] = useState<any>(undefined);
   const { state } = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [actionInfo, setActionInfo] = useState<any>({});
