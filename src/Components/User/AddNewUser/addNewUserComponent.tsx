@@ -282,6 +282,7 @@ export const AddNewUserComponent = (props: any) => {
           )}
       </div>
       <div className="content-card user-content-card">
+        <Skeleton></Skeleton>
         <Form
           name="user-details"
           className="user-details-form"
@@ -432,6 +433,7 @@ export const AddNewUserComponent = (props: any) => {
                     </div>
                   </Radio.Group>
                 </Form.Item>
+                <Skeleton></Skeleton>
                 <Skeleton>
                   {countries.length > 0 && (
                     <Form.Item
