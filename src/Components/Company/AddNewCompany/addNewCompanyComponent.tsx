@@ -514,7 +514,7 @@ export const AddNewCompanyComponent = (props: any) => {
                     ]}
                   >
                     <PhoneInput
-                      placeholder="Phone number"
+                      placeholder="Phone number 111"
                       international
                       value={formatPhoneNumberIntl(contactNoInput)}
                       defaultCountry="LK"
