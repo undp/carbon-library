@@ -41,7 +41,6 @@ export const AddNewUserComponent = (props: any) => {
   const { state } = useLocation();
   const { updateToken } = useConnection();
   const { removeUserInfo } = useUserContext();
-  const [loading, setLoading] = useState<boolean>(false);
   const [actionInfo, setActionInfo] = useState<any>({});
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,12 +71,12 @@ export const AddNewUserComponent = (props: any) => {
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const onAddUser = async (values: any) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       if (values.phoneNo) {
         values.phoneNo = formatPhoneNumberIntl(values.phoneNo);
@@ -93,7 +92,7 @@ export const AddNewUserComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         onNavigateToUserManagement();
-        setLoading(false);
+        setIsLoading(false);
       }
     } catch (error: any) {
       console.log("Error in user creation", error);
@@ -104,12 +103,12 @@ export const AddNewUserComponent = (props: any) => {
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const onUpdateUser = async () => {
-    setLoading(true);
+    setIsLoading(true);
     const formOneValues = formOne.getFieldsValue();
     formOneValues.phoneNo = formatPhoneNumberIntl(formOneValues.phoneNo);
     try {
@@ -138,7 +137,7 @@ export const AddNewUserComponent = (props: any) => {
         });
         onNavigateToUserManagement();
         state.record = {};
-        setLoading(false);
+        setIsLoading(false);
       }
     } catch (error: any) {
       console.log("Error in user update", error);
@@ -148,7 +147,7 @@ export const AddNewUserComponent = (props: any) => {
         duration: 3,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -463,7 +462,7 @@ export const AddNewUserComponent = (props: any) => {
           <div className="actions">
             <Form.Item>
               <div className="create-user-btn-container">
-                <Button type="primary" htmlType="submit" loading={loading}>
+                <Button type="primary" htmlType="submit" loading={isLoading}>
                   {isUpdate ? t("addUser:update") : t("addUser:submit")}
                 </Button>
               </div>
