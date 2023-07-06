@@ -170,7 +170,7 @@ export const CompanyProfileComponent = (props: any) => {
           )}
 
           {ability.can(Action.Update, plainToClass(Company, companyDetails)) &&
-            !isLoading && (
+            !isLoading && companyDetails && (
               <Button
                 className="mg-left-1"
                 type="primary"

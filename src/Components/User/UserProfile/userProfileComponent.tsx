@@ -64,15 +64,17 @@ export const UserProfileComponent = (props: any) => {
             >
               {t("userProfile:logOut")}
             </Button>
-            <Button
-              className="mg-left-1 mg-bottom-1"
-              type="primary"
-              onClick={() => {
-                onNavigateUpdateUser(organisationDetails, userDetails);
-              }}
-            >
-              {t("userProfile:edit")}
-            </Button>
+            {userDetails && organisationDetails && (
+              <Button
+                className="mg-left-1 mg-bottom-1"
+                type="primary"
+                onClick={() => {
+                  onNavigateUpdateUser(organisationDetails, userDetails);
+                }}
+              >
+                {t("userProfile:edit")}
+              </Button>
+            )}
             <LanguageSelection i18n={i18n}></LanguageSelection>
           </Row>
         </Col>
