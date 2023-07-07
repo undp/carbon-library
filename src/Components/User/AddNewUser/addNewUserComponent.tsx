@@ -9,6 +9,7 @@ import {
   message,
   Radio,
   Tooltip,
+  Skeleton,
 } from "antd";
 import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -51,14 +52,29 @@ export const AddNewUserComponent = (props: any) => {
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
   const [countries, setCountries] = useState<[]>([]);
+  const [isCountryListLoading, setIsCountryListLoading] = useState(false);
+
 
   const getCountryList = async () => {
-    const response = await get("national/organisation/countries");
-    if (response.data) {
-      const alpha2Names = response.data.map((item: any) => {
-        return item.alpha2;
+    setIsCountryListLoading(true);
+    try {
+      const response = await get("national/organisation/countries");
+      if (response.data) {
+        const alpha2Names = response.data.map((item: any) => {
+          return item.alpha2;
+        });
+        setCountries(alpha2Names);
+      }
+    } catch (error: any) {
+      console.log("Error in getCountryList", error);
+      message.open({
+        type: "error",
+        content: `${error.message}`,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
-      setCountries(alpha2Names);
+    } finally {
+      setIsCountryListLoading(false);
     }
   };
 
@@ -419,26 +435,30 @@ export const AddNewUserComponent = (props: any) => {
                     </div>
                   </Radio.Group>
                 </Form.Item>
-                <Form.Item
-                  name="phoneNo"
-                  label={t("addUser:phoneNo")}
-                  initialValue={state?.record?.phoneNo}
-                  rules={[
-                    {
-                      required: false,
-                    },
-                  ]}
-                >
-                  <PhoneInput
-                    placeholder={t("addUser:phoneNo")}
-                    international
-                    // value={contactNoInput}
-                    defaultCountry="LK"
-                    countryCallingCodeEditable={false}
-                    onChange={(v) => {}}
-                    countries={countries}
-                  />
-                </Form.Item>
+                <Skeleton loading={isCountryListLoading} active>
+                  {countries.length > 0 && (
+                    <Form.Item
+                      name="phoneNo"
+                      label={t("addUser:phoneNo")}
+                      initialValue={state?.record?.phoneNo}
+                      rules={[
+                        {
+                          required: false,
+                        },
+                      ]}
+                    >
+                      <PhoneInput
+                        placeholder={t("addUser:phoneNo")}
+                        international
+                        // value={contactNoInput}
+                        defaultCountry="LK"
+                        countryCallingCodeEditable={false}
+                        onChange={(v) => {}}
+                        countries={countries}
+                      />
+                    </Form.Item>
+                  )}
+                </Skeleton>
               </div>
             </Col>
           </Row>
