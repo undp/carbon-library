@@ -306,9 +306,6 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
-                    getValueFromEvent={(event: any) =>
-                      event.target.value.trim()
-                    }
                   >
                     <Input size="large" />
                   </Form.Item>
@@ -335,9 +332,6 @@ export const AddNewCompanyComponent = (props: any) => {
                           },
                         },
                       ]}
-                      getValueFromEvent={(event: any) =>
-                        event.target.value.trim()
-                      }
                     >
                       <Input size="large" />
                     </Form.Item>
@@ -372,9 +366,6 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
-                    getValueFromEvent={(event: any) =>
-                      event.target.value.trim()
-                    }
                   >
                     <Input size="large" />
                   </Form.Item>
@@ -400,7 +391,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       },
                     ]}
                     getValueFromEvent={(event: any) =>
-                      event.target.value.trim()
+                      event?.target?.value.trim()
                     }
                   >
                     <Input addonBefore="https://" size="large" />
@@ -538,9 +529,6 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
-                    getValueFromEvent={(event: any) =>
-                      event.target.value.trim()
-                    }
                   >
                     <PhoneInput
                       placeholder="Phone number"
@@ -596,9 +584,6 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
-                    getValueFromEvent={(event: any) =>
-                      event.target.value.trim()
-                    }
                   >
                     <Input.TextArea rows={3} maxLength={100} />
                   </Form.Item>
@@ -664,7 +649,6 @@ export const AddNewCompanyComponent = (props: any) => {
                       },
                     },
                   ]}
-                  getValueFromEvent={(event: any) => event.target.value.trim()}
                 >
                   <Input size="large" />
                 </Form.Item>
@@ -720,7 +704,6 @@ export const AddNewCompanyComponent = (props: any) => {
                       },
                     },
                   ]}
-                  getValueFromEvent={(event: any) => event.target.value.trim()}
                 >
                   <Input size="large" />
                 </Form.Item>
