@@ -177,10 +177,10 @@ export const AddNewCompanyComponent = (props: any) => {
       }
     } catch (error: any) {
       message.open({
-        type: 'error',
-        content: `${t('errorInAddUser')} ${error.message}`,
+        type: "error",
+        content: `${error.message}`,
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
       setLoading(false);
@@ -306,6 +306,9 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
+                    getValueFromEvent={(event: any) =>
+                      event.target.value.trim()
+                    }
                   >
                     <Input size="large" />
                   </Form.Item>
@@ -332,6 +335,9 @@ export const AddNewCompanyComponent = (props: any) => {
                           },
                         },
                       ]}
+                      getValueFromEvent={(event: any) =>
+                        event.target.value.trim()
+                      }
                     >
                       <Input size="large" />
                     </Form.Item>
@@ -366,6 +372,9 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
+                    getValueFromEvent={(event: any) =>
+                      event.target.value.trim()
+                    }
                   >
                     <Input size="large" />
                   </Form.Item>
@@ -378,11 +387,21 @@ export const AddNewCompanyComponent = (props: any) => {
                       {
                         required: false,
                         validator: async (rule, value) => {
-                          if (value && !validator.isURL('https://' + value))
-                            throw new Error(`Website ${t('isInvalid')}`);
+                          if (
+                            String(value).trim() !== "" ||
+                            String(value).trim() !== undefined ||
+                            value !== null ||
+                            value !== undefined
+                          ) {
+                            if (value && !validator.isURL("https://" + value))
+                              throw new Error(`Website ${t("isInvalid")}`);
+                          }
                         },
                       },
                     ]}
+                    getValueFromEvent={(event: any) =>
+                      event.target.value.trim()
+                    }
                   >
                     <Input addonBefore="https://" size="large" />
                   </Form.Item>
@@ -519,6 +538,9 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
+                    getValueFromEvent={(event: any) =>
+                      event.target.value.trim()
+                    }
                   >
                     <PhoneInput
                       placeholder="Phone number"
@@ -574,6 +596,9 @@ export const AddNewCompanyComponent = (props: any) => {
                         },
                       },
                     ]}
+                    getValueFromEvent={(event: any) =>
+                      event.target.value.trim()
+                    }
                   >
                     <Input.TextArea rows={3} maxLength={100} />
                   </Form.Item>
@@ -639,6 +664,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       },
                     },
                   ]}
+                  getValueFromEvent={(event: any) => event.target.value.trim()}
                 >
                   <Input size="large" />
                 </Form.Item>
@@ -650,6 +676,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       required: false,
                     },
                   ]}
+                  getValueFromEvent={(event: any) => event.target.value.trim()}
                 >
                   <PhoneInput
                     placeholder="Phone number"
@@ -693,6 +720,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       },
                     },
                   ]}
+                  getValueFromEvent={(event: any) => event.target.value.trim()}
                 >
                   <Input size="large" />
                 </Form.Item>
