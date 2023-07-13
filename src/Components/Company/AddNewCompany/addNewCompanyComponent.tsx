@@ -660,7 +660,6 @@ export const AddNewCompanyComponent = (props: any) => {
                       required: false,
                     },
                   ]}
-                  getValueFromEvent={(event: any) => event.target.value.trim()}
                 >
                   <PhoneInput
                     placeholder="Phone number"
