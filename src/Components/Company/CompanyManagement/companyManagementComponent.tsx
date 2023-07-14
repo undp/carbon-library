@@ -330,7 +330,7 @@ export const CompanyManagementComponent = (props: any) => {
       title: "Filter by",
       label: (
         <div className="filter-menu-item">
-          <div className="filter-title">{t("company:creditBalance")}</div>
+          <div className="filter-title">{t("company:filterByOrgType")}</div>
           <Radio.Group
             onChange={onFilterOrganisationType}
             value={filterByOrganisationType}
