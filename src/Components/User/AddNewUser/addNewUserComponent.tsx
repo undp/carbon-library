@@ -35,6 +35,7 @@ export const AddNewUserComponent = (props: any) => {
     useUserContext,
     useLocation,
     useAbilityContext,
+    themeColor
   } = props;
   const { post, put, delete: del, get } = useConnection();
   const [formOne] = Form.useForm();
@@ -53,7 +54,6 @@ export const AddNewUserComponent = (props: any) => {
   const ability = useAbilityContext();
   const [countries, setCountries] = useState<[]>([]);
   const [isCountryListLoading, setIsCountryListLoading] = useState(false);
-
 
   const getCountryList = async () => {
     setIsCountryListLoading(true);
@@ -490,6 +490,7 @@ export const AddNewUserComponent = (props: any) => {
         openModal={openPasswordChangeModal}
         errorMsg={errorMsg}
         loadingBtn={isLoading}
+        themeColor={themeColor}
       ></ChangePasswordModel>
     </div>
   );
