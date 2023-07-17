@@ -11,6 +11,7 @@ export interface ChangePasswordProps {
   openModal: any;
   errorMsg: any;
   loadingBtn: boolean;
+  themeColor: string;
 }
 
 const ChangePasswordModel: FC<ChangePasswordProps> = (
@@ -24,6 +25,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
     openModal,
     errorMsg,
     loadingBtn,
+    themeColor,
   } = props;
 
   return (
@@ -32,7 +34,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
       title={
         <div className="popup-header">
           <div className="icon">
-            <Lock size={100} color="#16B1FF" />
+            <Lock size={100} color={themeColor} />
           </div>
           <div>{t("passwordReset:changePassword")}</div>
         </div>
