@@ -520,7 +520,7 @@ export const AddNewCompanyComponent = (props: any) => {
                         message: "",
                       },
                       {
-                        validator: async (rule, value) => {
+                        validator: async (rule: any, value: any) => {
                           if (
                             String(value).trim() === "" ||
                             String(value).trim() === undefined ||
@@ -530,16 +530,12 @@ export const AddNewCompanyComponent = (props: any) => {
                             throw new Error(`Phone Number ${t("isRequired")}`);
                           } else {
                             const phoneNo = formatPhoneNumber(String(value));
-                            if (
-                              phoneNo === null ||
-                              phoneNo === "" ||
-                              phoneNo === undefined
-                            ) {
-                              if (String(value) !== "") {
-                                throw new Error(
-                                  `Phone Number ${t("isInvalid")}`
-                                );
-                              } else {
+                            if (String(value).trim() !== "") {
+                              if (
+                                phoneNo === null ||
+                                phoneNo === "" ||
+                                phoneNo === undefined
+                              ) {
                                 throw new Error(
                                   `Phone Number ${t("isRequired")}`
                                 );
