@@ -12,7 +12,10 @@ import {
   Upload,
   message,
 } from "antd";
-import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
+import PhoneInput, {
+  formatPhoneNumberIntl,
+  isPossiblePhoneNumber,
+} from "react-phone-number-input";
 import {
   BankOutlined,
   ExperimentOutlined,
@@ -514,17 +517,21 @@ export const AddNewCompanyComponent = (props: any) => {
                     rules={[
                       {
                         required: true,
-                        message: '',
+                        message: "",
                       },
                       {
                         validator: async (rule, value) => {
                           if (
-                            String(value).trim() === '' ||
+                            String(value).trim() === "" ||
                             String(value).trim() === undefined ||
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`Phone Number ${t('isRequired')}`);
+                            throw new Error(`Phone Number ${t("isRequired")}`);
+                          } else if (
+                            !isPossiblePhoneNumber(String(value).trim())
+                          ) {
+                            throw new Error(`Phone Number ${t("isRequired")}`);
                           }
                         },
                       },
