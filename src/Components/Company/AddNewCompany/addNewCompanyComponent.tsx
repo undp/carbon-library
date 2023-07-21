@@ -530,7 +530,6 @@ export const AddNewCompanyComponent = (props: any) => {
                             throw new Error(`Phone Number ${t("isRequired")}`);
                           } else {
                             const phoneNo = formatPhoneNumber(String(value));
-                            console.log(phoneNo);
                             if (
                               phoneNo === null ||
                               phoneNo === "" ||
