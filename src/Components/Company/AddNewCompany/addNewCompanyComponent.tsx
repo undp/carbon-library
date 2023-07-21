@@ -535,9 +535,15 @@ export const AddNewCompanyComponent = (props: any) => {
                               phoneNo === "" ||
                               phoneNo === undefined
                             ) {
-                              throw new Error(
-                                `Phone Number ${t("isRequired")}`
-                              );
+                              if (String(value) !== "") {
+                                throw new Error(
+                                  `Phone Number ${t("isInvalid")}`
+                                );
+                              } else {
+                                throw new Error(
+                                  `Phone Number ${t("isRequired")}`
+                                );
+                              }
                             }
                           }
                         },
