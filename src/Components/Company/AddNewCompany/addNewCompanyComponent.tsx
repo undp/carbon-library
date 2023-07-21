@@ -13,8 +13,8 @@ import {
   message,
 } from "antd";
 import PhoneInput, {
+  formatPhoneNumber,
   formatPhoneNumberIntl,
-  isPossiblePhoneNumber,
 } from "react-phone-number-input";
 import {
   BankOutlined,
@@ -528,10 +528,18 @@ export const AddNewCompanyComponent = (props: any) => {
                             value === undefined
                           ) {
                             throw new Error(`Phone Number ${t("isRequired")}`);
-                          } else if (
-                            !isPossiblePhoneNumber(String(value).trim())
-                          ) {
-                            throw new Error(`Phone Number ${t("isRequired")}`);
+                          } else {
+                            const phoneNo = formatPhoneNumber(String(value));
+                            console.log(phoneNo);
+                            if (
+                              phoneNo === null ||
+                              phoneNo === "" ||
+                              phoneNo === undefined
+                            ) {
+                              throw new Error(
+                                `Phone Number ${t("isRequired")}`
+                              );
+                            }
                           }
                         },
                       },
