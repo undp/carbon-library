@@ -16,7 +16,7 @@ export enum ProgrammeStage {
 }
 
 export enum ProgrammeStageMRV {
-  AwaitingAuthorization = "AwaitingAuthorization",
+  AwaitingAuthorization = "Pending",
   Authorised = "Authorised",
   Approved = "Approved",
   Rejected = "Rejected",
