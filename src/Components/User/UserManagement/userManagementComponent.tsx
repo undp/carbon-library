@@ -59,6 +59,7 @@ import { Action } from "../../../Definitions/Enums/action.enum";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
+import { CompanyRole } from "../../../Definitions/Definitions/programme.definitions";
 
 const { Search } = Input;
 
@@ -515,8 +516,13 @@ export const UserManagementComponent = (props: any) => {
         "national/user/query",
         getAllUserParams()
       );
-      setTableData(response?.data);
-      setTotalUser(response?.response?.data?.total);
+      if (response && response.data) {
+        const availableUsers = response.data.filter(
+          (user: any) => user.companyRole !== CompanyRole.API
+        );
+        setTableData(availableUsers);
+        setTotalUser(response.data.total);
+      }
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);

@@ -291,13 +291,13 @@ export const CompanyManagementComponent = (props: any) => {
         "national/organisation/query",
         getAllOrganisationParams()
       );
-      console.log("response.data", response.data);
-      const availableCompanies = response.data.filter(
-        (company: any) => company.companyRole !== CompanyRole.API
-      );
-      console.log("availableCompanies", availableCompanies);
-      setTableData(availableCompanies);
-      setTotalCompany(availableCompanies.total);
+      if (response && response.data) {
+        const availableCompanies = response.data.filter(
+          (company: any) => company.companyRole !== CompanyRole.API
+        );
+        setTableData(availableCompanies);
+        setTotalCompany(response.data.total);
+      }
       setLoading(false);
     } catch (error: any) {
       message.open({
