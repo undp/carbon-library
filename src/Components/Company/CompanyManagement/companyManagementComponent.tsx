@@ -296,7 +296,7 @@ export const CompanyManagementComponent = (props: any) => {
           (company: any) => company.companyRole !== CompanyRole.API
         );
         setTableData(availableCompanies);
-        setTotalCompany(response.total);
+        setTotalCompany(response?.response?.data?.total);
       }
       setLoading(false);
     } catch (error: any) {
