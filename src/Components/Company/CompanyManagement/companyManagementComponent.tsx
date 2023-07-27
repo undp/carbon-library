@@ -32,7 +32,10 @@ import {
   GovBGColor,
   GovColor,
 } from "../../../Styles/role.color.constants";
-import { addCommSep } from "../../../Definitions/Definitions/programme.definitions";
+import {
+  CompanyRole,
+  addCommSep,
+} from "../../../Definitions/Definitions/programme.definitions";
 import { CompanyTableDataType } from "../../../Definitions/Definitions/companyManagement.definitions";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { Company } from "../../../Definitions/Entities/company";
@@ -288,8 +291,13 @@ export const CompanyManagementComponent = (props: any) => {
         "national/organisation/query",
         getAllOrganisationParams()
       );
-      setTableData(response.data);
-      setTotalCompany(response.response.data.total);
+      console.log("response.data", response.data);
+      const availableCompanies = response.data.filter(
+        (company: any) => company.companyRole !== CompanyRole.API
+      );
+      console.log("availableCompanies", availableCompanies);
+      setTableData(availableCompanies);
+      setTotalCompany(availableCompanies.total);
       setLoading(false);
     } catch (error: any) {
       message.open({
