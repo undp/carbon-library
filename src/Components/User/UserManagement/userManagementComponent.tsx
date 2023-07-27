@@ -521,7 +521,7 @@ export const UserManagementComponent = (props: any) => {
           (user: any) => user.companyRole !== CompanyRole.API
         );
         setTableData(availableUsers);
-        setTotalUser(response.data.total);
+        setTotalUser(response.total);
       }
       setLoading(false);
     } catch (error: any) {
