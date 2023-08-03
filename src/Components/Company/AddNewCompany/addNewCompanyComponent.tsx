@@ -324,7 +324,7 @@ export const AddNewCompanyComponent = (props: any) => {
                   >
                     <Input size="large" />
                   </Form.Item>
-                  {companyRole !== CompanyRole.MINISTRY ||
+                  {companyRole !== CompanyRole.MINISTRY &&
                   companyRoleType !== CompanyRole.MINISTRY
                     ? (!isUpdate ||
                         (isUpdate &&
