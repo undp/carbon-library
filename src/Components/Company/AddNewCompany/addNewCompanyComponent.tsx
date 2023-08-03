@@ -324,11 +324,10 @@ export const AddNewCompanyComponent = (props: any) => {
                   >
                     <Input size="large" />
                   </Form.Item>
-                  {(!isUpdate ||
-                    (isUpdate &&
-                      companyRole !== CompanyRole.GOVERNMENT &&
-                      companyRole !== CompanyRole.MINISTRY) ||
-                    companyRoleType !== CompanyRole.MINISTRY) && (
+                  {((companyRole !== CompanyRole.MINISTRY &&
+                    companyRoleType !== CompanyRole.MINISTRY) ||
+                    !isUpdate ||
+                    (isUpdate && companyRole !== CompanyRole.GOVERNMENT)) && (
                     <Form.Item
                       label="Tax ID"
                       initialValue={state?.record?.taxId}
