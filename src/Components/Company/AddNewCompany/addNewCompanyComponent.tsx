@@ -57,6 +57,7 @@ export const AddNewCompanyComponent = (props: any) => {
   const [countries, setCountries] = useState<[]>([]);
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [regionsList, setRegionsList] = useState<any[]>([]);
+  const [companyRoleType, setCompanyRoleType] = useState<any>("");
 
   const getCountryList = async () => {
     const response = await get('national/organisation/countries');
@@ -269,6 +270,11 @@ export const AddNewCompanyComponent = (props: any) => {
     onNavigateToCompanyManagement();
   };
 
+  const onChangeCompanyRole = (event: any) => {
+    const value = event.target.value;
+    setCompanyRoleType(value);
+  };
+
   const CompanyDetailsForm = () => {
     const companyRole = state?.record?.companyRole;
     const companyRoleClassName =
@@ -458,6 +464,31 @@ export const AddNewCompanyComponent = (props: any) => {
                       </Button>
                     </Upload>
                   </Form.Item>
+                  {(companyRole === CompanyRole.MINISTRY ||
+                    companyRoleType === CompanyRole.MINISTRY) && (
+                    <Form.Item
+                      name="address"
+                      label="Address"
+                      initialValue={state?.record?.address}
+                      rules={[
+                        { required: true, message: "" },
+                        {
+                          validator: async (rule, value) => {
+                            if (
+                              String(value).trim() === "" ||
+                              String(value).trim() === undefined ||
+                              value === null ||
+                              value === undefined
+                            ) {
+                              throw new Error(`Address ${t("isRequired")}`);
+                            }
+                          },
+                        },
+                      ]}
+                    >
+                      <Input.TextArea rows={3} maxLength={100} />
+                    </Form.Item>
+                  )}
                 </div>
               </Col>
               <Col xl={12} md={24}>
@@ -474,7 +505,11 @@ export const AddNewCompanyComponent = (props: any) => {
                       },
                     ]}
                   >
-                    <Radio.Group size="large" disabled={isUpdate}>
+                    <Radio.Group
+                      size="large"
+                      disabled={isUpdate}
+                      onChange={onChangeCompanyRole}
+                    >
                       {isUpdate ? (
                         <div
                           className={`${companyRoleClassName}-radio-container`}
@@ -544,19 +579,55 @@ export const AddNewCompanyComponent = (props: any) => {
                       )}
                     </Radio.Group>
                   </Form.Item>
+                  {(companyRole === CompanyRole.MINISTRY ||
+                    companyRoleType === CompanyRole.MINISTRY) && (
+                  <Form.Item
+                    label="Name of the Minister"
+                    name="nameOfMinister"
+                    initialValue={state?.record?.nameOfMinister}
+                    rules={[
+                      {
+                        required: true,
+                        message: "",
+                      },
+                      {
+                        validator: async (rule, value) => {
+                          if (
+                            String(value).trim() === "" ||
+                            String(value).trim() === undefined ||
+                            value === null ||
+                            value === undefined
+                          ) {
+                            throw new Error(
+                              `Name of the Minister ${t("isRequired")}`
+                            );
+                          }
+                        },
+                      },
+                    ]}
+                  >
+                    <Input size="large" />
+                  </Form.Item>
+                  )}
+                  {(companyRole === CompanyRole.MINISTRY ||
+                    companyRoleType === CompanyRole.MINISTRY) && (
                   <Form.Item
                     label="Sectoral Scope"
                     name="sectoralScope"
                     rules={[
                       {
                         required: true,
-                        message: `${t("addProgramme:sectoralScope")} ${t(
-                          "isRequired"
-                        )}`,
+                        message: `Sectoral Scope ${t("isRequired")}`,
                       },
                     ]}
+                    initialValue={state?.record?.sectoralScope}
                   >
-                    <Select mode="multiple" size="large" maxTagCount={2}>
+                    <Select
+                      mode="multiple"
+                      size="large"
+                      maxTagCount={2}
+                      allowClear
+                    >
                       {Object.entries(SectoralScope).map(([key, value]) => (
                         <Select.Option key={value} value={value}>
                           {key}
@@ -564,6 +635,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       ))}
                     </Select>
                   </Form.Item>
+                  )}
                   <Form.Item
                     name="phoneNo"
                     label="Phone Number"
@@ -628,6 +700,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       maxTagCount={2}
                       onChange={onChangeRegion}
                         loading={loadingList}
+                        allowClear
                     >
                       {regionsList.map((region: any) => (
                         <Select.Option value={region}>{region}</Select.Option>
@@ -635,28 +708,31 @@ export const AddNewCompanyComponent = (props: any) => {
                     </Select>
                   </Form.Item>
                   )}
-                  <Form.Item
-                    name="address"
-                    label="Address"
-                    initialValue={state?.record?.address}
-                    rules={[
-                      { required: true, message: "" },
-                      {
-                        validator: async (rule, value) => {
-                          if (
-                            String(value).trim() === "" ||
-                            String(value).trim() === undefined ||
-                            value === null ||
-                            value === undefined
-                          ) {
-                            throw new Error(`Address ${t("isRequired")}`);
-                          }
+                  {(companyRole !== CompanyRole.MINISTRY ||
+                    companyRoleType !== CompanyRole.MINISTRY) && (
+                    <Form.Item
+                      name="address"
+                      label="Address"
+                      initialValue={state?.record?.address}
+                      rules={[
+                        { required: true, message: "" },
+                        {
+                          validator: async (rule, value) => {
+                            if (
+                              String(value).trim() === "" ||
+                              String(value).trim() === undefined ||
+                              value === null ||
+                              value === undefined
+                            ) {
+                              throw new Error(`Address ${t("isRequired")}`);
+                            }
+                          },
                         },
-                      },
-                    ]}
-                  >
-                    <Input.TextArea rows={3} maxLength={100} />
-                  </Form.Item>
+                      ]}
+                    >
+                      <Input.TextArea rows={3} maxLength={100} />
+                    </Form.Item>
+                  )}
                 </div>
               </Col>
             </Row>
