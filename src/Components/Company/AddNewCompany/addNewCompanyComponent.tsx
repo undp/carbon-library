@@ -324,7 +324,9 @@ export const AddNewCompanyComponent = (props: any) => {
                   >
                     <Input size="large" />
                   </Form.Item>
-                  {(!isUpdate || (isUpdate && companyRole !== CompanyRole.GOVERNMENT)) && (
+                  {(!isUpdate ||
+                    (isUpdate && companyRole !== CompanyRole.GOVERNMENT) ||
+                    companyRole !== CompanyRole.MINISTRY) && (
                     <Form.Item
                       label="Tax ID"
                       initialValue={state?.record?.taxId}
@@ -332,7 +334,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       rules={[
                         {
                           required: true,
-                          message: '',
+                          message: "",
                         },
                         {
                           validator: async (rule, value) => {
