@@ -506,6 +506,17 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
+                          <div className="minister-radio-container">
+                            <Tooltip
+                              placement="top"
+                              title="Permitted to own programmes and transfer carbon credits"
+                            >
+                              <Radio.Button className="dev" value="Ministry">
+                                <ExperimentOutlined className="role-icons" />
+                                Ministry
+                              </Radio.Button>
+                            </Tooltip>
+                          </div>
                         </>
                       )}
                     </Radio.Group>
