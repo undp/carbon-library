@@ -85,8 +85,8 @@
             .ant-radio-button-wrapper-checked:not(
                 .ant-radio-button-wrapper-disabled
               ) {
-              color: $dev-color !important;
-              border-color: $dev-color !important;
+              color: $ministry-color !important;
+              border-color: $ministry-color !important;
               box-shadow: none;
             }
 
@@ -94,7 +94,7 @@
               background: #eeeeee;
               border-radius: 50px;
               padding: 0.2rem;
-              color: $dev-color;
+              color: $ministry-color;
             }
           }
           .gov-radio-container {
@@ -160,6 +160,13 @@
             .ant-radio-button-checked {
               background: $gov-bg-color;
               color: $gov-color;
+            }
+          }
+          .minister {
+            width: 100%;
+            .ant-radio-button-checked {
+              background: $ministry-bg-color;
+              color: $ministry-color;
             }
           }
           .observer {

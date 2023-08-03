@@ -17,6 +17,7 @@ import PhoneInput, {
   formatPhoneNumberIntl,
 } from "react-phone-number-input";
 import {
+  AuditOutlined,
   BankOutlined,
   ExperimentOutlined,
   SafetyOutlined,
@@ -25,7 +26,10 @@ import {
 import "./addNewCompanyComponent.scss";
 import "../../../Styles/app.scss";
 import { RcFile, UploadFile } from "antd/lib/upload";
-import { CompanyRole } from "../../../Definitions/Definitions/programme.definitions";
+import {
+  CompanyRole,
+  SectoralScope,
+} from "../../../Definitions/Definitions/programme.definitions";
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
 import validator from "validator";
 
@@ -269,10 +273,12 @@ export const AddNewCompanyComponent = (props: any) => {
     const companyRole = state?.record?.companyRole;
     const companyRoleClassName =
       companyRole === CompanyRole.CERTIFIER
-        ? 'certifier'
+        ? "certifier"
         : companyRole === CompanyRole.PROGRAMME_DEVELOPER
-        ? 'dev'
-        : 'gov';
+        ? "dev"
+        : companyRole === CompanyRole.MINISTRY
+        ? "minister"
+        : "gov";
     return (
       <div className="company-details-form-container">
         <div className="company-details-form">
@@ -464,18 +470,26 @@ export const AddNewCompanyComponent = (props: any) => {
                     rules={[
                       {
                         required: true,
-                        message: `Role ${t('isRequired')}`,
+                        message: `Role ${t("isRequired")}`,
                       },
                     ]}
                   >
                     <Radio.Group size="large" disabled={isUpdate}>
                       {isUpdate ? (
-                        <div className={`${companyRoleClassName}-radio-container`}>
-                          <Radio.Button className={companyRoleClassName} value={companyRole}>
+                        <div
+                          className={`${companyRoleClassName}-radio-container`}
+                        >
+                          <Radio.Button
+                            className={companyRoleClassName}
+                            value={companyRole}
+                          >
                             {companyRole === CompanyRole.CERTIFIER ? (
                               <SafetyOutlined className="role-icons" />
-                            ) : companyRole === CompanyRole.PROGRAMME_DEVELOPER ? (
+                            ) : companyRole ===
+                              CompanyRole.PROGRAMME_DEVELOPER ? (
                               <ExperimentOutlined className="role-icons" />
+                            ) : companyRole === CompanyRole.MINISTRY ? (
+                              <AuditOutlined className="role-icons" />
                             ) : (
                               <BankOutlined className="role-icons" />
                             )}
@@ -489,7 +503,10 @@ export const AddNewCompanyComponent = (props: any) => {
                               placement="top"
                               title="Permitted to certify and revoke certifications of programmes"
                             >
-                              <Radio.Button className="certifier" value="Certifier">
+                              <Radio.Button
+                                className="certifier"
+                                value="Certifier"
+                              >
                                 <SafetyOutlined className="role-icons" />
                                 Certifier
                               </Radio.Button>
@@ -500,19 +517,25 @@ export const AddNewCompanyComponent = (props: any) => {
                               placement="top"
                               title="Permitted to own programmes and transfer carbon credits"
                             >
-                              <Radio.Button className="dev" value="ProgrammeDeveloper">
+                              <Radio.Button
+                                className="dev"
+                                value="ProgrammeDeveloper"
+                              >
                                 <ExperimentOutlined className="role-icons" />
-                                Programme Developer
+                                Developer
                               </Radio.Button>
                             </Tooltip>
                           </div>
                           <div className="minister-radio-container">
                             <Tooltip
                               placement="top"
-                              title="Permitted to own programmes and transfer carbon credits"
+                              title="Permitted to perform all programme-related actions within the Ministry"
                             >
-                              <Radio.Button className="dev" value="Ministry">
-                                <ExperimentOutlined className="role-icons" />
+                              <Radio.Button
+                                className="minister"
+                                value="Ministry"
+                              >
+                                <AuditOutlined className="role-icons" />
                                 Ministry
                               </Radio.Button>
                             </Tooltip>
@@ -520,6 +543,26 @@ export const AddNewCompanyComponent = (props: any) => {
                         </>
                       )}
                     </Radio.Group>
+                  </Form.Item>
+                  <Form.Item
+                    label="Sectoral Scope"
+                    name="sectoralScope"
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t("addProgramme:sectoralScope")} ${t(
+                          "isRequired"
+                        )}`,
+                      },
+                    ]}
+                  >
+                    <Select mode="multiple" size="large" maxTagCount={2}>
+                      {Object.entries(SectoralScope).map(([key, value]) => (
+                        <Select.Option key={value} value={value}>
+                          {key}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                   <Form.Item
                     name="phoneNo"
