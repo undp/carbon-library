@@ -324,10 +324,11 @@ export const AddNewCompanyComponent = (props: any) => {
                   >
                     <Input size="large" />
                   </Form.Item>
-                  {((companyRole !== CompanyRole.MINISTRY &&
-                    companyRoleType !== CompanyRole.MINISTRY) ||
-                    !isUpdate ||
-                    (isUpdate && companyRole !== CompanyRole.GOVERNMENT)) && (
+                  {companyRole !== CompanyRole.MINISTRY ||
+                  companyRoleType !== CompanyRole.MINISTRY
+                    ? (!isUpdate ||
+                        (isUpdate &&
+                          companyRole !== CompanyRole.GOVERNMENT)) && (
                     <Form.Item
                       label="Tax ID"
                       initialValue={state?.record?.taxId}
@@ -340,12 +341,12 @@ export const AddNewCompanyComponent = (props: any) => {
                         {
                           validator: async (rule, value) => {
                             if (
-                              String(value).trim() === '' ||
+                                  String(value).trim() === "" ||
                               String(value).trim() === undefined ||
                               value === null ||
                               value === undefined
                             ) {
-                              throw new Error(`Tax ID ${t('isRequired')}`);
+                                  throw new Error(`Tax ID ${t("isRequired")}`);
                             }
                           },
                         },
@@ -353,7 +354,8 @@ export const AddNewCompanyComponent = (props: any) => {
                     >
                       <Input size="large" />
                     </Form.Item>
-                  )}
+                      )
+                    : null}
                   <Form.Item
                     label="Email"
                     name="email"
