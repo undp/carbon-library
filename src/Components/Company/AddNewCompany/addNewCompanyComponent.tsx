@@ -708,8 +708,8 @@ export const AddNewCompanyComponent = (props: any) => {
                     </Select>
                   </Form.Item>
                   )}
-                  {(companyRole !== CompanyRole.MINISTRY ||
-                    companyRoleType !== CompanyRole.MINISTRY) && (
+                  {companyRole !== CompanyRole.MINISTRY &&
+                    companyRoleType !== CompanyRole.MINISTRY && (
                     <Form.Item
                       name="address"
                       label="Address"
