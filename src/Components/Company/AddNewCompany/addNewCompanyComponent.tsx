@@ -17,6 +17,7 @@ import PhoneInput, {
   formatPhoneNumberIntl,
 } from "react-phone-number-input";
 import {
+  AuditOutlined,
   BankOutlined,
   ExperimentOutlined,
   SafetyOutlined,
@@ -25,7 +26,10 @@ import {
 import "./addNewCompanyComponent.scss";
 import "../../../Styles/app.scss";
 import { RcFile, UploadFile } from "antd/lib/upload";
-import { CompanyRole } from "../../../Definitions/Definitions/programme.definitions";
+import {
+  CompanyRole,
+  SectoralScope,
+} from "../../../Definitions/Definitions/programme.definitions";
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
 import validator from "validator";
 
@@ -53,6 +57,9 @@ export const AddNewCompanyComponent = (props: any) => {
   const [countries, setCountries] = useState<[]>([]);
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [regionsList, setRegionsList] = useState<any[]>([]);
+  const [companyRole, setCompanyRole] = useState<any>(
+    state?.record?.companyRole
+  );
 
   const getCountryList = async () => {
     const response = await get('national/organisation/countries');
@@ -265,14 +272,20 @@ export const AddNewCompanyComponent = (props: any) => {
     onNavigateToCompanyManagement();
   };
 
+  const onChangeCompanyRole = (event: any) => {
+    const value = event.target.value;
+    setCompanyRole(value);
+  };
+
   const CompanyDetailsForm = () => {
-    const companyRole = state?.record?.companyRole;
     const companyRoleClassName =
       companyRole === CompanyRole.CERTIFIER
-        ? 'certifier'
+        ? "certifier"
         : companyRole === CompanyRole.PROGRAMME_DEVELOPER
-        ? 'dev'
-        : 'gov';
+        ? "dev"
+        : companyRole === CompanyRole.MINISTRY
+        ? "minister"
+        : "gov";
     return (
       <div className="company-details-form-container">
         <div className="company-details-form">
@@ -312,7 +325,10 @@ export const AddNewCompanyComponent = (props: any) => {
                   >
                     <Input size="large" />
                   </Form.Item>
-                  {(!isUpdate || (isUpdate && companyRole !== CompanyRole.GOVERNMENT)) && (
+                  {companyRole !== CompanyRole.MINISTRY
+                    ? (!isUpdate ||
+                        (isUpdate &&
+                          companyRole !== CompanyRole.GOVERNMENT)) && (
                     <Form.Item
                       label="Tax ID"
                       initialValue={state?.record?.taxId}
@@ -320,17 +336,17 @@ export const AddNewCompanyComponent = (props: any) => {
                       rules={[
                         {
                           required: true,
-                          message: '',
+                          message: "",
                         },
                         {
                           validator: async (rule, value) => {
                             if (
-                              String(value).trim() === '' ||
+                                  String(value).trim() === "" ||
                               String(value).trim() === undefined ||
                               value === null ||
                               value === undefined
                             ) {
-                              throw new Error(`Tax ID ${t('isRequired')}`);
+                                  throw new Error(`Tax ID ${t("isRequired")}`);
                             }
                           },
                         },
@@ -338,7 +354,8 @@ export const AddNewCompanyComponent = (props: any) => {
                     >
                       <Input size="large" />
                     </Form.Item>
-                  )}
+                      )
+                    : null}
                   <Form.Item
                     label="Email"
                     name="email"
@@ -452,6 +469,30 @@ export const AddNewCompanyComponent = (props: any) => {
                       </Button>
                     </Upload>
                   </Form.Item>
+                  {companyRole === CompanyRole.MINISTRY && (
+                    <Form.Item
+                      name="address"
+                      label="Address"
+                      initialValue={state?.record?.address}
+                      rules={[
+                        { required: true, message: "" },
+                        {
+                          validator: async (rule, value) => {
+                            if (
+                              String(value).trim() === "" ||
+                              String(value).trim() === undefined ||
+                              value === null ||
+                              value === undefined
+                            ) {
+                              throw new Error(`Address ${t("isRequired")}`);
+                            }
+                          },
+                        },
+                      ]}
+                    >
+                      <Input.TextArea rows={3} maxLength={100} />
+                    </Form.Item>
+                  )}
                 </div>
               </Col>
               <Col xl={12} md={24}>
@@ -464,18 +505,30 @@ export const AddNewCompanyComponent = (props: any) => {
                     rules={[
                       {
                         required: true,
-                        message: `Role ${t('isRequired')}`,
+                        message: `Role ${t("isRequired")}`,
                       },
                     ]}
                   >
-                    <Radio.Group size="large" disabled={isUpdate}>
+                    <Radio.Group
+                      size="large"
+                      disabled={isUpdate}
+                      onChange={onChangeCompanyRole}
+                    >
                       {isUpdate ? (
-                        <div className={`${companyRoleClassName}-radio-container`}>
-                          <Radio.Button className={companyRoleClassName} value={companyRole}>
+                        <div
+                          className={`${companyRoleClassName}-radio-container`}
+                        >
+                          <Radio.Button
+                            className={companyRoleClassName}
+                            value={companyRole}
+                          >
                             {companyRole === CompanyRole.CERTIFIER ? (
                               <SafetyOutlined className="role-icons" />
-                            ) : companyRole === CompanyRole.PROGRAMME_DEVELOPER ? (
+                            ) : companyRole ===
+                              CompanyRole.PROGRAMME_DEVELOPER ? (
                               <ExperimentOutlined className="role-icons" />
+                            ) : companyRole === CompanyRole.MINISTRY ? (
+                              <AuditOutlined className="role-icons" />
                             ) : (
                               <BankOutlined className="role-icons" />
                             )}
@@ -489,7 +542,10 @@ export const AddNewCompanyComponent = (props: any) => {
                               placement="top"
                               title="Permitted to certify and revoke certifications of programmes"
                             >
-                              <Radio.Button className="certifier" value="Certifier">
+                              <Radio.Button
+                                className="certifier"
+                                value="Certifier"
+                              >
                                 <SafetyOutlined className="role-icons" />
                                 Certifier
                               </Radio.Button>
@@ -500,9 +556,26 @@ export const AddNewCompanyComponent = (props: any) => {
                               placement="top"
                               title="Permitted to own programmes and transfer carbon credits"
                             >
-                              <Radio.Button className="dev" value="ProgrammeDeveloper">
+                              <Radio.Button
+                                className="dev"
+                                value="ProgrammeDeveloper"
+                              >
                                 <ExperimentOutlined className="role-icons" />
-                                Programme Developer
+                                Developer
+                              </Radio.Button>
+                            </Tooltip>
+                          </div>
+                          <div className="minister-radio-container">
+                            <Tooltip
+                              placement="top"
+                              title="Permitted to perform all programme-related actions within the Ministry"
+                            >
+                              <Radio.Button
+                                className="minister"
+                                value="Ministry"
+                              >
+                                <AuditOutlined className="role-icons" />
+                                Ministry
                               </Radio.Button>
                             </Tooltip>
                           </div>
@@ -510,6 +583,61 @@ export const AddNewCompanyComponent = (props: any) => {
                       )}
                     </Radio.Group>
                   </Form.Item>
+                  {companyRole === CompanyRole.MINISTRY && (
+                  <Form.Item
+                    label="Name of the Minister"
+                    name="nameOfMinister"
+                    initialValue={state?.record?.nameOfMinister}
+                    rules={[
+                      {
+                        required: true,
+                        message: "",
+                      },
+                      {
+                        validator: async (rule, value) => {
+                          if (
+                            String(value).trim() === "" ||
+                            String(value).trim() === undefined ||
+                            value === null ||
+                            value === undefined
+                          ) {
+                            throw new Error(
+                              `Name of the Minister ${t("isRequired")}`
+                            );
+                          }
+                        },
+                      },
+                    ]}
+                  >
+                    <Input size="large" />
+                  </Form.Item>
+                  )}
+                  {companyRole === CompanyRole.MINISTRY && (
+                  <Form.Item
+                    label="Sectoral Scope"
+                    name="sectoralScope"
+                    rules={[
+                      {
+                        required: true,
+                        message: `Sectoral Scope ${t("isRequired")}`,
+                      },
+                    ]}
+                    initialValue={state?.record?.sectoralScope}
+                  >
+                    <Select
+                      mode="multiple"
+                      size="large"
+                      maxTagCount={2}
+                      allowClear
+                    >
+                      {Object.entries(SectoralScope).map(([key, value]) => (
+                        <Select.Option key={value} value={value}>
+                          {key}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  )}
                   <Form.Item
                     name="phoneNo"
                     label="Phone Number"
@@ -574,6 +702,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       maxTagCount={2}
                       onChange={onChangeRegion}
                         loading={loadingList}
+                        allowClear
                     >
                       {regionsList.map((region: any) => (
                         <Select.Option value={region}>{region}</Select.Option>
@@ -581,28 +710,30 @@ export const AddNewCompanyComponent = (props: any) => {
                     </Select>
                   </Form.Item>
                   )}
-                  <Form.Item
-                    name="address"
-                    label="Address"
-                    initialValue={state?.record?.address}
-                    rules={[
-                      { required: true, message: "" },
-                      {
-                        validator: async (rule, value) => {
-                          if (
-                            String(value).trim() === "" ||
-                            String(value).trim() === undefined ||
-                            value === null ||
-                            value === undefined
-                          ) {
-                            throw new Error(`Address ${t("isRequired")}`);
-                          }
+                  {companyRole !== CompanyRole.MINISTRY && (
+                    <Form.Item
+                      name="address"
+                      label="Address"
+                      initialValue={state?.record?.address}
+                      rules={[
+                        { required: true, message: "" },
+                        {
+                          validator: async (rule, value) => {
+                            if (
+                              String(value).trim() === "" ||
+                              String(value).trim() === undefined ||
+                              value === null ||
+                              value === undefined
+                            ) {
+                              throw new Error(`Address ${t("isRequired")}`);
+                            }
+                          },
                         },
-                      },
-                    ]}
-                  >
-                    <Input.TextArea rows={3} maxLength={100} />
-                  </Form.Item>
+                      ]}
+                    >
+                      <Input.TextArea rows={3} maxLength={100} />
+                    </Form.Item>
+                  )}
                 </div>
               </Col>
             </Row>
