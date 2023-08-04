@@ -57,7 +57,9 @@ export const AddNewCompanyComponent = (props: any) => {
   const [countries, setCountries] = useState<[]>([]);
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [regionsList, setRegionsList] = useState<any[]>([]);
-  const [companyRoleType, setCompanyRoleType] = useState<any>("");
+  const [companyRole, setCompanyRole] = useState<any>(
+    state?.record?.companyRole
+  );
 
   const getCountryList = async () => {
     const response = await get('national/organisation/countries');
@@ -272,11 +274,10 @@ export const AddNewCompanyComponent = (props: any) => {
 
   const onChangeCompanyRole = (event: any) => {
     const value = event.target.value;
-    setCompanyRoleType(value);
+    setCompanyRole(value);
   };
 
   const CompanyDetailsForm = () => {
-    const companyRole = state?.record?.companyRole;
     const companyRoleClassName =
       companyRole === CompanyRole.CERTIFIER
         ? "certifier"
@@ -324,8 +325,7 @@ export const AddNewCompanyComponent = (props: any) => {
                   >
                     <Input size="large" />
                   </Form.Item>
-                  {companyRole !== CompanyRole.MINISTRY &&
-                  companyRoleType !== CompanyRole.MINISTRY
+                  {companyRole !== CompanyRole.MINISTRY
                     ? (!isUpdate ||
                         (isUpdate &&
                           companyRole !== CompanyRole.GOVERNMENT)) && (
@@ -469,8 +469,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       </Button>
                     </Upload>
                   </Form.Item>
-                  {(companyRole === CompanyRole.MINISTRY ||
-                    companyRoleType === CompanyRole.MINISTRY) && (
+                  {companyRole === CompanyRole.MINISTRY && (
                     <Form.Item
                       name="address"
                       label="Address"
@@ -584,8 +583,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       )}
                     </Radio.Group>
                   </Form.Item>
-                  {(companyRole === CompanyRole.MINISTRY ||
-                    companyRoleType === CompanyRole.MINISTRY) && (
+                  {companyRole === CompanyRole.MINISTRY && (
                   <Form.Item
                     label="Name of the Minister"
                     name="nameOfMinister"
@@ -614,8 +612,7 @@ export const AddNewCompanyComponent = (props: any) => {
                     <Input size="large" />
                   </Form.Item>
                   )}
-                  {(companyRole === CompanyRole.MINISTRY ||
-                    companyRoleType === CompanyRole.MINISTRY) && (
+                  {companyRole === CompanyRole.MINISTRY && (
                   <Form.Item
                     label="Sectoral Scope"
                     name="sectoralScope"
@@ -713,8 +710,7 @@ export const AddNewCompanyComponent = (props: any) => {
                     </Select>
                   </Form.Item>
                   )}
-                  {companyRole !== CompanyRole.MINISTRY &&
-                    companyRoleType !== CompanyRole.MINISTRY && (
+                  {companyRole !== CompanyRole.MINISTRY && (
                     <Form.Item
                       name="address"
                       label="Address"
