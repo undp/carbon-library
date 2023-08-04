@@ -9,6 +9,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
+import { CompanyRole } from "../../../Definitions";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
@@ -250,6 +251,30 @@ export const CompanyProfileComponent = (props: any) => {
                         <CompanyRoleIcon role={companyDetails.companyRole} />
                       </Col>
                     </Row>
+                    {companyDetails?.companyRole === CompanyRole.MINISTRY && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:ministerName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            <CompanyRoleIcon
+                              role={companyDetails.nameOfMinister}
+                            />
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:sectoralScope")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.sectoralScope
+                              ? companyDetails.sectoralScope.join(", ")
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                     <Row className="field">
                       <Col span={12} className="field-key">
                         {t("companyProfile:email")}
