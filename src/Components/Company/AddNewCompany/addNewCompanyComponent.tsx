@@ -631,7 +631,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       allowClear
                     >
                       {Object.entries(SectoralScope).map(([key, value]) => (
-                        <Select.Option key={value} value={value}>
+                          <Select.Option key={value} value={parseInt(value)}>
                           {key}
                         </Select.Option>
                       ))}
