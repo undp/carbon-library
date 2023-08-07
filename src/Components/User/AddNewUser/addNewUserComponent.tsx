@@ -20,7 +20,10 @@ import { User } from "../../../Definitions/Entities/user";
 import * as Icon from "react-bootstrap-icons";
 import { plainToClass } from "class-transformer";
 import { Action } from "../../../Definitions/Enums/action.enum";
-import { Role } from "../../../Definitions/Definitions/programme.definitions";
+import {
+  CompanyRole,
+  Role,
+} from "../../../Definitions/Definitions/programme.definitions";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import ChangePasswordModel from "../../Common/Models/changePasswordModel";
 
@@ -35,7 +38,7 @@ export const AddNewUserComponent = (props: any) => {
     useUserContext,
     useLocation,
     useAbilityContext,
-    themeColor
+    themeColor,
   } = props;
   const { post, put, delete: del, get } = useConnection();
   const [formOne] = Form.useForm();
@@ -120,6 +123,10 @@ export const AddNewUserComponent = (props: any) => {
         name: formOneValues?.name,
         phoneNo: formOneValues?.phoneNo,
       };
+
+      if (state?.record?.companyRole === CompanyRole.MINISTRY) {
+        values.sectoralScope = state?.record?.company?.sectoralScope;
+      }
 
       if (ability.can(Action.Update, plainToClass(User, state?.record), "role"))
         values.role = formOneValues?.role;
