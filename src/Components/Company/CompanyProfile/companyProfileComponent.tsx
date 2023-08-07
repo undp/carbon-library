@@ -9,7 +9,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
-import { CompanyRole } from "../../../Definitions";
+import { CompanyRole, SectoralScope } from "../../../Definitions";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
@@ -137,6 +137,16 @@ export const CompanyProfileComponent = (props: any) => {
     setErrorMsg("");
     setOpenReactivateModal(true);
   };
+  const getEnumKeysFromValues = (values: string[]): string[] => {
+    const enumKeys: string[] = [];
+    for (const key in SectoralScope) {
+      if (values.includes(SectoralScope[key as keyof typeof SectoralScope])) {
+        enumKeys.push(key);
+      }
+    }
+
+    return enumKeys;
+  };
 
   return (
     <div className="content-container company-profile">
@@ -258,9 +268,9 @@ export const CompanyProfileComponent = (props: any) => {
                             {t("companyProfile:ministerName")}
                           </Col>
                           <Col span={12} className="field-value">
-                            <CompanyRoleIcon
-                              role={companyDetails.nameOfMinister}
-                            />
+                            {companyDetails.nameOfMinister
+                              ? companyDetails.nameOfMinister
+                              : "-"}
                           </Col>
                         </Row>
                         <Row className="field">
@@ -269,7 +279,9 @@ export const CompanyProfileComponent = (props: any) => {
                           </Col>
                           <Col span={12} className="field-value">
                             {companyDetails.sectoralScope
-                              ? companyDetails.sectoralScope.join(", ")
+                              ? getEnumKeysFromValues(
+                                  companyDetails.sectoralScope
+                                ).join(", ")
                               : "-"}
                           </Col>
                         </Row>
