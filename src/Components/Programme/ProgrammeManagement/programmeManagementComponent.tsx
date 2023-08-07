@@ -225,7 +225,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       key: ProgrammeManagementColumns.emissionReductionExpected,
       align: "right" as const,
       render: (item: any) => {
-        return item ? item : "-";
+        return item ? addCommSep(item) : "-";
       },
     },
     {
@@ -234,7 +234,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       key: ProgrammeManagementColumns.emissionReductionAchieved,
       align: "right" as const,
       render: (item: any) => {
-        return item ? item : "-";
+        return item ? addCommSep(item) : "-";
       },
     },
     {

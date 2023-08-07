@@ -196,7 +196,7 @@ export const CompanyManagementComponent = (props: any) => {
       sorter: true,
       align: "left" as const,
       render: (item: any) => {
-        return item ? item : "-";
+        return item ? addCommSep(item) : "-";
       },
     },
     {

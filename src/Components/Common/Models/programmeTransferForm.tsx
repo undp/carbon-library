@@ -264,6 +264,7 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
                         event.preventDefault();
                       }
                     }}
+                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   />
                 </Form.Item>
               </Col>
