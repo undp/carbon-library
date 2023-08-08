@@ -87,7 +87,6 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
                       event.preventDefault();
                     }
                   }}
-                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 />
               </Form.Item>
             </Col>
