@@ -395,7 +395,14 @@ export const ProgrammeManagementComponent = (props: any) => {
 
   useEffect(() => {
     getAllProgramme();
-  }, [currentPage, pageSize, sortField, sortOrder, search]);
+  }, [
+    currentPage,
+    pageSize,
+    sortField,
+    sortOrder,
+    search,
+    ministryLevelFilter,
+  ]);
 
   useEffect(() => {
     if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
@@ -472,7 +479,11 @@ export const ProgrammeManagementComponent = (props: any) => {
                   className="label"
                   onChange={(v) => {
                     if (userInfoState.companyRole === CompanyRole.MINISTRY) {
-                      setMinistryLevelFilter(true);
+                      if (v.target.checked) {
+                        setMinistryLevelFilter(true);
+                      } else {
+                        setMinistryLevelFilter(false);
+                      }
                     } else {
                       setDataFilter(
                         v.target.checked
