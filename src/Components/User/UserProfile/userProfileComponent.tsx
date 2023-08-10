@@ -6,6 +6,7 @@ import UserRoleIcon from "../../Common/UserRoleIcon/userRoleIcon";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import LanguageSelection from "../../Common/LanguageSelection/languageSelection";
 import React from "react";
+import { CompanyRole, SectoralScope } from "../../../Definitions";
 
 export const UserProfileComponent = (props: any) => {
   const {
@@ -40,6 +41,16 @@ export const UserProfileComponent = (props: any) => {
         setIsLoading(false);
       }
     } catch (exception) {}
+  };
+
+  const getEnumKeysFromValues = (values: string[]): string[] => {
+    const enumKeys: string[] = [];
+    for (const key in SectoralScope) {
+      if (values.includes(SectoralScope[key as keyof typeof SectoralScope])) {
+        enumKeys.push(key);
+      }
+    }
+    return enumKeys;
   };
 
   useEffect(() => {
@@ -195,6 +206,33 @@ export const UserProfileComponent = (props: any) => {
                         />
                       </Col>
                     </Row>
+                    {organisationDetails?.companyRole ===
+                      CompanyRole.MINISTRY && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("userProfile:ministerName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {organisationDetails.nameOfMinister
+                              ? organisationDetails.nameOfMinister
+                              : "-"}
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("userProfile:sectoralScope")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {organisationDetails.sectoralScope
+                              ? getEnumKeysFromValues(
+                                  organisationDetails.sectoralScope
+                                ).join(", ")
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                     <Row className="field">
                       <Col span={12} className="field-key">
                         {t("userProfile:email")}
