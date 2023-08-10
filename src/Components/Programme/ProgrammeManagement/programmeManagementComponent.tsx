@@ -60,6 +60,8 @@ export const ProgrammeManagementComponent = (props: any) => {
   const [sortOrder, setSortOrder] = useState<string>();
   const [sortField, setSortField] = useState<string>();
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
+  const [ministryLevelFilter, setMinistryLevelFilter] =
+    useState<boolean>(false);
   const { userInfoState } = useUserContext();
 
   const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
@@ -286,6 +288,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     setLoading(true);
 
     const filter: any[] = [];
+    const filterOr: any[] = [];
 
     if (dataFilter) {
       filter.push(dataFilter);
@@ -298,6 +301,16 @@ export const ProgrammeManagementComponent = (props: any) => {
         key: "title",
         operation: "like",
         value: `${search}%`,
+      });
+    }
+
+    if (ministryLevelFilter) {
+      ministrySectoralScope?.map((secScope: any) => {
+        filterOr.push({
+          key: "sectoralScope",
+          operation: "=",
+          value: secScope,
+        });
       });
     }
 
@@ -320,6 +333,7 @@ export const ProgrammeManagementComponent = (props: any) => {
         page: currentPage,
         size: pageSize,
         filterAnd: filter,
+        filterOr: filterOr,
         sort: sort,
       });
       setTableData(response.data);
@@ -456,23 +470,21 @@ export const ProgrammeManagementComponent = (props: any) => {
               <div className="search-filter">
                 <Checkbox
                   className="label"
-                  onChange={(v) =>
-                    setDataFilter(
-                      v.target.checked
-                        ? userInfoState.companyRole !== CompanyRole.MINISTRY
+                  onChange={(v) => {
+                    if (userInfoState.companyRole === CompanyRole.MINISTRY) {
+                      setMinistryLevelFilter(true);
+                    } else {
+                      setDataFilter(
+                        v.target.checked
                           ? {
                               key: "companyId",
                               operation: "ANY",
                               value: userInfoState?.companyId,
                             }
-                          : {
-                              key: "sectoralScope",
-                              operation: "ANY",
-                              value: ministrySectoralScope,
-                            }
-                        : undefined
-                    )
-                  }
+                          : undefined
+                      );
+                    }
+                  }}
                 >
                   {userInfoState.companyRole === CompanyRole.MINISTRY
                     ? t("view:ministryLevel")
