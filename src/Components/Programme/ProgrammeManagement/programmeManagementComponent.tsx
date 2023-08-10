@@ -19,6 +19,7 @@ import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import {
   addCommSep,
+  CompanyRole,
   getCompanyBgColor,
   getStageEnumVal,
   getStageTagType,
@@ -58,6 +59,7 @@ export const ProgrammeManagementComponent = (props: any) => {
   const [dataFilter, setDataFilter] = useState<any>();
   const [sortOrder, setSortOrder] = useState<string>();
   const [sortField, setSortField] = useState<string>();
+  const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
   const { userInfoState } = useUserContext();
 
   const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
@@ -335,6 +337,36 @@ export const ProgrammeManagementComponent = (props: any) => {
     }
   };
 
+  const getUserDetails = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/user/query", {
+        page: 1,
+        size: 10,
+        filterAnd: [
+          {
+            key: "id",
+            operation: "=",
+            value: userInfoState?.id,
+          },
+        ],
+      });
+      if (response && response.data) {
+        if (
+          response?.data[0]?.companyRole === CompanyRole.MINISTRY &&
+          response?.data[0]?.company &&
+          response?.data[0]?.company?.sectoralScope
+        ) {
+          setMinistrySectoralScope(response?.data[0]?.company?.sectoralScope);
+        }
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in getting users", error);
+      setLoading(false);
+    }
+  };
+
   const onSearch = async () => {
     setSearch(searchText);
   };
@@ -350,6 +382,12 @@ export const ProgrammeManagementComponent = (props: any) => {
   useEffect(() => {
     getAllProgramme();
   }, [currentPage, pageSize, sortField, sortOrder, search]);
+
+  useEffect(() => {
+    if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
+      getUserDetails();
+    }
+  }, []);
 
   const onChange: PaginationProps["onChange"] = (page, size) => {
     setCurrentPage(page);
@@ -421,16 +459,24 @@ export const ProgrammeManagementComponent = (props: any) => {
                   onChange={(v) =>
                     setDataFilter(
                       v.target.checked
-                        ? {
-                            key: "companyId",
-                            operation: "ANY",
-                            value: userInfoState?.companyId,
-                          }
+                        ? userInfoState.companyRole === CompanyRole.MINISTRY
+                          ? {
+                              key: "companyId",
+                              operation: "ANY",
+                              value: userInfoState?.companyId,
+                            }
+                          : {
+                              key: "sectoralScope",
+                              operation: "ANY",
+                              value: ministrySectoralScope,
+                            }
                         : undefined
                     )
                   }
                 >
-                  {t("view:seeMine")}
+                  {userInfoState.companyRole === CompanyRole.MINISTRY
+                    ? t("view:ministryLevel")
+                    : t("view:seeMine")}
                 </Checkbox>
               </div>
               <div className="search-bar">

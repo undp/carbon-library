@@ -1,4 +1,5 @@
 import {
+  AuditOutlined,
   BankOutlined,
   ExperimentOutlined,
   FilterOutlined,
@@ -31,6 +32,8 @@ import {
   DevColor,
   GovBGColor,
   GovColor,
+  MinBGColor,
+  MinColor,
 } from "../../../Styles/role.color.constants";
 import {
   CompanyRole,
@@ -98,14 +101,16 @@ export const CompanyManagementComponent = (props: any) => {
   const getCompanyRoleComponent = (item: string) => {
     return (
       <div style={{ display: "flex", alignItems: "center" }}>
-        {item === "Government" ? (
+        {item === CompanyRole.GOVERNMENT ? (
           <RoleIcon icon={<BankOutlined />} bg={GovBGColor} color={GovColor} />
-        ) : item === "Certifier" ? (
+        ) : item === CompanyRole.CERTIFIER ? (
           <RoleIcon
             icon={<SafetyOutlined />}
             bg={CertBGColor}
             color={CertColor}
           />
+        ) : item === CompanyRole.MINISTRY ? (
+          <RoleIcon icon={<AuditOutlined />} bg={MinBGColor} color={MinColor} />
         ) : (
           <RoleIcon
             icon={<ExperimentOutlined />}
@@ -113,7 +118,7 @@ export const CompanyManagementComponent = (props: any) => {
             color={DevColor}
           />
         )}
-        {item === "ProgrammeDeveloper" ? (
+        {item === CompanyRole.PROGRAMME_DEVELOPER ? (
           <div>{t("company:developer")}</div>
         ) : (
           <div>{item}</div>
@@ -346,6 +351,7 @@ export const CompanyManagementComponent = (props: any) => {
             <Space direction="vertical">
               <Radio value="All">{t("company:all")}</Radio>
               <Radio value="Government">{t("company:gov")}</Radio>
+              <Radio value="Ministry">{t("company:min")}</Radio>
               <Radio value="ProgrammeDeveloper">{t("company:developer")}</Radio>
               <Radio value="Certifier">{t("company:certifier")}</Radio>
             </Space>

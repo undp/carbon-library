@@ -1,4 +1,5 @@
 import {
+  AuditOutlined,
   BankOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -48,6 +49,8 @@ import {
   GovColor,
   ManagerBGColor,
   ManagerColor,
+  MinBGColor,
+  MinColor,
   RootBGColor,
   RootColor,
   ViewBGColor,
@@ -162,14 +165,16 @@ export const UserManagementComponent = (props: any) => {
       : null;
     return (
       <div style={{ display: "flex", alignItems: "center" }}>
-        {role === "Government" ? (
+        {role === CompanyRole.GOVERNMENT ? (
           <RoleIcon icon={<BankOutlined />} bg={GovBGColor} color={GovColor} />
-        ) : role === "Certifier" ? (
+        ) : role === CompanyRole.CERTIFIER ? (
           <RoleIcon
             icon={<SafetyOutlined />}
             bg={CertBGColor}
             color={CertColor}
           />
+        ) : role === CompanyRole.MINISTRY ? (
+          <RoleIcon icon={<AuditOutlined />} bg={MinBGColor} color={MinColor} />
         ) : (
           <RoleIcon
             icon={<ExperimentOutlined />}
@@ -177,7 +182,7 @@ export const UserManagementComponent = (props: any) => {
             color={DevColor}
           />
         )}
-        {role === "ProgrammeDeveloper" ? (
+        {role === CompanyRole.PROGRAMME_DEVELOPER ? (
           <div>{"Developer"}</div>
         ) : (
           <div>{role}</div>
@@ -621,6 +626,7 @@ export const UserManagementComponent = (props: any) => {
             <Space direction="vertical">
               <Radio value="All">All</Radio>
               <Radio value="Government">Government</Radio>
+              <Radio value="Ministry">Ministry</Radio>
               <Radio value="ProgrammeDeveloper">Developer</Radio>
               <Radio value="Certifier">Certifier</Radio>
             </Space>
