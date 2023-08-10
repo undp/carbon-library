@@ -459,7 +459,7 @@ export const ProgrammeManagementComponent = (props: any) => {
                   onChange={(v) =>
                     setDataFilter(
                       v.target.checked
-                        ? userInfoState.companyRole === CompanyRole.MINISTRY
+                        ? userInfoState.companyRole !== CompanyRole.MINISTRY
                           ? {
                               key: "companyId",
                               operation: "ANY",
