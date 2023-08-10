@@ -9,7 +9,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
-import { CompanyRole, SectoralScope } from "../../../Definitions";
+import { addCommSep, CompanyRole, SectoralScope } from "../../../Definitions";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
@@ -353,7 +353,7 @@ export const CompanyProfileComponent = (props: any) => {
                       </Col>
                       <Col span={12} className="field-value">
                         {companyDetails.creditBalance
-                          ? companyDetails.creditBalance
+                          ? addCommSep(companyDetails.creditBalance)
                           : "-"}
                       </Col>
                     </Row>

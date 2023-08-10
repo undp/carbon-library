@@ -6,7 +6,7 @@ import UserRoleIcon from "../../Common/UserRoleIcon/userRoleIcon";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import LanguageSelection from "../../Common/LanguageSelection/languageSelection";
 import React from "react";
-import { CompanyRole, SectoralScope } from "../../../Definitions";
+import { CompanyRole, SectoralScope, addCommSep } from "../../../Definitions";
 
 export const UserProfileComponent = (props: any) => {
   const {
@@ -296,7 +296,7 @@ export const UserProfileComponent = (props: any) => {
                       </Col>
                       <Col span={12} className="field-value">
                         {organisationDetails.creditBalance
-                          ? organisationDetails.creditBalance
+                          ? addCommSep(organisationDetails.creditBalance)
                           : "-"}
                       </Col>
                     </Row>
