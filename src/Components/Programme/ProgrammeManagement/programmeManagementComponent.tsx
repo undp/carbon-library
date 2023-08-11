@@ -34,6 +34,7 @@ import { User } from "../../../Definitions/Entities/user";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
+import { ProgrammeEntity } from "../../../Definitions";
 
 const { Search } = Input;
 
@@ -46,6 +47,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     onNavigateToProgrammeView,
     onClickAddProgramme,
     enableAddProgramme,
+    useAbilityContext,
   } = props;
   const { get, delete: del, post } = useConnection();
   const [totalProgramme, setTotalProgramme] = useState<number>();
@@ -63,6 +65,7 @@ export const ProgrammeManagementComponent = (props: any) => {
   const [ministryLevelFilter, setMinistryLevelFilter] =
     useState<boolean>(false);
   const { userInfoState } = useUserContext();
+  const ability = useAbilityContext();
 
   const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
 
@@ -436,17 +439,20 @@ export const ProgrammeManagementComponent = (props: any) => {
           <div className="body-sub-title">{t("programme:desc")}</div>
         </div>
         <div className="actions">
-          <div className="action-bar">
-            <Button
-              type="primary"
-              size="large"
-              block
-              icon={<PlusOutlined />}
-              onClick={onClickAddProgramme}
-            >
-              {t("programme:addProgramme")}
-            </Button>
-          </div>
+          {ability.can(Action.Manage, ProgrammeEntity) &&
+            enableAddProgramme && (
+              <div className="action-bar">
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  icon={<PlusOutlined />}
+                  onClick={onClickAddProgramme}
+                >
+                  {t("programme:addProgramme")}
+                </Button>
+              </div>
+            )}
         </div>
       </div>
       <div className="content-card">

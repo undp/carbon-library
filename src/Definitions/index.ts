@@ -15,3 +15,4 @@ export * from "./Entities/company";
 export * from "./Entities/baseEntity";
 export * from "./Entities/programmeTransfer";
 export * from "./Entities/user";
+export * from "./Entities/programme";
