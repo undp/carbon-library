@@ -124,10 +124,6 @@ export const AddNewUserComponent = (props: any) => {
         phoneNo: formOneValues?.phoneNo,
       };
 
-      if (state?.record?.companyRole === CompanyRole.MINISTRY) {
-        values.sectoralScope = state?.record?.company?.sectoralScope;
-      }
-
       if (ability.can(Action.Update, plainToClass(User, state?.record), "role"))
         values.role = formOneValues?.role;
 
