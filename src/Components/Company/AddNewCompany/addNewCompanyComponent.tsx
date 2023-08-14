@@ -225,12 +225,16 @@ export const AddNewCompanyComponent = (props: any) => {
         };
       }
 
-      if (state?.record?.companyRole !== CompanyRole.GOVERNMENT) {
+      if (
+        state?.record?.companyRole !== CompanyRole.GOVERNMENT &&
+        state?.record?.companyRole !== CompanyRole.MINISTRY
+      ) {
         values.taxId = formOneValues.taxId;
       }
 
       if (state?.record?.companyRole === CompanyRole.MINISTRY) {
-        values.taxId = formOneValues.sectoralScope;
+        values.sectoralScope = formOneValues.sectoralScope;
+        values.nameOfMinister = formOneValues.nameOfMinister;
       }
 
       if (formOneValues.website) {
