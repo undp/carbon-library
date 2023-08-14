@@ -457,7 +457,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       </div>
       <div className="content-card">
         <Row className="table-actions-section">
-          <Col lg={{ span: 16 }} md={{ span: 16 }}>
+          <Col lg={{ span: 15 }} md={{ span: 14 }}>
             <div className="action-bar">
               <Checkbox
                 className="all-check"
@@ -478,7 +478,7 @@ export const ProgrammeManagementComponent = (props: any) => {
               />
             </div>
           </Col>
-          <Col lg={{ span: 8 }} md={{ span: 8 }}>
+          <Col lg={{ span: 9 }} md={{ span: 10 }}>
             <div className="filter-section">
               <div className="search-filter">
                 <Checkbox
