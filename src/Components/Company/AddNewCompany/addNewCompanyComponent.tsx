@@ -229,6 +229,10 @@ export const AddNewCompanyComponent = (props: any) => {
         values.taxId = formOneValues.taxId;
       }
 
+      if (state?.record?.companyRole === CompanyRole.MINISTRY) {
+        values.taxId = formOneValues.sectoralScope;
+      }
+
       if (formOneValues.website) {
         values.website = 'https://' + formOneValues.website;
       } else {
