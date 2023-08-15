@@ -545,7 +545,17 @@ export const AddNewCompanyComponent = (props: any) => {
                         </div>
                       ) : (
                         <>
-                          <div className="certifier-radio-container">
+                          <div
+                            className="certifier-radio-container"
+                            style={
+                              userInfoState?.companyRole ===
+                              CompanyRole.MINISTRY
+                                ? {
+                                    width: "45%",
+                                  }
+                                : {}
+                            }
+                          >
                             <Tooltip
                               placement="top"
                               title="Permitted to certify and revoke certifications of programmes"
@@ -559,7 +569,17 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          <div className="dev-radio-container">
+                          <div
+                            className="dev-radio-container"
+                            style={
+                              userInfoState?.companyRole ===
+                              CompanyRole.MINISTRY
+                                ? {
+                                    width: "45%",
+                                  }
+                                : {}
+                            }
+                          >
                             <Tooltip
                               placement="top"
                               title="Permitted to own programmes and transfer carbon credits"
