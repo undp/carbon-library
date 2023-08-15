@@ -548,7 +548,7 @@ export const AddNewCompanyComponent = (props: any) => {
                           <div
                             className="certifier-radio-container"
                             style={
-                              userInfoState?.companyRole !==
+                              userInfoState?.companyRole ===
                               CompanyRole.MINISTRY
                                 ? {
                                     width: "45%",
@@ -572,7 +572,7 @@ export const AddNewCompanyComponent = (props: any) => {
                           <div
                             className="dev-radio-container"
                             style={
-                              userInfoState?.companyRole !==
+                              userInfoState?.companyRole ===
                               CompanyRole.MINISTRY
                                 ? {
                                     width: "45%",
