@@ -336,7 +336,7 @@ export const ProgrammeManagementComponent = (props: any) => {
         page: currentPage,
         size: pageSize,
         filterAnd: filter,
-        filterOr: filterOr,
+        filterOr: filterOr?.length > 0 ? filterOr : undefined,
         sort: sort,
       });
       setTableData(response.data);
