@@ -10,7 +10,7 @@ export enum InvestmentStatus {
   CANCELLED = "Cancelled",
 }
 
-export const getStageEnumVal = (value: string) => {
+export const getInvestmentStatusEnumVal = (value: string) => {
   const index = Object.keys(InvestmentStatus).indexOf(value);
   if (index < 0) {
     return value;
@@ -19,7 +19,7 @@ export const getStageEnumVal = (value: string) => {
 };
 
 export const getStatusTagType = (status: InvestmentStatus) => {
-  switch (getStageEnumVal(status)) {
+  switch (getInvestmentStatusEnumVal(status)) {
     case InvestmentStatus.REJECTED:
       return "error";
     case InvestmentStatus.PENDING:
