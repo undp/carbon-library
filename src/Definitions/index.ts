@@ -2,6 +2,7 @@ export * from "./Enums/company.management.columns.enum";
 export * from "./Enums/user.management.columns.enum";
 export * from "./Enums/programme.management.columns.enum";
 export * from "./Enums/investment.enum";
+export * from "./Enums/mitigation.types.enum";
 export * from "./Enums/eSGType.enum";
 export * from "./Enums/instrument.enum";
 export * from "./Enums/ndcAction.status.enum";

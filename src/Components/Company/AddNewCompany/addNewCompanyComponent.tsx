@@ -49,7 +49,7 @@ export const AddNewCompanyComponent = (props: any) => {
   const [current, setCurrent] = useState<number>(0);
   const [isUpdate, setIsUpdate] = useState(false);
   const { put, get, post } = useConnection();
-  const { setUserInfo } = useUserContext();
+  const { setUserInfo, userInfoState } = useUserContext();
   const { state } = useLocation();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [countries, setCountries] = useState<[]>([]);
@@ -231,8 +231,16 @@ export const AddNewCompanyComponent = (props: any) => {
         };
       }
 
-      if (state?.record?.companyRole !== CompanyRole.GOVERNMENT) {
+      if (
+        state?.record?.companyRole !== CompanyRole.GOVERNMENT &&
+        state?.record?.companyRole !== CompanyRole.MINISTRY
+      ) {
         values.taxId = formOneValues.taxId;
+      }
+
+      if (state?.record?.companyRole === CompanyRole.MINISTRY) {
+        values.sectoralScope = formOneValues.sectoralScope;
+        values.nameOfMinister = formOneValues.nameOfMinister;
       }
 
       if (formOneValues.website) {
@@ -551,7 +559,17 @@ export const AddNewCompanyComponent = (props: any) => {
                         </div>
                       ) : (
                         <>
-                          <div className="certifier-radio-container">
+                          <div
+                            className="certifier-radio-container"
+                            style={
+                              userInfoState?.companyRole ===
+                              CompanyRole.MINISTRY
+                                ? {
+                                    width: "45%",
+                                  }
+                                : {}
+                            }
+                          >
                             <Tooltip
                               placement="top"
                               title="Permitted to certify and revoke certifications of programmes"
@@ -565,7 +583,17 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          <div className="dev-radio-container">
+                          <div
+                            className="dev-radio-container"
+                            style={
+                              userInfoState?.companyRole ===
+                              CompanyRole.MINISTRY
+                                ? {
+                                    width: "45%",
+                                  }
+                                : {}
+                            }
+                          >
                             <Tooltip
                               placement="top"
                               title="Permitted to own programmes and transfer carbon credits"
@@ -579,20 +607,23 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          <div className="minister-radio-container">
-                            <Tooltip
-                              placement="top"
-                              title="Permitted to perform all programme-related actions within the Ministry"
-                            >
-                              <Radio.Button
-                                className="minister"
-                                value="Ministry"
+                          {userInfoState?.companyRole !==
+                            CompanyRole.MINISTRY && (
+                            <div className="minister-radio-container">
+                              <Tooltip
+                                placement="top"
+                                title="Permitted to perform all programme-related actions within the Ministry"
                               >
-                                <AuditOutlined className="role-icons" />
-                                Ministry
-                              </Radio.Button>
-                            </Tooltip>
-                          </div>
+                                <Radio.Button
+                                  className="minister"
+                                  value="Ministry"
+                                >
+                                  <AuditOutlined className="role-icons" />
+                                  Ministry
+                                </Radio.Button>
+                              </Tooltip>
+                            </div>
+                          )}
                         </>
                       )}
                     </Radio.Group>
