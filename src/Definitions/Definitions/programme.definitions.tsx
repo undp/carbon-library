@@ -205,6 +205,21 @@ export interface ProgrammeProperties {
   projectMaterial: [];
 }
 
+export interface ProgrammePropertiesT {
+  maxInternationalTransferAmount: string;
+  creditingPeriodInYears: number;
+  estimatedProgrammeCostUSD: number;
+  sourceOfFunding: any;
+  grantEquivalentAmount: number;
+  carbonPriceUSDPerTon: number;
+  buyerCountryEligibility: string;
+  geographicalLocation: string[];
+  greenHouseGasses: any[];
+  creditYear: number;
+  programmeMaterials: [];
+  projectMaterial: [];
+}
+
 export interface Programme {
   programmeId: string;
   serialNo: string;
@@ -239,6 +254,44 @@ export interface Programme {
   txRef: string;
   typeOfMitigation: TypeOfMitigation;
   geographicalLocationCordintes: any;
+}
+
+export interface ProgrammeT {
+  programmeId: string;
+  serialNo: string;
+  title: string;
+  sectoralScope: string;
+  sector: string;
+  countryCodeA2: string;
+  currentStage: ProgrammeStageMRV;
+  startTime: number;
+  endTime: number;
+  creditChange: number;
+  creditIssued: number;
+  creditEst: number;
+  creditBalance: number;
+  creditTransferred: number[];
+  creditRetired: number[];
+  creditFrozen: number[];
+  constantVersion: string;
+  proponentTaxVatId: string[];
+  companyId: number[];
+  proponentPercentage: number[];
+  creditOwnerPercentage: number[];
+  certifierId: any[];
+  certifier: any[];
+  company: any[];
+  creditUnit: string;
+  programmeProperties: ProgrammePropertiesT;
+  agricultureProperties: any;
+  solarProperties: any;
+  txTime: number;
+  createdTime: number;
+  txRef: string;
+  typeOfMitigation: TypeOfMitigation;
+  geographicalLocationCordintes: any;
+  emissionReductionExpected: number;
+  emissionReductionAchieved: number;
 }
 
 export const getGeneralFields = (programme: Programme) => {
