@@ -60,7 +60,7 @@ export const InvestmentManagementComponent = (props: any) => {
     t,
     useConnection,
     onNavigateToProgrammeView,
-    userInfoState,
+    useUserContext,
     useSettingsContext,
   } = props;
 
@@ -74,6 +74,7 @@ export const InvestmentManagementComponent = (props: any) => {
   );
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(true);
+  const { userInfoState } = useUserContext();
 
   const { post, get } = useConnection();
   const [totalProgramme, setTotalProgramme] = useState<number>();
@@ -450,8 +451,7 @@ export const InvestmentManagementComponent = (props: any) => {
       onCell: (record: any, rowIndex: any) => {
         return {
           onClick: (ev: any) => {
-            //navigate('/programmeManagement/view', { state: { id: record.programmeId } });
-            onNavigateToProgrammeView();
+            onNavigateToProgrammeView(record.programmeId);
           },
         };
       },

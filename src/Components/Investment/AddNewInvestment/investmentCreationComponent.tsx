@@ -111,7 +111,6 @@ export const InvestmentCreationComponent = (props: any) => {
 
   useEffect(() => {
     if (!state) {
-      //navigate('/programmeManagement/viewAll');
       onNavigateToProgrammeManagementView();
       return;
     }
@@ -177,7 +176,6 @@ export const InvestmentCreationComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
       }
-      //navigate('/programmeManagement/view');
       onNavigateToProgrammeView();
     } catch (error: any) {
       console.log("Error in investment creation - ", error);
