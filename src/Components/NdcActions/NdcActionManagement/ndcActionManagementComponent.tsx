@@ -27,7 +27,7 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
-const NdcActionManagementComponent = (props: any) => {
+export const NdcActionManagementComponent = (props: any) => {
   const {
     t,
     useConnection,
@@ -496,5 +496,3 @@ const NdcActionManagementComponent = (props: any) => {
     </div>
   );
 };
-
-export default NdcActionManagementComponent;
