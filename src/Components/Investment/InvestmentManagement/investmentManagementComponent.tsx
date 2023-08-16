@@ -27,7 +27,6 @@ import {
   InvestmentColor,
   TooltipColor,
 } from "../../../Styles/role.color.constants";
-import { Role } from "../../../Definitions/Enums/role.enum";
 import {
   InvestmentType,
   InvestmentLevel,
@@ -38,6 +37,7 @@ import {
 import InvestmentActionModel from "../../Common/Investment/investmentActionModel";
 import {
   CompanyRole,
+  Role,
   addCommSepRound,
   addSpaces,
   getCompanyBgColor,
