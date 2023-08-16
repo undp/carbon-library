@@ -36,8 +36,6 @@ import {
 } from "../../../Definitions/Enums/investment.enum";
 import InvestmentActionModel from "../../Common/Investment/investmentActionModel";
 import {
-  CompanyRole,
-  Role,
   addCommSepRound,
   addSpaces,
   getCompanyBgColor,
@@ -45,6 +43,8 @@ import {
 import { ProgrammeTransfer } from "../../../Definitions/Entities/programmeTransfer";
 import { RoleIcon } from "../../Common/RoleIcon/role.icon";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { Role } from "../../../Definitions/Enums/role.enum";
 
 type PopupInfo = {
   title: string;

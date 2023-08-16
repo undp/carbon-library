@@ -26,12 +26,10 @@ import {
 import "./addNewCompanyComponent.scss";
 import "../../../Styles/app.scss";
 import { RcFile, UploadFile } from "antd/lib/upload";
-import {
-  CompanyRole,
-  SectoralScope,
-} from "../../../Definitions/Definitions/programme.definitions";
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
 import validator from "validator";
+import { SectoralScope } from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const AddNewCompanyComponent = (props: any) => {
   const {
@@ -62,7 +60,7 @@ export const AddNewCompanyComponent = (props: any) => {
   );
 
   const getCountryList = async () => {
-    const response = await get('national/organisation/countries');
+    const response = await get("national/organisation/countries");
     if (response.data) {
       const alpha2Names = response.data.map((item: any) => {
         return item.alpha2;
@@ -152,7 +150,11 @@ export const AddNewCompanyComponent = (props: any) => {
     });
 
   const onFinishStepTwo = async (values: any) => {
-    const requestData = { ...values, role: 'Admin', company: { ...stepOneData } };
+    const requestData = {
+      ...values,
+      role: "Admin",
+      company: { ...stepOneData },
+    };
     setLoading(true);
     try {
       if (requestData.phoneNo) {
@@ -160,16 +162,20 @@ export const AddNewCompanyComponent = (props: any) => {
       } else {
         requestData.phoneNo = undefined;
       }
-      requestData.company.phoneNo = formatPhoneNumberIntl(requestData.company.phoneNo);
+      requestData.company.phoneNo = formatPhoneNumberIntl(
+        requestData.company.phoneNo
+      );
       if (requestData.company.website) {
-        requestData.company.website = 'https://' + requestData.company.website;
+        requestData.company.website = "https://" + requestData.company.website;
       } else {
         requestData.company.website = undefined;
       }
-      const logoBase64 = await getBase64(requestData?.company?.logo[0]?.originFileObj as RcFile);
-      const logoUrls = logoBase64.split(',');
+      const logoBase64 = await getBase64(
+        requestData?.company?.logo[0]?.originFileObj as RcFile
+      );
+      const logoUrls = logoBase64.split(",");
       requestData.company.logo = logoUrls[1];
-      const response = await post('national/user/add', requestData);
+      const response = await post("national/user/add", requestData);
       if (response.status === 200 || response.status === 201) {
         if (isUpdate) {
           setUserInfo({
@@ -177,10 +183,10 @@ export const AddNewCompanyComponent = (props: any) => {
           } as UserProps);
         }
         message.open({
-          type: 'success',
-          content: t('companyAddedSuccess'),
+          type: "success",
+          content: t("companyAddedSuccess"),
           duration: 3,
-          style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         onNavigateToCompanyManagement();
         setLoading(false);
@@ -206,14 +212,14 @@ export const AddNewCompanyComponent = (props: any) => {
       let values: any = {};
       if (regionField) {
         values = {
-        companyId: state?.record?.companyId,
-        name: formOneValues.name,
-        email: formOneValues.email,
-        phoneNo: formOneValues.phoneNo,
-        address: formOneValues.address,
+          companyId: state?.record?.companyId,
+          name: formOneValues.name,
+          email: formOneValues.email,
+          phoneNo: formOneValues.phoneNo,
+          address: formOneValues.address,
           regions: formOneValues.regions,
-        companyRole: state?.record?.companyRole,
-      };
+          companyRole: state?.record?.companyRole,
+        };
       } else {
         values = {
           companyId: state?.record?.companyId,
@@ -230,39 +236,41 @@ export const AddNewCompanyComponent = (props: any) => {
       }
 
       if (formOneValues.website) {
-        values.website = 'https://' + formOneValues.website;
+        values.website = "https://" + formOneValues.website;
       } else {
         values.website = undefined;
       }
 
       if (formOneValues.logo) {
         if (formOneValues.logo.length !== 0) {
-          const logoBase64 = await getBase64(formOneValues.logo[0]?.originFileObj as RcFile);
-          const logoUrls = logoBase64.split(',');
+          const logoBase64 = await getBase64(
+            formOneValues.logo[0]?.originFileObj as RcFile
+          );
+          const logoUrls = logoBase64.split(",");
           values.logo = logoUrls[1];
         }
       }
 
-      const response = await put('national/organisation/update', values);
+      const response = await put("national/organisation/update", values);
       if (response.status === 200 || response.status === 201) {
         setUserInfo({
           companyLogo: response.data.logo,
         } as UserProps);
         message.open({
-          type: 'success',
-          content: t('companyUpdatedSuccess'),
+          type: "success",
+          content: t("companyUpdatedSuccess"),
           duration: 3,
-          style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         onNavigateToCompanyManagement();
       }
       setLoading(false);
     } catch (error: any) {
       message.open({
-        type: 'error',
-        content: `${t('errorInUpdatingCompany')} ${error.message}`,
+        type: "error",
+        content: `${t("errorInUpdatingCompany")} ${error.message}`,
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       setLoading(false);
     }
@@ -307,17 +315,17 @@ export const AddNewCompanyComponent = (props: any) => {
                     rules={[
                       {
                         required: true,
-                        message: '',
+                        message: "",
                       },
                       {
                         validator: async (rule, value) => {
                           if (
-                            String(value).trim() === '' ||
+                            String(value).trim() === "" ||
                             String(value).trim() === undefined ||
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`Name ${t('isRequired')}`);
+                            throw new Error(`Name ${t("isRequired")}`);
                           }
                         },
                       },
@@ -329,31 +337,31 @@ export const AddNewCompanyComponent = (props: any) => {
                     ? (!isUpdate ||
                         (isUpdate &&
                           companyRole !== CompanyRole.GOVERNMENT)) && (
-                    <Form.Item
-                      label="Tax ID"
-                      initialValue={state?.record?.taxId}
-                      name="taxId"
-                      rules={[
-                        {
-                          required: true,
-                          message: "",
-                        },
-                        {
-                          validator: async (rule, value) => {
-                            if (
+                        <Form.Item
+                          label="Tax ID"
+                          initialValue={state?.record?.taxId}
+                          name="taxId"
+                          rules={[
+                            {
+                              required: true,
+                              message: "",
+                            },
+                            {
+                              validator: async (rule, value) => {
+                                if (
                                   String(value).trim() === "" ||
-                              String(value).trim() === undefined ||
-                              value === null ||
-                              value === undefined
-                            ) {
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
                                   throw new Error(`Tax ID ${t("isRequired")}`);
-                            }
-                          },
-                        },
-                      ]}
-                    >
-                      <Input size="large" />
-                    </Form.Item>
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <Input size="large" />
+                        </Form.Item>
                       )
                     : null}
                   <Form.Item
@@ -363,24 +371,26 @@ export const AddNewCompanyComponent = (props: any) => {
                     rules={[
                       {
                         required: true,
-                        message: '',
+                        message: "",
                       },
                       {
                         validator: async (rule, value) => {
                           if (
-                            String(value).trim() === '' ||
+                            String(value).trim() === "" ||
                             String(value).trim() === undefined ||
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`Email ${t('isRequired')}`);
+                            throw new Error(`Email ${t("isRequired")}`);
                           } else {
                             const val = value.trim();
                             const reg =
                               /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                            const matches = val.match(reg) ? val.match(reg) : [];
+                            const matches = val.match(reg)
+                              ? val.match(reg)
+                              : [];
                             if (matches.length === 0) {
-                              throw new Error(`Email ${t('isInvalid')}`);
+                              throw new Error(`Email ${t("isInvalid")}`);
                             }
                           }
                         },
@@ -392,7 +402,7 @@ export const AddNewCompanyComponent = (props: any) => {
                   <Form.Item
                     className="website"
                     label="Website"
-                    initialValue={state?.record?.website?.split('://')[1]}
+                    initialValue={state?.record?.website?.split("://")[1]}
                     name="website"
                     rules={[
                       {
@@ -427,24 +437,28 @@ export const AddNewCompanyComponent = (props: any) => {
                         validator: async (rule, file) => {
                           if (file === null || file === undefined) {
                             if (!state?.record?.logo)
-                              throw new Error(`Organisation Logo ${t('isRequired')}`);
+                              throw new Error(
+                                `Organisation Logo ${t("isRequired")}`
+                              );
                           } else {
                             if (file.length === 0) {
-                              throw new Error(`Organisation Logo ${t('isRequired')}`);
+                              throw new Error(
+                                `Organisation Logo ${t("isRequired")}`
+                              );
                             } else {
                               let isCorrectFormat = false;
-                              if (file[0]?.type === 'image/png') {
+                              if (file[0]?.type === "image/png") {
                                 isCorrectFormat = true;
-                              } else if (file[0]?.type === 'image/jpeg') {
+                              } else if (file[0]?.type === "image/jpeg") {
                                 isCorrectFormat = true;
-                              } else if (file[0]?.type === 'image/svg') {
+                              } else if (file[0]?.type === "image/svg") {
                                 isCorrectFormat = true;
                               }
                               if (!isCorrectFormat) {
-                                throw new Error(`${t('unsupportedFormat')}`);
+                                throw new Error(`${t("unsupportedFormat")}`);
                               } else if (file[0]?.size > maximumImageSize) {
                                 // default size format of files would be in bytes -> 1MB = 1000000bytes
-                                throw new Error(`${t('maxUploadSize')}`);
+                                throw new Error(`${t("maxUploadSize")}`);
                               }
                             }
                           }
@@ -584,59 +598,59 @@ export const AddNewCompanyComponent = (props: any) => {
                     </Radio.Group>
                   </Form.Item>
                   {companyRole === CompanyRole.MINISTRY && (
-                  <Form.Item
-                    label="Name of the Minister"
-                    name="nameOfMinister"
-                    initialValue={state?.record?.nameOfMinister}
-                    rules={[
-                      {
-                        required: true,
-                        message: "",
-                      },
-                      {
-                        validator: async (rule, value) => {
-                          if (
-                            String(value).trim() === "" ||
-                            String(value).trim() === undefined ||
-                            value === null ||
-                            value === undefined
-                          ) {
-                            throw new Error(
-                              `Name of the Minister ${t("isRequired")}`
-                            );
-                          }
+                    <Form.Item
+                      label="Name of the Minister"
+                      name="nameOfMinister"
+                      initialValue={state?.record?.nameOfMinister}
+                      rules={[
+                        {
+                          required: true,
+                          message: "",
                         },
-                      },
-                    ]}
-                  >
-                    <Input size="large" />
-                  </Form.Item>
+                        {
+                          validator: async (rule, value) => {
+                            if (
+                              String(value).trim() === "" ||
+                              String(value).trim() === undefined ||
+                              value === null ||
+                              value === undefined
+                            ) {
+                              throw new Error(
+                                `Name of the Minister ${t("isRequired")}`
+                              );
+                            }
+                          },
+                        },
+                      ]}
+                    >
+                      <Input size="large" />
+                    </Form.Item>
                   )}
                   {companyRole === CompanyRole.MINISTRY && (
-                  <Form.Item
-                    label="Sectoral Scope"
-                    name="sectoralScope"
-                    rules={[
-                      {
-                        required: true,
-                        message: `Sectoral Scope ${t("isRequired")}`,
-                      },
-                    ]}
-                    initialValue={state?.record?.sectoralScope}
-                  >
-                    <Select
-                      mode="multiple"
-                      size="large"
-                      maxTagCount={2}
-                      allowClear
+                    <Form.Item
+                      label="Sectoral Scope"
+                      name="sectoralScope"
+                      rules={[
+                        {
+                          required: true,
+                          message: `Sectoral Scope ${t("isRequired")}`,
+                        },
+                      ]}
+                      initialValue={state?.record?.sectoralScope}
                     >
-                      {Object.entries(SectoralScope).map(([key, value]) => (
+                      <Select
+                        mode="multiple"
+                        size="large"
+                        maxTagCount={2}
+                        allowClear
+                      >
+                        {Object.entries(SectoralScope).map(([key, value]) => (
                           <Select.Option key={value} value={value}>
-                          {key}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                            {key}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
                   )}
                   <Form.Item
                     name="phoneNo"
@@ -685,30 +699,30 @@ export const AddNewCompanyComponent = (props: any) => {
                     />
                   </Form.Item>
                   {regionField && (
-                  <Form.Item
-                    label={t("region")}
+                    <Form.Item
+                      label={t("region")}
                       name="regions"
                       initialValue={state?.record?.regions}
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t("region")} ${t("isRequired")}`,
-                      },
-                    ]}
-                  >
-                    <Select
-                      mode="multiple"
-                      size="large"
-                      maxTagCount={2}
-                      onChange={onChangeRegion}
+                      rules={[
+                        {
+                          required: true,
+                          message: `${t("region")} ${t("isRequired")}`,
+                        },
+                      ]}
+                    >
+                      <Select
+                        mode="multiple"
+                        size="large"
+                        maxTagCount={2}
+                        onChange={onChangeRegion}
                         loading={loadingList}
                         allowClear
-                    >
-                      {regionsList.map((region: any) => (
-                        <Select.Option value={region}>{region}</Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                      >
+                        {regionsList.map((region: any) => (
+                          <Select.Option value={region}>{region}</Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
                   )}
                   {companyRole !== CompanyRole.MINISTRY && (
                     <Form.Item
@@ -741,10 +755,15 @@ export const AddNewCompanyComponent = (props: any) => {
               {isUpdate ? (
                 <Row>
                   <Button loading={loading} onClick={onCancel}>
-                    {t('addCompany:cancel')}
+                    {t("addCompany:cancel")}
                   </Button>
-                  <Button loading={loading} className="mg-left-1" type="primary" htmlType="submit">
-                    {t('addCompany:submit')}
+                  <Button
+                    loading={loading}
+                    className="mg-left-1"
+                    type="primary"
+                    htmlType="submit"
+                  >
+                    {t("addCompany:submit")}
                   </Button>
                 </Row>
               ) : (
@@ -781,17 +800,17 @@ export const AddNewCompanyComponent = (props: any) => {
                   rules={[
                     {
                       required: true,
-                      message: '',
+                      message: "",
                     },
                     {
                       validator: async (rule, value) => {
                         if (
-                          String(value).trim() === '' ||
+                          String(value).trim() === "" ||
                           String(value).trim() === undefined ||
                           value === null ||
                           value === undefined
                         ) {
-                          throw new Error(`Name ${t('isRequired')}`);
+                          throw new Error(`Name ${t("isRequired")}`);
                         }
                       },
                     },
@@ -827,24 +846,24 @@ export const AddNewCompanyComponent = (props: any) => {
                   rules={[
                     {
                       required: true,
-                      message: '',
+                      message: "",
                     },
                     {
                       validator: async (rule, value) => {
                         if (
-                          String(value).trim() === '' ||
+                          String(value).trim() === "" ||
                           String(value).trim() === undefined ||
                           value === null ||
                           value === undefined
                         ) {
-                          throw new Error(`Email ${t('isRequired')}`);
+                          throw new Error(`Email ${t("isRequired")}`);
                         } else {
                           const val = value.trim();
                           const reg =
                             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                           const matches = val.match(reg) ? val.match(reg) : [];
                           if (matches.length === 0) {
-                            throw new Error(`Email ${t('isInvalid')}`);
+                            throw new Error(`Email ${t("isInvalid")}`);
                           }
                         }
                       },
@@ -867,7 +886,12 @@ export const AddNewCompanyComponent = (props: any) => {
                 UPDATE
               </Button>
             ) : (
-              <Button className="mg-left-1" type="primary" htmlType="submit" loading={loading}>
+              <Button
+                className="mg-left-1"
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+              >
                 SUBMIT
               </Button>
             )}
@@ -886,17 +910,21 @@ export const AddNewCompanyComponent = (props: any) => {
     <div className="add-company-main-container">
       <div className="title-container">
         <div className="main">
-          {isUpdate ? t('addCompany:editCompany') : t('addCompany:addNewCompany')}
+          {isUpdate
+            ? t("addCompany:editCompany")
+            : t("addCompany:addNewCompany")}
         </div>
         <div className="sub">
-          {isUpdate ? t('addCompany:editCompanySub') : t('addCompany:addCompanySub')}
+          {isUpdate
+            ? t("addCompany:editCompanySub")
+            : t("addCompany:addCompanySub")}
         </div>
       </div>
       <div className="adding-section">
         {isUpdate ? (
           <>
             <div className="step-title-container">
-              <div className="title">{t('addCompany:companyDetailsTitle')}</div>
+              <div className="title">{t("addCompany:companyDetailsTitle")}</div>
             </div>
             <CompanyDetailsForm />
           </>
@@ -911,7 +939,9 @@ export const AddNewCompanyComponent = (props: any) => {
                   title: (
                     <div className="step-title-container">
                       <div className="step-count">01</div>
-                      <div className="title">{t('addCompany:companyDetailsTitle')}</div>
+                      <div className="title">
+                        {t("addCompany:companyDetailsTitle")}
+                      </div>
                     </div>
                   ),
                   description: current === 0 && <CompanyDetailsForm />,
@@ -920,7 +950,9 @@ export const AddNewCompanyComponent = (props: any) => {
                   title: (
                     <div className="step-title-container">
                       <div className="step-count">02</div>
-                      <div className="title">{t('addCompany:companyAdminDetailsTitle')}</div>
+                      <div className="title">
+                        {t("addCompany:companyAdminDetailsTitle")}
+                      </div>
                     </div>
                   ),
                   description: current === 1 && <CompanyAdminDetailsForm />,

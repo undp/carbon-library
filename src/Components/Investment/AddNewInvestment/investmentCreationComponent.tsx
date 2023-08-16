@@ -15,7 +15,6 @@ import {
 } from "antd";
 import "../investmentComponent.scss";
 import {
-  CompanyRole,
   ProgrammeT,
   addSpaces,
 } from "../../../Definitions/Definitions/programme.definitions";
@@ -28,6 +27,7 @@ import {
   InvestmentType,
 } from "../../../Definitions/Enums/investment.enum";
 import { ESGType } from "../../../Definitions/Enums/eSGType.enum";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const InvestmentCreationComponent = (props: any) => {
   const {

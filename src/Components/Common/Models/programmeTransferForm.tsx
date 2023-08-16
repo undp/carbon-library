@@ -9,15 +9,15 @@ import {
   Row,
   Select,
   SelectProps,
-} from 'antd';
-import React, { FC, useEffect, useState } from 'react';
-import { CompanyState } from '../../../Definitions/Enums/company.state.enum';
+} from "antd";
+import React, { FC, useEffect, useState } from "react";
+import { CompanyState } from "../../../Definitions/Enums/company.state.enum";
 import {
   addCommSep,
-  CompanyRole,
   Programme,
-} from '../../../Definitions/Definitions/programme.definitions';
-import { creditUnit } from '../../../Definitions/Definitions/common.definitions';
+} from "../../../Definitions/Definitions/programme.definitions";
+import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export interface ProgrammeTransferFormProps {
   programme: Programme;
@@ -30,8 +30,8 @@ export interface ProgrammeTransferFormProps {
   receiverLabelText: string;
   userCompanyId: number | undefined;
   companyRole: string;
-  t:any;
-  useConnection:any;
+  t: any;
+  useConnection: any;
 }
 
 const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
@@ -49,12 +49,12 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
     userCompanyId,
     companyRole,
     t,
-    useConnection
+    useConnection,
   } = props;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentSum, setCurrentSum] = useState<number>(0);
-  const [companyList, setCompanyList] = useState<SelectProps['options']>(
+  const [companyList, setCompanyList] = useState<SelectProps["options"]>(
     toCompanyDefault ? [toCompanyDefault] : []
   );
   const [value, setValue] = useState<string>();
@@ -62,31 +62,38 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
 
   const handleSearch = async (newValue: string) => {
     if (newValue !== undefined) {
-      const resp = await post('national/organisation/queryNames', {
+      const resp = await post("national/organisation/queryNames", {
         page: 1,
         size: 50,
         filterAnd: [
           {
-            key: 'name',
-            operation: 'like',
-            value: newValue + '%',
+            key: "name",
+            operation: "like",
+            value: newValue + "%",
           },
           {
-            key: 'companyRole',
-            operation: '!=',
-            value: 'Certifier',
+            key: "companyRole",
+            operation: "!=",
+            value: "Certifier",
           },
         ],
         sort: {
-          key: 'name',
-          order: 'ASC',
+          key: "name",
+          order: "ASC",
         },
       });
       setCompanyList(
         resp.data
-          .map((d: any) => ({ label: d.name, value: d.companyId, state: d.state }))
+          .map((d: any) => ({
+            label: d.name,
+            value: d.companyId,
+            state: d.state,
+          }))
           .filter((d: any) => {
-            return d.value !== userCompanyId && parseInt(d.state) === CompanyState.ACTIVE.valueOf();
+            return (
+              d.value !== userCompanyId &&
+              parseInt(d.state) === CompanyState.ACTIVE.valueOf()
+            );
           })
       );
     } else {
@@ -114,12 +121,18 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
   for (const c of programme.company) {
     companies[c.companyId] = c;
   }
-  const validCompanies: { percentage: number; name: any; companyId: any; available: number }[] = [];
+  const validCompanies: {
+    percentage: number;
+    name: any;
+    companyId: any;
+    available: number;
+  }[] = [];
   let totalCredits = 0;
   const companyCredit = [];
   for (const index in programme.creditOwnerPercentage) {
     if (
-      ((toCompanyDefault && userCompanyId !== Number(programme.companyId[index])) ||
+      ((toCompanyDefault &&
+        userCompanyId !== Number(programme.companyId[index])) ||
         (!toCompanyDefault &&
           (userCompanyId === Number(programme.companyId[index]) ||
             companyRole === CompanyRole.GOVERNMENT))) &&
@@ -127,7 +140,8 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
         CompanyState.ACTIVE.valueOf()
     ) {
       const companyAvailableTotal =
-        ((programme.creditBalance - (programme.creditFrozen ? programme.creditFrozen[index] : 0)) *
+        ((programme.creditBalance -
+          (programme.creditFrozen ? programme.creditFrozen[index] : 0)) *
           programme.creditOwnerPercentage[index]) /
         100;
       validCompanies.push({
@@ -143,7 +157,7 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
   }
 
   useEffect(() => {
-    handleSearch('');
+    handleSearch("");
   }, []);
 
   return (
@@ -163,12 +177,15 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
         onChange={() => setPopupError(undefined)}
         onValuesChange={(v, allVal) => {
           setCurrentSum(
-            allVal.companyCredit.reduce((a: any, b: any) => (a ? a : 0) + (b ? b : 0), 0)
+            allVal.companyCredit.reduce(
+              (a: any, b: any) => (a ? a : 0) + (b ? b : 0),
+              0
+            )
           );
         }}
         onFinish={async (d) => {
           if (currentSum === 0) {
-            setPopupError('Total Amount should be greater than 0');
+            setPopupError("Total Amount should be greater than 0");
             return;
           }
           setLoading(true);
@@ -187,14 +204,14 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
               rules={[
                 {
                   required: !disableToCompany,
-                  message: 'Required field',
+                  message: "Required field",
                 },
               ]}
             >
               <Select
                 showSearch
                 disabled={disableToCompany}
-                placeholder={t('view:searchCompany')}
+                placeholder={t("view:searchCompany")}
                 showArrow={true}
                 filterOption={false}
                 onSearch={handleSearch}
@@ -217,7 +234,11 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
         </Row>
         <Row>
           <Col span={24}>
-            <Form.Item className="remarks-label" label={t('view:programme')} name="programme">
+            <Form.Item
+              className="remarks-label"
+              label={t("view:programme")}
+              name="programme"
+            >
               <Input placeholder={programme.title} disabled />
             </Form.Item>
           </Col>
@@ -231,24 +252,25 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
               <Col lg={6} md={12}>
                 <Form.Item
                   className="popup-credit-input"
-                  name={['companyCredit', index]}
+                  name={["companyCredit", index]}
                   rules={[
                     {
                       pattern: new RegExp(/^[+]?([.]\d+|\d+[.]?\d*)$/g),
-                      message: 'Credit Should be a positive number',
+                      message: "Credit Should be a positive number",
                     },
                     {
                       required: true,
-                      message: 'Required field',
+                      message: "Required field",
                     },
                     ({ getFieldValue }) => ({
                       validator(rule, v) {
                         if (
-                          getFieldValue(['companyCredit', index]) &&
-                          parseFloat(getFieldValue(['companyCredit', index])) > pert.available
+                          getFieldValue(["companyCredit", index]) &&
+                          parseFloat(getFieldValue(["companyCredit", index])) >
+                            pert.available
                         ) {
                           // eslint-disable-next-line prefer-promise-reject-errors
-                          return Promise.reject('Amount > Available');
+                          return Promise.reject("Amount > Available");
                         }
                         return Promise.resolve();
                       },
@@ -268,11 +290,14 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
                 </Form.Item>
               </Col>
               <Col lg={1} md={1} className="seperator">
-                {'/'}
+                {"/"}
               </Col>
               <Col lg={6} md={12}>
                 <Form.Item className="popup-credit-input">
-                  <InputNumber placeholder={addCommSep(pert.available)} disabled />
+                  <InputNumber
+                    placeholder={addCommSep(pert.available)}
+                    disabled
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -281,7 +306,9 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
         {validCompanies.length > 1 && (
           <Row>
             <Col lg={11} md={24}>
-              <div className="label">{`${t('view:totalTransferCredit')} (${creditUnit})`}</div>
+              <div className="label">{`${t(
+                "view:totalTransferCredit"
+              )} (${creditUnit})`}</div>
             </Col>
             <Col lg={6} md={12}>
               <Form.Item className="popup-credit-input">
@@ -289,11 +316,14 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
               </Form.Item>
             </Col>
             <Col lg={1} md={1} className="seperator">
-              {'/'}
+              {"/"}
             </Col>
             <Col lg={6} md={12}>
               <Form.Item className="popup-credit-input">
-                <InputNumber placeholder={addCommSep(programme.creditBalance)} disabled />
+                <InputNumber
+                  placeholder={addCommSep(programme.creditBalance)}
+                  disabled
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -316,13 +346,22 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
           </Col>
         </Row>
 
-        {popupError ? <Alert className="error" message={popupError} type="error" showIcon /> : ''}
+        {popupError ? (
+          <Alert className="error" message={popupError} type="error" showIcon />
+        ) : (
+          ""
+        )}
 
         <Form.Item className="footer">
           <Button htmlType="button" onClick={onCancel}>
-            {t('view:cancel')}
+            {t("view:cancel")}
           </Button>
-          <Button className="mg-left-2" type="primary" htmlType="submit" loading={loading}>
+          <Button
+            className="mg-left-2"
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
             {actionBtnText}
           </Button>
         </Form.Item>
