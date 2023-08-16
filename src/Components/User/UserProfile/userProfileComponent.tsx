@@ -6,7 +6,8 @@ import UserRoleIcon from "../../Common/UserRoleIcon/userRoleIcon";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import LanguageSelection from "../../Common/LanguageSelection/languageSelection";
 import React from "react";
-import { CompanyRole, SectoralScope, addCommSep } from "../../../Definitions";
+import { SectoralScope, addCommSep } from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const UserProfileComponent = (props: any) => {
   const {

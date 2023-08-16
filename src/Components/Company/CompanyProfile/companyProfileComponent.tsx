@@ -9,7 +9,8 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
-import { addCommSep, CompanyRole, SectoralScope } from "../../../Definitions";
+import { addCommSep, SectoralScope } from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const CompanyProfileComponent = (props: any) => {
   const {

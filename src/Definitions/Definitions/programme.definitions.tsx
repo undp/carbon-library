@@ -5,87 +5,11 @@ import {
   CertBGColor,
   DevBGColor,
 } from "../../Styles/role.color.constants";
-
-export enum ProgrammeStage {
-  AwaitingAuthorization = "Pending",
-  Authorised = "Authorised",
-  // Transferred = 'Transferred',
-  // Retired = 'Retired',
-  Rejected = "Rejected",
-  // Frozen = 'Frozen',
-}
-
-export enum ProgrammeStageMRV {
-  AwaitingAuthorization = "Pending",
-  Authorised = "Authorised",
-  Approved = "Approved",
-  Rejected = "Rejected",
-}
-
-// export enum ProgrammeTransferStage {
-//   APPROVED = 'Approved',
-//   REJECTED = 'Rejected',
-//   PENDING = 'Pending',
-//   // Frozen = 'Frozen',
-// }
-
-export enum Role {
-  Root = "Root",
-  Admin = "Admin",
-  Manager = "Manager",
-  ViewOnly = "ViewOnly",
-}
-
-export enum RetireType {
-  CROSS_BORDER = "0",
-  LEGAL_ACTION = "1",
-  OTHER = "2",
-}
-
-export enum CreditTransferStage {
-  Pending = "Pending",
-  Approved = "Accepted",
-  Rejected = "Rejected",
-  Cancelled = "Cancelled",
-  Recognised = "Recognised",
-  NotRecognised = "NotRecognised",
-}
-
-export enum TxType {
-  CREATE = "0",
-  REJECT = "1",
-  ISSUE = "2",
-  TRANSFER = "3",
-  CERTIFY = "4",
-  RETIRE = "5",
-  REVOKE = "6",
-  FREEZE = "7",
-  AUTH = "8",
-  UNFREEZE = "9",
-}
-
-export enum SectoralScope {
-  "Energy Industries (Renewable – / Non-Renewable Sources)" = "1",
-  "Energy Distribution" = "2",
-  "Energy Demand" = "3",
-  "Manufacturing Industries" = "4",
-  "Chemical Industries" = "5",
-  "Construction" = "6",
-  "Transport" = "7",
-  "Mining/Mineral Production" = "8",
-  "Metal Production" = "9",
-  "Fugitive Emissions From Fuels (Solid, Oil and Gas)" = "10",
-  "Fugitive Emissions From Production and Consumption of Halocarbons and Sulphur Hexafluoride" = "11",
-  "Solvent Use" = "12",
-  "Waste Handling and Disposal" = "13",
-  "Afforestation and Reforestation" = "14",
-  "Agriculture" = "15",
-}
-
-export enum TypeOfMitigation {
-  AGRICULTURE = "Agriculture",
-  SOLAR = "Solar",
-}
+import { ProgrammeStage } from "../Enums/programmeStage.enum";
+import { ProgrammeStageMRV } from "../Enums/programmeStageMRV.enum";
+import { TypeOfMitigation } from "../Enums/typeOfMitigation.enum";
+import { CreditTransferStage } from "../Enums/creditTransferStage.enum";
+import { SectoralScope } from "../Enums/sectoralScope.enum";
 
 export const getStageEnumVal = (value: string) => {
   const index = Object.keys(ProgrammeStage).indexOf(value);
@@ -181,19 +105,25 @@ export class UnitField {
   constructor(public unit: string, public value: any) {}
 }
 
-export enum CompanyRole {
-  CERTIFIER = "Certifier",
-  PROGRAMME_DEVELOPER = "ProgrammeDeveloper",
-  MINISTRY = "Ministry",
-  MRV = "MRV",
-  GOVERNMENT = "Government",
-  API = "API",
-}
-
 export interface ProgrammeProperties {
   maxInternationalTransferAmount: string;
   creditingPeriodInYears: number;
   programmeCostUSD: number;
+  sourceOfFunding: any;
+  grantEquivalentAmount: number;
+  carbonPriceUSDPerTon: number;
+  buyerCountryEligibility: string;
+  geographicalLocation: string[];
+  greenHouseGasses: any[];
+  creditYear: number;
+  programmeMaterials: [];
+  projectMaterial: [];
+}
+
+export interface ProgrammePropertiesT {
+  maxInternationalTransferAmount: string;
+  creditingPeriodInYears: number;
+  estimatedProgrammeCostUSD: number;
   sourceOfFunding: any;
   grantEquivalentAmount: number;
   carbonPriceUSDPerTon: number;
@@ -239,6 +169,44 @@ export interface Programme {
   txRef: string;
   typeOfMitigation: TypeOfMitigation;
   geographicalLocationCordintes: any;
+}
+
+export interface ProgrammeT {
+  programmeId: string;
+  serialNo: string;
+  title: string;
+  sectoralScope: string;
+  sector: string;
+  countryCodeA2: string;
+  currentStage: ProgrammeStageMRV;
+  startTime: number;
+  endTime: number;
+  creditChange: number;
+  creditIssued: number;
+  creditEst: number;
+  creditBalance: number;
+  creditTransferred: number[];
+  creditRetired: number[];
+  creditFrozen: number[];
+  constantVersion: string;
+  proponentTaxVatId: string[];
+  companyId: number[];
+  proponentPercentage: number[];
+  creditOwnerPercentage: number[];
+  certifierId: any[];
+  certifier: any[];
+  company: any[];
+  creditUnit: string;
+  programmeProperties: ProgrammePropertiesT;
+  agricultureProperties: any;
+  solarProperties: any;
+  txTime: number;
+  createdTime: number;
+  txRef: string;
+  typeOfMitigation: TypeOfMitigation;
+  geographicalLocationCordintes: any;
+  emissionReductionExpected: number;
+  emissionReductionAchieved: number;
 }
 
 export const getGeneralFields = (programme: Programme) => {

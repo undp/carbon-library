@@ -19,13 +19,10 @@ import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import {
   addCommSep,
-  CompanyRole,
   getCompanyBgColor,
   getStageEnumVal,
   getStageTagType,
   getStageTagTypeMRV,
-  ProgrammeStage,
-  ProgrammeStageMRV,
   sumArray,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -34,7 +31,12 @@ import { User } from "../../../Definitions/Entities/user";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
-import { ProgrammeEntity } from "../../../Definitions";
+import {
+  ProgrammeEntity,
+  ProgrammeStage,
+  ProgrammeStageMRV,
+} from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 const { Search } = Input;
 

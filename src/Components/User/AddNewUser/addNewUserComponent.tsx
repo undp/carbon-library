@@ -20,12 +20,9 @@ import { User } from "../../../Definitions/Entities/user";
 import * as Icon from "react-bootstrap-icons";
 import { plainToClass } from "class-transformer";
 import { Action } from "../../../Definitions/Enums/action.enum";
-import {
-  CompanyRole,
-  Role,
-} from "../../../Definitions/Definitions/programme.definitions";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import ChangePasswordModel from "../../Common/Models/changePasswordModel";
+import { Role } from "../../../Definitions";
 
 const { Option } = Select;
 

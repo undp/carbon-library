@@ -14,7 +14,7 @@ import {
   Radio,
   Space,
   Form,
-  Input
+  Input,
 } from "antd";
 import "./programmeViewComponent.scss";
 import { isBase64 } from "../../Common/ProfileIcon/profile.icon";
@@ -41,19 +41,13 @@ import {
 import {
   addCommSep,
   addSpaces,
-  CompanyRole,
-  CreditTransferStage,
   getFinancialFields,
   getGeneralFields,
   getRetirementTypeString,
   getStageEnumVal,
   getStageTagType,
   Programme,
-  ProgrammeStage,
-  RetireType,
   sumArray,
-  TxType,
-  TypeOfMitigation,
   UnitField,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { RoleIcon } from "../../Common/RoleIcon/role.icon";
@@ -90,6 +84,14 @@ import {
   MapTypes,
   MarkerData,
 } from "../../../Definitions/Definitions/mapComponent.definitions";
+import {
+  CreditTransferStage,
+  ProgrammeStage,
+  RetireType,
+  TxType,
+  TypeOfMitigation,
+} from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 const { TextArea } = Input;
 
 export const ProgrammeViewComponent = (props: any) => {

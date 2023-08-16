@@ -62,7 +62,7 @@ import { Action } from "../../../Definitions/Enums/action.enum";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
-import { CompanyRole } from "../../../Definitions/Definitions/programme.definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 const { Search } = Input;
 

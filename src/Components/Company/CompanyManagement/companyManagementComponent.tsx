@@ -35,15 +35,13 @@ import {
   MinBGColor,
   MinColor,
 } from "../../../Styles/role.color.constants";
-import {
-  CompanyRole,
-  addCommSep,
-} from "../../../Definitions/Definitions/programme.definitions";
+import { addCommSep } from "../../../Definitions/Definitions/programme.definitions";
 import { CompanyTableDataType } from "../../../Definitions/Definitions/companyManagement.definitions";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { Company } from "../../../Definitions/Entities/company";
 import { CompanyManagementColumns } from "../../../Definitions/Enums/company.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 const { Search } = Input;
 
