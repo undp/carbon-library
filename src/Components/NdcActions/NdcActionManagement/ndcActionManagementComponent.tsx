@@ -120,7 +120,6 @@ export const NdcActionManagementComponent = (props: any) => {
       onCell: (record: any, rowIndex: any) => {
         return {
           onClick: (ev: any) => {
-            //navigate('/ndcManagement/view', { state: { record } });
             onNavigateToNdcManagementView(record);
           },
         };
@@ -163,7 +162,6 @@ export const NdcActionManagementComponent = (props: any) => {
       onCell: (record: any, rowIndex: any) => {
         return {
           onClick: (ev: any) => {
-            //navigate('/programmeManagement/view', { state: { id: record.programmeId } });
             onNavigateToProgrammeManagementView(record.programmeId);
           },
         };
