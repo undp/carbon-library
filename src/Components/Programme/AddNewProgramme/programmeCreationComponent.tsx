@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -14,15 +14,24 @@ import {
   Tooltip,
   Upload,
   message,
-} from 'antd';
-import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import './programmeCreationComponent.scss';
-import { InfoCircle } from 'react-bootstrap-icons';
-import moment from 'moment';
-import { RcFile } from 'antd/lib/upload';
-import { CompanyRole, Sector, SectoralScope, addCommSepRound } from '../../../Definitions';
+} from "antd";
+import {
+  MinusCircleOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import "./programmeCreationComponent.scss";
+import { InfoCircle } from "react-bootstrap-icons";
+import moment from "moment";
+import { RcFile } from "antd/lib/upload";
+import {
+  CompanyRole,
+  Sector,
+  SectoralScope,
+  addCommSepRound,
+} from "../../../Definitions";
 
-type SizeType = Parameters<typeof Form>[0]['size'];
+type SizeType = Parameters<typeof Form>[0]["size"];
 
 const maximumImageSize = process.env.REACT_APP_MAXIMUM_FILE_SIZE
   ? parseInt(process.env.REACT_APP_MAXIMUM_FILE_SIZE)
@@ -30,25 +39,38 @@ const maximumImageSize = process.env.REACT_APP_MAXIMUM_FILE_SIZE
 
 const sectoralScopes: any = {
   Energy: [
-    'Energy Industries (Renewable – / Non-Renewable Sources)',
-    'Energy Distribution',
-    'Energy Demand',
+    "Energy Industries (Renewable – / Non-Renewable Sources)",
+    "Energy Distribution",
+    "Energy Demand",
   ],
-  Transport: ['Transport'],
-  Manufacturing: ['Manufacturing Industries', 'Chemical Industries', 'Metal Production'],
-  Forestry: ['Afforestation and Reforestation'],
-  Waste: ['Waste Handling and Disposal', 'Fugitive Emissions From Fuels (Solid, Oil and Gas)'],
-  Agriculture: ['Agriculture'],
+  Transport: ["Transport"],
+  Manufacturing: [
+    "Manufacturing Industries",
+    "Chemical Industries",
+    "Metal Production",
+  ],
+  Forestry: ["Afforestation and Reforestation"],
+  Waste: [
+    "Waste Handling and Disposal",
+    "Fugitive Emissions From Fuels (Solid, Oil and Gas)",
+  ],
+  Agriculture: ["Agriculture"],
   Other: [
-    'Mining/Mineral Production',
-    'Construction',
-    'Fugitive Emissions From Production and Consumption of Halocarbons and Sulphur Hexafluoride',
-    'Solvent Use',
+    "Mining/Mineral Production",
+    "Construction",
+    "Fugitive Emissions From Production and Consumption of Halocarbons and Sulphur Hexafluoride",
+    "Solvent Use",
   ],
 };
 
-export const ProgrammeCreationComponent = (props:any) => {
-    const {useUserContext,useConnection,useLocation,onNavigateToProgrammeView,t} = props;
+export const ProgrammeCreationComponent = (props: any) => {
+  const {
+    useUserContext,
+    useConnection,
+    useLocation,
+    onNavigateToProgrammeView,
+    t,
+  } = props;
   const { state } = useLocation();
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -66,15 +88,17 @@ export const ProgrammeCreationComponent = (props:any) => {
   const [includedInNAP, setIncludedInNAP] = useState<any>();
   const [countries, setCountries] = useState<[]>([]);
   const [organisationsList, setOrganisationList] = useState<any[]>([]);
-  const [userOrgTaxId, setUserOrgTaxId] = useState<any>('');
+  const [userOrgTaxId, setUserOrgTaxId] = useState<any>("");
   const [regionsList, setRegionsList] = useState<any[]>([]);
   const [programmeDetailsObj, setProgrammeDetailsObj] = useState<any>();
   const [selectedOrgs, setSelectedOrgs] = useState<any[]>();
   const [ownershipPercentageValidation, setOwnershipPercentageValidation] =
     useState<boolean>(false);
-  const [selectedSector, setSelectedSector] = useState<string>('');
+  const [selectedSector, setSelectedSector] = useState<string>("");
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
-  const [availableSecoralScope, setAvailableSectoralScope] = useState<any[]>([]);
+  const [availableSecoralScope, setAvailableSectoralScope] = useState<any[]>(
+    []
+  );
   const [availableSectar, setAvailableSectar] = useState<any[]>([]);
 
   const initialOrganisationOwnershipValues: any[] = [
@@ -108,12 +132,12 @@ export const ProgrammeCreationComponent = (props:any) => {
   const getCountryList = async () => {
     setLoadingList(true);
     try {
-      const response = await get('national/organisation/countries');
+      const response = await get("national/organisation/countries");
       if (response.data) {
         setCountries(response.data);
       }
     } catch (error: any) {
-      console.log('Error in getting country list', error);
+      console.log("Error in getting country list", error);
     } finally {
       setLoadingList(false);
     }
@@ -122,23 +146,23 @@ export const ProgrammeCreationComponent = (props:any) => {
   const getRegionList = async () => {
     setLoadingList(true);
     try {
-      const response = await post('national/organisation/regions', {
+      const response = await post("national/organisation/regions", {
         page: 1,
         size: 100,
         filterAnd: [
           {
-            key: 'lang',
-            operation: '=',
-            value: 'en',
+            key: "lang",
+            operation: "=",
+            value: "en",
           },
         ],
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList(['National', ...regionNames]);
+        setRegionsList(["National", ...regionNames]);
       }
     } catch (error: any) {
-      console.log('Error in getting regions list', error);
+      console.log("Error in getting regions list", error);
     } finally {
       setLoadingList(false);
     }
@@ -147,13 +171,13 @@ export const ProgrammeCreationComponent = (props:any) => {
   const getOrganisationsDetails = async () => {
     setLoadingList(true);
     try {
-      const response = await post('national/organisation/queryNames', {
+      const response = await post("national/organisation/queryNames", {
         page: 1,
         size: 100,
         filterAnd: [
           {
-            key: 'companyRole',
-            operation: '=',
+            key: "companyRole",
+            operation: "=",
             value: CompanyRole.PROGRAMME_DEVELOPER,
           },
         ],
@@ -167,7 +191,7 @@ export const ProgrammeCreationComponent = (props:any) => {
         setUserOrgTaxId(taxId);
       }
     } catch (error: any) {
-      console.log('Error in getting organisation list', error);
+      console.log("Error in getting organisation list", error);
     } finally {
       setLoadingList(false);
     }
@@ -176,13 +200,13 @@ export const ProgrammeCreationComponent = (props:any) => {
   const getUserDetails = async () => {
     setLoading(true);
     try {
-      const response: any = await post('national/user/query', {
+      const response: any = await post("national/user/query", {
         page: 1,
         size: 10,
         filterAnd: [
           {
-            key: 'id',
-            operation: '=',
+            key: "id",
+            operation: "=",
             value: userInfoState?.id,
           },
         ],
@@ -215,17 +239,22 @@ export const ProgrammeCreationComponent = (props:any) => {
               }
             });
           });
-          setAvailableSectar([...sectors, 'Health', 'Education', 'Hospitality']);
+          setAvailableSectar([
+            ...sectors,
+            "Health",
+            "Education",
+            "Hospitality",
+          ]);
         }
       }
       setLoading(false);
     } catch (error: any) {
-      console.log('Error in getting users', error);
+      console.log("Error in getting users", error);
       message.open({
-        type: 'error',
+        type: "error",
         content: error.message,
         duration: 3,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       setLoading(false);
     }
@@ -264,17 +293,21 @@ export const ProgrammeCreationComponent = (props:any) => {
       (sum: any, field: any) => sum + field.proponentPercentage,
       0
     );
-    const proponentPercentages = ownershipPercentage.map((item: any) => item.proponentPercentage);
+    const proponentPercentages = ownershipPercentage.map(
+      (item: any) => item.proponentPercentage
+    );
     const proponentTxIds =
       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
       userInfoState?.companyRole !== CompanyRole.MINISTRY
         ? ownershipPercentage?.slice(1).map((item: any) => item.organisation)
         : ownershipPercentage?.map((item: any) => item.organisation);
-    let logoBase64 = '';
+    let logoBase64 = "";
     let logoUrls: any[] = [];
     if (values?.designDocument?.length > 0) {
-      logoBase64 = await getBase64(values?.designDocument[0]?.originFileObj as RcFile);
-      logoUrls = logoBase64?.split(',');
+      logoBase64 = await getBase64(
+        values?.designDocument[0]?.originFileObj as RcFile
+      );
+      logoUrls = logoBase64?.split(",");
     }
     const propTaxIds =
       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
@@ -284,18 +317,18 @@ export const ProgrammeCreationComponent = (props:any) => {
     const duplicateIds = new Set(propTaxIds).size !== propTaxIds.length;
     if (totalPercentage !== 100) {
       message.open({
-        type: 'error',
-        content: t('addProgramme:proponentPercentValidation'),
+        type: "error",
+        content: t("addProgramme:proponentPercentValidation"),
         duration: 4,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       setLoading(false);
     } else if (duplicateIds) {
       message.open({
-        type: 'error',
-        content: t('addProgramme:duplicateOrg'),
+        type: "error",
+        content: t("addProgramme:duplicateOrg"),
         duration: 4,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       setLoading(false);
     } else {
@@ -304,8 +337,8 @@ export const ProgrammeCreationComponent = (props:any) => {
         externalId: values?.externalId,
         sectoralScope: values?.sectoralScope,
         sector: values?.sector,
-        startTime: moment(values?.startTime).startOf('day').unix(),
-        endTime: moment(values?.endTime).endOf('day').unix(),
+        startTime: moment(values?.startTime).startOf("day").unix(),
+        endTime: moment(values?.endTime).endOf("day").unix(),
         proponentTaxVatId:
           userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
           userInfoState?.companyRole !== CompanyRole.MINISTRY
@@ -317,7 +350,9 @@ export const ProgrammeCreationComponent = (props:any) => {
           geographicalLocation: values?.geographicalLocation,
           greenHouseGasses: values?.greenHouseGasses,
           ...(values?.ndcScope !== undefined &&
-            values?.ndcScope !== null && { ndcScope: values?.ndcScope === 'true' ? true : false }),
+            values?.ndcScope !== null && {
+              ndcScope: values?.ndcScope === "true" ? true : false,
+            }),
           ...(includedInNDC !== undefined &&
             includedInNDC !== null && { includedInNdc: includedInNDC }),
           ...(includedInNAP !== undefined &&
@@ -336,25 +371,24 @@ export const ProgrammeCreationComponent = (props:any) => {
   const saveNewProgramme = async (payload: any) => {
     setLoading(true);
     try {
-      const response: any = await post('national/programme/create', payload);
-      console.log('Programme creation -> ', response);
-      if (response?.statusText === 'SUCCESS') {
+      const response: any = await post("national/programme/create", payload);
+      console.log("Programme creation -> ", response);
+      if (response?.statusText === "SUCCESS") {
         message.open({
-          type: 'success',
-          content: t('addProgramme:programmeCreationSuccess'),
+          type: "success",
+          content: t("addProgramme:programmeCreationSuccess"),
           duration: 4,
-          style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
       }
-      //navigate('/programmeManagement/view');
       onNavigateToProgrammeView();
     } catch (error: any) {
-      console.log('Error in programme creation - ', error);
+      console.log("Error in programme creation - ", error);
       message.open({
-        type: 'error',
+        type: "error",
         content: error?.message,
         duration: 4,
-        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
       setLoading(false);
@@ -365,7 +399,10 @@ export const ProgrammeCreationComponent = (props:any) => {
     if (ndcActionDetailsObj.enablementReportData) {
       delete ndcActionDetailsObj.enablementReportData;
     }
-    const updatedProgrammeDetailsObj = { ...programmeDetailsObj, ndcAction: ndcActionDetailsObj };
+    const updatedProgrammeDetailsObj = {
+      ...programmeDetailsObj,
+      ndcAction: ndcActionDetailsObj,
+    };
     setProgrammeDetailsObj(updatedProgrammeDetailsObj);
     setCurrent(current + 1);
   };
@@ -378,7 +415,8 @@ export const ProgrammeCreationComponent = (props:any) => {
     if (!updatedProgrammeDetailsObj.ndcAction) {
       updatedProgrammeDetailsObj.ndcAction = {};
     }
-    updatedProgrammeDetailsObj.ndcAction.coBenefitsProperties = coBenefitDetails;
+    updatedProgrammeDetailsObj.ndcAction.coBenefitsProperties =
+      coBenefitDetails;
     setProgrammeDetailsObj(updatedProgrammeDetailsObj);
     saveNewProgramme(updatedProgrammeDetailsObj);
   };
@@ -419,9 +457,12 @@ export const ProgrammeCreationComponent = (props:any) => {
       const minViableCarbonPrice = Number(
         allValues?.estimatedProgrammeCostUSD / allValues?.creditEst
       ).toFixed(2);
-      formTwo.setFieldValue('minViableCarbonPrice', addCommSepRound(minViableCarbonPrice));
+      formTwo.setFieldValue(
+        "minViableCarbonPrice",
+        addCommSepRound(minViableCarbonPrice)
+      );
     } else {
-      formTwo.setFieldValue('minViableCarbonPrice', '');
+      formTwo.setFieldValue("minViableCarbonPrice", "");
     }
   };
 
@@ -439,7 +480,7 @@ export const ProgrammeCreationComponent = (props:any) => {
   const onClickNDCScope = (value: any) => {
     if (value === ndcScopeValue) {
       setNdcScopeValue(null);
-      formOne.setFieldValue('ndcScope', null);
+      formOne.setFieldValue("ndcScope", null);
       setNdcScopeChanged(undefined);
       setIncludedInNDC(undefined);
     }
@@ -462,41 +503,48 @@ export const ProgrammeCreationComponent = (props:any) => {
   };
 
   const onChangeGeoLocation = (values: any[]) => {
-    if (values.includes('National')) {
+    if (values.includes("National")) {
       const buyerCountryValues = regionsList;
-      const newBuyerValues = buyerCountryValues?.filter((item: any) => item !== 'National');
-      formOne.setFieldValue('geographicalLocation', [...newBuyerValues]);
+      const newBuyerValues = buyerCountryValues?.filter(
+        (item: any) => item !== "National"
+      );
+      formOne.setFieldValue("geographicalLocation", [...newBuyerValues]);
     }
   };
 
   const onInCludedNAPChange = (event: any) => {
-    if (event?.target?.value === 'inNAP') {
+    if (event?.target?.value === "inNAP") {
       setIncludedInNAP(true);
-    } else if (event?.target?.value === 'notInNAP') {
+    } else if (event?.target?.value === "notInNAP") {
       setIncludedInNAP(false);
     }
   };
 
   const onInCludedNDCChange = (event: any) => {
-    if (event?.target?.value === 'inNDC') {
+    if (event?.target?.value === "inNDC") {
       setIncludedInNDC(true);
-    } else if (event?.target?.value === 'notInNDC') {
+    } else if (event?.target?.value === "notInNDC") {
       setIncludedInNDC(false);
     }
   };
 
   const onChangeStepOne = (changedValues: any, allValues: any) => {
-    const selectedCompanies = allValues?.ownershipPercentage?.map((org: any) => org?.organisation);
+    const selectedCompanies = allValues?.ownershipPercentage?.map(
+      (org: any) => org?.organisation
+    );
     const orgPercentValidation =
-      allValues?.ownershipPercentage[0]?.proponentPercentage === false ? true : false;
+      allValues?.ownershipPercentage[0]?.proponentPercentage === false
+        ? true
+        : false;
     setOwnershipPercentageValidation(orgPercentValidation);
-    const uniqueOrgs:any = new Set(selectedCompanies);
+    const uniqueOrgs: any = new Set(selectedCompanies);
     setSelectedOrgs([...uniqueOrgs]);
   };
 
   const checkOrgPercentageValidation = () => {
-    const orgPercentage = formOne.getFieldValue('ownershipPercentage');
-    const orgPercentValidation = orgPercentage[0]?.proponentPercentage === false ? true : false;
+    const orgPercentage = formOne.getFieldValue("ownershipPercentage");
+    const orgPercentValidation =
+      orgPercentage[0]?.proponentPercentage === false ? true : false;
     setOwnershipPercentageValidation(orgPercentValidation);
   };
 
@@ -512,10 +560,14 @@ export const ProgrammeCreationComponent = (props:any) => {
     <div className="add-programme-main-container">
       <div className="title-container">
         <div className="main">
-          {isUpdate ? t('addProgramme:editProgramme') : t('addProgramme:addProgramme')}
+          {isUpdate
+            ? t("addProgramme:editProgramme")
+            : t("addProgramme:addProgramme")}
         </div>
         <div className="sub">
-          {isUpdate ? t('addProgramme:editProgrammeSub') : t('addProgramme:addProgrammeSub')}
+          {isUpdate
+            ? t("addProgramme:editProgrammeSub")
+            : t("addProgramme:addProgrammeSub")}
         </div>
       </div>
       <div className="adding-section">
@@ -529,7 +581,9 @@ export const ProgrammeCreationComponent = (props:any) => {
                 title: (
                   <div className="step-title-container">
                     <div className="step-count">01</div>
-                    <div className="title">{t('addProgramme:addProgramme1')}</div>
+                    <div className="title">
+                      {t("addProgramme:addProgramme1")}
+                    </div>
                   </div>
                 ),
                 description: current === 0 && (
@@ -550,24 +604,26 @@ export const ProgrammeCreationComponent = (props:any) => {
                           <Col xl={12} md={24}>
                             <div className="details-part-one">
                               <Form.Item
-                                label={t('addProgramme:title')}
+                                label={t("addProgramme:title")}
                                 name="title"
                                 initialValue={state?.record?.name}
                                 rules={[
                                   {
                                     required: true,
-                                    message: '',
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
                                       if (
-                                        String(value).trim() === '' ||
+                                        String(value).trim() === "" ||
                                         String(value).trim() === undefined ||
                                         value === null ||
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t('addProgramme:title')} ${t('isRequired')}`
+                                          `${t("addProgramme:title")} ${t(
+                                            "isRequired"
+                                          )}`
                                         );
                                       }
                                     },
@@ -578,49 +634,63 @@ export const ProgrammeCreationComponent = (props:any) => {
                               </Form.Item>
                               <Form.Item
                                 wrapperCol={{ span: 13 }}
-                                label={t('addProgramme:sector')}
+                                label={t("addProgramme:sector")}
                                 name="sector"
                                 rules={[
                                   {
                                     required: true,
-                                    message: `${t('addProgramme:sector')} ${t('isRequired')}`,
+                                    message: `${t("addProgramme:sector")} ${t(
+                                      "isRequired"
+                                    )}`,
                                   },
                                 ]}
                               >
                                 <Select size="large" onChange={onChangeSector}>
-                                  {userInfoState?.companyRole === CompanyRole.MINISTRY
+                                  {userInfoState?.companyRole ===
+                                  CompanyRole.MINISTRY
                                     ? availableSectar?.map((sector: any) => (
-                                        <Select.Option value={sector}>{sector}</Select.Option>
+                                        <Select.Option value={sector}>
+                                          {sector}
+                                        </Select.Option>
                                       ))
-                                    : Object.values(Sector).map((sector: any) => (
-                                        <Select.Option value={sector}>{sector}</Select.Option>
-                                      ))}
+                                    : Object.values(Sector).map(
+                                        (sector: any) => (
+                                          <Select.Option value={sector}>
+                                            {sector}
+                                          </Select.Option>
+                                        )
+                                      )}
                                 </Select>
                               </Form.Item>
                               <Form.Item
                                 wrapperCol={{ span: 13 }}
-                                label={t('addProgramme:startTime')}
+                                label={t("addProgramme:startTime")}
                                 name="startTime"
                                 rules={[
                                   {
                                     required: true,
-                                    message: '',
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
                                       if (
-                                        String(value).trim() === '' ||
+                                        String(value).trim() === "" ||
                                         String(value).trim() === undefined ||
                                         value === null ||
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t('addProgramme:startTime')} ${t('isRequired')}`
+                                          `${t("addProgramme:startTime")} ${t(
+                                            "isRequired"
+                                          )}`
                                         );
                                       } else {
-                                        const endTime = formOne.getFieldValue('endTime');
+                                        const endTime =
+                                          formOne.getFieldValue("endTime");
                                         if (endTime && value >= endTime) {
-                                          throw new Error(`${t('addProgramme:endTimeVal')}`);
+                                          throw new Error(
+                                            `${t("addProgramme:endTimeVal")}`
+                                          );
                                         }
                                       }
                                     },
@@ -630,22 +700,29 @@ export const ProgrammeCreationComponent = (props:any) => {
                                 <DatePicker
                                   size="large"
                                   disabledDate={(currentDate: any) =>
-                                    currentDate < moment().startOf('day')
+                                    currentDate < moment().startOf("day")
                                   }
                                 />
                               </Form.Item>
                               <Form.Item
                                 wrapperCol={{ span: 13 }}
-                                label={t('addProgramme:ghgCovered')}
+                                label={t("addProgramme:ghgCovered")}
                                 name="greenHouseGasses"
                                 rules={[
                                   {
                                     required: true,
-                                    message: `${t('addProgramme:ghgCovered')} ${t('isRequired')}`,
+                                    message: `${t(
+                                      "addProgramme:ghgCovered"
+                                    )} ${t("isRequired")}`,
                                   },
                                 ]}
                               >
-                                <Select size="large" mode="multiple" maxTagCount={2} allowClear>
+                                <Select
+                                  size="large"
+                                  mode="multiple"
+                                  maxTagCount={2}
+                                  allowClear
+                                >
                                   <Select.Option value="CO2">
                                     CO<sub>2</sub>
                                   </Select.Option>
@@ -667,7 +744,7 @@ export const ProgrammeCreationComponent = (props:any) => {
                                 </Select>
                               </Form.Item>
                               <Form.Item
-                                label={t('addProgramme:designDoc')}
+                                label={t("addProgramme:designDoc")}
                                 name="designDocument"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
@@ -675,22 +752,32 @@ export const ProgrammeCreationComponent = (props:any) => {
                                 rules={[
                                   {
                                     required: true,
-                                    message: `${t('addProgramme:designDoc')} ${t(
-                                      'addProgramme:isRequired'
-                                    )}`,
+                                    message: `${t(
+                                      "addProgramme:designDoc"
+                                    )} ${t("addProgramme:isRequired")}`,
                                   },
                                   {
                                     validator: async (rule, file) => {
                                       if (file?.length > 0) {
                                         let isCorrectFormat = false;
-                                        if (file[0]?.type === 'application/pdf') {
+                                        if (
+                                          file[0]?.type === "application/pdf"
+                                        ) {
                                           isCorrectFormat = true;
                                         }
                                         if (!isCorrectFormat) {
-                                          throw new Error(`${t('addProgramme:invalidFileFormat')}`);
-                                        } else if (file[0]?.size > maximumImageSize) {
+                                          throw new Error(
+                                            `${t(
+                                              "addProgramme:invalidFileFormat"
+                                            )}`
+                                          );
+                                        } else if (
+                                          file[0]?.size > maximumImageSize
+                                        ) {
                                           // default size format of files would be in bytes -> 1MB = 1000000bytes
-                                          throw new Error(`${t('common:maxSizeVal')}`);
+                                          throw new Error(
+                                            `${t("common:maxSizeVal")}`
+                                          );
                                         }
                                       }
                                     },
@@ -720,7 +807,9 @@ export const ProgrammeCreationComponent = (props:any) => {
                                 </Upload>
                               </Form.Item>
                               <Form.Item
-                                label={t('addProgramme:buyerCountryEligibility')}
+                                label={t(
+                                  "addProgramme:buyerCountryEligibility"
+                                )}
                                 name="buyerCountryEligibility"
                                 initialValue={state?.record?.name}
                                 rules={[
@@ -731,7 +820,10 @@ export const ProgrammeCreationComponent = (props:any) => {
                               >
                                 <Select size="large" loading={loadingList}>
                                   {countries.map((country: any) => (
-                                    <Select.Option key={country.alpha2} value={country.alpha2}>
+                                    <Select.Option
+                                      key={country.alpha2}
+                                      value={country.alpha2}
+                                    >
                                       {country.name}
                                     </Select.Option>
                                   ))}
@@ -739,128 +831,162 @@ export const ProgrammeCreationComponent = (props:any) => {
                               </Form.Item>
                               <Form.List
                                 name="ownershipPercentage"
-                                initialValue={initialOrganisationOwnershipValues}
+                                initialValue={
+                                  initialOrganisationOwnershipValues
+                                }
                               >
                                 {(fields, { add, remove }) => {
                                   return (
-                                    <div className="space-container" style={{ width: '100%' }}>
-                                      {fields.map(({ key, name, ...restField }) => {
-                                        return (
-                                          <Space
-                                            wrap={true}
-                                            key={key}
-                                            style={{ display: 'flex', marginBottom: 8 }}
-                                            align="center"
-                                            size={'large'}
-                                          >
-                                            <div className="ownership-list-item">
-                                              <Form.Item
-                                                {...restField}
-                                                label={t('addProgramme:company')}
-                                                name={[name, 'organisation']}
-                                                wrapperCol={{ span: 24 }}
-                                                className="organisation"
-                                                rules={[
-                                                  {
-                                                    required: true,
-                                                    message: `${t('addProgramme:company')} ${t(
-                                                      'isRequired'
-                                                    )}`,
-                                                    validateTrigger: 'onBlur',
-                                                  },
-                                                ]}
-                                                shouldUpdate
-                                              >
-                                                <Select
-                                                  size="large"
-                                                  loading={loadingList}
-                                                  disabled={
-                                                    name === 0 &&
-                                                    userInfoState?.companyRole !==
-                                                      CompanyRole.GOVERNMENT &&
-                                                    userInfoState?.companyRole !==
-                                                      CompanyRole.MINISTRY
-                                                  }
-                                                >
-                                                  {organisationsList.map((organisation) => (
-                                                    <Select.Option
-                                                      key={organisation.companyId}
-                                                      value={organisation.taxId}
-                                                      disabled={
-                                                        selectedOrgs?.includes(
-                                                          organisation.taxId
-                                                        ) ||
-                                                        (userInfoState?.companyRole !==
-                                                          CompanyRole.GOVERNMENT &&
-                                                          userInfoState?.companyRole !==
-                                                            CompanyRole.MINISTRY &&
-                                                          userOrgTaxId === organisation?.taxId)
-                                                      }
-                                                    >
-                                                      {organisation.name}
-                                                    </Select.Option>
-                                                  ))}
-                                                </Select>
-                                              </Form.Item>
-                                              <Form.Item
-                                                {...restField}
-                                                label={t('addProgramme:proponentPercentage')}
-                                                className="ownership-percent"
-                                                name={[name, 'proponentPercentage']}
-                                                labelCol={{ span: 24 }}
-                                                wrapperCol={{ span: 24 }}
-                                                required={true}
-                                                rules={[
-                                                  {
-                                                    required: true,
-                                                    message: `${t(
-                                                      'addProgramme:proponentPercentage'
-                                                    )} ${t('isRequired')}`,
-                                                  },
-                                                  {
-                                                    validator: async (rule, value) => {
-                                                      if (
-                                                        ownershipPercentageValidation &&
-                                                        name === 0
-                                                      ) {
-                                                        throw new Error(
-                                                          `${t(
-                                                            'addProgramme:proponentPercentage'
-                                                          )} ${t('isRequired')}`
-                                                        );
-                                                      }
+                                    <div
+                                      className="space-container"
+                                      style={{ width: "100%" }}
+                                    >
+                                      {fields.map(
+                                        ({ key, name, ...restField }) => {
+                                          return (
+                                            <Space
+                                              wrap={true}
+                                              key={key}
+                                              style={{
+                                                display: "flex",
+                                                marginBottom: 8,
+                                              }}
+                                              align="center"
+                                              size={"large"}
+                                            >
+                                              <div className="ownership-list-item">
+                                                <Form.Item
+                                                  {...restField}
+                                                  label={t(
+                                                    "addProgramme:company"
+                                                  )}
+                                                  name={[name, "organisation"]}
+                                                  wrapperCol={{ span: 24 }}
+                                                  className="organisation"
+                                                  rules={[
+                                                    {
+                                                      required: true,
+                                                      message: `${t(
+                                                        "addProgramme:company"
+                                                      )} ${t("isRequired")}`,
+                                                      validateTrigger: "onBlur",
                                                     },
-                                                  },
-                                                ]}
-                                                shouldUpdate
-                                              >
-                                                <InputNumber
-                                                  size="large"
-                                                  min={1}
-                                                  max={100}
-                                                  formatter={(value) => `${value}%`}
-                                                  parser={(value: any) => value.replace('%', '')}
-                                                  disabled={
-                                                    fields?.length < 2 &&
-                                                    userInfoState?.companyRole !==
-                                                      CompanyRole.GOVERNMENT &&
-                                                    userInfoState?.companyRole !==
-                                                      CompanyRole.MINISTRY
-                                                  }
-                                                />
-                                              </Form.Item>
-                                              {fields?.length > 1 && name !== 0 && (
-                                                <MinusCircleOutlined
-                                                  className="dynamic-delete-button"
-                                                  onClick={() => {
-                                                    remove(name);
-                                                  }}
-                                                />
-                                              )}
-                                            </div>
-                                          </Space>
-                                        );
-                                      })}
+                                                  ]}
+                                                  shouldUpdate
+                                                >
+                                                  <Select
+                                                    size="large"
+                                                    loading={loadingList}
+                                                    disabled={
+                                                      name === 0 &&
+                                                      userInfoState?.companyRole !==
+                                                        CompanyRole.GOVERNMENT &&
+                                                      userInfoState?.companyRole !==
+                                                        CompanyRole.MINISTRY
+                                                    }
+                                                  >
+                                                    {organisationsList.map(
+                                                      (organisation) => (
+                                                        <Select.Option
+                                                          key={
+                                                            organisation.companyId
+                                                          }
+                                                          value={
+                                                            organisation.taxId
+                                                          }
+                                                          disabled={
+                                                            selectedOrgs?.includes(
+                                                              organisation.taxId
+                                                            ) ||
+                                                            (userInfoState?.companyRole !==
+                                                              CompanyRole.GOVERNMENT &&
+                                                              userInfoState?.companyRole !==
+                                                                CompanyRole.MINISTRY &&
+                                                              userOrgTaxId ===
+                                                                organisation?.taxId)
+                                                          }
+                                                        >
+                                                          {organisation.name}
+                                                        </Select.Option>
+                                                      )
+                                                    )}
+                                                  </Select>
+                                                </Form.Item>
+                                                <Form.Item
+                                                  {...restField}
+                                                  label={t(
+                                                    "addProgramme:proponentPercentage"
+                                                  )}
+                                                  className="ownership-percent"
+                                                  name={[
+                                                    name,
+                                                    "proponentPercentage",
+                                                  ]}
+                                                  labelCol={{ span: 24 }}
+                                                  wrapperCol={{ span: 24 }}
+                                                  required={true}
+                                                  rules={[
+                                                    {
+                                                      required: true,
+                                                      message: `${t(
+                                                        "addProgramme:proponentPercentage"
+                                                      )} ${t("isRequired")}`,
+                                                    },
+                                                    {
+                                                      validator: async (
+                                                        rule,
+                                                        value
+                                                      ) => {
+                                                        if (
+                                                          ownershipPercentageValidation &&
+                                                          name === 0
+                                                        ) {
+                                                          throw new Error(
+                                                            `${t(
+                                                              "addProgramme:proponentPercentage"
+                                                            )} ${t(
+                                                              "isRequired"
+                                                            )}`
+                                                          );
+                                                        }
+                                                      },
+                                                    },
+                                                  ]}
+                                                  shouldUpdate
+                                                >
+                                                  <InputNumber
+                                                    size="large"
+                                                    min={1}
+                                                    max={100}
+                                                    formatter={(value) =>
+                                                      `${value}%`
+                                                    }
+                                                    parser={(value: any) =>
+                                                      value.replace("%", "")
+                                                    }
+                                                    disabled={
+                                                      fields?.length < 2 &&
+                                                      userInfoState?.companyRole !==
+                                                        CompanyRole.GOVERNMENT &&
+                                                      userInfoState?.companyRole !==
+                                                        CompanyRole.MINISTRY
+                                                    }
+                                                  />
+                                                </Form.Item>
+                                                {fields?.length > 1 &&
+                                                  name !== 0 && (
+                                                    <MinusCircleOutlined
+                                                      className="dynamic-delete-button"
+                                                      onClick={() => {
+                                                        remove(name);
+                                                      }}
+                                                    />
+                                                  )}
+                                              </div>
+                                            </Space>
+                                          );
+                                        }
+                                      )}
                                       <Form.Item>
                                         <Button
                                           type="dashed"
@@ -877,23 +1003,25 @@ export const ProgrammeCreationComponent = (props:any) => {
                           <Col xl={12} md={24}>
                             <div className="details-part-two">
                               <Form.Item
-                                label={t('addProgramme:externalId')}
+                                label={t("addProgramme:externalId")}
                                 name="externalId"
                                 rules={[
                                   {
                                     required: true,
-                                    message: '',
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
                                       if (
-                                        String(value).trim() === '' ||
+                                        String(value).trim() === "" ||
                                         String(value).trim() === undefined ||
                                         value === null ||
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t('addProgramme:externalId')} ${t('isRequired')}`
+                                          `${t("addProgramme:externalId")} ${t(
+                                            "isRequired"
+                                          )}`
                                         );
                                       }
                                     },
@@ -904,64 +1032,78 @@ export const ProgrammeCreationComponent = (props:any) => {
                               </Form.Item>
                               <Form.Item
                                 wrapperCol={{ span: 13 }}
-                                label={t('addProgramme:sectoralScope')}
+                                label={t("addProgramme:sectoralScope")}
                                 name="sectoralScope"
                                 rules={[
                                   {
                                     required: true,
-                                    message: `${t('addProgramme:sectoralScope')} ${t(
-                                      'isRequired'
-                                    )}`,
+                                    message: `${t(
+                                      "addProgramme:sectoralScope"
+                                    )} ${t("isRequired")}`,
                                   },
                                 ]}
                               >
                                 <Select size="large">
-                                  {userInfoState?.companyRole === CompanyRole.MINISTRY
-                                    ? availableSecoralScope?.map((item: any) => (
-                                        <Select.Option key={item.value} value={item.value}>
-                                          {item.key}
-                                        </Select.Option>
-                                      ))
-                                    : selectedSectoralScopes?.map((val: any) => {
-                                        if (val in SectoralScope) {
-                                          const key = val as keyof typeof SectoralScope;
-                                          return (
-                                            <Select.Option
-                                              key={SectoralScope[key]}
-                                              value={SectoralScope[key]}
-                                            >
-                                              {val}
-                                            </Select.Option>
-                                          );
+                                  {userInfoState?.companyRole ===
+                                  CompanyRole.MINISTRY
+                                    ? availableSecoralScope?.map(
+                                        (item: any) => (
+                                          <Select.Option
+                                            key={item.value}
+                                            value={item.value}
+                                          >
+                                            {item.key}
+                                          </Select.Option>
+                                        )
+                                      )
+                                    : selectedSectoralScopes?.map(
+                                        (val: any) => {
+                                          if (val in SectoralScope) {
+                                            const key =
+                                              val as keyof typeof SectoralScope;
+                                            return (
+                                              <Select.Option
+                                                key={SectoralScope[key]}
+                                                value={SectoralScope[key]}
+                                              >
+                                                {val}
+                                              </Select.Option>
+                                            );
+                                          }
+                                          return null;
                                         }
-                                        return null;
-                                      })}
+                                      )}
                                 </Select>
                               </Form.Item>
                               <Form.Item
                                 wrapperCol={{ span: 13 }}
-                                label={t('addProgramme:endTime')}
+                                label={t("addProgramme:endTime")}
                                 name="endTime"
                                 rules={[
                                   {
                                     required: true,
-                                    message: '',
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
                                       if (
-                                        String(value).trim() === '' ||
+                                        String(value).trim() === "" ||
                                         String(value).trim() === undefined ||
                                         value === null ||
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t('addProgramme:endTime')} ${t('isRequired')}`
+                                          `${t("addProgramme:endTime")} ${t(
+                                            "isRequired"
+                                          )}`
                                         );
                                       } else {
-                                        const startTime = formOne.getFieldValue('startTime');
+                                        const startTime =
+                                          formOne.getFieldValue("startTime");
                                         if (startTime && value <= startTime) {
-                                          throw new Error(`${t('addProgramme:endTimeVal')}`);
+                                          throw new Error(
+                                            `${t("addProgramme:endTimeVal")}`
+                                          );
                                         }
                                       }
                                     },
@@ -971,12 +1113,12 @@ export const ProgrammeCreationComponent = (props:any) => {
                                 <DatePicker
                                   size="large"
                                   disabledDate={(currentDate: any) =>
-                                    currentDate < moment().endOf('day')
+                                    currentDate < moment().endOf("day")
                                   }
                                 />
                               </Form.Item>
                               <Form.Item
-                                label={t('addProgramme:ndcScope')}
+                                label={t("addProgramme:ndcScope")}
                                 wrapperCol={{ span: 13 }}
                                 className="role-group"
                                 name="ndcScope"
@@ -996,31 +1138,31 @@ export const ProgrammeCreationComponent = (props:any) => {
                                     <Radio.Button
                                       className="condition-radio"
                                       value="true"
-                                      onClick={() => onClickNDCScope('true')}
+                                      onClick={() => onClickNDCScope("true")}
                                     >
-                                      {t('addProgramme:conditional')}
+                                      {t("addProgramme:conditional")}
                                     </Radio.Button>
                                   </div>
                                   <div className="condition-radio-container">
                                     <Radio.Button
                                       className="condition-radio"
                                       value="false"
-                                      onClick={() => onClickNDCScope('false')}
+                                      onClick={() => onClickNDCScope("false")}
                                     >
-                                      {t('addProgramme:unConditional')}
+                                      {t("addProgramme:unConditional")}
                                     </Radio.Button>
                                   </div>
                                 </Radio.Group>
                               </Form.Item>
                               <Form.Item
-                                label={t('addProgramme:geographicalLocation')}
+                                label={t("addProgramme:geographicalLocation")}
                                 name="geographicalLocation"
                                 rules={[
                                   {
                                     required: true,
-                                    message: `${t('addProgramme:geographicalLocation')} ${t(
-                                      'isRequired'
-                                    )}`,
+                                    message: `${t(
+                                      "addProgramme:geographicalLocation"
+                                    )} ${t("isRequired")}`,
                                   },
                                 ]}
                               >
@@ -1034,25 +1176,30 @@ export const ProgrammeCreationComponent = (props:any) => {
                                   allowClear
                                 >
                                   {regionsList.map((region: any) => (
-                                    <Select.Option value={region}>{region}</Select.Option>
+                                    <Select.Option value={region}>
+                                      {region}
+                                    </Select.Option>
                                   ))}
                                 </Select>
                               </Form.Item>
                             </div>
                           </Col>
                         </Row>
-                        <Row className="selection-details-row" gutter={[16, 16]}>
+                        <Row
+                          className="selection-details-row"
+                          gutter={[16, 16]}
+                        >
                           <Col md={24} xl={12} className="in-ndc-col">
                             <Row className="in-ndc-row">
                               <Col md={16} lg={18} xl={18}>
                                 <div className="included-label">
-                                  <div>{t('addProgramme:inNDC')}</div>
+                                  <div>{t("addProgramme:inNDC")}</div>
                                   <div className="info-container">
                                     <Tooltip
                                       arrowPointAtCenter
                                       placement="topLeft"
                                       trigger="hover"
-                                      title={t('addProgramme:inNDCToolTip')}
+                                      title={t("addProgramme:inNDCToolTip")}
                                       overlayClassName="custom-tooltip"
                                     >
                                       <InfoCircle color="#000000" size={17} />
@@ -1060,7 +1207,12 @@ export const ProgrammeCreationComponent = (props:any) => {
                                   </div>
                                 </div>
                               </Col>
-                              <Col md={8} lg={6} xl={6} className="included-val">
+                              <Col
+                                md={8}
+                                lg={6}
+                                xl={6}
+                                className="included-val"
+                              >
                                 <Radio.Group
                                   size="middle"
                                   disabled={ndcScopeChanged}
@@ -1071,18 +1223,22 @@ export const ProgrammeCreationComponent = (props:any) => {
                                     <Radio.Button
                                       className="yes-no-radio"
                                       value={true}
-                                      onClick={() => onClickIncludedInNDCScope(true)}
+                                      onClick={() =>
+                                        onClickIncludedInNDCScope(true)
+                                      }
                                     >
-                                      {t('addProgramme:yes')}
+                                      {t("addProgramme:yes")}
                                     </Radio.Button>
                                   </div>
                                   <div className="yes-no-radio-container">
                                     <Radio.Button
                                       className="yes-no-radio"
                                       value={false}
-                                      onClick={() => onClickIncludedInNDCScope(false)}
+                                      onClick={() =>
+                                        onClickIncludedInNDCScope(false)
+                                      }
                                     >
-                                      {t('addProgramme:no')}
+                                      {t("addProgramme:no")}
                                     </Radio.Button>
                                   </div>
                                 </Radio.Group>
@@ -1093,13 +1249,13 @@ export const ProgrammeCreationComponent = (props:any) => {
                             <Row className="in-nap-row">
                               <Col md={16} lg={18} xl={18}>
                                 <div className="included-label">
-                                  <div>{t('addProgramme:inNAP')}</div>
+                                  <div>{t("addProgramme:inNAP")}</div>
                                   <div className="info-container">
                                     <Tooltip
                                       arrowPointAtCenter
                                       placement="topLeft"
                                       trigger="hover"
-                                      title={t('addProgramme:inNAPToolTip')}
+                                      title={t("addProgramme:inNAPToolTip")}
                                       overlayClassName="custom-tooltip"
                                     >
                                       <InfoCircle color="#000000" size={17} />
@@ -1107,7 +1263,12 @@ export const ProgrammeCreationComponent = (props:any) => {
                                   </div>
                                 </div>
                               </Col>
-                              <Col md={8} lg={6} xl={6} className="included-val">
+                              <Col
+                                md={8}
+                                lg={6}
+                                xl={6}
+                                className="included-val"
+                              >
                                 <Radio.Group
                                   size="middle"
                                   onChange={onInCludedNAPChange}
@@ -1117,18 +1278,22 @@ export const ProgrammeCreationComponent = (props:any) => {
                                     <Radio.Button
                                       className="yes-no-radio"
                                       value={true}
-                                      onClick={() => onClickIncludedInNAPScope(true)}
+                                      onClick={() =>
+                                        onClickIncludedInNAPScope(true)
+                                      }
                                     >
-                                      {t('addProgramme:yes')}
+                                      {t("addProgramme:yes")}
                                     </Radio.Button>
                                   </div>
                                   <div className="yes-no-radio-container">
                                     <Radio.Button
                                       className="yes-no-radio"
                                       value={false}
-                                      onClick={() => onClickIncludedInNAPScope(false)}
+                                      onClick={() =>
+                                        onClickIncludedInNAPScope(false)
+                                      }
                                     >
-                                      {t('addProgramme:no')}
+                                      {t("addProgramme:no")}
                                     </Radio.Button>
                                   </div>
                                 </Radio.Group>
@@ -1143,7 +1308,7 @@ export const ProgrammeCreationComponent = (props:any) => {
                             loading={loading}
                             onClick={checkOrgPercentageValidation}
                           >
-                            {t('addProgramme:next')}
+                            {t("addProgramme:next")}
                           </Button>
                         </div>
                       </Form>
@@ -1155,7 +1320,9 @@ export const ProgrammeCreationComponent = (props:any) => {
                 title: (
                   <div className="step-title-container">
                     <div className="step-count">02</div>
-                    <div className="title">{t('addProgramme:addProgramme2')}</div>
+                    <div className="title">
+                      {t("addProgramme:addProgramme2")}
+                    </div>
                   </div>
                 ),
                 description: current === 1 && (
@@ -1176,33 +1343,38 @@ export const ProgrammeCreationComponent = (props:any) => {
                           <Col xl={12} md={24}>
                             <div className="details-part-one">
                               <Form.Item
-                                label={t('addProgramme:estimatedProgrammeCostUSD')}
+                                label={t(
+                                  "addProgramme:estimatedProgrammeCostUSD"
+                                )}
                                 name="estimatedProgrammeCostUSD"
                                 rules={[
                                   {
                                     required: true,
-                                    message: '',
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
                                       if (
-                                        String(value).trim() === '' ||
+                                        String(value).trim() === "" ||
                                         String(value).trim() === undefined ||
                                         value === null ||
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t('addProgramme:estimatedProgrammeCostUSD')} ${t(
-                                            'isRequired'
-                                          )}`
+                                          `${t(
+                                            "addProgramme:estimatedProgrammeCostUSD"
+                                          )} ${t("isRequired")}`
                                         );
-                                      } else if (!isNaN(value) && Number(value) > 0) {
+                                      } else if (
+                                        !isNaN(value) &&
+                                        Number(value) > 0
+                                      ) {
                                         return Promise.resolve();
                                       } else {
                                         throw new Error(
-                                          `${t('addProgramme:estimatedProgrammeCostUSD')} ${t(
-                                            'isInvalid'
-                                          )}`
+                                          `${t(
+                                            "addProgramme:estimatedProgrammeCostUSD"
+                                          )} ${t("isInvalid")}`
                                         );
                                       }
                                     },
@@ -1211,17 +1383,17 @@ export const ProgrammeCreationComponent = (props:any) => {
                               >
                                 <InputNumber
                                   size="large"
-                                  style={{ width: '100%', paddingRight: 12 }}
+                                  style={{ width: "100%", paddingRight: 12 }}
                                 />
                               </Form.Item>
                               <Form.Item
-                                label={t('addProgramme:minViableCarbonPrice')}
+                                label={t("addProgramme:minViableCarbonPrice")}
                                 name="minViableCarbonPrice"
                               >
                                 <InputNumber
                                   disabled
                                   size="large"
-                                  style={{ width: '100%', paddingRight: 12 }}
+                                  style={{ width: "100%", paddingRight: 12 }}
                                 />
                               </Form.Item>
                             </div>
@@ -1229,29 +1401,36 @@ export const ProgrammeCreationComponent = (props:any) => {
                           <Col xl={12} md={24}>
                             <div className="details-part-two">
                               <Form.Item
-                                label={t('addProgramme:creditEst')}
+                                label={t("addProgramme:creditEst")}
                                 name="creditEst"
                                 rules={[
                                   {
                                     required: true,
-                                    message: '',
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
                                       if (
-                                        String(value).trim() === '' ||
+                                        String(value).trim() === "" ||
                                         String(value).trim() === undefined ||
                                         value === null ||
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t('addProgramme:creditEst')} ${t('isRequired')}`
+                                          `${t("addProgramme:creditEst")} ${t(
+                                            "isRequired"
+                                          )}`
                                         );
-                                      } else if (!isNaN(value) && Number(value) > 0) {
+                                      } else if (
+                                        !isNaN(value) &&
+                                        Number(value) > 0
+                                      ) {
                                         return Promise.resolve();
                                       } else {
                                         throw new Error(
-                                          `${t('addProgramme:creditEst')} ${t('isInvalid')}`
+                                          `${t("addProgramme:creditEst")} ${t(
+                                            "isInvalid"
+                                          )}`
                                         );
                                       }
                                     },
@@ -1260,15 +1439,19 @@ export const ProgrammeCreationComponent = (props:any) => {
                               >
                                 <InputNumber
                                   size="large"
-                                  style={{ width: '100%', paddingRight: 12 }}
+                                  style={{ width: "100%", paddingRight: 12 }}
                                 />
                               </Form.Item>
                             </div>
                           </Col>
                         </Row>
                         <div className="steps-actions">
-                          <Button type="primary" htmlType="submit" loading={loading}>
-                            {t('addProgramme:submit')}
+                          <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={loading}
+                          >
+                            {t("addProgramme:submit")}
                           </Button>
                           {current === 1 && (
                             <Button
@@ -1276,7 +1459,7 @@ export const ProgrammeCreationComponent = (props:any) => {
                               onClick={() => prevOne()}
                               loading={loading}
                             >
-                              {t('addProgramme:back')}
+                              {t("addProgramme:back")}
                             </Button>
                           )}
                         </div>

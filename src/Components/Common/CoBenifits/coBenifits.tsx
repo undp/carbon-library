@@ -18,6 +18,7 @@ export interface CoBenefitProps {
   viewOnly?: boolean;
   coBenifitsViewDetails?: any;
   loading?: any;
+  sdgGoalImages: any;
   t: any;
 }
 
@@ -30,6 +31,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
     viewOnly,
     coBenifitsViewDetails,
     loading = false,
+    sdgGoalImages,
     t,
   } = props;
   const [coBenefitDetails, setCoBenefitDetails] = useState<any>();
@@ -102,6 +104,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
               : coBenefitsDetails?.sdgGoals
           }
           viewOnly={viewOnly || false}
+          sdgGoalImages={sdgGoalImages}
         />
       ),
     },
