@@ -28,7 +28,7 @@ import "../../../Styles/app.scss";
 import { RcFile, UploadFile } from "antd/lib/upload";
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
 import validator from "validator";
-import { SectoralScope } from "../../../Definitions";
+import { SectoralScope, getBase64 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const AddNewCompanyComponent = (props: any) => {
@@ -140,14 +140,6 @@ export const AddNewCompanyComponent = (props: any) => {
       formOne.setFieldValue("regions", [...newBuyerValues]);
     }
   };
-
-  const getBase64 = (file: RcFile): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
 
   const onFinishStepTwo = async (values: any) => {
     const requestData = {

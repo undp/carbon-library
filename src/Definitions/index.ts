@@ -16,6 +16,12 @@ export * from "./Enums/retireType.enum";
 export * from "./Enums/programmeStageMRV.enum";
 export * from "./Enums/programmeStage.enum";
 export * from "./Enums/company.role.enum";
+export * from "./Enums/energyGenerationUnits.enum"
+export * from "./Enums/landAreaUnits.enum"
+export * from "./Enums/consumerGroups.enum"
+export * from "./Enums/sector.enum"
+export * from "./Enums/commonEnums"
+export * from "./Enums/sdgGoals.enum"
 export * from "./Definitions/userLogin.definitions";
 export * from "./Definitions/userInformationContext.definitions";
 export * from "./Definitions/userForgotPassword.definitions";
