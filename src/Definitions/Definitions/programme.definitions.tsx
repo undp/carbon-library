@@ -10,6 +10,7 @@ import { ProgrammeStageMRV } from "../Enums/programmeStageMRV.enum";
 import { TypeOfMitigation } from "../Enums/typeOfMitigation.enum";
 import { CreditTransferStage } from "../Enums/creditTransferStage.enum";
 import { SectoralScope } from "../Enums/sectoralScope.enum";
+import { RcFile } from "rc-upload/lib/interface";
 
 export const getStageEnumVal = (value: string) => {
   const index = Object.keys(ProgrammeStage).indexOf(value);
@@ -302,3 +303,11 @@ export const sumArray = (arrList: any[]) => {
 
   return arrList.reduce((a, b) => Number(a) + Number(b), 0);
 };
+
+export const getBase64 = (file: RcFile): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
