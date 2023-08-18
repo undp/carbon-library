@@ -15,7 +15,6 @@ export const AddNdcActionComponent = (props: any) => {
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
     t,
-    coBenefitTranslations,
   } = props;
 
   const [current, setCurrent] = useState<number>(1);
@@ -31,7 +30,6 @@ export const AddNdcActionComponent = (props: any) => {
 
   useEffect(() => {
     if (!state?.record) {
-      //navigate("/programmeManagement/viewAll", { replace: true });
       onNavigateToProgrammeManagementView();
     } else {
       setprogrammeDetails(state.record);
@@ -62,9 +60,6 @@ export const AddNdcActionComponent = (props: any) => {
           duration: 4,
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
-        // navigate("/programmeManagement/view", {
-        //   state: { record: programmeDetails },
-        // });
         onNavigateToProgrammeView(programmeDetails);
       }
     } catch (error: any) {
@@ -195,7 +190,7 @@ export const AddNdcActionComponent = (props: any) => {
                 : t("ndcAction:submit")
             }
             loading={loading}
-            t={coBenefitTranslations}
+            t={t}
           />
         </div>
       ),
