@@ -14,6 +14,7 @@ export const AddNdcActionComponent = (props: any) => {
     useLocation,
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
+    sdgGoalImages,
     t,
   } = props;
 
@@ -190,6 +191,7 @@ export const AddNdcActionComponent = (props: any) => {
                 : t("ndcAction:submit")
             }
             loading={loading}
+            sdgGoalImages={sdgGoalImages}
             t={t}
           />
         </div>
