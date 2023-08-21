@@ -5,7 +5,9 @@ import { SdgGoals as SdgGoalsEnum } from "../../../Definitions";
 const sdgGoalMap: any = {};
 
 const SdgGoals = (props: any) => {
+  console.log('d1 props',props);
   const { onFormSubmit, sdgGoalsViewData, viewOnly, sdgGoalImages } = props;
+  console.log('d1 sdgGoalImages',sdgGoalImages);
   const {
     goal1,
     goal2,
