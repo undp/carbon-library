@@ -192,6 +192,7 @@ export const AddNdcActionComponent = (props: any) => {
             }
             loading={loading}
             sdgGoalImages={sdgGoalImages}
+            useConnection={useConnection}
             t={t}
           />
         </div>

@@ -36,7 +36,7 @@ export const NdcActionViewComponent = (props: any) => {
     useLocation,
     onNavigateToNdcManagementView,
     t,
-    sdgGoalImages
+    sdgGoalImages,
   } = props;
   const { userInfoState } = useUserContext();
   const { post } = useConnection();
@@ -556,6 +556,7 @@ export const NdcActionViewComponent = (props: any) => {
                     viewOnly={true}
                     coBenifitsViewDetails={state?.record?.coBenefitsProperties}
                     sdgGoalImages={sdgGoalImages}
+                    useConnection={useConnection}
                     t={t}
                   />
                 </div>
