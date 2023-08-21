@@ -6,8 +6,8 @@ import './info.view.scss';
 
 export interface InfoViewProps {
   data: any;
-  title: any;
-  icon: any;
+  title?: any;
+  icon?: any;
   hiddenColumns?: any;
 }
 

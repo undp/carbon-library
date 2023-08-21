@@ -18,8 +18,8 @@ export interface CoBenefitProps {
   viewOnly?: boolean;
   coBenifitsViewDetails?: any;
   loading?: any;
-  sdgGoalImages: any;
-  t: any;
+  sdgGoalImages?: any;
+  t?: any;
 }
 
 const CoBenifitsComponent = (props: CoBenefitProps) => {
