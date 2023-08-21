@@ -37,8 +37,6 @@ import {
   ProgrammeStageMRV,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
-import { CarbonSystemType } from "../../../Definitions/Enums/carbonSystemType.enum";
-import { ProgrammeStageUnified } from "../../../Definitions/Enums/programmeStageUnified.enum";
 
 const { Search } = Input;
 
@@ -52,7 +50,6 @@ export const ProgrammeManagementComponent = (props: any) => {
     onClickAddProgramme,
     enableAddProgramme,
     useAbilityContext,
-    carbonSystemType,
   } = props;
   const { get, delete: del, post } = useConnection();
   const [totalProgramme, setTotalProgramme] = useState<number>();
@@ -72,12 +69,7 @@ export const ProgrammeManagementComponent = (props: any) => {
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
 
-  const stageObject =
-    carbonSystemType === CarbonSystemType.MRV
-      ? ProgrammeStageMRV
-      : carbonSystemType === CarbonSystemType.REGISTRY
-      ? ProgrammeStage
-      : ProgrammeStageUnified;
+  const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
 
   const statusOptions = Object.keys(stageObject).map((k, index) => ({
     label: Object.values(stageObject)[index],
