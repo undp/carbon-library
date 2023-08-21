@@ -213,7 +213,6 @@ export const NdcActionViewComponent = (props: any) => {
 
   useEffect(() => {
     if (!state) {
-      //navigate('/ndcManagement/viewAll', { replace: true });
       onNavigateToNdcManagementView();
     } else {
       if (!state.record && state.id) {
