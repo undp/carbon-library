@@ -22,6 +22,7 @@ export * from "./Enums/consumerGroups.enum"
 export * from "./Enums/sector.enum"
 export * from "./Enums/commonEnums"
 export * from "./Enums/sdgGoals.enum"
+export * from "./Enums/carbonSystemType.enum"
 export * from "./Definitions/userLogin.definitions";
 export * from "./Definitions/userInformationContext.definitions";
 export * from "./Definitions/userForgotPassword.definitions";
