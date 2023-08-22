@@ -181,7 +181,9 @@ const Assessment = (props: any) => {
               {!viewOnly && (
                 <div className="radio-content">
                   <Form.Item
-                    label={t("assessmentIsThirdPartyVerified")}
+                    label={t("assessmentIsThirdPartyVerified", {
+                      ns: "coBenifits",
+                    })}
                     className="form-item"
                     name="IsThirdPartyVerified"
                   >
