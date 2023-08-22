@@ -18,6 +18,7 @@ export const AddNdcActionComponent = (props: any) => {
     t,
   } = props;
 
+  console.log('testing t',t);
   const [current, setCurrent] = useState<number>(1);
   const [programmeDetails, setprogrammeDetails] = useState<Programme>();
   const [ndcActionDetails, setNdcActionDetails] = useState<any>();
