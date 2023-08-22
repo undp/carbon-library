@@ -37,7 +37,7 @@ export interface NdcActionDetailsProps {
   isBackBtnVisible: boolean;
   onFormSubmit: any;
   ndcActionDetails: any;
-  t: any;
+  translator: any;
   programmeDetails?: any;
   onClickedBackBtn?: any;
 }
@@ -47,7 +47,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     isBackBtnVisible,
     onFormSubmit,
     ndcActionDetails,
-    t,
+    translator,
     programmeDetails,
     onClickedBackBtn,
   } = props;
@@ -57,6 +57,8 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
   const [ndcActionTypeListFiltered, setNdcActionTypeListFiltered] =
     useState<any[]>(ndcActionTypeList);
   const [form] = Form.useForm();
+  translator.setDefaultNamespace('ndcAction');
+  const t = translator.t;
 
   const maximumImageSize = process.env.REACT_APP_MAXIMUM_FILE_SIZE
     ? parseInt(process.env.REACT_APP_MAXIMUM_FILE_SIZE)
