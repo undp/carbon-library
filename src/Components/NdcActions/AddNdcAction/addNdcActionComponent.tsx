@@ -15,10 +15,11 @@ export const AddNdcActionComponent = (props: any) => {
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
     sdgGoalImages,
-    t,
+    translator,
   } = props;
 
-  console.log('testing t',t);
+  console.log('testing t',translator);
+  const t = translator.t;
   const [current, setCurrent] = useState<number>(1);
   const [programmeDetails, setprogrammeDetails] = useState<Programme>();
   const [ndcActionDetails, setNdcActionDetails] = useState<any>();
