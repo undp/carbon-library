@@ -69,8 +69,9 @@ export const ProgrammeCreationComponent = (props: any) => {
     useConnection,
     useLocation,
     onNavigateToProgrammeView,
-    t,
+    translator,
   } = props;
+  const t = translator.t;
   const { state } = useLocation();
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
