@@ -26,7 +26,7 @@ export interface InvestmentActionModelProps {
   openModal: boolean;
   type: string;
   remarkRequired: boolean;
-  t: any;
+  translator: any;
 }
 
 const InvestmentActionModel: FC<InvestmentActionModelProps> = (
@@ -43,11 +43,12 @@ const InvestmentActionModel: FC<InvestmentActionModelProps> = (
     icon,
     type,
     remarkRequired,
-    t,
+    translator,
   } = props;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [checked, setChecked] = useState<boolean>(false);
+  const t = translator.t;
 
   const companyList = !investment.isRetirement
     ? [

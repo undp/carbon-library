@@ -166,7 +166,7 @@ export const AddNdcActionComponent = (props: any) => {
             isBackBtnVisible={false}
             onFormSubmit={onNdcActionDetailsSubmit}
             ndcActionDetails={ndcActionDetails}
-            t={t}
+            translator={translator}
             programmeDetails={programmeDetails}
           ></NdcActionDetails>
         </div>
