@@ -57,13 +57,14 @@ type PopupInfo = {
 
 export const InvestmentManagementComponent = (props: any) => {
   const {
-    t,
+    translator,
     useConnection,
     onNavigateToProgrammeView,
     useUserContext,
     useSettingsContext,
   } = props;
 
+  const t = translator.t;
   const statusOptions = Object.keys(InvestmentStatus).map((k, index) => ({
     label: addSpaces(Object.values(InvestmentStatus)[index]),
     value: Object.values(InvestmentStatus)[index],
@@ -805,7 +806,7 @@ export const InvestmentManagementComponent = (props: any) => {
           title={popupInfo!.title}
           type={popupInfo!.type}
           remarkRequired={popupInfo.remarkRequired}
-          t={t}
+          translator={translator}
         />
       )}
     </div>
