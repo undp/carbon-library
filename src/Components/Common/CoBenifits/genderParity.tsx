@@ -2,9 +2,11 @@ import { Col, Empty, Form, Input, InputNumber, Radio, Row } from "antd";
 import React, { useEffect, useState } from "react";
 
 const GenderParity = (props: any) => {
-  const { onFormSubmit, genderParityViewData, viewOnly, t } = props;
+  const { onFormSubmit, genderParityViewData, viewOnly, translator } = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
+  translator.setDefaultNamespace("genderParity");
+  const t = translator.t;
   const [genderParityDetails, setGenderParityDetails] = useState();
   const genderParityDetailsOne = [
     {

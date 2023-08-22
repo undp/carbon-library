@@ -55,6 +55,7 @@ export const NdcActionViewComponent = (props: any) => {
     useState<boolean>(false);
   const [monitoringReportAccepted, setMonitoringReportAccepted] =
     useState<boolean>(false);
+  translator.setDefaultNamespace("ndcAction");
   const t = translator.t;
 
   const getProgrammeById = async (programmeId: string) => {

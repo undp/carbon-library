@@ -3,7 +3,9 @@ import { Empty, Form, Radio } from "antd";
 import { FormElementType, RadioButtonStatus2 } from "../../../Definitions";
 
 const Safeguards = (props: any) => {
-  const { onFormSubmit, safeGuardViewData, viewOnly, t } = props;
+  const { onFormSubmit, safeGuardViewData, viewOnly, translator } = props;
+  translator.setDefaultNamespace("safeguards");
+  const t = translator.t;
   const [safeguardDetails, setSafeguardDetails] = useState();
   const [form] = Form.useForm();
   const initialFormElementList = [

@@ -120,7 +120,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
           onFormSubmit={onGenderParityFormSubmit}
           genderParityViewData={viewOnly && coBenifitsViewDetails?.genderPariy}
           viewOnly={viewOnly || false}
-          t={t}
+          translator={translator}
         />
       ),
     },
@@ -135,7 +135,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
           }
           viewOnly={viewOnly || false}
           onFormSubmit={onSafeguardFormSubmit}
-          t={t}
+          translator={translator}
         />
       ),
     },
@@ -168,7 +168,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
             (!viewOnly && coBenefitsDetails?.socialValueDetails)
           }
           viewOnly={viewOnly || false}
-          t={t}
+          translator={translator}
         />
       ),
     },
@@ -186,7 +186,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
               : undefined
           }
           viewOnly={viewOnly || false}
-          t={t}
+          translator={translator}
         />
       ),
     },
@@ -202,7 +202,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
           }
           viewOnly={viewOnly || false}
           useConnection={useConnection}
-          t={t}
+          translator={translator}
         />
       ),
     },

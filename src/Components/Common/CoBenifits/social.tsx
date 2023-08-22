@@ -3,7 +3,9 @@ import { Empty, Form, Input, InputNumber, Radio } from "antd";
 import { FormElementType, RadioButtonStatus } from "../../../Definitions";
 
 const Social = (props: any) => {
-  const { onFormSubmit, socialViewData, viewOnly, t } = props;
+  const { onFormSubmit, socialViewData, viewOnly, translator } = props;
+  translator.setDefaultNamespace("social");
+  const t = translator.t;
   const [form] = Form.useForm();
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [socialDetails, setSocialDetails] = useState();

@@ -18,6 +18,7 @@ export const AddNdcActionComponent = (props: any) => {
     translator,
   } = props;
 
+  translator.setDefaultNamespace('ndcAction');
   const t = translator.t;
   const [current, setCurrent] = useState<number>(1);
   const [programmeDetails, setprogrammeDetails] = useState<Programme>();

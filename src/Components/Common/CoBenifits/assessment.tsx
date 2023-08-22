@@ -19,8 +19,15 @@ import { RcFile } from "antd/lib/upload";
 import { RadioButtonStatus, getBase64, titleList } from "../../../Definitions";
 
 const Assessment = (props: any) => {
-  const { onFormSubmit, assessmentViewData, viewOnly, useConnection, t } =
-    props;
+  const {
+    onFormSubmit,
+    assessmentViewData,
+    viewOnly,
+    useConnection,
+    translator,
+  } = props;
+  translator.setDefaultNamespace("coBenifits");
+  const t = translator.t;
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
   const [form3] = Form.useForm();
