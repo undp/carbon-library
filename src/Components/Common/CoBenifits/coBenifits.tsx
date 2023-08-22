@@ -19,7 +19,7 @@ export interface CoBenefitProps {
   coBenifitsViewDetails?: any;
   loading?: any;
   sdgGoalImages?: any;
-  t?: any;
+  translator?: any;
   useConnection?: any;
 }
 
@@ -33,12 +33,14 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
     coBenifitsViewDetails,
     loading = false,
     sdgGoalImages,
-    t,
+    translator,
     useConnection,
   } = props;
   const [coBenefitDetails, setCoBenefitDetails] = useState<any>();
   const [isSocialFormValid, setIsSocialFormValid] = useState<any>(true);
   const [isAssessmentFormValid, setIsAssessmentFormValid] = useState<any>(true);
+  translator.setDefaultNamespace('coBenifits');
+  const t = translator.t;
 
   const onSdgGoalsFormSubmit = (sdgGoalsDetails: any) => {
     setCoBenefitDetails((pre: any) => ({ ...pre, sdgGoals: sdgGoalsDetails }));
@@ -151,7 +153,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
               : undefined
           }
           viewOnly={viewOnly || false}
-          t={t}
+          translator={translator}
         />
       ),
     },
@@ -387,7 +389,7 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
         <div className="steps-actions">
           <Row>
             <Button onClick={() => onClickedBackBtn(coBenefitDetails)}>
-              {t("back")}
+              {t("back", { ns: "coBenifits" })}
             </Button>
             <Button
               className="mg-left-1"
@@ -395,7 +397,9 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
               loading={loading}
               onClick={onCoBenefitSubmit}
             >
-              {submitButtonText ? submitButtonText : t("submit")}
+              {submitButtonText
+                ? submitButtonText
+                : t("submit", { ns: "coBenifits" })}
             </Button>
           </Row>
         </div>

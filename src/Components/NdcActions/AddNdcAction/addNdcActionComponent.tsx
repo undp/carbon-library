@@ -18,9 +18,7 @@ export const AddNdcActionComponent = (props: any) => {
     translator,
   } = props;
 
-  console.log('testing translator',translator);
   const t = translator.t;
-  console.log('testing t',t);
   const [current, setCurrent] = useState<number>(1);
   const [programmeDetails, setprogrammeDetails] = useState<Programme>();
   const [ndcActionDetails, setNdcActionDetails] = useState<any>();
@@ -196,7 +194,7 @@ export const AddNdcActionComponent = (props: any) => {
             loading={loading}
             sdgGoalImages={sdgGoalImages}
             useConnection={useConnection}
-            t={t}
+            translator={translator}
           />
         </div>
       ),

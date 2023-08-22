@@ -3,179 +3,181 @@ import React, { useEffect, useState } from "react";
 import { RadioButtonStatus } from "../../../Definitions";
 
 const Environmental = (props: any) => {
-  const { onFormSubmit, environmentalViewData, viewOnly, t } = props;
+  const { onFormSubmit, environmentalViewData, viewOnly, translator } = props;
+  translator.setDefaultNamespace('environment');
+  const t = translator.t;
   const environmentalDetailsInitial: any[] = [
     {
-      section: t("air"),
+      section: t("air",{ ns: "environment" }),
       fields: [
         {
           name: "airQ1",
-          label: t("airQ1"),
+          label: t("airQ1",{ ns: "environment" }),
           hide: false,
           required: false,
         },
         {
           name: "airQ2",
-          label: t("airQ2"),
+          label: t("airQ2",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ3",
-          label: t("airQ3"),
+          label: t("airQ3",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ4",
-          label: t("airQ4"),
+          label: t("airQ4",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ5",
-          label: t("airQ5"),
+          label: t("airQ5",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ6",
-          label: t("airQ6"),
+          label: t("airQ6",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ7",
-          label: t("airQ7"),
+          label: t("airQ7",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ8",
-          label: t("airQ8"),
+          label: t("airQ8",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "airQ9",
-          label: t("airQ9"),
+          label: t("airQ9",{ ns: "environment" }),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("land"),
+      section: t("land",{ ns: "environment" }),
       fields: [
         {
           name: "landQ1",
-          label: t("landQ1"),
+          label: t("landQ1",{ ns: "environment" }),
           hide: false,
           required: false,
         },
         {
           name: "landQ2",
-          label: t("landQ2"),
+          label: t("landQ2",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "landQ3",
-          label: t("landQ3"),
+          label: t("landQ3",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "landQ4",
-          label: t("landQ4"),
+          label: t("landQ4",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "landQ5",
-          label: t("landQ5"),
+          label: t("landQ5",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "landQ6",
-          label: t("landQ6"),
+          label: t("landQ6",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "landQ7",
-          label: t("landQ7"),
+          label: t("landQ7",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "landQ8",
-          label: t("landQ8"),
+          label: t("landQ8",{ ns: "environment" }),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("water"),
+      section: t("water",{ ns: "environment" }),
       fields: [
         {
           name: "waterQ1",
-          label: t("waterQ1"),
+          label: t("waterQ1",{ ns: "environment" }),
           hide: false,
           required: false,
         },
         {
           name: "waterQ2",
-          label: t("waterQ2"),
+          label: t("waterQ2",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "waterQ3",
-          label: t("waterQ3"),
+          label: t("waterQ3",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "waterQ4",
-          label: t("waterQ4"),
+          label: t("waterQ4",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "waterQ5",
-          label: t("waterQ5"),
+          label: t("waterQ5",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "waterQ6",
-          label: t("waterQ6"),
+          label: t("waterQ6",{ ns: "environment" }),
           hide: true,
           required: true,
         },
         {
           name: "waterQ7",
-          label: t("waterQ7"),
+          label: t("waterQ7",{ ns: "environment" }),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("naturalResource"),
+      section: t("naturalResource",{ ns: "environment" }),
       fields: [
         {
           name: "naturalResourceQ1",
-          label: t("naturalResourceQ1"),
+          label: t("naturalResourceQ1",{ ns: "environment" }),
           hide: false,
           required: false,
         },
         {
           name: "naturalResourceQ2",
-          label: t("naturalResourceQ2"),
+          label: t("naturalResourceQ2",{ ns: "environment" }),
           hide: true,
           required: true,
         },
