@@ -35,7 +35,7 @@ export const NdcActionViewComponent = (props: any) => {
     useConnection,
     useLocation,
     onNavigateToNdcManagementView,
-    t,
+    translator,
     sdgGoalImages,
   } = props;
   const { userInfoState } = useUserContext();
@@ -55,6 +55,7 @@ export const NdcActionViewComponent = (props: any) => {
     useState<boolean>(false);
   const [monitoringReportAccepted, setMonitoringReportAccepted] =
     useState<boolean>(false);
+  const t = translator.t;
 
   const getProgrammeById = async (programmeId: string) => {
     setIsLoading(true);
@@ -557,7 +558,7 @@ export const NdcActionViewComponent = (props: any) => {
                     coBenifitsViewDetails={state?.record?.coBenefitsProperties}
                     sdgGoalImages={sdgGoalImages}
                     useConnection={useConnection}
-                    t={t}
+                    translator={translator}
                   />
                 </div>
               </Card>
