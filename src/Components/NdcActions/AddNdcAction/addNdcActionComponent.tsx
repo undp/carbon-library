@@ -15,9 +15,11 @@ export const AddNdcActionComponent = (props: any) => {
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
     sdgGoalImages,
-    t,
+    translator,
   } = props;
 
+  translator.setDefaultNamespace('ndcAction');
+  const t = translator.t;
   const [current, setCurrent] = useState<number>(1);
   const [programmeDetails, setprogrammeDetails] = useState<Programme>();
   const [ndcActionDetails, setNdcActionDetails] = useState<any>();
@@ -193,7 +195,7 @@ export const AddNdcActionComponent = (props: any) => {
             loading={loading}
             sdgGoalImages={sdgGoalImages}
             useConnection={useConnection}
-            t={t}
+            translator={translator}
           />
         </div>
       ),

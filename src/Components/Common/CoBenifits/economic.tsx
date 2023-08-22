@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 import { RadioButtonStatus } from "../../../Definitions";
 
 const Economic = (props: any) => {
-  const { onFormSubmit, economicViewData, viewOnly, t } = props;
+  const { onFormSubmit, economicViewData, viewOnly, translator } = props;
+  translator.setDefaultNamespace("economic");
+  const t = translator.t;
   const economicDetailsInitial: any[] = [
     {
       section: t("growth"),

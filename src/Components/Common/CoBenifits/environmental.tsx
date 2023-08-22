@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 import { RadioButtonStatus } from "../../../Definitions";
 
 const Environmental = (props: any) => {
-  const { onFormSubmit, environmentalViewData, viewOnly, t } = props;
+  const { onFormSubmit, environmentalViewData, viewOnly, translator } = props;
+  translator.setDefaultNamespace('environment');
+  const t = translator.t;
   const environmentalDetailsInitial: any[] = [
     {
       section: t("air"),
