@@ -1,8 +1,8 @@
-import { Col, Row } from 'antd';
-import { DateTime } from 'luxon';
-import React, { FC } from 'react';
-import { dateFormat } from '../../../Definitions/Definitions/common.definitions';
-import './info.view.scss';
+import { Col, Row } from "antd";
+import { DateTime } from "luxon";
+import React, { FC } from "react";
+import "./info.view.scss";
+import { dateFormat } from "../../../Definitions/Definitions/common.definitions";
 
 export interface InfoViewProps {
   data: any;
@@ -28,11 +28,28 @@ const InfoView: FC<InfoViewProps> = (props: InfoViewProps) => {
                   {k}
                 </Col>
                 <Col span={12} className="field-value">
-                  {data[k] instanceof DateTime
-                    ? data[k].toFormat(dateFormat)
-                    : data[k] === '' || !data[k] || data[k] === 'NaN'
-                    ? '-'
-                    : data[k]}
+                  {k.includes("GHG Emissions") ? (
+                    Object.values(data[k])?.length > 0 ? (
+                      Object.entries(data[k]).map(([key, value]) => {
+                        return (
+                          <div className="row">
+                            <div className="key">{key}</div>
+                            <div className="data">{data[k][key]}</div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div>-</div>
+                    )
+                  ) : (
+                    <span>
+                      {data[k] instanceof DateTime
+                        ? data[k].toFormat(dateFormat)
+                        : data[k] === "" || !data[k] || data[k] === "NaN"
+                        ? "-"
+                        : data[k]}
+                    </span>
+                  )}
                 </Col>
               </Row>
             );
