@@ -59,7 +59,7 @@ export const AddNdcActionComponent = (props: any) => {
       if (response.status === 200 || response.status === 201) {
         message.open({
           type: "success",
-          content: `${t("ndcSuccessfullyCreated")}`,
+          content: `${t("ndcAction:ndcSuccessfullyCreated")}`,
           duration: 4,
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
@@ -69,7 +69,7 @@ export const AddNdcActionComponent = (props: any) => {
       message.open({
         type: "error",
         content:
-          error && error.message ? error.message : `${"ndcCreationFailed"}`,
+          error && error.message ? error.message : `${"ndcAction:ndcCreationFailed"}`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
