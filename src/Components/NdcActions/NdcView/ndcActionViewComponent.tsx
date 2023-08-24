@@ -208,11 +208,11 @@ export const NdcActionViewComponent = (props: any) => {
     }
   };
 
-  useEffect(() => {
-    if (ndcActionDetails?.id) {
-      getProjectReports();
-    }
-  }, [ndcActionDetails?.id, programmeOwnerId]);
+  // useEffect(() => {
+  //   if (ndcActionDetails?.id) {
+  //     getProjectReports();
+  //   }
+  // }, [ndcActionDetails?.id, programmeOwnerId]);
 
   useEffect(() => {
     if (!state) {
