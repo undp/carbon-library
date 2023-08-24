@@ -11,7 +11,7 @@ export interface InfoViewProps {
   hiddenColumns?: any;
 }
 
-const InfoView: FC<InfoViewProps> = (props: InfoViewProps) => {
+export const InfoView: FC<InfoViewProps> = (props: InfoViewProps) => {
   const { title, data, icon, hiddenColumns } = props;
   return (
     <div className="info-view">
@@ -66,4 +66,3 @@ InfoView.defaultProps = {
   hiddenColumns: [],
 };
 
-export default InfoView;
