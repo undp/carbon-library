@@ -51,7 +51,6 @@ export const AddNdcActionComponent = (props: any) => {
         delete ndcActionDetailsObj.enablementReportData;
       }
 
-      ndcActionDetailsObj.methodology = t("ndcAction:goldStandard");
       const response: any = await post(
         "national/programme/addNDCAction",
         ndcActionDetailsObj
