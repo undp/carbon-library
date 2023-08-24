@@ -327,7 +327,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       };
     } else {
       sort = {
-        key: "programmeId",
+        key: "createdTime",
         order: "DESC",
       };
     }
