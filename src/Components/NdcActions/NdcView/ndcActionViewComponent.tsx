@@ -28,6 +28,7 @@ import { InfoView } from "../../Common/InfoView/info.view";
 import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
 
 export const NdcActionViewComponent = (props: any) => {
+  console.log('testing NdcActionViewComponent');
   const {
     useUserContext,
     linkDocVisible,
@@ -209,12 +210,14 @@ export const NdcActionViewComponent = (props: any) => {
   };
 
   useEffect(() => {
+    console.log('testing useEffect1');
     if (ndcActionDetails?.id) {
       getProjectReports();
     }
   }, [ndcActionDetails?.id, programmeOwnerId]);
 
   useEffect(() => {
+    console.log('testing useEffect2');
     if (!state) {
       onNavigateToNdcManagementView();
     } else {
