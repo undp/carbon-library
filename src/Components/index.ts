@@ -19,3 +19,4 @@ export * from "./Common/Maps/mapboxComponent";
 export * from "./Common/StasticCard/stasticCard";
 export * from "./Common/ProfileIcon/profile.icon";
 export * from "./Common/RoleIcon/role.icon";
+export * from "./Common/InfoView/info.view"

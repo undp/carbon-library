@@ -24,7 +24,7 @@ import {
   getNdcStatusTagType,
   mitigationTypeList,
 } from "../../../Definitions";
-import InfoView from "../../Common/InfoView/info.view";
+import { InfoView } from "../../Common/InfoView/info.view";
 import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
 
 export const NdcActionViewComponent = (props: any) => {
@@ -38,6 +38,8 @@ export const NdcActionViewComponent = (props: any) => {
     translator,
     sdgGoalImages,
   } = props;
+  translator.setDefaultNamespace("ndcAction");
+  const t = translator.t;
   const { userInfoState } = useUserContext();
   const { post } = useConnection();
   const { state } = useLocation();
@@ -55,8 +57,6 @@ export const NdcActionViewComponent = (props: any) => {
     useState<boolean>(false);
   const [monitoringReportAccepted, setMonitoringReportAccepted] =
     useState<boolean>(false);
-  translator.setDefaultNamespace("ndcAction");
-  const t = translator.t;
 
   const getProgrammeById = async (programmeId: string) => {
     setIsLoading(true);
@@ -314,10 +314,22 @@ export const NdcActionViewComponent = (props: any) => {
         ndcActionDetails.adaptationProperties.implementingAgency;
       adaptationDetails[t("ndcAction:viewAdaptationNationalPlanObjectives")] =
         ndcActionDetails.adaptationProperties.nationalPlanObjectives;
+      adaptationDetails[t("ndcAction:viewAdaptationNationalPlanCoverage")] =
+        ndcActionDetails.adaptationProperties.nationalPlanCoverage;
+      adaptationDetails[t("ndcAction:viewIncludedInNAP")] = ndcActionDetails
+        ?.adaptationProperties?.includedInNAP
+        ? "Yes"
+        : ndcActionDetails?.adaptationProperties?.includedInNAP === false
+        ? "No"
+        : "-";
       adaptationDetails[t("ndcAction:viewGhgEmissionsAvoided")] =
-        ndcActionDetails.adaptationProperties.ghgEmissionsAvoided;
+        ndcActionDetails?.adaptationProperties?.ghgEmissionsAvoided
+          ? ndcActionDetails.adaptationProperties.ghgEmissionsAvoided
+          : {};
       adaptationDetails[t("ndcAction:viewGhgEmissionsReduced")] =
-        ndcActionDetails.adaptationProperties.ghgEmissionsReduced;
+        ndcActionDetails?.adaptationProperties?.ghgEmissionsReduced
+          ? ndcActionDetails.adaptationProperties.ghgEmissionsReduced
+          : {};
     }
     return adaptationDetails;
   };

@@ -19,7 +19,7 @@ import {
 import "./programmeViewComponent.scss";
 import { isBase64 } from "../../Common/ProfileIcon/profile.icon";
 import Chart from "react-apexcharts";
-import InfoView from "../../Common/InfoView/info.view";
+import { InfoView } from "../../Common/InfoView/info.view";
 import * as Icon from "react-bootstrap-icons";
 import {
   BlockOutlined,
