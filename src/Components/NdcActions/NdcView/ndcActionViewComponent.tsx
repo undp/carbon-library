@@ -217,7 +217,7 @@ export const NdcActionViewComponent = (props: any) => {
   }, [ndcActionDetails?.id, programmeOwnerId]);
 
   useEffect(() => {
-    console.log('testing useEffect2');
+    console.log('testing useEffect2', state);
     if (!state) {
       onNavigateToNdcManagementView();
     } else {
