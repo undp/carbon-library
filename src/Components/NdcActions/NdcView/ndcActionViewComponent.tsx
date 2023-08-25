@@ -569,13 +569,13 @@ export const NdcActionViewComponent = (props: any) => {
                   <div className="title">
                     {t("ndcAction:coBenefitsSubTitle")}
                   </div>
-                  <CoBenifitsComponent
+                  {/* <CoBenifitsComponent
                     viewOnly={true}
                     coBenifitsViewDetails={state?.record?.coBenefitsProperties}
                     sdgGoalImages={sdgGoalImages}
                     useConnection={useConnection}
                     translator={translator}
-                  />
+                  /> */}
                 </div>
               </Card>
             </Col>
