@@ -24,7 +24,7 @@ import {
   getNdcStatusTagType,
   mitigationTypeList,
 } from "../../../Definitions";
-//import { InfoView } from "../../Common/InfoView/info.view";
+import { InfoView } from "../../Common/InfoView/info.view";
 import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
 
 export const NdcActionViewComponent = (props: any) => {
@@ -376,7 +376,7 @@ export const NdcActionViewComponent = (props: any) => {
 
   return (
     <div className="ndc-details-view content-container">
-      <div>Hello World 4</div>
+      <div>Hello World 5</div>
       <div className="title-bar">
         <div>
           <div className="body-title">
@@ -496,11 +496,11 @@ export const NdcActionViewComponent = (props: any) => {
           <Col lg={8} md={24}>
             <Card className="card-container fix-height">
               <div>
-                {/* <InfoView
+                <InfoView
                   data={ndcActionBasicDetails}
                   title={t("ndcAction:viewGeneralTitle")}
                   icon={<Icon.Lightbulb />}
-                /> */}
+                />
               </div>
             </Card>
           </Col>
@@ -508,11 +508,11 @@ export const NdcActionViewComponent = (props: any) => {
             <Skeleton loading={isLoading} active>
               <Card className="card-container fix-height">
                 <div>
-                  {/* <InfoView
+                  <InfoView
                     data={ndcActionReportDetails}
                     title={t("ndcAction:viewReportsTitle")}
                     icon={<Icon.FileEarmarkText />}
-                  /> */}
+                  />
                 </div>
               </Card>
             </Skeleton>
@@ -524,10 +524,10 @@ export const NdcActionViewComponent = (props: any) => {
             <Col lg={24} className="gutter-row">
               <Card className="card-container">
                 <div>
-                  {/* <InfoView
+                  <InfoView
                     data={getNdcActionMitigationDetails()}
                     title={t("ndcAction:viewMitigationTitle")}
-                  /> */}
+                  />
                 </div>
               </Card>
             </Col>
@@ -539,10 +539,10 @@ export const NdcActionViewComponent = (props: any) => {
             <Col lg={24}>
               <Card className="card-container">
                 <div>
-                  {/* <InfoView
+                  <InfoView
                     data={getNdcActionAdaptationDetails()}
                     title={t("ndcAction:viewAdaptationTitle")}
-                  /> */}
+                  />
                 </div>
               </Card>
             </Col>
@@ -553,10 +553,10 @@ export const NdcActionViewComponent = (props: any) => {
             <Col lg={24}>
               <Card className="card-container">
                 <div>
-                  {/* <InfoView
+                  <InfoView
                     data={getEnablementProperties()}
                     title={t("ndcAction:enablement")}
-                  /> */}
+                  />
                 </div>
               </Card>
             </Col>
@@ -570,13 +570,13 @@ export const NdcActionViewComponent = (props: any) => {
                   <div className="title">
                     {t("ndcAction:coBenefitsSubTitle")}
                   </div>
-                  {/* <CoBenifitsComponent
+                  <CoBenifitsComponent
                     viewOnly={true}
                     coBenifitsViewDetails={state?.record?.coBenefitsProperties}
                     sdgGoalImages={sdgGoalImages}
                     useConnection={useConnection}
                     translator={translator}
-                  /> */}
+                  />
                 </div>
               </Card>
             </Col>
