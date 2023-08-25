@@ -376,7 +376,7 @@ export const NdcActionViewComponent = (props: any) => {
 
   return (
     <div className="ndc-details-view content-container">
-      <div>Hello World 1</div>
+      <div>Hello World 2</div>
       <div className="title-bar">
         <div>
           <div className="body-title">
