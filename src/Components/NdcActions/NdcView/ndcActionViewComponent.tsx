@@ -28,7 +28,7 @@ import { InfoView } from "../../Common/InfoView/info.view";
 import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
 
 export const NdcActionViewComponent = (props: any) => {
-  console.log('testing NdcActionViewComponent');
+  console.log("testing NdcActionViewComponent");
   const {
     useUserContext,
     linkDocVisible,
@@ -210,14 +210,14 @@ export const NdcActionViewComponent = (props: any) => {
   };
 
   useEffect(() => {
-    console.log('testing useEffect1');
+    console.log("testing useEffect1");
     if (ndcActionDetails?.id) {
       getProjectReports();
     }
   }, [ndcActionDetails?.id, programmeOwnerId]);
 
   useEffect(() => {
-    console.log('testing useEffect2', state);
+    console.log("testing useEffect2", state);
     if (!state) {
       onNavigateToNdcManagementView();
     } else {
@@ -376,7 +376,10 @@ export const NdcActionViewComponent = (props: any) => {
 
   return (
     <div className="ndc-details-view content-container">
-      <div>Hello World 6 {emissionsReductionAchieved} and {emissionsReductionExpected}</div>
+      <div>
+        Hello World 7 {emissionsReductionAchieved} and{" "}
+        {emissionsReductionExpected}
+      </div>
       <div className="title-bar">
         <div>
           <div className="body-title">
@@ -401,7 +404,7 @@ export const NdcActionViewComponent = (props: any) => {
                     </span>
                   </div>
                   <div className="map-content">
-                    {/* <Chart
+                    <Chart
                       id={"creditChart"}
                       options={{
                         labels: ["Achieved", "Pending"],
@@ -454,10 +457,7 @@ export const NdcActionViewComponent = (props: any) => {
                                   show: true,
                                   label: "Expected",
                                   formatter: () =>
-                                    "" +
-                                    addCommSep(
-                                      state.record?.emissionReductionExpected
-                                    ),
+                                    "" + addCommSep(emissionsReductionExpected),
                                 },
                               },
                             },
@@ -487,7 +487,7 @@ export const NdcActionViewComponent = (props: any) => {
                       type="donut"
                       fontFamily="inter"
                       height="290px"
-                    /> */}
+                    />
                   </div>
                 </div>
               </Card>
