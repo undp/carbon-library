@@ -23,7 +23,7 @@ export interface CoBenefitProps {
   useConnection?: any;
 }
 
-const CoBenifitsComponent = (props: CoBenefitProps) => {
+export const CoBenifitsComponent = (props: CoBenefitProps) => {
   const {
     onClickedBackBtn,
     onFormSubmit,
@@ -408,4 +408,3 @@ const CoBenifitsComponent = (props: CoBenefitProps) => {
   );
 };
 
-export default CoBenifitsComponent;

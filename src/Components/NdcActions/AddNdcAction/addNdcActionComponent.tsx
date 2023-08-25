@@ -5,7 +5,7 @@ import "./addNdcActionComponent.scss";
 import { UploadOutlined } from "@ant-design/icons";
 import { RcFile } from "rc-upload/lib/interface";
 import { InfoCircle } from "react-bootstrap-icons";
-import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
+import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
 import { Programme, ProgrammeStage, getBase64 } from "../../../Definitions";
 
 export const AddNdcActionComponent = (props: any) => {
@@ -18,7 +18,7 @@ export const AddNdcActionComponent = (props: any) => {
     translator,
   } = props;
 
-  translator.setDefaultNamespace('ndcAction');
+  translator.setDefaultNamespace("ndcAction");
   const t = translator.t;
   const [current, setCurrent] = useState<number>(1);
   const [programmeDetails, setprogrammeDetails] = useState<Programme>();
@@ -68,7 +68,9 @@ export const AddNdcActionComponent = (props: any) => {
       message.open({
         type: "error",
         content:
-          error && error.message ? error.message : `${"ndcAction:ndcCreationFailed"}`,
+          error && error.message
+            ? error.message
+            : `${"ndcAction:ndcCreationFailed"}`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });

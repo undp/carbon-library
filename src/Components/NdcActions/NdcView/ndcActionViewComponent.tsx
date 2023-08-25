@@ -25,7 +25,7 @@ import {
   mitigationTypeList,
 } from "../../../Definitions";
 import { InfoView } from "../../Common/InfoView/info.view";
-import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
+import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
 
 export const NdcActionViewComponent = (props: any) => {
   const {
