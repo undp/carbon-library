@@ -28,7 +28,6 @@ import { InfoView } from "../../Common/InfoView/info.view";
 import CoBenifitsComponent from "../../Common/CoBenifits/coBenifits";
 
 export const NdcActionViewComponent = (props: any) => {
-  console.log("testing NdcActionViewComponent");
   const {
     useUserContext,
     linkDocVisible,
@@ -78,7 +77,6 @@ export const NdcActionViewComponent = (props: any) => {
         if (response?.data[0]?.currentStage === ProgrammeStage.Authorised) {
           setCanUploadMonitorReport(true);
         }
-        console.log();
       }
     } catch (error: any) {
       console.log("Error in getting programme by id", error);
@@ -210,14 +208,12 @@ export const NdcActionViewComponent = (props: any) => {
   };
 
   useEffect(() => {
-    console.log("testing useEffect1");
     if (ndcActionDetails?.id) {
       getProjectReports();
     }
   }, [ndcActionDetails?.id, programmeOwnerId]);
 
   useEffect(() => {
-    console.log("testing useEffect2", state);
     if (!state) {
       onNavigateToNdcManagementView();
     } else {
