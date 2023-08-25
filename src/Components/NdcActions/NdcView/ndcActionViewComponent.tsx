@@ -376,7 +376,7 @@ export const NdcActionViewComponent = (props: any) => {
 
   return (
     <div className="ndc-details-view content-container">
-      <div>Hello World 3</div>
+      <div>Hello World 4</div>
       <div className="title-bar">
         <div>
           <div className="body-title">
@@ -401,7 +401,7 @@ export const NdcActionViewComponent = (props: any) => {
                     </span>
                   </div>
                   <div className="map-content">
-                    <Chart
+                    {/* <Chart
                       id={"creditChart"}
                       options={{
                         labels: ["Achieved", "Pending"],
@@ -487,7 +487,7 @@ export const NdcActionViewComponent = (props: any) => {
                       type="donut"
                       fontFamily="inter"
                       height="290px"
-                    />
+                    /> */}
                   </div>
                 </div>
               </Card>
