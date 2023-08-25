@@ -387,7 +387,7 @@ export const NdcActionViewComponent = (props: any) => {
           </div>
         </div>
       </div>
-      <div className="content-body">
+      {/* <div className="content-body">
         <Row gutter={16}>
           {(emissionsReductionAchieved !== 0 ||
             emissionsReductionExpected !== 0) && (
@@ -576,12 +576,12 @@ export const NdcActionViewComponent = (props: any) => {
                     useConnection={useConnection}
                     translator={translator}
                   /> */}
-                </div>
+                {/* </div>
               </Card>
             </Col>
           </Row>
         )}
-      </div>
+      </div> */} 
     </div>
   );
 };
