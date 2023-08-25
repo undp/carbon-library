@@ -376,8 +376,8 @@ export const NdcActionViewComponent = (props: any) => {
 
   return (
     <div className="ndc-details-view content-container">
-      <div>Hello World</div>
-      {/* <div className="title-bar">
+      <div>Hello World 1</div>
+      <div className="title-bar">
         <div>
           <div className="body-title">
             {t("ndcAction:NdcDetailsViewTitle")}{" "}
@@ -387,7 +387,7 @@ export const NdcActionViewComponent = (props: any) => {
             {t("ndcAction:NdcDetailsViewSubTitle")}
           </div>
         </div>
-      </div> */}
+      </div>
       {/* <div className="content-body">
         <Row gutter={16}>
           {(emissionsReductionAchieved !== 0 ||
