@@ -372,10 +372,6 @@ export const NdcActionViewComponent = (props: any) => {
 
   return (
     <div className="ndc-details-view content-container">
-      <div>
-        Hello World 7 {emissionsReductionAchieved} and{" "}
-        {emissionsReductionExpected}
-      </div>
       <div className="title-bar">
         <div>
           <div className="body-title">
