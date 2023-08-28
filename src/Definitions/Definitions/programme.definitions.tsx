@@ -170,6 +170,7 @@ export interface Programme {
   txRef: string;
   typeOfMitigation: TypeOfMitigation;
   geographicalLocationCordintes: any;
+  mitigationActions: any;
 }
 
 export interface ProgrammeT {
