@@ -4,7 +4,7 @@ import { Alert, Button, Form, Input, Modal } from "antd";
 import "../../../Styles/app.scss";
 
 export interface ChangePasswordProps {
-  t: any;
+  translator: any;
   onPasswordChanged: any;
   onFieldsChanged: any;
   onCanceled: any;
@@ -18,7 +18,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
   props: ChangePasswordProps
 ) => {
   const {
-    t,
+    translator,
     onPasswordChanged,
     onFieldsChanged,
     onCanceled,
@@ -27,6 +27,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
     loadingBtn,
     themeColor,
   } = props;
+  const t = translator.t;
 
   return (
     <Modal

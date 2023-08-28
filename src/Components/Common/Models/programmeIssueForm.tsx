@@ -14,7 +14,7 @@ export interface ProgrammeIssueFormProps {
   onFinish: any;
   subText: string;
   enableIssue: boolean;
-  t: any;
+  translator: any;
 }
 
 export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
@@ -27,8 +27,9 @@ export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
     actionBtnText,
     subText,
     enableIssue,
-    t,
+    translator,
   } = props;
+  const t = translator.t;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
 

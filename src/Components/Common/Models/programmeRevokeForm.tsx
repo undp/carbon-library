@@ -19,7 +19,7 @@ export interface ProgrammeRevokeFormProps {
   onFinish: any;
   subText: string;
   showCertifiers: boolean;
-  t: any;
+  translator: any;
 }
 
 export const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (
@@ -32,8 +32,9 @@ export const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (
     actionBtnText,
     subText,
     showCertifiers,
-    t,
+    translator,
   } = props;
+  const t = translator.t;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
 

@@ -5,7 +5,7 @@ import "../../../Styles/app.scss";
 const { TextArea } = Input;
 
 export interface UserActionProps {
-  t: any;
+  translator: any;
   actionInfo: any;
   onActionConfirmed: any;
   onActionCanceled: any;
@@ -18,7 +18,7 @@ const UserActionConfirmationModel: FC<UserActionProps> = (
   props: UserActionProps
 ) => {
   const {
-    t,
+    translator,
     actionInfo,
     onActionConfirmed,
     onActionCanceled,
@@ -26,6 +26,7 @@ const UserActionConfirmationModel: FC<UserActionProps> = (
     errorMsg,
     loading,
   } = props;
+  const t = translator.t;
   const [comment, setComment] = useState<any>("");
 
   useEffect(() => {

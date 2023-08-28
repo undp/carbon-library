@@ -29,7 +29,7 @@ export interface ProgrammeRetireFormProps {
   subText?: string;
   hideType: boolean;
   myCompanyId?: number;
-  t: any;
+  translator: any;
   useConnection: any;
 }
 
@@ -44,9 +44,11 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
     subText,
     hideType,
     myCompanyId,
-    t,
+    translator,
     useConnection,
   } = props;
+
+  const t = translator.t;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [type, setType] = useState<string>("");

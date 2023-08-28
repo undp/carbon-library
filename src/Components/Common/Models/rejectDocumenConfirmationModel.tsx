@@ -10,12 +10,12 @@ export interface RejectDocumentationProps {
   openModal: any;
   errorMsg: any;
   loading: any;
-  t: any;
+  translator: any;
 }
 
-export const RejectDocumentationConfirmationModel: FC<RejectDocumentationProps> = (
-  props: RejectDocumentationProps
-) => {
+export const RejectDocumentationConfirmationModel: FC<
+  RejectDocumentationProps
+> = (props: RejectDocumentationProps) => {
   const {
     actionInfo,
     onActionConfirmed,
@@ -23,8 +23,10 @@ export const RejectDocumentationConfirmationModel: FC<RejectDocumentationProps> 
     openModal,
     errorMsg,
     loading,
-    t,
+    translator,
   } = props;
+
+  const t = translator.t;
   const [comment, setComment] = useState<any>("");
 
   useEffect(() => {
@@ -108,4 +110,3 @@ export const RejectDocumentationConfirmationModel: FC<RejectDocumentationProps> 
     </Modal>
   );
 };
-

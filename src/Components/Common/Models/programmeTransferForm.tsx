@@ -30,7 +30,7 @@ export interface ProgrammeTransferFormProps {
   receiverLabelText: string;
   userCompanyId: number | undefined;
   companyRole: string;
-  t: any;
+  translator: any;
   useConnection: any;
 }
 
@@ -48,9 +48,10 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
     receiverLabelText,
     userCompanyId,
     companyRole,
-    t,
+    translator,
     useConnection,
   } = props;
+  const t = translator.t;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentSum, setCurrentSum] = useState<number>(0);
