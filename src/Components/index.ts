@@ -3,7 +3,7 @@ export * from "./Company/AddNewCompany/addNewCompanyComponent";
 export * from "./Company/CompanyProfile/companyProfileComponent";
 export * from "./Programme/ProgrammeManagement/programmeManagementComponent";
 export * from "./Programme/ProgrammeView/programmeViewComponent";
-export * from "./Programme/AddNewProgramme/programmeCreationComponent"
+export * from "./Programme/AddNewProgramme/programmeCreationComponent";
 export * from "./User/AddNewUser/addNewUserComponent";
 export * from "./User/UserProfile/userProfileComponent";
 export * from "./User/UserManagement/userManagementComponent";
@@ -19,5 +19,7 @@ export * from "./Common/Maps/mapboxComponent";
 export * from "./Common/StasticCard/stasticCard";
 export * from "./Common/ProfileIcon/profile.icon";
 export * from "./Common/RoleIcon/role.icon";
-export * from "./Common/InfoView/info.view"
-export * from "./Common/CoBenifits/coBenifits"
+export * from "./Common/InfoView/info.view";
+export * from "./Common/CoBenifits/coBenifits";
+export * from "./Common/ImgwithFallback/imgWithFallback";
+export * from "./Common/Investment/investmentBody";
