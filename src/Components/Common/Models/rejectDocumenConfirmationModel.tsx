@@ -13,7 +13,7 @@ export interface RejectDocumentationProps {
   t: any;
 }
 
-const RejectDocumentationConfirmationModel: FC<RejectDocumentationProps> = (
+export const RejectDocumentationConfirmationModel: FC<RejectDocumentationProps> = (
   props: RejectDocumentationProps
 ) => {
   const {
@@ -109,4 +109,3 @@ const RejectDocumentationConfirmationModel: FC<RejectDocumentationProps> = (
   );
 };
 
-export default RejectDocumentationConfirmationModel;
