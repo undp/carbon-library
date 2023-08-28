@@ -1,6 +1,16 @@
-import { Alert, Button, Col, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
-import React, { FC, useState } from 'react';
-import { Programme } from '../../../Definitions/Definitions/programme.definitions';
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Row,
+  Select,
+} from "antd";
+import React, { FC, useState } from "react";
+import { Programme } from "../../../Definitions/Definitions/programme.definitions";
 
 export interface ProgrammeRevokeFormProps {
   programme: Programme;
@@ -12,8 +22,18 @@ export interface ProgrammeRevokeFormProps {
   t: any;
 }
 
-const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (props: ProgrammeRevokeFormProps) => {
-  const { programme, onFinish, onCancel, actionBtnText, subText, showCertifiers, t } = props;
+export const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (
+  props: ProgrammeRevokeFormProps
+) => {
+  const {
+    programme,
+    onFinish,
+    onCancel,
+    actionBtnText,
+    subText,
+    showCertifiers,
+    t,
+  } = props;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -46,21 +66,26 @@ const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (props: ProgrammeRevok
             <Col span={24}>
               <Form.Item
                 className="remarks-label"
-                label={t('view:certifier')}
+                label={t("view:certifier")}
                 name="certifierId"
                 rules={[
                   {
                     required: true,
-                    message: 'Required field',
+                    message: "Required field",
                   },
                 ]}
               >
                 <Select
-                  disabled={!programme.certifierId || programme.certifierId.length <= 1}
+                  disabled={
+                    !programme.certifierId || programme.certifierId.length <= 1
+                  }
                   showArrow={true}
                   filterOption={false}
                   defaultActiveFirstOption={true}
-                  options={programme.certifier.map((c) => ({ label: c.name, value: c.companyId }))}
+                  options={programme.certifier.map((c) => ({
+                    label: c.name,
+                    value: c.companyId,
+                  }))}
                 />
               </Form.Item>
             </Col>
@@ -75,7 +100,7 @@ const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (props: ProgrammeRevok
               rules={[
                 {
                   required: true,
-                  message: 'Required field',
+                  message: "Required field",
                 },
               ]}
             >
@@ -84,13 +109,22 @@ const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (props: ProgrammeRevok
           </Col>
         </Row>
 
-        {popupError ? <Alert className="error" message={popupError} type="error" showIcon /> : ''}
+        {popupError ? (
+          <Alert className="error" message={popupError} type="error" showIcon />
+        ) : (
+          ""
+        )}
 
         <Form.Item className="footer">
           <Button htmlType="button" onClick={onCancel}>
-            {t('view:cancel')}
+            {t("view:cancel")}
           </Button>
-          <Button className="mg-left-2" type="primary" htmlType="submit" loading={loading}>
+          <Button
+            className="mg-left-2"
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
             {actionBtnText}
           </Button>
         </Form.Item>
@@ -98,5 +132,3 @@ const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (props: ProgrammeRevok
     </div>
   );
 };
-
-export default ProgrammeRevokeForm;

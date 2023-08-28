@@ -34,7 +34,7 @@ export interface ProgrammeTransferFormProps {
   useConnection: any;
 }
 
-const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
+export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
   props: ProgrammeTransferFormProps
 ) => {
   const {
@@ -369,5 +369,3 @@ const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
     </div>
   );
 };
-
-export default ProgrammeTransferForm;

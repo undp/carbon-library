@@ -12,11 +12,14 @@ import {
   Select,
   SelectProps,
   Space,
-} from 'antd';
-import React, { FC, useEffect, useState } from 'react';
-import { CompanyState } from '../../../Definitions/Enums/company.state.enum';
-import { addCommSep, Programme } from '../../../Definitions/Definitions/programme.definitions';
-import { creditUnit } from '../../../Definitions/Definitions/common.definitions';
+} from "antd";
+import React, { FC, useEffect, useState } from "react";
+import { CompanyState } from "../../../Definitions/Enums/company.state.enum";
+import {
+  addCommSep,
+  Programme,
+} from "../../../Definitions/Definitions/programme.definitions";
+import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
 
 export interface ProgrammeRetireFormProps {
   programme: Programme;
@@ -26,19 +29,31 @@ export interface ProgrammeRetireFormProps {
   subText?: string;
   hideType: boolean;
   myCompanyId?: number;
-  t:any;
-  useConnection:any
+  t: any;
+  useConnection: any;
 }
 
-const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetireFormProps) => {
-  const { programme, onFinish, onCancel, actionBtnText, subText, hideType, myCompanyId, t, useConnection } = props;
+export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
+  props: ProgrammeRetireFormProps
+) => {
+  const {
+    programme,
+    onFinish,
+    onCancel,
+    actionBtnText,
+    subText,
+    hideType,
+    myCompanyId,
+    t,
+    useConnection,
+  } = props;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const [type, setType] = useState<string>('');
+  const [type, setType] = useState<string>("");
   const [form] = Form.useForm();
 
   const [currentSum, setCurrentSum] = useState<number>(0);
-  const [countryList, setCountryList] = useState<SelectProps['options']>([]);
+  const [countryList, setCountryList] = useState<SelectProps["options"]>([]);
   const [value, setValue] = useState<string>();
   const [checked, setChecked] = useState<boolean>(false);
 
@@ -46,22 +61,24 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
 
   const handleSearch = async (newValue: string) => {
     if (newValue !== undefined) {
-      const resp = await post('national/organisation/countries', {
+      const resp = await post("national/organisation/countries", {
         page: 1,
         size: 250,
         filterAnd: [
           {
-            key: 'name',
-            operation: 'like',
-            value: newValue.charAt(0).toUpperCase() + newValue.slice(1) + '%',
+            key: "name",
+            operation: "like",
+            value: newValue.charAt(0).toUpperCase() + newValue.slice(1) + "%",
           },
         ],
         sort: {
-          key: 'name',
-          order: 'ASC',
+          key: "name",
+          order: "ASC",
         },
       });
-      setCountryList(resp.data.map((d: any) => ({ label: d.name, value: d.alpha2 })));
+      setCountryList(
+        resp.data.map((d: any) => ({ label: d.name, value: d.alpha2 }))
+      );
     }
   };
 
@@ -85,7 +102,12 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
   for (const c of programme.company) {
     companies[c.companyId] = c;
   }
-  const validCompanies: { percentage: number; name: any; available: number; companyId: any }[] = [];
+  const validCompanies: {
+    percentage: number;
+    name: any;
+    available: number;
+    companyId: any;
+  }[] = [];
   const companyCredit = [];
   let totalCredits = 0;
   let companyName = undefined;
@@ -100,7 +122,8 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
       companyName = companies[Number(programme.companyId[index])].name;
     }
     const companyAvailableTotal =
-      ((programme.creditBalance - (programme.creditFrozen ? programme.creditFrozen[index] : 0)) *
+      ((programme.creditBalance -
+        (programme.creditFrozen ? programme.creditFrozen[index] : 0)) *
         programme.creditOwnerPercentage[index]) /
       100;
     validCompanies.push({
@@ -115,9 +138,9 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
   }
 
   useEffect(() => {
-    handleSearch('');
+    handleSearch("");
     if (hideType) {
-      setType('0');
+      setType("0");
     }
   }, []);
 
@@ -142,7 +165,10 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
         onValuesChange={(v, allVal) => {
           if (allVal.companyCredit) {
             setCurrentSum(
-              allVal.companyCredit.reduce((a: any, b: any) => (a ? a : 0) + (b ? b : 0), 0)
+              allVal.companyCredit.reduce(
+                (a: any, b: any) => (a ? a : 0) + (b ? b : 0),
+                0
+              )
             );
           }
         }}
@@ -152,11 +178,11 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
             d.comment = d.comment.trim();
           }
           if (hideType) {
-            d.type = '0';
+            d.type = "0";
           }
-          if (d.type === '0') {
+          if (d.type === "0") {
             if (currentSum === 0) {
-              setPopupError('Total Amount should be greater than 0');
+              setPopupError("Total Amount should be greater than 0");
               setLoading(false);
               return;
             }
@@ -177,14 +203,22 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
           <>
             <Row>
               <Col span={24}>
-                <Form.Item className="remarks-label" label={t('view:from')} name="from">
+                <Form.Item
+                  className="remarks-label"
+                  label={t("view:from")}
+                  name="from"
+                >
                   <Input placeholder={companyName} disabled />
                 </Form.Item>
               </Col>
             </Row>
             <Row>
               <Col span={24}>
-                <Form.Item className="remarks-label" label={t('view:programme')} name="programme">
+                <Form.Item
+                  className="remarks-label"
+                  label={t("view:programme")}
+                  name="programme"
+                >
                   <Input placeholder={programme.title} disabled />
                 </Form.Item>
               </Col>
@@ -202,7 +236,7 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
                 rules={[
                   {
                     required: true,
-                    message: 'Required field',
+                    message: "Required field",
                   },
                 ]}
               >
@@ -213,33 +247,33 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
                   }}
                 >
                   <Space direction="vertical">
-                    <Radio value={'0'}>Cross-border transfer</Radio>
-                    <Radio value={'1'}>Legal Action</Radio>
-                    <Radio value={'2'}>Other</Radio>
+                    <Radio value={"0"}>Cross-border transfer</Radio>
+                    <Radio value={"1"}>Legal Action</Radio>
+                    <Radio value={"2"}>Other</Radio>
                   </Space>
                 </Radio.Group>
               </Form.Item>
             </Col>
           </Row>
         )}
-        {type === '0' && (
+        {type === "0" && (
           <div>
             <Row>
               <Col span={24}>
                 <Form.Item
                   className="remarks-label"
-                  label={t('view:country')}
+                  label={t("view:country")}
                   name="country"
                   rules={[
                     {
                       required: true,
-                      message: 'Required field',
+                      message: "Required field",
                     },
                   ]}
                 >
                   <Select
                     showSearch
-                    placeholder={t('view:searchCountry')}
+                    placeholder={t("view:searchCountry")}
                     showArrow={true}
                     filterOption={false}
                     onSearch={handleSearch}
@@ -262,7 +296,11 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
             </Row>
             <Row>
               <Col span={24}>
-                <Form.Item className="remarks-label" label={t('view:company')} name="company">
+                <Form.Item
+                  className="remarks-label"
+                  label={t("view:company")}
+                  name="company"
+                >
                   <Input />
                 </Form.Item>
               </Col>
@@ -273,7 +311,7 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
                   <Col lg={11} md={24}>
                     {hideType ? (
                       <div className="label">{`${t(
-                        'view:totalRetireCredit'
+                        "view:totalRetireCredit"
                       )} (${creditUnit})`}</div>
                     ) : (
                       <div className="label">{pert.name}</div>
@@ -282,24 +320,28 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
                   <Col lg={6} md={12}>
                     <Form.Item
                       className="popup-credit-input"
-                      name={['companyCredit', index]}
+                      name={["companyCredit", index]}
                       rules={[
                         {
                           pattern: new RegExp(/^[+]?([.]\d+|\d+[.]?\d*)$/g),
-                          message: 'Credit Should be a positive number',
+                          message: "Credit Should be a positive number",
                         },
                         {
                           required: true,
-                          message: 'Required field',
+                          message: "Required field",
                         },
                         ({ getFieldValue }) => ({
                           validator(rule, v) {
                             if (
-                              getFieldValue(['companyCredit', index]) &&
-                              parseFloat(getFieldValue(['companyCredit', index])) > pert.available
+                              getFieldValue(["companyCredit", index]) &&
+                              parseFloat(
+                                getFieldValue(["companyCredit", index])
+                              ) > pert.available
                             ) {
                               // eslint-disable-next-line prefer-promise-reject-errors
-                              return Promise.reject('Retire Amount > Credit Balance');
+                              return Promise.reject(
+                                "Retire Amount > Credit Balance"
+                              );
                             }
                             return Promise.resolve();
                           },
@@ -318,11 +360,14 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
                     </Form.Item>
                   </Col>
                   <Col lg={1} md={1} className="seperator">
-                    {'/'}
+                    {"/"}
                   </Col>
                   <Col lg={6} md={12}>
                     <Form.Item className="popup-credit-input">
-                      <InputNumber placeholder={addCommSep(pert.available)} disabled />
+                      <InputNumber
+                        placeholder={addCommSep(pert.available)}
+                        disabled
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -331,19 +376,27 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
             {!hideType && validCompanies.length > 1 && (
               <Row>
                 <Col lg={11} md={24}>
-                  <div className="label">{`${t('view:totalTransferCredit')} (${creditUnit})`}</div>
+                  <div className="label">{`${t(
+                    "view:totalTransferCredit"
+                  )} (${creditUnit})`}</div>
                 </Col>
                 <Col lg={6} md={12}>
                   <Form.Item className="popup-credit-input">
-                    <InputNumber placeholder={addCommSep(currentSum)} disabled />
+                    <InputNumber
+                      placeholder={addCommSep(currentSum)}
+                      disabled
+                    />
                   </Form.Item>
                 </Col>
                 <Col lg={1} md={1} className="seperator">
-                  {'/'}
+                  {"/"}
                 </Col>
                 <Col lg={6} md={12}>
                   <Form.Item className="popup-credit-input">
-                    <InputNumber placeholder={addCommSep(totalCredits)} disabled />
+                    <InputNumber
+                      placeholder={addCommSep(totalCredits)}
+                      disabled
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -388,13 +441,13 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
               rules={[
                 {
                   required: true,
-                  message: 'Required field',
+                  message: "Required field",
                 },
                 ({ getFieldValue }) => ({
                   validator(rule, v) {
-                    if (v !== undefined && v !== '' && v.trim() === '') {
+                    if (v !== undefined && v !== "" && v.trim() === "") {
                       // eslint-disable-next-line prefer-promise-reject-errors
-                      return Promise.reject('Required field');
+                      return Promise.reject("Required field");
                     }
                     return Promise.resolve();
                   },
@@ -428,18 +481,25 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
               //   }),
               // ]}
             >
-              <Checkbox className="label" onChange={(v) => setChecked(v.target.checked)}>
-                {hideType ? t('view:confirmRetire') : t('view:confirmClosure')}
+              <Checkbox
+                className="label"
+                onChange={(v) => setChecked(v.target.checked)}
+              >
+                {hideType ? t("view:confirmRetire") : t("view:confirmClosure")}
               </Checkbox>
             </Form.Item>
           </Col>
         </Row>
 
-        {popupError ? <Alert className="error" message={popupError} type="error" showIcon /> : ''}
+        {popupError ? (
+          <Alert className="error" message={popupError} type="error" showIcon />
+        ) : (
+          ""
+        )}
 
         <Form.Item className="footer">
           <Button htmlType="button" onClick={onCancel}>
-            {t('view:cancel')}
+            {t("view:cancel")}
           </Button>
           <Button
             className="mg-left-2"
@@ -455,5 +515,3 @@ const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (props: ProgrammeRetir
     </div>
   );
 };
-
-export default ProgrammeRetireForm;

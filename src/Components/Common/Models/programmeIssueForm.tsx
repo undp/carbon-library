@@ -1,8 +1,11 @@
-import { Alert, Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd';
-import react, { FC, useState } from 'react';
-import { addCommSep, Programme } from '../../../Definitions/Definitions/programme.definitions';
-import { creditUnit } from '../../../Definitions/Definitions/common.definitions';
-import React from 'react';
+import { Alert, Button, Col, Form, Input, InputNumber, Modal, Row } from "antd";
+import react, { FC, useState } from "react";
+import {
+  addCommSep,
+  Programme,
+} from "../../../Definitions/Definitions/programme.definitions";
+import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
+import React from "react";
 
 export interface ProgrammeIssueFormProps {
   programme: Programme;
@@ -11,11 +14,21 @@ export interface ProgrammeIssueFormProps {
   onFinish: any;
   subText: string;
   enableIssue: boolean;
-  t:any;
+  t: any;
 }
 
-const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFormProps) => {
-  const { programme, onFinish, onCancel, actionBtnText, subText, enableIssue, t } = props;
+export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
+  props: ProgrammeIssueFormProps
+) => {
+  const {
+    programme,
+    onFinish,
+    onCancel,
+    actionBtnText,
+    subText,
+    enableIssue,
+    t,
+  } = props;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -35,7 +48,7 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
         onChange={() => setPopupError(undefined)}
         onFinish={async (d) => {
           if (d.issueAmount === 0) {
-            setPopupError('Issue amount should be greater than 0');
+            setPopupError("Issue amount should be greater than 0");
             setLoading(false);
             return;
           }
@@ -48,31 +61,33 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
         {enableIssue ? (
           <Row>
             <Col lg={11} md={24}>
-              <div className="label">{`${t('view:issueCreditText')} (${creditUnit})`}</div>
+              <div className="label">{`${t(
+                "view:issueCreditText"
+              )} (${creditUnit})`}</div>
             </Col>
 
             <Col lg={6} md={12}>
               <Form.Item
                 className="popup-credit-input"
-                name={'issueAmount'}
+                name={"issueAmount"}
                 rules={[
                   {
                     pattern: new RegExp(/^[+]?([.]\d+|\d+[.]?\d*)$/g),
-                    message: 'Credit Should be a positive number',
+                    message: "Credit Should be a positive number",
                   },
                   {
                     required: true,
-                    message: 'Required field',
+                    message: "Required field",
                   },
                   ({ getFieldValue }) => ({
                     validator(rule, value) {
                       if (
-                        getFieldValue('issueAmount') &&
-                        parseFloat(getFieldValue('issueAmount')) >
+                        getFieldValue("issueAmount") &&
+                        parseFloat(getFieldValue("issueAmount")) >
                           programme.creditEst - programme.creditIssued
                       ) {
                         // eslint-disable-next-line prefer-promise-reject-errors
-                        return Promise.reject('Amount > Authorised');
+                        return Promise.reject("Amount > Authorised");
                       }
                       return Promise.resolve();
                     },
@@ -91,12 +106,14 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
               </Form.Item>
             </Col>
             <Col lg={1} md={1} className="seperator">
-              {'/'}
+              {"/"}
             </Col>
             <Col lg={6} md={12}>
               <Form.Item className="popup-credit-input">
                 <InputNumber
-                  placeholder={addCommSep(programme.creditEst - programme.creditIssued)}
+                  placeholder={addCommSep(
+                    programme.creditEst - programme.creditIssued
+                  )}
                   disabled
                 />
               </Form.Item>
@@ -105,12 +122,16 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
         ) : (
           <Row>
             <Col lg={18} md={20}>
-              <div className="label">{`${t('view:authCreditText')} (${creditUnit})`}</div>
+              <div className="label">{`${t(
+                "view:authCreditText"
+              )} (${creditUnit})`}</div>
             </Col>
             <Col lg={6} md={6}>
               <Form.Item className="popup-credit-input">
                 <InputNumber
-                  placeholder={addCommSep(programme.creditEst - programme.creditIssued)}
+                  placeholder={addCommSep(
+                    programme.creditEst - programme.creditIssued
+                  )}
                   disabled
                 />
               </Form.Item>
@@ -136,13 +157,22 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
           </Col>
         </Row>
 
-        {popupError ? <Alert className="error" message={popupError} type="error" showIcon /> : ''}
+        {popupError ? (
+          <Alert className="error" message={popupError} type="error" showIcon />
+        ) : (
+          ""
+        )}
 
         <Form.Item className="footer">
           <Button htmlType="button" onClick={onCancel}>
-            {t('view:cancel')}
+            {t("view:cancel")}
           </Button>
-          <Button className="mg-left-2" type="primary" htmlType="submit" loading={loading}>
+          <Button
+            className="mg-left-2"
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
             {actionBtnText}
           </Button>
         </Form.Item>
@@ -150,5 +180,3 @@ const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (props: ProgrammeIssueFo
     </div>
   );
 };
-
-export default ProgrammeIssueForm;
