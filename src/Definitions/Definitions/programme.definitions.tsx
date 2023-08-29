@@ -185,7 +185,7 @@ export interface ProgrammeT extends Programme {
   emissionReductionAchieved: number;
 }
 
-export interface ProgrammeU {
+export interface ProgrammeU extends Programme {
   currentStage: ProgrammeStageUnified;
   programmeProperties: ProgrammePropertiesU;
   emissionReductionExpected: number;
