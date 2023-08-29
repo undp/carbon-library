@@ -2,7 +2,7 @@ import { Row, Col, Card, Button, Skeleton } from "antd";
 import { UserOutlined, BankOutlined } from "@ant-design/icons";
 import "./userProfileComponent.scss";
 import { useEffect, useState } from "react";
-import UserRoleIcon from "../../Common/UserRoleIcon/userRoleIcon";
+import { UserRoleIcon } from "../../Common/UserRoleIcon/userRoleIcon";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import LanguageSelection from "../../Common/LanguageSelection/languageSelection";
 import React from "react";

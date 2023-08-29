@@ -32,3 +32,4 @@ export * from "./Common/Models/transferActionModel";
 export * from "./Common/NdcActionBody/ndcActionBody";
 export * from "./Common/OrganisationStatus/organisationStatus";
 export * from "./Common/ProgrammeDocuments/programmeDocuments";
+export * from "./Common/UserRoleIcon/userRoleIcon";
