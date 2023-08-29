@@ -29,3 +29,4 @@ export * from "./Common/Models/programmeRevokeForm";
 export * from "./Common/Models/programmeTransferForm";
 export * from "./Common/Models/rejectDocumenConfirmationModel";
 export * from "./Common/Models/transferActionModel";
+export * from "./Common/NdcActionBody/ndcActionBody";

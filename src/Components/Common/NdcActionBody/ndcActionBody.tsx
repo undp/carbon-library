@@ -34,7 +34,7 @@ export interface NdcActionBodyProps {
   uploadDocUserPermission: any;
 }
 
-const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps) => {
+export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps) => {
   const {
     data,
     programmeId,
@@ -701,4 +701,3 @@ const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps) => {
   );
 };
 
-export default NdcActionBody;
