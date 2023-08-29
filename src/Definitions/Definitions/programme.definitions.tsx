@@ -5,19 +5,22 @@ import {
   CertBGColor,
   DevBGColor,
 } from "../../Styles/role.color.constants";
-import { ProgrammeStage } from "../Enums/programmeStage.enum";
-import { ProgrammeStageMRV } from "../Enums/programmeStageMRV.enum";
+import {
+  ProgrammeStageR,
+  ProgrammeStageMRV,
+  ProgrammeStageUnified,
+} from "../Enums/programmeStage.enum";
 import { TypeOfMitigation } from "../Enums/typeOfMitigation.enum";
 import { CreditTransferStage } from "../Enums/creditTransferStage.enum";
 import { SectoralScope } from "../Enums/sectoralScope.enum";
 import { RcFile } from "rc-upload/lib/interface";
 
 export const getStageEnumVal = (value: string) => {
-  const index = Object.keys(ProgrammeStage).indexOf(value);
+  const index = Object.keys(ProgrammeStageUnified).indexOf(value);
   if (index < 0) {
     return value;
   }
-  return Object.values(ProgrammeStage)[index];
+  return Object.values(ProgrammeStageUnified)[index];
 };
 
 export const getCreditStageVal = (value: string) => {
@@ -48,13 +51,15 @@ export const getStageTransferEnumVal = (
   return Object.values(CreditTransferStage)[index];
 };
 
-export const getStageTagType = (stage: ProgrammeStage) => {
+export const getStageTagType = (
+  stage: ProgrammeStageR | ProgrammeStageUnified
+) => {
   switch (getStageEnumVal(stage)) {
-    case ProgrammeStage.AwaitingAuthorization:
+    case ProgrammeStageR.AwaitingAuthorization:
       return "error";
-    case ProgrammeStage.Authorised:
+    case ProgrammeStageR.Authorised:
       return "processing";
-    // case ProgrammeStage.Transferred:
+    // case ProgrammeStageR.Transferred:
     //   return 'success';
     default:
       return "default";
@@ -109,7 +114,6 @@ export class UnitField {
 export interface ProgrammeProperties {
   maxInternationalTransferAmount: string;
   creditingPeriodInYears: number;
-  programmeCostUSD: number;
   sourceOfFunding: any;
   grantEquivalentAmount: number;
   carbonPriceUSDPerTon: number;
@@ -121,19 +125,17 @@ export interface ProgrammeProperties {
   projectMaterial: [];
 }
 
-export interface ProgrammePropertiesT {
-  maxInternationalTransferAmount: string;
-  creditingPeriodInYears: number;
+export interface ProgrammePropertiesR extends ProgrammeProperties {
+  programmeCostUSD: number;
+}
+
+export interface ProgrammePropertiesT extends ProgrammeProperties {
   estimatedProgrammeCostUSD: number;
-  sourceOfFunding: any;
-  grantEquivalentAmount: number;
-  carbonPriceUSDPerTon: number;
-  buyerCountryEligibility: string;
-  geographicalLocation: string[];
-  greenHouseGasses: any[];
-  creditYear: number;
-  programmeMaterials: [];
-  projectMaterial: [];
+}
+
+export interface ProgrammePropertiesU extends ProgrammeProperties {
+  estimatedProgrammeCostUSD: number;
+  programmeCostUSD: number;
 }
 
 export interface Programme {
@@ -143,7 +145,7 @@ export interface Programme {
   sectoralScope: string;
   sector: string;
   countryCodeA2: string;
-  currentStage: ProgrammeStage;
+  currentStage: ProgrammeStageR | ProgrammeStageMRV | ProgrammeStageUnified;
   startTime: number;
   endTime: number;
   creditChange: number;
@@ -170,42 +172,24 @@ export interface Programme {
   txRef: string;
   typeOfMitigation: TypeOfMitigation;
   geographicalLocationCordintes: any;
+  mitigationActions: any;
 }
 
-export interface ProgrammeT {
-  programmeId: string;
-  serialNo: string;
-  title: string;
-  sectoralScope: string;
-  sector: string;
-  countryCodeA2: string;
+export interface ProgrammeR extends Programme {
+  currentStage: ProgrammeStageR;
+  programmeProperties: ProgrammePropertiesR;
+}
+
+export interface ProgrammeT extends Programme {
   currentStage: ProgrammeStageMRV;
-  startTime: number;
-  endTime: number;
-  creditChange: number;
-  creditIssued: number;
-  creditEst: number;
-  creditBalance: number;
-  creditTransferred: number[];
-  creditRetired: number[];
-  creditFrozen: number[];
-  constantVersion: string;
-  proponentTaxVatId: string[];
-  companyId: number[];
-  proponentPercentage: number[];
-  creditOwnerPercentage: number[];
-  certifierId: any[];
-  certifier: any[];
-  company: any[];
-  creditUnit: string;
   programmeProperties: ProgrammePropertiesT;
-  agricultureProperties: any;
-  solarProperties: any;
-  txTime: number;
-  createdTime: number;
-  txRef: string;
-  typeOfMitigation: TypeOfMitigation;
-  geographicalLocationCordintes: any;
+  emissionReductionExpected: number;
+  emissionReductionAchieved: number;
+}
+
+export interface ProgrammeU extends Programme {
+  currentStage: ProgrammeStageUnified;
+  programmeProperties: ProgrammePropertiesU;
   emissionReductionExpected: number;
   emissionReductionAchieved: number;
 }
@@ -260,7 +244,7 @@ export const addSpaces = (text: string) => {
   return text.replace(/([A-Z])/g, " $1").trim();
 };
 
-export const getFinancialFields = (programme: Programme) => {
+export const getFinancialFields = (programme: ProgrammeR | ProgrammeU) => {
   return {
     programmeCost: addCommSep(programme.programmeProperties.programmeCostUSD),
     financingType: addSpaces(programme.programmeProperties.sourceOfFunding),

@@ -6,7 +6,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { RcFile } from "rc-upload/lib/interface";
 import { InfoCircle } from "react-bootstrap-icons";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
-import { Programme, ProgrammeStage, getBase64 } from "../../../Definitions";
+import { Programme, ProgrammeStageR, getBase64 } from "../../../Definitions";
 
 export const AddNdcActionComponent = (props: any) => {
   const {
@@ -41,7 +41,7 @@ export const AddNdcActionComponent = (props: any) => {
   }, []);
 
   const isProjectReportsVisible = () => {
-    return programmeDetails?.currentStage === ProgrammeStage.Authorised;
+    return programmeDetails?.currentStage === ProgrammeStageR.Authorised;
   };
 
   const saveNdcAction = async (ndcActionDetailsObj: any) => {

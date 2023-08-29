@@ -16,7 +16,7 @@ import {
   MitigationTypes,
   NdcActionStatus,
   NdcActionTypes,
-  ProgrammeStage,
+  ProgrammeStageR,
   Role,
   addCommSep,
   addCommSepRound,
@@ -74,7 +74,7 @@ export const NdcActionViewComponent = (props: any) => {
       });
       if (response?.data?.length > 0) {
         setProgrammeOwnerId(response?.data[0]?.companyId);
-        if (response?.data[0]?.currentStage === ProgrammeStage.Authorised) {
+        if (response?.data[0]?.currentStage === ProgrammeStageR.Authorised) {
           setCanUploadMonitorReport(true);
         }
       }

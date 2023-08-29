@@ -13,7 +13,6 @@ export * from "./Enums/sectoralScope.enum";
 export * from "./Enums/TxType.enum";
 export * from "./Enums/creditTransferStage.enum";
 export * from "./Enums/retireType.enum";
-export * from "./Enums/programmeStageMRV.enum";
 export * from "./Enums/programmeStage.enum";
 export * from "./Enums/company.role.enum";
 export * from "./Enums/energyGenerationUnits.enum"
