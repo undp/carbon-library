@@ -8,7 +8,7 @@ export interface TimelineBodyProps {
   t:any;
 }
 
-const TimelineBody: FC<TimelineBodyProps> = (props: TimelineBodyProps) => {
+export const TimelineBody: FC<TimelineBodyProps> = (props: TimelineBodyProps) => {
   const { text, remark, via, t } = props;
   return (
     <div>
@@ -25,5 +25,3 @@ const TimelineBody: FC<TimelineBodyProps> = (props: TimelineBodyProps) => {
     </div>
   );
 };
-
-export default TimelineBody;
