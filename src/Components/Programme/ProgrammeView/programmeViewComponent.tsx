@@ -78,7 +78,7 @@ import { OrganisationStatus } from "../../Common/OrganisationStatus/organisation
 import { Loading } from "../../Common/Loading/loading";
 import { CompanyState } from "../../../Definitions/Enums/company.state.enum";
 import { ProgrammeTransfer } from "../../../Definitions/Entities/programmeTransfer";
-import TimelineBody from "../../Common/TimelineBody/timelineBody";
+import { TimelineBody } from "../../Common/TimelineBody/timelineBody";
 import { MapComponent } from "../../Common/Maps/mapComponent";
 import {
   MapTypes,

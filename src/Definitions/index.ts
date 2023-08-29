@@ -24,6 +24,7 @@ export * from "./Enums/sdgGoals.enum"
 export * from "./Enums/carbonSystemType.enum"
 export * from "./Enums/document.type"
 export * from "./Enums/document.status"
+export * from "./Enums/company.state.enum"
 export * from "./Definitions/userLogin.definitions";
 export * from "./Definitions/userInformationContext.definitions";
 export * from "./Definitions/userForgotPassword.definitions";
