@@ -7,6 +7,7 @@ import {
 } from "../../Styles/role.color.constants";
 import { ProgrammeStage } from "../Enums/programmeStage.enum";
 import { ProgrammeStageMRV } from "../Enums/programmeStageMRV.enum";
+import { ProgrammeStageUnified } from "../Enums/programmeStageUnified.enum";
 import { TypeOfMitigation } from "../Enums/typeOfMitigation.enum";
 import { CreditTransferStage } from "../Enums/creditTransferStage.enum";
 import { SectoralScope } from "../Enums/sectoralScope.enum";
@@ -136,6 +137,22 @@ export interface ProgrammePropertiesT {
   projectMaterial: [];
 }
 
+export interface ProgrammePropertiesU {
+  maxInternationalTransferAmount: string;
+  creditingPeriodInYears: number;
+  estimatedProgrammeCostUSD: number;
+  programmeCostUSD: number;
+  sourceOfFunding: any;
+  grantEquivalentAmount: number;
+  carbonPriceUSDPerTon: number;
+  buyerCountryEligibility: string;
+  geographicalLocation: string[];
+  greenHouseGasses: any[];
+  creditYear: number;
+  programmeMaterials: [];
+  projectMaterial: [];
+}
+
 export interface Programme {
   programmeId: string;
   serialNo: string;
@@ -209,6 +226,45 @@ export interface ProgrammeT {
   geographicalLocationCordintes: any;
   emissionReductionExpected: number;
   emissionReductionAchieved: number;
+}
+
+export interface ProgrammeU {
+  programmeId: string;
+  serialNo: string;
+  title: string;
+  sectoralScope: string;
+  sector: string;
+  countryCodeA2: string;
+  currentStage: ProgrammeStageUnified;
+  startTime: number;
+  endTime: number;
+  creditChange: number;
+  creditIssued: number;
+  creditEst: number;
+  creditBalance: number;
+  creditTransferred: number[];
+  creditRetired: number[];
+  creditFrozen: number[];
+  constantVersion: string;
+  proponentTaxVatId: string[];
+  companyId: number[];
+  proponentPercentage: number[];
+  creditOwnerPercentage: number[];
+  certifierId: any[];
+  certifier: any[];
+  company: any[];
+  creditUnit: string;
+  programmeProperties: ProgrammePropertiesU;
+  agricultureProperties: any;
+  solarProperties: any;
+  txTime: number;
+  createdTime: number;
+  txRef: string;
+  typeOfMitigation: TypeOfMitigation;
+  geographicalLocationCordintes: any;
+  emissionReductionExpected: number;
+  emissionReductionAchieved: number;
+  mitigationActions: any;
 }
 
 export const getGeneralFields = (programme: Programme) => {

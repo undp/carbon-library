@@ -15,6 +15,7 @@ export * from "./Enums/creditTransferStage.enum";
 export * from "./Enums/retireType.enum";
 export * from "./Enums/programmeStageMRV.enum";
 export * from "./Enums/programmeStage.enum";
+export * from "./Enums/programmeStageUnified.enum";
 export * from "./Enums/company.role.enum";
 export * from "./Enums/energyGenerationUnits.enum"
 export * from "./Enums/landAreaUnits.enum"
