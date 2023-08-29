@@ -244,15 +244,16 @@ export const addSpaces = (text: string) => {
   return text.replace(/([A-Z])/g, " $1").trim();
 };
 
-export const getFinancialFields = (programme: ProgrammeR | ProgrammeU) => {
+export const getFinancialFields = (programme: ProgrammeU) => {
   return {
-    programmeCost: addCommSep(programme.programmeProperties.programmeCostUSD),
+    estimatedProgrammeCostUSD: addCommSep(programme.programmeProperties.estimatedProgrammeCostUSD),
+    creditEst: addCommSep(programme.creditEst),
     financingType: addSpaces(programme.programmeProperties.sourceOfFunding),
     grantEquivalent: new UnitField(
-      "USD",
+      'USD',
       addCommSep(programme.programmeProperties.grantEquivalentAmount)
     ),
-    carbonPrice: addCommSep(programme.programmeProperties.carbonPriceUSDPerTon),
+    carbonPriceUSDPerTon: addCommSep(programme.programmeProperties.carbonPriceUSDPerTon),
   };
 };
 
