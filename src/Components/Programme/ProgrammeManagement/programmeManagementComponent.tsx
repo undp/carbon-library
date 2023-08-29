@@ -33,7 +33,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import {
   ProgrammeEntity,
-  ProgrammeStage,
+  ProgrammeStageR,
   ProgrammeStageMRV,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
@@ -69,7 +69,7 @@ export const ProgrammeManagementComponent = (props: any) => {
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
 
-  const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
+  const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStageR;
 
   const statusOptions = Object.keys(stageObject).map((k, index) => ({
     label: Object.values(stageObject)[index],

@@ -2,7 +2,7 @@ export * from "./Company/CompanyManagement/companyManagementComponent";
 export * from "./Company/AddNewCompany/addNewCompanyComponent";
 export * from "./Company/CompanyProfile/companyProfileComponent";
 export * from "./Programme/ProgrammeManagement/programmeManagementComponent";
-export * from "./Programme/ProgrammeView/programmeViewComponent";
+//export * from "./Programme/ProgrammeView/programmeViewComponent";
 export * from "./Programme/AddNewProgramme/programmeCreationComponent";
 export * from "./User/AddNewUser/addNewUserComponent";
 export * from "./User/UserProfile/userProfileComponent";

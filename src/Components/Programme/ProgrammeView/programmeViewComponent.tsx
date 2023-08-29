@@ -86,7 +86,7 @@ import {
 } from "../../../Definitions/Definitions/mapComponent.definitions";
 import {
   CreditTransferStage,
-  ProgrammeStage,
+  ProgrammeStageR,
   RetireType,
   TxType,
   TypeOfMitigation,
@@ -96,7 +96,7 @@ const { TextArea } = Input;
 
 export const ProgrammeViewComponent = (props: any) => {
   const {
-    t,
+    translator,
     useConnection,
     useLocation,
     useNavigate,
@@ -109,6 +109,7 @@ export const ProgrammeViewComponent = (props: any) => {
   } = props;
   const { get, put, post } = useConnection();
 
+  const t = translator.t;
   const { userInfoState } = useUserContext();
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -966,7 +967,7 @@ export const ProgrammeViewComponent = (props: any) => {
             genCerts(response.data, certTimes);
             genPieData(response.data);
           } else if (action === "Reject") {
-            data!.currentStage = ProgrammeStage.Rejected;
+            data!.currentStage = ProgrammeStageR.Rejected;
             setData(data);
           }
 
@@ -1184,7 +1185,7 @@ export const ProgrammeViewComponent = (props: any) => {
                         updateProgrammeData
                       )
                     }
-                    t={t}
+                    translator={translator}
                   />
                 ),
               });
@@ -1196,7 +1197,7 @@ export const ProgrammeViewComponent = (props: any) => {
         );
       }
     } else if (
-      data.currentStage.toString() !== ProgrammeStage.Rejected &&
+      data.currentStage.toString() !== ProgrammeStageR.Rejected &&
       Number(data.creditEst) > Number(data.creditIssued)
     ) {
       if (userInfoState?.companyRole === CompanyRole.GOVERNMENT) {
@@ -1231,7 +1232,7 @@ export const ProgrammeViewComponent = (props: any) => {
                           updateProgrammeData
                         )
                       }
-                      t={t}
+                      translator={translator}
                     />
                   ),
                 });
@@ -1349,7 +1350,7 @@ export const ProgrammeViewComponent = (props: any) => {
                   showCertifiers={
                     userInfoState.companyRole === CompanyRole.GOVERNMENT
                   }
-                  t={t}
+                  translator={translator}
                 />
               ),
             });
@@ -1368,7 +1369,7 @@ export const ProgrammeViewComponent = (props: any) => {
     const text = t("view:" + k);
     if (k === "currentStatus") {
       generalInfo[text] = (
-        <Tag color={getStageTagType(v as ProgrammeStage)}>
+        <Tag color={getStageTagType(v as ProgrammeStageR)}>
           {getStageEnumVal(v as string)}
         </Tag>
       );
@@ -1518,7 +1519,7 @@ export const ProgrammeViewComponent = (props: any) => {
               </div>
             </Card>
             {getStageEnumVal(data.currentStage) ===
-            ProgrammeStage.Authorised ? (
+            ProgrammeStageR.Authorised ? (
               <Card className="card-container">
                 <div className="info-view">
                   <div className="title">
@@ -1615,7 +1616,7 @@ export const ProgrammeViewComponent = (props: any) => {
                       userInfoState?.companyRole !== "Certifier" && (
                         <div className="flex-display action-btns">
                           {data.currentStage.toString() ===
-                            ProgrammeStage.Authorised &&
+                            ProgrammeStageR.Authorised &&
                             data.creditBalance -
                               (data.creditFrozen
                                 ? data.creditFrozen.reduce(
@@ -1676,7 +1677,7 @@ export const ProgrammeViewComponent = (props: any) => {
                                                   updateCreditInfo
                                                 )
                                               }
-                                              t={t}
+                                              translator={translator}
                                               useConnection={useConnection}
                                             />
                                           ),
@@ -1726,7 +1727,7 @@ export const ProgrammeViewComponent = (props: any) => {
                                                   updateCreditInfo
                                                 )
                                               }
-                                              t={t}
+                                              translator={translator}
                                               useConnection={useConnection}
                                             />
                                           ),
@@ -1783,7 +1784,7 @@ export const ProgrammeViewComponent = (props: any) => {
                                                   updateCreditInfo
                                                 )
                                               }
-                                              t={t}
+                                              translator={translator}
                                               useConnection={useConnection}
                                             />
                                           ),
@@ -1843,7 +1844,7 @@ export const ProgrammeViewComponent = (props: any) => {
                 </Card>
               )}
             <Card className="card-container">
-              <div>
+              {/* <div>
                 <InfoView
                   data={mapArrayToi18n(getFinancialFields(data))}
                   title={t("view:financial")}
@@ -1853,7 +1854,7 @@ export const ProgrammeViewComponent = (props: any) => {
                     </span>
                   }
                 />
-              </div>
+              </div> */}
             </Card>
           </Col>
           <Col md={24} lg={14}>
