@@ -8,7 +8,7 @@ import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
-import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
+import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
 import { addCommSep, SectoralScope } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 

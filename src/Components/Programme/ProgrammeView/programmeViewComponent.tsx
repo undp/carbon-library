@@ -74,7 +74,7 @@ import { ProgrammeIssueForm } from "../../Common/Models/programmeIssueForm";
 import { ProgrammeTransferForm } from "../../Common/Models/programmeTransferForm";
 import { ProgrammeRetireForm } from "../../Common/Models/programmeRetireForm";
 import { ProgrammeRevokeForm } from "../../Common/Models/programmeRevokeForm";
-import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
+import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
 import { Loading } from "../../Common/Loading/loading";
 import { CompanyState } from "../../../Definitions/Enums/company.state.enum";
 import { ProgrammeTransfer } from "../../../Definitions/Entities/programmeTransfer";
