@@ -51,7 +51,9 @@ export const getStageTransferEnumVal = (
   return Object.values(CreditTransferStage)[index];
 };
 
-export const getStageTagType = (stage: ProgrammeStageR) => {
+export const getStageTagType = (
+  stage: ProgrammeStageR | ProgrammeStageUnified
+) => {
   switch (getStageEnumVal(stage)) {
     case ProgrammeStageR.AwaitingAuthorization:
       return "error";
@@ -242,7 +244,7 @@ export const addSpaces = (text: string) => {
   return text.replace(/([A-Z])/g, " $1").trim();
 };
 
-export const getFinancialFields = (programme: ProgrammeR) => {
+export const getFinancialFields = (programme: ProgrammeR | ProgrammeU) => {
   return {
     programmeCost: addCommSep(programme.programmeProperties.programmeCostUSD),
     financingType: addSpaces(programme.programmeProperties.sourceOfFunding),
