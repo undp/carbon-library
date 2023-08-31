@@ -8,7 +8,6 @@ import {
   LinkOutlined,
 } from "@ant-design/icons";
 import * as Icon from "react-bootstrap-icons";
-//import Chart from "react-apexcharts";
 import { NdcAction } from "../../../Definitions/Definitions/ndcAction.definitions";
 import {
   DocType,
