@@ -18,6 +18,7 @@
     "@undp/carbon-credit-calculator": "^1.0.0",
     "node-sass": "^7.0.3",
     "postcss": "^8.4.23",
+    "react-circle-flags": "^0.0.19",
     "rollup": "^3.22.0",
     "rollup-plugin-dts": "^5.3.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
