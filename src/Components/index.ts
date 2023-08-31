@@ -12,6 +12,7 @@ export * from "./Investment/InvestmentManagement/investmentManagementComponent";
 export * from "./NdcActions/NdcActionManagement/ndcActionManagementComponent";
 export * from "./NdcActions/AddNdcAction/addNdcActionComponent";
 export * from "./NdcActions/NdcView/ndcActionViewComponent";
+export * from "./Transfers/creditTransfersComponent";
 export * from "./Common/Loading/loading";
 export * from "./Common/LegendItem/legendItem";
 export * from "./Common/Maps/mapComponent";
