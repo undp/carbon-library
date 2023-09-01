@@ -17,3 +17,9 @@ export enum ProgrammeStageUnified {
   Approved = "Approved",
   Rejected = "Rejected",
 }
+
+export enum ProgrammeStageLegend {
+  AUTHORISED = "Authorised",
+  REJECTED = "Rejected",
+  AWAITING_AUTHORIZATION = "AwaitingAuthorization",
+}
