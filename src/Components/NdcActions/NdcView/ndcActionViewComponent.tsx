@@ -8,7 +8,6 @@ import {
   LinkOutlined,
 } from "@ant-design/icons";
 import * as Icon from "react-bootstrap-icons";
-import Chart from "react-apexcharts";
 import { NdcAction } from "../../../Definitions/Definitions/ndcAction.definitions";
 import {
   DocType,
@@ -37,6 +36,7 @@ export const NdcActionViewComponent = (props: any) => {
     onNavigateToNdcManagementView,
     translator,
     sdgGoalImages,
+    Chart,
   } = props;
   translator.setDefaultNamespace("ndcAction");
   const t = translator.t;
