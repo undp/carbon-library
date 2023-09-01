@@ -3,6 +3,7 @@ import { Progress, Skeleton, Tooltip } from "antd";
 import "./dashboard.scss";
 import { HandThumbsUp, XCircle, InfoCircle } from "react-bootstrap-icons";
 import { addCommSepRound } from "../../Definitions";
+import React from "react";
 
 export interface ListWidgetProps {
   data: any[];
