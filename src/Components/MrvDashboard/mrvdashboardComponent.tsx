@@ -17,14 +17,19 @@ import { MrvPieChartsStatComponent } from "./mrvPieChartStatComponent";
 import { getChartOptions } from "./mrvChartOptions";
 import { ListWidgetComponent } from "./listWidgetComponent";
 import { MapStatsComponent } from "./mapStatsComponent";
-import ButtonGroup from "antd/lib/button/button-group";
 
 const { RangePicker } = DatePicker;
 
 export const MrvDashboardComponent = (props: any) => {
-  const { useConnection, useUserContext, Link, Chart, translator } = props;
+  const {
+    useConnection,
+    useUserContext,
+    Link,
+    Chart,
+    translator,
+    ButtonGroup,
+  } = props;
   const t = translator.t;
-  //const { t } = useTranslation(['mrvdashboard']);
   const { get, post, delete: del } = useConnection();
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
