@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { Col, DatePicker, Row, Skeleton, message } from "antd";
+import { Button, Col, DatePicker, Row, Skeleton, message } from "antd";
 import "./dashboard.scss";
 import moment from "moment";
 import { Clipboard2Pulse, HandThumbsUp } from "react-bootstrap-icons";
-import ButtonGroup from "antd/lib/button/button-group";
-import Button from "antd/lib/button/button";
 import {
   CompanyRole,
   MapSourceData,
@@ -19,6 +17,7 @@ import { MrvPieChartsStatComponent } from "./mrvPieChartStatComponent";
 import { getChartOptions } from "./mrvChartOptions";
 import { ListWidgetComponent } from "./listWidgetComponent";
 import { MapStatsComponent } from "./mapStatsComponent";
+import ButtonGroup from "antd/lib/button/button-group";
 
 const { RangePicker } = DatePicker;
 
