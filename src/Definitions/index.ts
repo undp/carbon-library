@@ -27,6 +27,7 @@ export * from "./Enums/document.status";
 export * from "./Enums/company.state.enum";
 export * from "./Enums/widget.type.enum";
 export * from "./Enums/statsCards.type.enum";
+export * from "./Enums/action.enum";
 export * from "./Definitions/userLogin.definitions";
 export * from "./Definitions/userInformationContext.definitions";
 export * from "./Definitions/userForgotPassword.definitions";
