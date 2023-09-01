@@ -2133,7 +2133,7 @@ ${total}
           </Link>
         </ButtonGroup>
       </div>
-      {/* <div className="stastics-cards-container" style={{ marginTop: `50px` }}>
+      <div className="stastics-cards-container" style={{ marginTop: `50px` }}>
         <Row gutter={[40, 40]} className="stastic-card-row">
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">
             <StasticCard
@@ -2579,7 +2579,7 @@ ${total}
         </div>
       ) : (
         ""
-      )} */}
+      )}
     </div>
   );
 };
