@@ -61,11 +61,10 @@ export const RegistryDashboardComponent = (props: any) => {
     useUserContext,
     useConnection,
     Chart,
-    translator,
+    t,
     ButtonGroup,
     Link,
   } = props;
-  const t = translator.t;
   const { get, post, delete: del } = useConnection();
   const { userInfoState } = useUserContext();
   const [loadingWithoutTimeRange, setLoadingWithoutTimeRange] =
