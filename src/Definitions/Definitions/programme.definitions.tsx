@@ -127,6 +127,7 @@ export interface ProgrammeProperties {
 
 export interface ProgrammePropertiesR extends ProgrammeProperties {
   programmeCostUSD: number;
+  estimatedProgrammeCostUSD: number;
 }
 
 export interface ProgrammePropertiesT extends ProgrammeProperties {
@@ -244,7 +245,7 @@ export const addSpaces = (text: string) => {
   return text.replace(/([A-Z])/g, " $1").trim();
 };
 
-export const getFinancialFields = (programme: ProgrammeU) => {
+export const getFinancialFields = (programme: ProgrammeU|ProgrammeR) => {
   return {
     estimatedProgrammeCostUSD: addCommSep(programme.programmeProperties.estimatedProgrammeCostUSD),
     creditEst: addCommSep(programme.creditEst),
