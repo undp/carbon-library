@@ -64,6 +64,7 @@ export const RegistryDashboardComponent = (props: any) => {
     t,
     ButtonGroup,
     Link,
+    isMultipleDashboardsVisible = false,
   } = props;
   const { get, post, delete: del } = useConnection();
   const { userInfoState } = useUserContext();
@@ -2122,16 +2123,18 @@ ${total}
 
   return (
     <div className="dashboard-main-container">
-      <div className="systemchange-container" style={{ marginLeft: `20px` }}>
-        <ButtonGroup>
-          <Button type="primary" className="rgprimary">
-            Carbon Registry
-          </Button>
-          <Link to="/dashboard/mrv">
-            <Button className="rgdefault">Transparency System</Button>
-          </Link>
-        </ButtonGroup>
-      </div>
+      {isMultipleDashboardsVisible && (
+        <div className="systemchange-container" style={{ marginLeft: `20px` }}>
+          <ButtonGroup>
+            <Button type="primary" className="rgprimary">
+              Carbon Registry
+            </Button>
+            <Link to="/dashboard/mrv">
+              <Button className="rgdefault">Transparency System</Button>
+            </Link>
+          </ButtonGroup>
+        </div>
+      )}
       <div className="stastics-cards-container" style={{ marginTop: `50px` }}>
         <Row gutter={[40, 40]} className="stastic-card-row">
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">

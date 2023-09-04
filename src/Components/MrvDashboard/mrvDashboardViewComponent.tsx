@@ -28,6 +28,7 @@ export const MrvDashboardComponent = (props: any) => {
     Chart,
     t,
     ButtonGroup,
+    isMultipleDashboardsVisible = false,
   } = props;
   const { get, post, delete: del } = useConnection();
   const [data, setData] = useState<any>({});
@@ -734,16 +735,18 @@ export const MrvDashboardComponent = (props: any) => {
 
   return (
     <div className="dashboard-main-container">
-      <div className="systemchange-container" style={{ marginLeft: `20px` }}>
-        <ButtonGroup aria-label="outlined button group">
-          <Link to="/dashboard">
-            <Button className="mrvdefault">Carbon Registry</Button>
-          </Link>
-          <Button type="primary" className="mrvprimary">
-            Transparency System
-          </Button>
-        </ButtonGroup>
-      </div>
+      {isMultipleDashboardsVisible && (
+        <div className="systemchange-container" style={{ marginLeft: `20px` }}>
+          <ButtonGroup aria-label="outlined button group">
+            <Link to="/dashboard">
+              <Button className="mrvdefault">Carbon Registry</Button>
+            </Link>
+            <Button type="primary" className="mrvprimary">
+              Transparency System
+            </Button>
+          </ButtonGroup>
+        </div>
+      )}
       <div className="filter-container">
         <div className="date-filter">
           <RangePicker
