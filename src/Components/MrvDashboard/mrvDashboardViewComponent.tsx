@@ -26,10 +26,9 @@ export const MrvDashboardComponent = (props: any) => {
     useUserContext,
     Link,
     Chart,
-    translator,
+    t,
     ButtonGroup,
   } = props;
-  const t = translator.t;
   const { get, post, delete: del } = useConnection();
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
