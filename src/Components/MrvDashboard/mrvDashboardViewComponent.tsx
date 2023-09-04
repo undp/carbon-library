@@ -741,7 +741,7 @@ export const MrvDashboardComponent = (props: any) => {
             <Button className="mrvdefault">Carbon Registry</Button>
           </Link>
           <Button type="primary" className="mrvprimary">
-            Transparancy System
+            Transparency System
           </Button>
         </ButtonGroup>
       </div>
