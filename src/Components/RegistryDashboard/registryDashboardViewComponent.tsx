@@ -2129,7 +2129,7 @@ ${total}
             Carbon Registry
           </Button>
           <Link to="/dashboard/mrv">
-            <Button className="rgdefault">Transparancy System</Button>
+            <Button className="rgdefault">Transparency System</Button>
           </Link>
         </ButtonGroup>
       </div>
