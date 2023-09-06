@@ -38,6 +38,10 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+
+    .profile-icon {
+      margin-bottom: 4px;
+    }
   }
   .table-actions-section {
     margin-bottom: 0px;
