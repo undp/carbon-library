@@ -9,5 +9,6 @@ export enum ProgrammeManagementColumns {
   certifierId = 'certifierId',
   serialNo = 'serialNo',
   emissionReductionExpected = 'emissionReductionExpected',
-  emissionReductionAchieved = 'emissionReductionAchieved'
+  emissionReductionAchieved = 'emissionReductionAchieved',
+  emissionReductionAchievedandCreditIssued = 'emissionReductionAchievedandCreditIssued'
 }

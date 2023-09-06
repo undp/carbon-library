@@ -246,6 +246,15 @@ export const ProgrammeManagementComponent = (props: any) => {
       },
     },
     {
+      title: t("programme:emissionReductionAchievedandCreditIssued"),
+      dataIndex: "emissionReductionAchieved",
+      key: ProgrammeManagementColumns.emissionReductionAchievedandCreditIssued,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? addCommSep(item) : "-";
+      },
+    },
+    {
       title: t("programme:certifiers"),
       dataIndex: "certifierId",
       key: ProgrammeManagementColumns.certifierId,
