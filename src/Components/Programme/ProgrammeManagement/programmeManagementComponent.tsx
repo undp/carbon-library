@@ -161,7 +161,7 @@ export const ProgrammeManagementComponent = (props: any) => {
             </Tooltip>
           );
         });
-        return <div className="org-list">{elements}</div>;
+        return <div className="certify-list">{elements}</div>;
       },
     },
     {
