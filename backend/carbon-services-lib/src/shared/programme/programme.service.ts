@@ -221,7 +221,7 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
-  async updateOwnership(update: OwnershipUpdateDto): Promise<DataResponseDto | undefined> {
+  async updateOwnership(update: OwnershipUpdateDto, user: string): Promise<DataResponseDto | undefined> {
     this.logger.log('Ownership update triggered')
 
     if (
@@ -276,7 +276,12 @@ export class ProgrammeService {
       companyIds.push(compo.companyId)
     }
     
-    const resp = await this.programmeLedger.updateOwnership(update.externalId, companyIds, update.proponentTaxVatId, update.proponentPercentage, investorCompanyId, ownerCompanyId, investorCompanyName, ownerCompanyName, update.shareFromOwner);
+    const resp = await this.programmeLedger.updateOwnership(update.externalId, companyIds, update.proponentTaxVatId, update.proponentPercentage, investorCompanyId, ownerCompanyId, update.shareFromOwner, `${this.getUserRef(user)}#${investorCompanyId}#${
+      investorCompanyName
+    }#${ownerCompanyId}#${
+      ownerCompanyName
+    }`);
+    
     if(resp)
       this.checkPendingTransferValidity(resp);
     return new DataResponseDto(HttpStatus.OK, resp);
@@ -497,7 +502,11 @@ export class ProgrammeService {
       updateProgramme = (
         await this.doInvestment(
           trf,
-          `${toCompany.companyId}#${toCompany.name}#${this.getUserRef(requester)}`.split('#',4).join('#'),
+          `${this.getUserRef(requester)}#${toCompany.companyId}#${
+            toCompany.name
+          }#${fromCompanyListMap[trf.fromCompanyId].companyId}#${
+            fromCompanyListMap[trf.fromCompanyId].name
+          }`,
           programme,
           toCompany
         )
@@ -1290,18 +1299,6 @@ export class ProgrammeService {
             `/programmeManagement/view?id=${programme.programmeId}`,
         }
       );
-      savedProgramme.companyId.forEach(async (companyId) => {
-        await this.emailHelperService.sendEmailToOrganisationAdmins(
-          companyId,
-          EmailTemplates.PROGRAMME_CREATE,
-          {
-            organisationName: orgNamesList,
-          programmePageLink:
-            hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
-          }
-        );
-      });
     }
 
     return savedProgramme;
@@ -3705,7 +3702,9 @@ export class ProgrammeService {
 
     const transferResult = await this.doInvestment(
       investment,
-      `${receiver.companyId}#${receiver.name}#${this.getUserRef(approver)}`.split('#',4).join('#'),
+      `${this.getUserRef(approver)}#${receiver.companyId}#${receiver.name}#${
+        giver.companyId
+      }#${giver.name}`,
       programme,
       receiver
     );
