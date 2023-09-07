@@ -161,42 +161,7 @@ export const ProgrammeManagementComponent = (props: any) => {
             </Tooltip>
           );
         });
-        return <div className="certify-list">{elements}</div>;
-      },
-    },
-    {
-      title: t("programme:certifiers"),
-      dataIndex: "certifierId",
-      key: ProgrammeManagementColumns.certifierId,
-      align: "left" as const,
-      sorter: true,
-      render: (item: any, itemObj: any) => {
-        if (item === null) {
-          return "-";
-        }
-        const cMap: any = {};
-        for (const c of itemObj.certifier) {
-          cMap[c.companyId] = c;
-        }
-
-        const elements = item.map((id: any) => {
-          const obj = cMap[id];
-          if (!obj) {
-            return;
-          }
-          return (
-            <Tooltip title={obj.name} color={TooltipColor} key={TooltipColor}>
-              <div>
-                <ProfileIcon
-                  icon={obj.logo}
-                  bg={getCompanyBgColor(obj.companyRole)}
-                  name={obj.name}
-                />
-              </div>
-            </Tooltip>
-          );
-        });
-        return <div className="certify-list">{elements}</div>;
+        return <div className="org-list">{elements}</div>;
       },
     },
     {
@@ -283,6 +248,41 @@ export const ProgrammeManagementComponent = (props: any) => {
       align: "right" as const,
       render: (item: any) => {
         return item ? addCommSep(item) : "-";
+      },
+    },
+    {
+      title: t("programme:certifiers"),
+      dataIndex: "certifierId",
+      key: ProgrammeManagementColumns.certifierId,
+      align: "left" as const,
+      sorter: true,
+      render: (item: any, itemObj: any) => {
+        if (item === null) {
+          return "-";
+        }
+        const cMap: any = {};
+        for (const c of itemObj.certifier) {
+          cMap[c.companyId] = c;
+        }
+
+        const elements = item.map((id: any) => {
+          const obj = cMap[id];
+          if (!obj) {
+            return;
+          }
+          return (
+            <Tooltip title={obj.name} color={TooltipColor} key={TooltipColor}>
+              <div>
+                <ProfileIcon
+                  icon={obj.logo}
+                  bg={getCompanyBgColor(obj.companyRole)}
+                  name={obj.name}
+                />
+              </div>
+            </Tooltip>
+          );
+        });
+        return <div className="certify-list">{elements}</div>;
       },
     },
     {
