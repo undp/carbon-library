@@ -14,6 +14,7 @@ import { TypeOfMitigation } from "../Enums/typeOfMitigation.enum";
 import { CreditTransferStage } from "../Enums/creditTransferStage.enum";
 import { SectoralScope } from "../Enums/sectoralScope.enum";
 import { RcFile } from "rc-upload/lib/interface";
+import { CarbonSystemType } from "../Enums/carbonSystemType.enum";
 
 export const getStageEnumVal = (value: string) => {
   const index = Object.keys(ProgrammeStageUnified).indexOf(value);
@@ -195,8 +196,8 @@ export interface ProgrammeU extends Programme {
   emissionReductionAchieved: number;
 }
 
-export const getGeneralFields = (programme: Programme) => {
-  return {
+export const getGeneralFields = (programme: Programme |ProgrammeU | ProgrammeR | ProgrammeT, system?:CarbonSystemType) => {
+  let res: Record<string,any>={
     title: programme.title,
     serialNo: programme.serialNo,
     currentStatus: programme.currentStage,
@@ -212,6 +213,12 @@ export const getGeneralFields = (programme: Programme) => {
     endDate: DateTime.fromSeconds(Number(programme.endTime)),
     buyerCountry: programme.programmeProperties.buyerCountryEligibility,
   };
+  if(system===CarbonSystemType.UNIFIED || system===CarbonSystemType.MRV){
+    let prog:any=programme
+    res.emissionsReductionExpected = prog.emissionReductionExpected
+    res.emissionsReductionAchieved = prog.emissionReductionAchieved
+  }
+  return res
 };
 
 export const addCommSep = (value: any) => {

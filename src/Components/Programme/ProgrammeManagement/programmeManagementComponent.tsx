@@ -161,11 +161,7 @@ export const ProgrammeManagementComponent = (props: any) => {
             </Tooltip>
           );
         });
-        return (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {elements}
-          </div>
-        );
+        return <div className="org-list">{elements}</div>;
       },
     },
     {
@@ -240,6 +236,15 @@ export const ProgrammeManagementComponent = (props: any) => {
       title: t("programme:emissionsReductionAchieved"),
       dataIndex: "emissionReductionAchieved",
       key: ProgrammeManagementColumns.emissionReductionAchieved,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? addCommSep(item) : "-";
+      },
+    },
+    {
+      title: t("programme:emissionReductionAchievedandCreditIssued"),
+      dataIndex: "emissionReductionAchieved",
+      key: ProgrammeManagementColumns.emissionReductionAchievedandCreditIssued,
       align: "right" as const,
       render: (item: any) => {
         return item ? addCommSep(item) : "-";
