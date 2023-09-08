@@ -84,6 +84,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
   };
 
   const onUploadDocument = async (file: any, type: any) => {
+    console.log('On Upload NDC ----------------------------------------------------');
     if (file.size > maximumImageSize) {
       message.open({
         type: "error",
