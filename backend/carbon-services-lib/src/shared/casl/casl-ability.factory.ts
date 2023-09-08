@@ -250,7 +250,8 @@ export class CaslAbilityFactory {
 
       if (user.companyState === 0) {
         cannot(Action.Create, "all");
-        cannot(Action.Delete, "all");
+        cannot(Action.Delete, Programme);
+        cannot(Action.Delete, Company);
         cannot(Action.Update, User, { id: { $ne: user.id } });
         cannot(Action.Update, Programme);
         cannot(Action.Update, Company);
