@@ -116,7 +116,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
           actionId: ndcActionId,
         });
         if (response?.data) {
-          setMethodologyDocumentUpdated(true);
+          console.log(response);
           message.open({
             type: "success",
             content: `${t("programme:isUploaded")}`,
