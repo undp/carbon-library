@@ -33,6 +33,7 @@ export interface ProgrammeDocumentsProps {
   useConnection: any;
   useUserContext: any;
   translator: any;
+  setMethodologyDocumentUpdated: any;
 }
 
 export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
@@ -52,6 +53,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     useConnection,
     useUserContext,
     translator,
+    setMethodologyDocumentUpdated,
   } = props;
   const t = translator.t;
   const { userInfoState } = useUserContext();
@@ -164,6 +166,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
         fileInputRefMeth.current = null;
         if (response?.data) {
           setDocData([...docData, response?.data]);
+          setMethodologyDocumentUpdated(true);
           message.open({
             type: "success",
             content: `${t("programme:isUploaded")}`,
