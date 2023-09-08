@@ -32,6 +32,7 @@ export interface NdcActionBodyProps {
   useUserContext: any;
   linkDocVisible: any;
   uploadDocUserPermission: any;
+  setMethodologyDocumentUpdated: any;
 }
 
 export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps) => {
@@ -47,6 +48,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     useUserContext,
     linkDocVisible,
     uploadDocUserPermission,
+    setMethodologyDocumentUpdated,
   } = props;
   const t = translator.t;
   const { userInfoState } = useUserContext();
@@ -137,6 +139,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
+      console.log("Doc Updated");
+      setMethodologyDocumentUpdated(true);
       getProgrammeDocs();
       fileInputMonitoringRef.current = null;
       fileInputVerificationRef.current = null;
