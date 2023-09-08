@@ -159,6 +159,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           data: imgData,
           programmeId: programmeId,
         });
+        console.log(response);
         fileInputRefMeth.current = null;
         if (response?.data) {
           setDocData([...docData, response?.data]);
