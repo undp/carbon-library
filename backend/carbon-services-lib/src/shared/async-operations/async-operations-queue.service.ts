@@ -7,12 +7,12 @@ import {
   AsyncOperationsInterface,
 } from "./async-operations.interface";
 
-var AWS = require("aws-sdk");
-var sqs = new AWS.SQS();
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs"
 
 @Injectable()
 export class AsyncOperationsQueueService implements AsyncOperationsInterface {
   private emailDisabled: boolean;
+  private sqs = new SQSClient({});
 
   constructor(
     private configService: ConfigService,
@@ -23,7 +23,7 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
   }
 
   public async AddAction(action: AsyncAction): Promise<boolean> {
-    var params = {};
+    // var params = {};
 
     if (action.actionType === AsyncActionType.Email) {
       if (this.emailDisabled) {
@@ -31,7 +31,21 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
       }
     }
 
-    params = {
+    // params = {
+    //   MessageAttributes: {
+    //     actionType: {
+    //       DataType: "Number",
+    //       StringValue: action.actionType.toString(),
+    //     },
+    //   },
+    //   MessageBody: JSON.stringify(action.actionProps),
+    //   MessageGroupId: action.actionType.toString() + new Date().getTime(),
+    //   QueueUrl: this.configService.get("asyncQueueName"),
+    // };
+
+    const params = new SendMessageCommand({
+      QueueUrl: this.configService.get("asyncQueueName"),
+      DelaySeconds: 10,
       MessageAttributes: {
         actionType: {
           DataType: "Number",
@@ -39,12 +53,10 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
         },
       },
       MessageBody: JSON.stringify(action.actionProps),
-      MessageGroupId: action.actionType.toString() + new Date().getTime(),
-      QueueUrl: this.configService.get("asyncQueueName"),
-    };
+    });
 
     try {
-      await sqs.sendMessage(params).promise();
+      await this.sqs.send(params);
       this.logger.log("Succefully added to the queue", action.actionType);
     } catch (error) {
       this.logger.error("Failed when adding to queue", action.actionType);
