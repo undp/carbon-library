@@ -1124,6 +1124,16 @@ export class ProgrammeService {
       companyNames.push(projectCompany.name);
     }
 
+    if(user.companyRole === CompanyRole.PROGRAMME_DEVELOPER && !companyIds.includes(user.companyId)){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "user.userUnAUth",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     programme.programmeId = await this.counterService.incrementCount(
       CounterType.PROGRAMME,
       3
