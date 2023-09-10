@@ -25,6 +25,11 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
   public async AddAction(action: AsyncAction): Promise<boolean> {
     // var params = {};
 
+    if ([AsyncActionType.AuthProgramme, AsyncActionType.DocumentUpload, AsyncActionType.IssueCredit, AsyncActionType.RegistryCompanyCreate, AsyncActionType.RejectProgramme].includes(action.actionType) && !this.configService.get("registry.syncEnable")) {
+      this.logger.log(`Dropping sync event ${action.actionType} due to sync disabled`)
+      return false;
+    }
+
     if (action.actionType === AsyncActionType.Email) {
       if (this.emailDisabled) {
         return false;
