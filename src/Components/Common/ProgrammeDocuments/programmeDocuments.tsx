@@ -130,7 +130,6 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     });
 
   const onUploadDocument = async (file: any, type: any) => {
-    console.log('On Upload PD ----------------------------------------------------');
     if (file.size > maximumImageSize) {
       message.open({
         type: "error",
@@ -166,7 +165,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
         fileInputRefMeth.current = null;
         if (response?.data) {
           setDocData([...docData, response?.data]);
-          setMethodologyDocumentUpdated(true);
+          setMethodologyDocumentUpdated();
           message.open({
             type: "success",
             content: `${t("programme:isUploaded")}`,
