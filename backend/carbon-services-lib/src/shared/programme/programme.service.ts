@@ -990,9 +990,9 @@ export class ProgrammeService {
   }
 
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
-    this.logger.verbose("ProgrammeDTO received", programmeDto);
+    this.logger.verbose("ProgrammeDTO received", JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
-    this.logger.verbose("Programme create", programme);
+    this.logger.verbose("Programme create", JSON.stringify(programme));
 
     if (
       programmeDto.proponentTaxVatId.length > 1 &&
