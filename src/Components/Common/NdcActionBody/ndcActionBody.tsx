@@ -32,7 +32,6 @@ export interface NdcActionBodyProps {
   useUserContext: any;
   linkDocVisible: any;
   uploadDocUserPermission: any;
-  setMethodologyDocumentUpdated: any;
 }
 
 export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps) => {
@@ -48,7 +47,6 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     useUserContext,
     linkDocVisible,
     uploadDocUserPermission,
-    setMethodologyDocumentUpdated,
   } = props;
   const t = translator.t;
   const { userInfoState } = useUserContext();
@@ -84,7 +82,6 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
   };
 
   const onUploadDocument = async (file: any, type: any) => {
-    console.log('On Upload NDC ----------------------------------------------------');
     if (file.size > maximumImageSize) {
       message.open({
         type: "error",
@@ -117,7 +114,6 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
           actionId: ndcActionId,
         });
         if (response?.data) {
-          console.log(response);
           message.open({
             type: "success",
             content: `${t("programme:isUploaded")}`,
@@ -141,8 +137,6 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     } finally {
-      console.log("Doc Updated");
-      setMethodologyDocumentUpdated(true);
       getProgrammeDocs();
       fileInputMonitoringRef.current = null;
       fileInputVerificationRef.current = null;
