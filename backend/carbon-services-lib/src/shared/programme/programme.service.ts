@@ -904,8 +904,7 @@ export class ProgrammeService {
     let ndc: NDCAction;
     if (user.companyRole === CompanyRole.GOVERNMENT || 
       (user.companyRole === CompanyRole.MINISTRY && 
-       permissionForMinistryLevel) || 
-       (documentDto.type !== DocType.VERIFICATION_REPORT)) {
+       permissionForMinistryLevel)) {
       this.logger.log(
         `Approving document since the user is ${user.companyRole}`
       );
