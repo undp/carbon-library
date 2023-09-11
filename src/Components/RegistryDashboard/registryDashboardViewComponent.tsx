@@ -13,7 +13,7 @@ import {
 } from "antd";
 import type { MenuProps } from 'antd';
 import "./dashboard.scss";
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
+import { LinkOutlined, DownloadOutlined } from '@ant-design/icons';
 import moment from "moment";
 import {
   ClockHistory,
@@ -2136,25 +2136,25 @@ ${total}
   };
   const items: MenuProps['items'] = [
     {
-      label: '1st menu item',
+      label: '2020',
       key: '1',
-      icon: <UserOutlined />,
+      icon: <DownloadOutlined />,
     },
     {
-      label: '2nd menu item',
+      label: '2021',
       key: '2',
-      icon: <UserOutlined />,
+      icon: <DownloadOutlined />,
     },
     {
-      label: '3rd menu item',
+      label: '2022',
       key: '3',
-      icon: <UserOutlined />,
+      icon: <DownloadOutlined />,
       danger: true,
     },
     {
-      label: '4rd menu item',
+      label: '2023',
       key: '4',
-      icon: <UserOutlined />,
+      icon: <DownloadOutlined />,
       danger: true,
       disabled: true,
     },
@@ -2302,16 +2302,19 @@ ${total}
           </Col>
         </Row>
       </div>
-      <div classname="annual-report-button">
+      <div classname="annual-report">
         <div>Annual Statistic Report</div>
-        <Dropdown menu={menuProps}>
+        <div classname="annual-report-dropdown">
+            <Dropdown menu={menuProps}>
+          </Dropdown>
+        </div>
+        <div classname="annual-report-button">
           <Button>
             <Space>
-              Button
-              <DownOutlined />
+              <LinkOutlined />
             </Space>
           </Button>
-        </Dropdown>
+        </div>
       </div>
       <div className="filter-container">
         <div className="date-filter">
