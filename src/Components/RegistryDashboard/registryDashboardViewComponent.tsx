@@ -286,7 +286,7 @@ export const RegistryDashboardComponent = (props: any) => {
       ],
     };
   };
-
+  const [selectedItem, setSelectedItem] = useState(null);
   const getAllProgrammeAnalyticsStatsParams = () => {
     if (userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER) {
       return {
@@ -2304,9 +2304,15 @@ ${total}
       </div>
       <div classname="annual-report">
         <div>Annual Statistic Report</div>
+        
         <div classname="annual-report-dropdown">
-            <Dropdown menu={menuProps}>
-          </Dropdown>
+          <Dropdown menu={menuProps}>
+          <Button>
+              <Space>
+                  -
+              </Space>
+            </Button>
+           </Dropdown>
         </div>
         <div classname="annual-report-button">
           <Button>
