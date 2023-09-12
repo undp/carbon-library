@@ -2304,18 +2304,24 @@ ${total}
       </div>
       <div classname="annual-report">
         <div>Annual Statistic Report</div>
-          <Dropdown menu={menuProps}>
-            <Button>
-              <Space>
-                <CaretDownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
-            <Button>
-                <Space>
-                  <LinkOutlined />
-                </Space>
-            </Button>
+        <div classname="annual-report-buttons">
+            <Dropdown menu={menuProps}>
+              <div classname="annual-report-dropdownbutton">
+                <Button>
+                  <Space>
+                    <CaretDownOutlined />
+                  </Space>
+                </Button>
+              </div>
+            </Dropdown>
+              <div classname="annual-report-downloadbutton">
+                <Button>
+                    <Space>
+                      <LinkOutlined />
+                    </Space>
+                </Button>
+              </div>
+          </div>
       </div>
       <div className="filter-container">
         <div className="date-filter">
