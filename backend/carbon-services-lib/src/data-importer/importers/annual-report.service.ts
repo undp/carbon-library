@@ -1,0 +1,35 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ImporterInterface } from '../importer.interface';
+import { AnnualReportGen } from '../../shared/util/annual.report.gen';
+import { ProgrammeDocumentViewEntity } from '../../shared/entities/document.view.entity';
+import { ProgrammeDocument } from '../../shared/entities/programme.document';
+import { DocumentStatus } from '../../shared/enum/document.status';
+import { DocType } from '../../shared/enum/document.type';
+@Injectable()
+export class AnnualReportImport implements ImporterInterface {
+  constructor(
+    @InjectRepository(ProgrammeDocumentViewEntity)
+    private documentRepo: Repository<ProgrammeDocument>,
+    private configService: ConfigService,
+    private annualReportGen: AnnualReportGen,
+  ) {}
+
+  async start(type: string): Promise<any> {
+    const annualreporturl =
+      await this.annualReportGen.generateAnnualReportpdf();
+    console.log(annualreporturl);
+    const year = Number(new Date().getFullYear()) - 1;
+    const country = this.configService.get('systemCountryName');
+    const dr = new ProgrammeDocument();
+    dr.programmeId = `AR${year}`;
+    dr.externalId = `Annual_Report_${country}_${year}.pdf`;
+    dr.status = DocumentStatus.ACCEPTED;
+    dr.type = DocType.ANNUAL_REPORT;
+    dr.txTime = new Date().getTime();
+    dr.url = annualreporturl;
+    await this.documentRepo.save(dr);
+  }
+}

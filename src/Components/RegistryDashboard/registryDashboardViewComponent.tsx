@@ -2304,7 +2304,6 @@ ${total}
       </div>
       <div classname="annual-report">
         <div>Annual Statistic Report</div>
-         <div classname="annual-report-buttons">
             <Dropdown menu={menuProps}>
                 <Button classname="annual-report-dropdownbutton">
                   <Space>
@@ -2317,7 +2316,6 @@ ${total}
                       <LinkOutlined />
                     </Space>
                 </Button>
-          </div>
       </div>
       <div className="filter-container">
         <div className="date-filter">
