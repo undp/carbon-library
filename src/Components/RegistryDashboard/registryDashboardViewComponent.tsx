@@ -13,7 +13,7 @@ import {
 } from "antd";
 import type { MenuProps } from 'antd';
 import "./dashboard.scss";
-import { LinkOutlined, DownloadOutlined } from '@ant-design/icons';
+import { LinkOutlined, DownloadOutlined, CaretDownOutlined } from '@ant-design/icons';
 import moment from "moment";
 import {
   ClockHistory,
@@ -2304,23 +2304,18 @@ ${total}
       </div>
       <div classname="annual-report">
         <div>Annual Statistic Report</div>
-        
-        <div classname="annual-report-dropdown">
           <Dropdown menu={menuProps}>
-          <Button>
+            <Button>
               <Space>
-                  -
+                <CaretDownOutlined />
               </Space>
             </Button>
-           </Dropdown>
-        </div>
-        <div classname="annual-report-button">
-          <Button>
-            <Space>
-              <LinkOutlined />
-            </Space>
-          </Button>
-        </div>
+          </Dropdown>
+            <Button>
+                <Space>
+                  <LinkOutlined />
+                </Space>
+            </Button>
       </div>
       <div className="filter-container">
         <div className="date-filter">
