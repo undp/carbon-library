@@ -717,8 +717,8 @@ export class ProgrammeService {
   }
 
   async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme) {
-    
-    console.log('NDC COmmit', ndc)
+    console.log('approveDocumentCommit', program);
+    console.log('approveDocumentCommit certifierId', certifierId);
     if (ndc) {
       await em.update(
         NDCAction,
