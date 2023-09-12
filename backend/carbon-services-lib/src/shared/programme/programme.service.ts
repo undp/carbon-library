@@ -733,7 +733,8 @@ export class ProgrammeService {
     
     if (certifierId && program) {
       await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
-    } else if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
+    } 
+    if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
       await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
     }
   }
