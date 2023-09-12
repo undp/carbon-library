@@ -728,8 +728,14 @@ export class ProgrammeService {
     }
     
     if (certifierId && program ) {
-      const index = program.certifierId ? program.certifierId.indexOf(certifierId): -1;
-      if (index === -1) {
+      if(program.certifierId){
+        const index = program.certifierId.findIndex((element:any) => {
+          Number(element) === certifierId
+        })
+        if (index === -1) {
+          await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+        }
+      }else{
         await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
       }
     } 
