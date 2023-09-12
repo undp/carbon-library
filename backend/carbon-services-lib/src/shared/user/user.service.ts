@@ -594,6 +594,15 @@ export class UserService {
         };
         await this.asyncOperationsInterface.AddAction(action);
       }
+
+      if(company.regions){
+        company.geographicalLocationCordintes = await this.locationService
+        .getCoordinatesForRegion(company.regions)
+        .then((response: any) => {
+          console.log("response from forwardGeoCoding function -> ", response);
+          return  [...response];
+        });
+      }
     }
 
     const templateData = {
@@ -628,22 +637,15 @@ export class UserService {
 
     u.createdTime = new Date().getTime();
 
-    // if (company && companyRole !== CompanyRole.API && userFields.role !== Role.Root && company.companyRole !== CompanyRole.API) {
-    //   const registryCompanyCreateAction: AsyncAction = {
-    //     actionType: AsyncActionType.RegistryCompanyCreate,
-    //     actionProps: createdUserDto,
-    //   };
-    //   await this.asyncOperationsInterface.AddAction(
-    //     registryCompanyCreateAction
-    //   );
-    // }
-
-    company.geographicalLocationCordintes = await this.locationService
-    .getCoordinatesForRegion(company.regions)
-    .then((response: any) => {
-      console.log("response from forwardGeoCoding function -> ", response);
-      return  [...response];
-    });
+    if (company && companyRole !== CompanyRole.API && userFields.role !== Role.Root && company.companyRole !== CompanyRole.API) {
+      const registryCompanyCreateAction: AsyncAction = {
+        actionType: AsyncActionType.RegistryCompanyCreate,
+        actionProps: createdUserDto,
+      };
+      await this.asyncOperationsInterface.AddAction(
+        registryCompanyCreateAction
+      );
+    }
 
     const usr = await this.entityManger
       .transaction(async (em) => {

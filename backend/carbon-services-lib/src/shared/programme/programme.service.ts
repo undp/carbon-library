@@ -904,8 +904,7 @@ export class ProgrammeService {
     let ndc: NDCAction;
     if (user.companyRole === CompanyRole.GOVERNMENT || 
       (user.companyRole === CompanyRole.MINISTRY && 
-       permissionForMinistryLevel) || 
-       (documentDto.type !== DocType.VERIFICATION_REPORT)) {
+       permissionForMinistryLevel)) {
       this.logger.log(
         `Approving document since the user is ${user.companyRole}`
       );
@@ -990,9 +989,9 @@ export class ProgrammeService {
   }
 
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
-    this.logger.verbose("ProgrammeDTO received", programmeDto);
+    this.logger.verbose("ProgrammeDTO received", JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
-    this.logger.verbose("Programme create", programme);
+    this.logger.verbose("Programme create", JSON.stringify(programme));
 
     if (
       programmeDto.proponentTaxVatId.length > 1 &&
@@ -1122,6 +1121,16 @@ export class ProgrammeService {
 
       companyIds.push(projectCompany.companyId);
       companyNames.push(projectCompany.name);
+    }
+
+    if(user.companyRole === CompanyRole.PROGRAMME_DEVELOPER && !companyIds.includes(user.companyId)){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "user.userUnAUth",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     programme.programmeId = await this.counterService.incrementCount(
@@ -3135,16 +3144,16 @@ export class ProgrammeService {
       );
     }
 
-    // const issueCReq: AsyncAction = {
-    //   actionType: AsyncActionType.IssueCredit,
-    //   actionProps: {
-    //     externalId: program.externalId,
-    //     issueAmount: req.issueAmount,
-    //   },
-    // };
-    // await this.asyncOperationsInterface.AddAction(
-    //   issueCReq
-    // );
+    const issueCReq: AsyncAction = {
+      actionType: AsyncActionType.IssueCredit,
+      actionProps: {
+        externalId: program.externalId,
+        issueAmount: req.issueAmount,
+      },
+    };
+    await this.asyncOperationsInterface.AddAction(
+      issueCReq
+    );
 
     const hostAddress = this.configService.get("host");
     updated.companyId.forEach(async (companyId) => {
@@ -3254,9 +3263,9 @@ export class ProgrammeService {
     const authRe: AsyncAction = {
       actionType: AsyncActionType.AuthProgramme,
       actionProps: {
-        // externalId: program.externalId,
-        // issueAmount: req.issueAmount,
-        // serialNo: updated.serialNo,
+        externalId: program.externalId,
+        issueAmount: req.issueAmount,
+        serialNo: updated.serialNo,
         programmeId: program.programmeId,
         authOrganisationId: user.companyId
       },
@@ -3329,16 +3338,16 @@ export class ProgrammeService {
       );
     }
 
-    // const authRe: AsyncAction = {
-    //   actionType: AsyncActionType.RejectProgramme,
-    //   actionProps: {
-    //     externalId: programme.externalId,
-    //     comment: req.comment
-    //   },
-    // };
-    // await this.asyncOperationsInterface.AddAction(
-    //   authRe
-    // );
+    const authRe: AsyncAction = {
+      actionType: AsyncActionType.RejectProgramme,
+      actionProps: {
+        externalId: programme.externalId,
+        comment: req.comment
+      },
+    };
+    await this.asyncOperationsInterface.AddAction(
+      authRe
+    );
 
     await this.emailHelperService.sendEmailToProgrammeOwnerAdmins(
       req.programmeId,
