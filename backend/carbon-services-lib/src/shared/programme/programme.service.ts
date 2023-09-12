@@ -731,8 +731,11 @@ export class ProgrammeService {
       );
     }
     
-    if (certifierId && program) {
-      await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+    if (certifierId && program ) {
+      const index = program.certifierId ? program.certifierId.indexOf(certifierId): -1;
+      if (index === -1) {
+        await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+      }
     } 
     if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
       await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");

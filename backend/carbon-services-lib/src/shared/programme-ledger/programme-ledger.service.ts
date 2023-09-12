@@ -446,14 +446,13 @@ export class ProgrammeLedgerService {
           : -1;
         if (add) {
           if (index >= 0) {
-            // throw new HttpException(
-            //   this.helperService.formatReqMessagesString(
-            //     "programme.alreadyCertified",
-            //     []
-            //   ),
-            //   HttpStatus.BAD_REQUEST
-            // );
-            return;
+            throw new HttpException(
+              this.helperService.formatReqMessagesString(
+                "programme.alreadyCertified",
+                []
+              ),
+              HttpStatus.BAD_REQUEST
+            );
           }
 
           if (!(programme.currentStage == ProgrammeStage.AUTHORISED || programme.currentStage == ProgrammeStage.APPROVED || programme.currentStage == ProgrammeStage.AWAITING_AUTHORIZATION) ) {
