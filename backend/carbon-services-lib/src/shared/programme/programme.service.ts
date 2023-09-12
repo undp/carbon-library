@@ -824,8 +824,16 @@ export class ProgrammeService {
   }
 
   async addDocument(documentDto: ProgrammeDocumentDto, user: User) {
-    const programme = await this.findById(documentDto.programmeId);
-
+    
+    let programme;
+    if (documentDto.programmeId) {
+      programme = await this.findById(documentDto.programmeId);
+      documentDto.externalId = programme.externalId;
+    } else if (documentDto.externalId) {
+      programme = await this.findByExternalId(documentDto.externalId);
+      documentDto.programmeId = programme.programmeId;
+    }
+    
     if (!programme) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
