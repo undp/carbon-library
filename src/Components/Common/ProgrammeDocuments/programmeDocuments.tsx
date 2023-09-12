@@ -82,6 +82,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     ? parseInt(process.env.REACT_APP_MAXIMUM_FILE_SIZE)
     : 5000000;
 
+  const allowedFileTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"];
+
   const handleDesignDocFileUpload = () => {
     fileInputRef?.current?.click();
   };
@@ -149,13 +151,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     }
 
     try {
-      if (
-        (type === DocType.DESIGN_DOCUMENT &&
-          file?.type === "application/pdf") ||
-        (type === DocType.METHODOLOGY_DOCUMENT &&
-          file?.type ===
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-      ) {
+      console.log('Allowed File Types ', allowedFileTypes);
+      if (allowedFileTypes.includes(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
           data: imgData,
