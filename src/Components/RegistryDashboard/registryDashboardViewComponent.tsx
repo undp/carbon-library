@@ -9,11 +9,15 @@ import {
   Tooltip,
   message,
   Dropdown,
-  Space
+  Space,
 } from "antd";
-import type { MenuProps } from 'antd';
+import type { MenuProps } from "antd";
 import "./dashboard.scss";
-import { LinkOutlined, DownloadOutlined, CaretDownOutlined } from '@ant-design/icons';
+import {
+  LinkOutlined,
+  DownloadOutlined,
+  CaretDownOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import {
   ClockHistory,
@@ -2121,39 +2125,39 @@ ${total}
 
       currentMarkers.push(marker);
     }
-    
+
     return currentMarkers;
   };
-  
+
   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    message.info('Click on left button.');
-    console.log('click left button', e);
+    message.info("Click on left button.");
+    console.log("click left button", e);
   };
-  
-  const handleMenuClick: MenuProps['onClick'] = (e) => {
-    message.info('Click on menu item.');
-    console.log('click', e);
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    message.info("Click on menu item.");
+    console.log("click", e);
   };
-  const items: MenuProps['items'] = [
+  const items: MenuProps["items"] = [
     {
-      label: '2020',
-      key: '1',
+      label: "2020",
+      key: "1",
       icon: <DownloadOutlined />,
     },
     {
-      label: '2021',
-      key: '2',
+      label: "2021",
+      key: "2",
       icon: <DownloadOutlined />,
     },
     {
-      label: '2022',
-      key: '3',
+      label: "2022",
+      key: "3",
       icon: <DownloadOutlined />,
       danger: true,
     },
     {
-      label: '2023',
-      key: '4',
+      label: "2023",
+      key: "4",
       icon: <DownloadOutlined />,
       danger: true,
       disabled: true,
@@ -2304,18 +2308,18 @@ ${total}
       </div>
       <div classname="annual-report">
         <div>Annual Statistic Report</div>
-            <Dropdown menu={menuProps}>
-                <Button classname="annual-report-dropdownbutton">
-                  <Space>
-                    <CaretDownOutlined />
-                  </Space>
-                </Button>
-            </Dropdown>
-                <Button classname="annual-report-downloadbutton">
-                    <Space>
-                      <LinkOutlined />
-                    </Space>
-                </Button>
+        <Dropdown menu={menuProps}>
+          <Button className="annual-report-dropdownbutton">
+            <Space>
+              <CaretDownOutlined />
+            </Space>
+          </Button>
+        </Dropdown>
+        <Button className="annual-report-downloadbutton">
+          <Space>
+            <LinkOutlined />
+          </Space>
+        </Button>
       </div>
       <div className="filter-container">
         <div className="date-filter">
