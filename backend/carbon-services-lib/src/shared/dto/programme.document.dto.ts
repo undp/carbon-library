@@ -31,4 +31,7 @@ export class ProgrammeDocumentDto {
     @ApiPropertyOptional()
     @IsString()
     certifierTaxId: string;
+
+    externalId?: string;
+
 }

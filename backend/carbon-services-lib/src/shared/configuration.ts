@@ -75,5 +75,7 @@ export default () => ({
     ministerName: process.env.MINISTER_NAME || 'Minister X',
     ministryName: "Ministry of Environment, Forestry & Tourism",
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X"
-  }
+  },
+  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
+  systemSync: process.env.SYSTEM_SYNC || false
 });

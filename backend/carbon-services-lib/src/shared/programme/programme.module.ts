@@ -22,6 +22,7 @@ import { InvestmentView } from '../entities/investment.view.entity';
 import { ProgrammeDocumentViewEntity } from '../entities/document.view.entity';
 import { NDCAction } from '../entities/ndc.action.entity';
 import { FileHandlerModule } from '../file-handler/filehandler.module';
+import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
 
 @Module({
   imports: [
@@ -47,7 +48,8 @@ import { FileHandlerModule } from '../file-handler/filehandler.module';
     EmailHelperModule,
     LocationModule,
     AsyncOperationsModule,
-    FileHandlerModule
+    FileHandlerModule,
+    AuthorizationLetterGen
   ],
   providers: [Logger, ProgrammeService],
   exports: [ProgrammeService],

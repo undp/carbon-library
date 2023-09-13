@@ -32,6 +32,12 @@ export class AsyncOperationsDatabaseService
       this.logger.log(`Dropping sync event ${action.actionType} due to sync disabled`)
       return false;
     }
+
+    //temperory drop
+    if ([AsyncActionType.DocumentUpload,AsyncActionType.AddMitigation,AsyncActionType.ProgrammeAccept,AsyncActionType.AuthProgramme,AsyncActionType.RejectProgramme, AsyncActionType.IssueCredit,AsyncActionType.ProgrammeCreate].includes(action.actionType) && !this.configService.get("systemSync")) {
+      this.logger.log(`Dropping sync event ${action.actionType} due to sync disabled`)
+      return false;
+    }
     
     if (action.actionType === AsyncActionType.Email) {
       if (this.emailDisabled) return false;
