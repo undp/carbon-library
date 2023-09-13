@@ -375,7 +375,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         type="file"
                         ref={fileInputRef}
                         style={{ display: "none" }}
-                        accept=".pdf"
+                        accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                         onChange={(e: any) => {
                           const selectedFile = e.target.files[0];
                           e.target.value = null;
@@ -433,7 +433,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     type="file"
                     ref={fileInputRef}
                     style={{ display: "none" }}
-                    accept=".pdf"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
@@ -602,7 +602,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         type="file"
                         ref={fileInputRefMeth}
                         style={{ display: "none" }}
-                        accept=".xlsx, .xls, .pdf"
+                        accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                         onChange={(e: any) => {
                           const selectedFile = e.target.files[0];
                           e.target.value = null;
@@ -666,7 +666,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     type="file"
                     ref={fileInputRefMeth}
                     style={{ display: "none" }}
-                    accept=".xlsx,.xls"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
