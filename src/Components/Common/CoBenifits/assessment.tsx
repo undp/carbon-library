@@ -114,11 +114,11 @@ const Assessment = (props: any) => {
     const changedValues: any = {};
     if (info.changedFields && info.changedFields.length > 0) {
       info.changedFields.map(async (changedField: any) => {
-        if (changedField.name[0] === "document") {
+        if (changedField.name[0] === "document" && changedField.name[0]) {
           const base64Value = await getBase64(
             changedField.value[0].originFileObj as RcFile
           );
-          const values = base64Value.split(",");
+          const values = base64Value;
 
           setCobenefitsAssessmentDetails((pre: any) => ({
             ...pre,

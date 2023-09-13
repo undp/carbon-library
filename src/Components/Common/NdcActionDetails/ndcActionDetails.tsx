@@ -341,7 +341,6 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
         const enablementReport = await getBase64(
           ndcActionFormvalues.EnablementReport[0]?.originFileObj as RcFile
         );
-        // const enablementReportData = enablementReport.split(",");
         ndcActionDetailObj.enablementProperties.report = enablementReport;
       }
       ndcActionDetailObj.enablementReportData =
