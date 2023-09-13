@@ -18,6 +18,7 @@ import {
   Role,
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 export interface ProgrammeDocumentsProps {
   data: any;
@@ -152,7 +153,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
 
     try {
       console.log('Allowed File Types ', allowedFileTypes);
-      if (allowedFileTypes.includes(file?.type)) {
+      if (isValidateFileType(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
           data: imgData,
@@ -602,7 +603,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         type="file"
                         ref={fileInputRefMeth}
                         style={{ display: "none" }}
-                        accept=".xlsx,.xls"
+                        accept=".xlsx,.xls,.ppt,.pptx,.csv,.doc,.docx,.PDF,.png,.jpg "
                         onChange={(e: any) => {
                           const selectedFile = e.target.files[0];
                           e.target.value = null;
