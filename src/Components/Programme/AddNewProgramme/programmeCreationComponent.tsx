@@ -307,12 +307,10 @@ export const ProgrammeCreationComponent = (props: any) => {
         ? ownershipPercentage?.slice(1).map((item: any) => item.organisation)
         : ownershipPercentage?.map((item: any) => item.organisation);
     let logoBase64 = "";
-    let logoUrls: any[] = [];
     if (values?.designDocument?.length > 0) {
       logoBase64 = await getBase64(
         values?.designDocument[0]?.originFileObj as RcFile
       );
-      logoUrls = logoBase64?.split(",");
     }
     const propTaxIds =
       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
@@ -362,8 +360,8 @@ export const ProgrammeCreationComponent = (props: any) => {
             includedInNDC !== null && { includedInNdc: includedInNDC }),
         },
       };
-      if (logoUrls?.length > 0) {
-        programmeDetails.designDocument = logoUrls[1];
+      if (logoBase64?.length > 0) {
+        programmeDetails.designDocument = logoBase64;
       }
       setLoading(false);
       console.log(programmeDetails);

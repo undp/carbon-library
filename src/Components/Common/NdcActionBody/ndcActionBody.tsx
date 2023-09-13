@@ -94,17 +94,12 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     }
     setLoading(true);
     const logoBase64 = await getBase64(file as RcFile);
-    let imgData = logoBase64;
-    if (type !== DocType.MONITORING_REPORT) {
-      const logoUrls = logoBase64.split(",");
-      imgData = logoUrls[1];
-    }
-
+    
     try {
       if (isValidateFileType(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
-          data: imgData,
+          data: logoBase64,
           programmeId: programmeId,
           actionId: ndcActionId,
         });
