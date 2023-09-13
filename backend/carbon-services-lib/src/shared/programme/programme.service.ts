@@ -730,7 +730,7 @@ export class ProgrammeService {
     if (certifierId && program ) {
       if(program.certifierId){
         const index = program.certifierId.findIndex((element:any) => {
-          Number(element) === certifierId
+          return Number(element) === certifierId
         })
         if (index === -1) {
           await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
