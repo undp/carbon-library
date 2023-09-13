@@ -354,7 +354,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                     type="file"
                     ref={fileInputMonitoringRef}
                     style={{ display: "none" }}
-                    accept=".pdf,.xlsx,.csv,.xls"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
@@ -436,7 +436,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                     type="file"
                     ref={fileInputMonitoringRef}
                     style={{ display: "none" }}
-                    accept=".pdf,.xlsx,.csv,.xls"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
@@ -581,7 +581,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                       type="file"
                       ref={fileInputVerificationRef}
                       style={{ display: "none" }}
-                      accept=".pdf"
+                      accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                       onChange={(e: any) => {
                         const selectedFile = e.target.files[0];
                         e.target.value = null;
@@ -667,7 +667,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                     type="file"
                     ref={fileInputVerificationRef}
                     style={{ display: "none" }}
-                    accept=".pdf"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;

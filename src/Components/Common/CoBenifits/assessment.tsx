@@ -17,6 +17,7 @@ import React, { useEffect, useState } from "react";
 import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import { RcFile } from "antd/lib/upload";
 import { RadioButtonStatus, getBase64, titleList } from "../../../Definitions";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 const Assessment = (props: any) => {
   const {
@@ -801,7 +802,7 @@ const Assessment = (props: any) => {
                         validator: async (rule, file) => {
                           if (file?.length > 0) {
                             let isCorrectFormat = false;
-                            if (file[0]?.type === "application/pdf") {
+                            if (isValidateFileType(file[0]?.type)) {
                               isCorrectFormat = true;
                             }
                             if (!isCorrectFormat) {
@@ -815,7 +816,7 @@ const Assessment = (props: any) => {
                     ]}
                   >
                     <Upload
-                      accept=".pdf"
+                      accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                       beforeUpload={(file: any) => {
                         return false;
                       }}

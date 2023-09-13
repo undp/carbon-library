@@ -31,7 +31,7 @@ import {
   addCommSepRound,
 } from "../../../Definitions";
 
-import { isValidateFileType } from "../../../Utils/DocumentValidator"
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 type SizeType = Parameters<typeof Form>[0]["size"];
 
@@ -792,7 +792,7 @@ export const ProgrammeCreationComponent = (props: any) => {
                                 ]}
                               >
                                 <Upload
-                                  accept=".pdf"
+                                  accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                                   beforeUpload={(file: any) => {
                                     return false;
                                   }}
