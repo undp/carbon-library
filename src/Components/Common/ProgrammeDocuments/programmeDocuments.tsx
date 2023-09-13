@@ -603,7 +603,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         type="file"
                         ref={fileInputRefMeth}
                         style={{ display: "none" }}
-                        accept=".xlsx,.xls,.ppt,.pptx,.csv,.doc,.docx,.PDF,.png,.jpg "
+                        accept=".xlsx, .xls, .pdf"
                         onChange={(e: any) => {
                           const selectedFile = e.target.files[0];
                           e.target.value = null;
