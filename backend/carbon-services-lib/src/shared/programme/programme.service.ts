@@ -459,6 +459,9 @@ export class ProgrammeService {
         continue;
       }
 
+      console.log('calculated ownership map', ownershipMap);
+      console.log('calculated propPerMap map', propPerMap);
+
       if (!ownershipMap[fromCompanyId] ||  ownershipMap[fromCompanyId] < req.percentage[j] || !propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
