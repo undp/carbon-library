@@ -18,6 +18,7 @@ import {
   Role,
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 export interface NdcActionBodyProps {
   data?: any;
@@ -100,13 +101,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     }
 
     try {
-      if (
-        file?.type === "application/pdf" ||
-        (type === DocType.MONITORING_REPORT &&
-          (file?.type ===
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-            file?.type === "text/csv"))
-      ) {
+      if (isValidateFileType(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
           data: imgData,

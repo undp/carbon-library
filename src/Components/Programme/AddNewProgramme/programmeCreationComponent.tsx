@@ -31,6 +31,8 @@ import {
   addCommSepRound,
 } from "../../../Definitions";
 
+import { isValidateFileType } from "../../../Utils/DocumentValidator"
+
 type SizeType = Parameters<typeof Form>[0]["size"];
 
 const maximumImageSize = process.env.REACT_APP_MAXIMUM_FILE_SIZE
@@ -767,9 +769,7 @@ export const ProgrammeCreationComponent = (props: any) => {
                                     validator: async (rule, file) => {
                                       if (file?.length > 0) {
                                         let isCorrectFormat = false;
-                                        if (
-                                          file[0]?.type === "application/pdf"
-                                        ) {
+                                        if (isValidateFileType(file[0]?.type)) {
                                           isCorrectFormat = true;
                                         }
                                         if (!isCorrectFormat) {
