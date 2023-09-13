@@ -502,11 +502,7 @@ export class ProgrammeService {
       updateProgramme = (
         await this.doInvestment(
           trf,
-          `${this.getUserRef(requester)}#${toCompany.companyId}#${
-            toCompany.name
-          }#${fromCompanyListMap[trf.fromCompanyId].companyId}#${
-            fromCompanyListMap[trf.fromCompanyId].name
-          }`,
+          `${toCompany.companyId}#${toCompany.name}#${this.getUserRef(requester)}`.split('#',4).join('#'),
           programme,
           toCompany
         )
@@ -717,8 +713,8 @@ export class ProgrammeService {
   }
 
   async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme) {
-    
-    console.log('NDC COmmit', ndc)
+    console.log('approveDocumentCommit', program);
+    console.log('approveDocumentCommit certifierId', certifierId);
     if (ndc) {
       await em.update(
         NDCAction,
@@ -731,9 +727,19 @@ export class ProgrammeService {
       );
     }
     
-    if (certifierId && program) {
-      await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
-    } else if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
+    if (certifierId && program ) {
+      if(program.certifierId){
+        const index = program.certifierId.findIndex((element:any) => {
+          return Number(element) === certifierId
+        })
+        if (index === -1) {
+          await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+        }
+      }else{
+        await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+      }
+    } 
+    if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
       await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
     }
   }
@@ -824,8 +830,16 @@ export class ProgrammeService {
   }
 
   async addDocument(documentDto: ProgrammeDocumentDto, user: User) {
-    const programme = await this.findById(documentDto.programmeId);
-
+    
+    let programme;
+    if (documentDto.programmeId) {
+      programme = await this.findById(documentDto.programmeId);
+      documentDto.externalId = programme.externalId;
+    } else if (documentDto.externalId) {
+      programme = await this.findByExternalId(documentDto.externalId);
+      documentDto.programmeId = programme.programmeId;
+    }
+    
     if (!programme) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -3711,9 +3725,7 @@ export class ProgrammeService {
 
     const transferResult = await this.doInvestment(
       investment,
-      `${this.getUserRef(approver)}#${receiver.companyId}#${receiver.name}#${
-        giver.companyId
-      }#${giver.name}`,
+      `${receiver.companyId}#${receiver.name}#${this.getUserRef(approver)}`.split('#',4).join('#'),
       programme,
       receiver
     );
