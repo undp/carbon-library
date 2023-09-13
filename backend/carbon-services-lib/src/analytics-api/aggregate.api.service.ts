@@ -26,6 +26,7 @@ import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
 import { InvestmentStatus } from "../shared/enum/investment.status";
 import { SYSTEM_NAMES } from "../shared/enum/system.names.enum";
+import { ProgrammeDocument } from "../shared/entities/programme.document";
 
 @Injectable()
 export class AggregateAPIService {
@@ -50,7 +51,8 @@ export class AggregateAPIService {
     @InjectRepository(InvestmentView) private investmentRepo: Repository<InvestmentView>,
     @InjectRepository(NDCActionViewEntity) private ndcRepo: Repository<NDCActionViewEntity>,
     @InjectRepository(ProgrammeTransferViewEntityQuery)
-    private programmeTransferRepo: Repository<ProgrammeTransferViewEntityQuery>
+    private programmeTransferRepo: Repository<ProgrammeTransferViewEntityQuery>,
+    @InjectRepository(ProgrammeDocument) private documentRepo: Repository<ProgrammeDocument>,
   ) {}
 
   private getFilterAndByStatFilter(
@@ -1982,5 +1984,16 @@ export class AggregateAPIService {
     }
 
     return data;
+  }
+  
+  findAll(query: QueryDto) {
+    return this.documentRepo
+      .createQueryBuilder('annualreport')
+      .select(['annualreport.programmeId', 'annualreport.externalId', 'annualreport.url', 'annualreport.type', 'annualreport.txTime'])
+      .where(this.helperService.generateWhereSQL(query, undefined))
+      .orderBy(query?.sort?.key && `"${query?.sort?.key}"`, query?.sort?.order)
+      .offset(query.size * query.page - query.size)
+      .limit(query.size) 
+      .getManyAndCount();
   }
 }

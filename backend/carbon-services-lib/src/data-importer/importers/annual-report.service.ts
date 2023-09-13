@@ -20,16 +20,18 @@ export class AnnualReportImport implements ImporterInterface {
   async start(type: string): Promise<any> {
     const annualreporturl =
       await this.annualReportGen.generateAnnualReportpdf();
-    console.log(annualreporturl);
     const year = Number(new Date().getFullYear()) - 1;
+    const d = await this.documentRepo.query(`SELECT "programmeId" FROM public.programme_document WHERE "programmeId"='AR${year}'`)
     const country = this.configService.get('systemCountryName');
-    const dr = new ProgrammeDocument();
-    dr.programmeId = `AR${year}`;
-    dr.externalId = `Annual_Report_${country}_${year}.pdf`;
-    dr.status = DocumentStatus.ACCEPTED;
-    dr.type = DocType.ANNUAL_REPORT;
-    dr.txTime = new Date().getTime();
-    dr.url = annualreporturl;
-    await this.documentRepo.save(dr);
+    if(d.length <= 0){
+      const dr = new ProgrammeDocument();
+      dr.programmeId = `AR${year}`;
+      dr.externalId = `Annual_Report_${country}_${year}.pdf`;
+      dr.status = DocumentStatus.ACCEPTED;
+      dr.type = DocType.ANNUAL_REPORT;
+      dr.txTime = new Date().getTime();
+      dr.url = annualreporturl;
+      await this.documentRepo.save(dr);
+    }
   }
 }

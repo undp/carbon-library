@@ -257,14 +257,15 @@ export const RegistryDashboardComponent = (props: any) => {
     useState<MapSourceData>();
   const [programmeLocationsMapLayer, setProgrammeLocationsMapLayer] =
     useState<any>();
-
+  const [fileList, setFileList] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
   const mapType = process.env.REACT_APP_MAP_TYPE
     ? process.env.REACT_APP_MAP_TYPE
     : "None";
   const accessToken = process.env.REACT_APP_MAPBOXGL_ACCESS_TOKEN
     ? process.env.REACT_APP_MAPBOXGL_ACCESS_TOKEN
     : "";
-
+  
   const getAllProgrammeAnalyticsStatsParamsWithoutTimeRange = () => {
     return {
       system: SystemNames.CARBON_REGISTRY,
@@ -290,7 +291,6 @@ export const RegistryDashboardComponent = (props: any) => {
       ],
     };
   };
-  const [selectedItem, setSelectedItem] = useState(null);
   const getAllProgrammeAnalyticsStatsParams = () => {
     if (userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER) {
       return {
@@ -2128,16 +2128,54 @@ ${total}
 
     return currentMarkers;
   };
-
+  type FilterType = {
+    key: string;
+    operation: string;
+    value: any;
+  };
+  useEffect(() => {
+    const fetchProgrammeIds = async () => {
+      const filter: FilterType[] = [
+        {
+          key: 'programmeId',
+          operation: 'LIKE',
+          value: "AR%"
+        }
+      ];    
+      
+      
+      const body = {
+        page: 1,
+        size: 100,
+        filterAnd: filter,
+      };
+        try {
+          const response = await post('stats/programme/annualreportDocs', 
+          body
+          ,undefined,
+          process.env.REACT_APP_STAT_URL);
+          setFileList(response.data);
+        } catch (error) {
+          console.error('Error fetching programmeIds:', error);
+        }
+    };
+    fetchProgrammeIds();
+  },  [fileList]);  
+  console.log(fileList)
   const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     message.info("Click on left button.");
     console.log("click left button", e);
   };
 
   const handleMenuClick: MenuProps["onClick"] = (e) => {
-    message.info("Click on menu item.");
-    console.log("click", e);
+    message.info(`Selected file: ${e.item.label}`);
+    setSelectedFile(e.item);
   };
+  useEffect(() => {
+    if (selectedFile) {
+      console.log(`Selected file:`, selectedFile);
+    }
+  }, [selectedFile]);
   const items: MenuProps["items"] = [
     {
       label: "2020",
@@ -2306,7 +2344,7 @@ ${total}
           </Col>
         </Row>
       </div>
-      <div classname="annual-report">
+      <div className="annual-report">
         <div>Annual Statistic Report</div>
         <Dropdown menu={menuProps}>
           <Button className="annual-report-dropdownbutton">

@@ -11,6 +11,7 @@ import { TypeOrmConfigService } from '../shared/typeorm.config.service';
 import { Company } from '../shared/entities/company.entity';
 import { ProgrammeDocumentViewEntity } from '../shared/entities/document.view.entity';
 import { ProgrammeDocument } from '../shared/entities/programme.document';
+import { UtilModule } from '../shared/util/util.module';
 
 @Module({
   imports: [
@@ -31,6 +32,8 @@ import { ProgrammeDocument } from '../shared/entities/programme.document';
     ProgrammeModule,
     CompanyModule,
     UserModule,
+    UtilModule
+    
   ],
   providers: [Logger, DataImporterService],
 })
