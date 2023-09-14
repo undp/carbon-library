@@ -48,8 +48,7 @@ import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
     EmailHelperModule,
     LocationModule,
     AsyncOperationsModule,
-    FileHandlerModule,
-    AuthorizationLetterGen
+    FileHandlerModule
   ],
   providers: [Logger, ProgrammeService],
   exports: [ProgrammeService],

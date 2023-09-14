@@ -757,7 +757,38 @@ export class ProgrammeService {
   }
 
   async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme) {
-    
+    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
+      const updT = {}    
+      if (
+        d.type == DocType.METHODOLOGY_DOCUMENT
+      ) {
+        updT['currentStage'] = ProgrammeStage.APPROVED;
+        updT['statusUpdateTime'] = new Date().getTime();
+      }
+
+      if (certifierId && program) {
+        await this.updateProgrammeCertifier(program, certifierId, updT);
+      }
+      console.log('Update T', updT)
+      
+      if (Object.keys(updT).length > 0) {
+        updT['txTime'] = new Date().getTime();
+        await em.update(
+          Programme,
+          {
+            programmeId: d.programmeId,
+          },
+          updT
+        );
+      }
+    }
+    else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
+      if (certifierId && program) {
+        await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+      } else if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
+        await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+      }
+    }
     console.log('NDC COmmit', ndc)
     if (ndc) {
       await em.update(
@@ -771,11 +802,30 @@ export class ProgrammeService {
       );
     }
     
-    if (certifierId && program) {
-      await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
-    } else if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
-      await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+  }
+
+  async updateProgrammeCertifier(programme: Programme, certifierId: number, update: any) {
+    if (!programme.certifierId) {
+      programme.certifierId = [certifierId]
+    } else {
+      const index = programme.certifierId.map(e => Number(e)).indexOf(Number(certifierId));
+      if (index < 0) {
+        programme.certifierId.push(certifierId)
+      }
     }
+    if (update) {
+      update['certifierId'] = programme.certifierId;
+    }
+    if (programme.revokedCertifierId) {
+      const index = programme.revokedCertifierId.map(e => Number(e)).indexOf(Number(certifierId));
+      if (index >=0) {
+        programme.revokedCertifierId.splice(index, 1);
+        if (update) {
+          update['revokedCertifierId'] = programme.revokedCertifierId;
+        }
+      }
+    }
+    return programme;
   }
 
   async docAction(documentAction: DocumentAction, user: User) {
@@ -1043,8 +1093,6 @@ export class ProgrammeService {
           externalId: dr.externalId
         },
       });
-
-      return
     }
 
     await this.asyncOperationsInterface.AddAction({
@@ -1356,6 +1404,7 @@ export class ProgrammeService {
             if (dr) {
               await em.save<ProgrammeDocument>(dr);
             }
+            return await em.save<Programme>(programme);
           })
           .catch((err: any) => {
             console.log(err);
