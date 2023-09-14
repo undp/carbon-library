@@ -301,7 +301,8 @@ export class EmailHelperService {
     template,
     templateData: any,
     programmeId?: string,
-    companyId?: number
+    companyId?: number,
+    attachments?: any
   ) {
     if (this.isEmailDisabled) return;
     const systemCountryName = this.configService.get("systemCountryName");
@@ -380,6 +381,10 @@ export class EmailHelperService {
           ),
         },
       };
+      
+      if(attachments){
+        action.actionProps["attachments"] = attachments;
+      }
       await this.asyncOperationsInterface.AddAction(action);
     });
   }
