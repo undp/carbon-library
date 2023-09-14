@@ -365,9 +365,9 @@ export const AddNewCompanyComponent = (props: any) => {
                       )
                     : null}
                     <Form.Item
-                          label="Tax ID"
-                          initialValue={state?.record?.taxId}
-                          name="taxId"
+                          label="Registration Payment ID"
+                          initialValue={state?.record?.paymentId}
+                          name="paymentId"
                           rules={[
                             {
                               required: true,
@@ -381,7 +381,7 @@ export const AddNewCompanyComponent = (props: any) => {
                                   value === null ||
                                   value === undefined
                                 ) {
-                                  throw new Error(`Tax ID ${t("isRequired")}`);
+                                  throw new Error(`Registration Payment ID ${t("isRequired")}`);
                                 }
                               },
                             },
