@@ -9,10 +9,15 @@ export class ProgrammeDocumentDto {
     @ApiProperty()
     data: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    @ApiProperty()
+    @ApiPropertyOptional()
     programmeId: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiPropertyOptional()
+    externalId: string;
 
     @IsNotEmpty()
     @ApiProperty({ enum: DocType })

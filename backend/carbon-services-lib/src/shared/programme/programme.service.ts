@@ -472,7 +472,7 @@ export class ProgrammeService {
         continue;
       }
 
-      if (!ownershipMap[fromCompanyId] ||  ownershipMap[fromCompanyId] < req.percentage[j] || !propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage) {
+      if (!propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
             "programme.invalidCompPercentageForGivenComp",
@@ -734,8 +734,8 @@ export class ProgrammeService {
   }
 
   async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme) {
-    
-    console.log('NDC COmmit', ndc)
+    console.log('approveDocumentCommit', program);
+    console.log('approveDocumentCommit certifierId', certifierId);
     if (ndc) {
       await em.update(
         NDCAction,
@@ -748,8 +748,17 @@ export class ProgrammeService {
       );
     }
     
-    if (certifierId && program) {
-      await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+    if (certifierId && program ) {
+      if(program.certifierId){
+        const index = program.certifierId.findIndex((element:any) => {
+          return Number(element) === certifierId
+        })
+        if (index === -1) {
+          await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+        }
+      }else{
+        await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+      }
     } 
     if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
       await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
@@ -842,8 +851,16 @@ export class ProgrammeService {
   }
 
   async addDocument(documentDto: ProgrammeDocumentDto, user: User) {
-    const programme = await this.findById(documentDto.programmeId);
-
+    
+    let programme;
+    if (documentDto.programmeId) {
+      programme = await this.findById(documentDto.programmeId);
+      documentDto.externalId = programme.externalId;
+    } else if (documentDto.externalId) {
+      programme = await this.findByExternalId(documentDto.externalId);
+      documentDto.programmeId = programme.programmeId;
+    }
+    
     if (!programme) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
