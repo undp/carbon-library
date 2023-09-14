@@ -37,6 +37,7 @@ import {
 } from "../../../Definitions";
 import { InfoCircle } from "react-bootstrap-icons";
 import { enablementTypesAndValues } from "../../../Definitions/Enums/enablementTypes.enum";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 export interface NdcActionDetailsProps {
   isBackBtnVisible: boolean;
@@ -340,9 +341,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
         const enablementReport = await getBase64(
           ndcActionFormvalues.EnablementReport[0]?.originFileObj as RcFile
         );
-        const enablementReportData = enablementReport.split(",");
-        ndcActionDetailObj.enablementProperties.report =
-          enablementReportData[1];
+        ndcActionDetailObj.enablementProperties.report = enablementReport;
       }
       ndcActionDetailObj.enablementReportData =
         ndcActionFormvalues.EnablementReport;
@@ -990,7 +989,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                     validator: async (rule, file) => {
                       let isCorrectFormat = false;
                       if (file && file.length > 0) {
-                        if (file[0]?.type === "application/pdf") {
+                        if (isValidateFileType(file[0]?.type)) {
                           isCorrectFormat = true;
                         }
                         if (!isCorrectFormat) {
@@ -1006,7 +1005,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                 ]}
               >
                 <Upload
-                  accept=".pdf"
+                  accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                   beforeUpload={(file: any) => {
                     return false;
                   }}

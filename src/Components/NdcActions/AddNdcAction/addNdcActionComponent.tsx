@@ -7,6 +7,7 @@ import { RcFile } from "rc-upload/lib/interface";
 import { InfoCircle } from "react-bootstrap-icons";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
 import { Programme, ProgrammeStageR, getBase64 } from "../../../Definitions";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 export const AddNdcActionComponent = (props: any) => {
   const {
@@ -230,14 +231,7 @@ export const AddNdcActionComponent = (props: any) => {
                   validator: async (rule, file) => {
                     if (file?.length > 0) {
                       let isCorrectFormat = false;
-                      if (file[0]?.type === "application/pdf") {
-                        isCorrectFormat = true;
-                      } else if (
-                        file[0]?.type ===
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                      ) {
-                        isCorrectFormat = true;
-                      } else if (file[0]?.type === "text/csv") {
+                      if (isValidateFileType(file[0]?.type)) {
                         isCorrectFormat = true;
                       }
                       if (!isCorrectFormat) {
