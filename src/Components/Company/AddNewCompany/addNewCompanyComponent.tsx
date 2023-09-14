@@ -364,6 +364,31 @@ export const AddNewCompanyComponent = (props: any) => {
                         </Form.Item>
                       )
                     : null}
+                    <Form.Item
+                          label="Tax ID"
+                          initialValue={state?.record?.taxId}
+                          name="taxId"
+                          rules={[
+                            {
+                              required: true,
+                              message: "",
+                            },
+                            {
+                              validator: async (rule, value) => {
+                                if (
+                                  String(value).trim() === "" ||
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
+                                  throw new Error(`Tax ID ${t("isRequired")}`);
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <Input size="large" />
+                     </Form.Item>
                   <Form.Item
                     label="Email"
                     name="email"
