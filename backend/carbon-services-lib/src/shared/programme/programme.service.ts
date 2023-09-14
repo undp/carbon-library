@@ -81,6 +81,7 @@ import { NdcFinancing } from "../dto/ndc.financing";
 import { PRECISION } from "@undp/carbon-credit-calculator/dist/esm/calculator";
 import { MitigationAddDto } from "../dto/mitigation.add.dto";
 import { OwnershipUpdateDto } from "../dto/ownership.update";
+import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -126,6 +127,7 @@ export class ProgrammeService {
     @InjectRepository(NDCAction) private ndcActionRepo: Repository<NDCAction>,
     @InjectRepository(NDCActionViewEntity)
     private ndcActionViewRepo: Repository<NDCActionViewEntity>,
+    private letterOfIntentRequestGen: LetterOfIntentRequestGen,
   ) {}
 
   private toProgramme(programmeDto: ProgrammeDto): Programme {
@@ -1312,6 +1314,14 @@ export class ProgrammeService {
     );
 
     if (savedProgramme) {
+      const letterOfIntentRequestLetterUrl = await this.letterOfIntentRequestGen.generateLetter(
+        programme.programmeId,
+        programme.title,
+        orgNamesList,
+        programme.geographicalLocationCordintes,
+        programmeDto.designDocument
+      );
+
       const hostAddress = this.configService.get("host");
       await this.emailHelperService.sendEmailToGovernmentAdmins(
         EmailTemplates.PROGRAMME_CREATE,
@@ -1320,6 +1330,10 @@ export class ProgrammeService {
           programmePageLink:
             hostAddress +
             `/programmeManagement/view?id=${programme.programmeId}`,
+        },undefined,undefined,
+        {
+          filename: 'REQUEST_FOR_LETTER_OF_INTENT.pdf',
+          path: letterOfIntentRequestLetterUrl
         }
       );
     }
