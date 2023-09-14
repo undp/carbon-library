@@ -123,7 +123,7 @@ const Assessment = (props: any) => {
 
           setCobenefitsAssessmentDetails((pre: any) => ({
             ...pre,
-            document: values[1],
+            document: values,
           }));
         } else {
           changedValues[changedField.name[0]] = changedField.value;
