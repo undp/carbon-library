@@ -12,11 +12,20 @@ export class LetterOfIntentRequestGen {
         private fileHandler: FileHandlerInterface) {
     }
 
-    async generateLetter(programmeId, programmeName, orgName, programmeLocation, designDocUrl) {
+    async generateLetter(programmeId, programmeName, orgName, programmeLocations, designDocUrl) {
         const filepath = `REQUEST_FOR_LETTER_OF_INTENT_${programmeId}.pdf`;
         const country = this.configService.get("systemCountryName");
+        const continent = this.configService.get("systemContinentName");
         const date = new Date().toDateString();
         const refNo = this.helperService.generateRandomNumber();
+
+        let programmeLocation;  
+        if (programmeLocations.length > 2) {
+            programmeLocation = programmeLocations.slice(0, programmeLocations.length - 1).join(", ");
+            programmeLocation += " and " + programmeLocations[programmeLocations.length - 1];
+        } else {
+            programmeLocation = programmeLocations.join(" and ");
+        }
 
         const doc = new PDFDocument();
         const stream = fs.createWriteStream("/tmp/" + filepath);
@@ -41,7 +50,7 @@ export class LetterOfIntentRequestGen {
 
         doc.font("fonts/Inter-Regular.ttf");
 
-        doc.text(`\n\n${orgName} is active in the business area and experienced in technology in Africa and ${country}. ${orgName} intends to develop and implement ${programmeName} at ${programmeLocation} in ${country} to generate mitigation outcomes authorised for international transfer under this framework towards the international mitigation use as determined by the participating Parties.`, {
+        doc.text(`\n\n${orgName} is active in the business area and experienced in technology in ${continent} and ${country}. ${orgName} intends to develop and implement ${programmeName} at ${programmeLocation} in ${country} to generate mitigation outcomes authorised for international transfer under this framework towards the international mitigation use as determined by the participating Parties.`, {
             align: "left",
         });
 
