@@ -11,5 +11,6 @@ const allowedFileTypes = [
 ];
 
 export const isValidateFileType = (fileType: string): boolean => {
+    console.log("isValidateFileType called with type with new file type change 8 : ", fileType)
     return allowedFileTypes.includes(fileType);
 }
