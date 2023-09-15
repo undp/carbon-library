@@ -1357,6 +1357,23 @@ export class ProgrammeService {
           path: letterOfIntentRequestLetterUrl
         }
       );
+
+      savedProgramme.companyId.forEach(async (companyId) => {
+        await this.emailHelperService.sendEmailToOrganisationAdmins(
+          companyId,
+          EmailTemplates.PROGRAMME_CREATE,
+          {
+            organisationName: orgNamesList,
+            programmePageLink:
+            hostAddress +
+            `/programmeManagement/view?id=${programme.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'REQUEST_FOR_LETTER_OF_INTENT.pdf',
+            path: letterOfIntentRequestLetterUrl
+          }
+        );
+      });
     }
 
     return savedProgramme;
