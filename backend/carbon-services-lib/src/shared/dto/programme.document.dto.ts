@@ -32,6 +32,4 @@ export class ProgrammeDocumentDto {
     @IsString()
     certifierTaxId: string;
 
-    externalId?: string;
-
 }

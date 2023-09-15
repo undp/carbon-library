@@ -180,10 +180,6 @@ export class ProgrammeService {
         investorTaxId: investor.taxId,
         shareFromOwner: transfer.shareFromOwner,
         ownerTaxId: ownerTaxId,
-        companyId:programme.companyId,
-        toCompanyId:transfer.toCompanyId,
-        fromCompanyId: transfer.fromCompanyId,
-        user:user
       },
     });
 
@@ -264,7 +260,7 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
-  async updateOwnership(update: OwnershipUpdateDto, user: string): Promise<DataResponseDto | undefined> {
+  async updateOwnership(update: OwnershipUpdateDto, user: string): Promise<DataResponseDto | undefined> { 
     this.logger.log('Ownership update triggered')
 
     if (
@@ -3281,6 +3277,7 @@ export class ProgrammeService {
       actionProps: {
         externalId: program.externalId,
         issueAmount: req.issueAmount,
+        programmeId: program.externalId
       },
     };
     await this.asyncOperationsInterface.AddAction(
@@ -3341,7 +3338,7 @@ export class ProgrammeService {
   }
 
   async issueCredit(issue: ProgrammeIssue) {
-    const programme = await this.findByExternalId(issue.externalId);
+    const programme = await this.findByExternalId(issue.externalId?issue.externalId:issue.programmeId);
     if (!programme) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -3376,7 +3373,7 @@ export class ProgrammeService {
 
     const resp = await this.programmeRepo.update(
       {
-        externalId: issue.externalId,
+        externalId: issue.externalId?issue.externalId:issue.programmeId,
       },
       {
         emissionReductionAchieved: issued,
@@ -3686,7 +3683,8 @@ export class ProgrammeService {
         actionType: AsyncActionType.RejectProgramme,
         actionProps: {
           externalId: programme.externalId,
-          comment: req.comment
+          comment: req.comment,
+          programmeId:programme.externalId
         },
       };
       await this.asyncOperationsInterface.AddAction(
@@ -3702,7 +3700,7 @@ export class ProgrammeService {
       return new BasicResponseDto(HttpStatus.OK, "Successfully updated");
     }
     else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
-      const programme = await this.findByExternalId(req.externalId);
+      const programme = await this.findByExternalId(req.externalId?req.externalId:req.programmeId);
       if (!programme) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
@@ -3715,7 +3713,7 @@ export class ProgrammeService {
 
       const resp = await this.programmeRepo.update(
         {
-          externalId: req.externalId,
+          externalId: req.externalId?req.externalId:req.programmeId,
         },
         {
           currentStage: ProgrammeStage.REJECTED,
