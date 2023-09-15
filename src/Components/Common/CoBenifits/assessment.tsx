@@ -802,11 +802,7 @@ const Assessment = (props: any) => {
                       {
                         validator: async (rule, file) => {
                           if (file?.length > 0) {
-                            let isCorrectFormat = false;
-                            if (isValidateFileType(file[0]?.type)) {
-                              isCorrectFormat = true;
-                            }
-                            if (!isCorrectFormat) {
+                            if (!isValidateFileType(file[0]?.type)) {
                               throw new Error(`${t("invalidFileFormat")}`);
                             } else if (file[0]?.size > maximumFileSize) {
                               throw new Error(`${t("common:maxSizeVal")}`);
