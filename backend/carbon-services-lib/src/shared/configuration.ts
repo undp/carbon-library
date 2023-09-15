@@ -76,6 +76,5 @@ export default () => ({
     ministryName: "Ministry of Environment, Forestry & Tourism",
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X"
   },
-  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
-  systemSync: process.env.SYSTEM_SYNC || false
+  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM"
 });
