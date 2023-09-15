@@ -84,6 +84,7 @@ import { OwnershipUpdateDto } from "../dto/ownership.update";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
 import { ProgrammeAuth } from "../dto/programme.auth";
 import { AuthorizationLetterGen } from "../util/authorisation.letter.gen";
+import { ProgrammeDocumentRegistryDto } from "../dto/programme.document.registry.dto";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -317,7 +318,8 @@ export class ProgrammeService {
       }
       companyIds.push(compo.companyId)
     }
-    const resp =await this.programmeLedger.updateOwnership(update.externalId, update.companyId, update.proponentTaxVatId, update.proponentPercentage, update.toCompanyId, update.fromCompanyId, update.shareFromOwner, user);
+    
+    const resp = await this.programmeLedger.updateOwnership(update.externalId, companyIds, update.proponentTaxVatId, update.proponentPercentage, investorCompanyId, ownerCompanyId,update.shareFromOwner,`${investorCompanyId}#${investorCompanyName}#${ownerCompanyId}#${ownerCompanyName}`);
     
     if(resp)
       this.checkPendingTransferValidity(resp);
@@ -913,129 +915,126 @@ export class ProgrammeService {
     );
   }
 
+  async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
+    this.logger.log('Add Document triggered')
+
+    const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
+    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
+    return new DataResponseDto(HttpStatus.OK, resp);
+  }
+
   async addDocument(documentDto: ProgrammeDocumentDto, user: User) {
-    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY ||
-      this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
-        const programme = await this.findById(documentDto.programmeId);
+    const programme = await this.findById(documentDto.programmeId);
 
-        if (!programme) {
-          throw new HttpException(
-            this.helperService.formatReqMessagesString(
-              "programme.programmeNotExist",
-              []
-            ),
-            HttpStatus.BAD_REQUEST
-          );
-        }
+    if (!programme) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.programmeNotExist",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
-        let permissionForMinistryLevel = false;
-        if(user.companyRole === CompanyRole.MINISTRY) {
-          const permission = await this.findPermissionForMinistryUser(user, programme.sectoralScope);
-          permissionForMinistryLevel = permission
-          if(!permission) {
-            throw new HttpException(
-              this.helperService.formatReqMessagesString("user.userUnAUth", []),
-              HttpStatus.FORBIDDEN
-            );
-          }
-        }
-        
-        const expected = this.getExpectedDoc(documentDto.type);
-        if (expected) {
-          let whr = {
-            programmeId: documentDto.programmeId,
-            status: DocumentStatus.ACCEPTED,
-            type: expected,
-          };
-          if (documentDto.actionId && documentDto.type === DocType.VERIFICATION_REPORT) {
-            whr["actionId"] = documentDto.actionId;
-          }
-          const approvedDesign = await this.documentRepo.findOne({
-            where: whr,
-          });
-
-          console.log('Where', whr)
-
-          if (!approvedDesign) {
-            throw new HttpException(
-              this.helperService.formatReqMessagesString(
-                "programme.invalidDocumentUpload",
-                []
-              ),
-              HttpStatus.BAD_REQUEST
-            );
-          }
-        }
-
-        let whr = {
-          programmeId: documentDto.programmeId,
-          type: documentDto.type,
-        };
-        if (documentDto.actionId) {
-          whr["actionId"] = documentDto.actionId;
-        }
-        const currentDoc = await this.documentRepo.findOne({
-          where: whr,
-        });
-
-        const url = await this.uploadDocument(
-          documentDto.type,
-          programme.programmeId + (documentDto.actionId ? ('_' + documentDto.actionId) : ''),
-          documentDto.data
+    let permissionForMinistryLevel = false;
+    if(user.companyRole === CompanyRole.MINISTRY) {
+      const permission = await this.findPermissionForMinistryUser(user, programme.sectoralScope);
+      permissionForMinistryLevel = permission
+      if(!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
         );
-        const dr = new ProgrammeDocument();
-        dr.programmeId = programme.programmeId;
-        dr.externalId = programme.externalId;
-        dr.status = DocumentStatus.PENDING;
-        dr.type = documentDto.type;
-        dr.actionId = documentDto.actionId;
-        dr.txTime = new Date().getTime();
-        dr.url = url;
-        dr.remark = user.id.toString();
+      }
+    }
+    
+    const expected = this.getExpectedDoc(documentDto.type);
+    if (expected) {
+      let whr = {
+        programmeId: documentDto.programmeId,
+        status: DocumentStatus.ACCEPTED,
+        type: expected,
+      };
+      if (documentDto.actionId && documentDto.type === DocType.VERIFICATION_REPORT) {
+        whr["actionId"] = documentDto.actionId;
+      }
+      const approvedDesign = await this.documentRepo.findOne({
+        where: whr,
+      });
 
-        let ndc: NDCAction;
-        if (user.companyRole === CompanyRole.GOVERNMENT || 
-          (user.companyRole === CompanyRole.MINISTRY && 
-          permissionForMinistryLevel)) {
-          this.logger.log(
-            `Approving document since the user is ${user.companyRole}`
-          );
-          dr.status = DocumentStatus.ACCEPTED;
-          if (dr.actionId) {
-            ndc = await this.ndcActionRepo.findOne({
-              where: {
-                id: dr.actionId,
-              },
-            });
-          }
-          ndc = await this.approveDocumentPre(dr, programme, undefined, ndc);
-        }
+      console.log('Where', whr)
 
-        let resp = await this.entityManager.transaction(async (em) => {
-          if (dr.status === DocumentStatus.ACCEPTED) {
-            await this.approveDocumentCommit(em, dr, ndc, undefined, programme);
-          }
-          if (!currentDoc) {
-            return await em.save(dr);
-          } else {
-            return await em.update(ProgrammeDocument, whr, {
-              status: dr.status,
-              txTime: dr.txTime,
-              url: dr.url,
-              remark: dr.remark
-            });
-          }
+      if (!approvedDesign) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.invalidDocumentUpload",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
+    let whr = {
+      programmeId: documentDto.programmeId,
+      type: documentDto.type,
+    };
+    if (documentDto.actionId) {
+      whr["actionId"] = documentDto.actionId;
+    }
+    const currentDoc = await this.documentRepo.findOne({
+      where: whr,
+    });
+
+    const url = await this.uploadDocument(
+      documentDto.type,
+      programme.programmeId + (documentDto.actionId ? ('_' + documentDto.actionId) : ''),
+      documentDto.data
+    );
+    const dr = new ProgrammeDocument();
+    dr.programmeId = programme.programmeId;
+    dr.externalId = programme.externalId;
+    dr.status = DocumentStatus.PENDING;
+    dr.type = documentDto.type;
+    dr.actionId = documentDto.actionId;
+    dr.txTime = new Date().getTime();
+    dr.url = url;
+    dr.remark = user.id.toString();
+
+    let ndc: NDCAction;
+    if (user.companyRole === CompanyRole.GOVERNMENT || 
+      (user.companyRole === CompanyRole.MINISTRY && 
+      permissionForMinistryLevel)) {
+      this.logger.log(
+        `Approving document since the user is ${user.companyRole}`
+      );
+      dr.status = DocumentStatus.ACCEPTED;
+      if (dr.actionId) {
+        ndc = await this.ndcActionRepo.findOne({
+          where: {
+            id: dr.actionId,
+          },
         });
-        return new DataResponseDto(HttpStatus.OK, resp);
-    }
-    else if (this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
-      this.logger.log('Add Document triggered')
-
-      const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
-      const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
-      return new DataResponseDto(HttpStatus.OK, resp);
+      }
+      ndc = await this.approveDocumentPre(dr, programme, undefined, ndc);
     }
 
+    let resp = await this.entityManager.transaction(async (em) => {
+      if (dr.status === DocumentStatus.ACCEPTED) {
+        await this.approveDocumentCommit(em, dr, ndc, undefined, programme);
+      }
+      if (!currentDoc) {
+        return await em.save(dr);
+      } else {
+        return await em.update(ProgrammeDocument, whr, {
+          status: dr.status,
+          txTime: dr.txTime,
+          url: dr.url,
+          remark: dr.remark
+        });
+      }
+    });
+    return new DataResponseDto(HttpStatus.OK, resp);
   }
 
   async queueDocument(action: AsyncActionType, req: any, ndcAction: NDCAction,docType: DocType, certifierId: number, programme: Programme) {
@@ -1339,6 +1338,11 @@ export class ProgrammeService {
         );
       }
 
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.ProgrammeCreate,
+        actionProps: programmeDto,
+      });
+
       if ([CompanyRole.CERTIFIER, CompanyRole.GOVERNMENT, CompanyRole.MINISTRY].includes(user.companyRole)){
         const certifierId =
           user.companyRole === CompanyRole.CERTIFIER
@@ -1385,11 +1389,6 @@ export class ProgrammeService {
           },ndcAc, monitoringReport.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
         }
       }
-
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.ProgrammeCreate,
-        actionProps: programmeDto,
-      });
       
       if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
   

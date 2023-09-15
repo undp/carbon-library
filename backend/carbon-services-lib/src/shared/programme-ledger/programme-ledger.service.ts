@@ -1446,7 +1446,7 @@ export class ProgrammeLedgerService {
         }
 
         if (creditEst > 0) {
-          programme.currentStage = ProgrammeStage.AWAITING_AUTHORIZATION;
+          programme.currentStage = ProgrammeStage.APPROVED;
           programme.creditEst = creditEst;
           updateMap[this.ledger.tableName]["currentStage"] =
             programme.currentStage;
