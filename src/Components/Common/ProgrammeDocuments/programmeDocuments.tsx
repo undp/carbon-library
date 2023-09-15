@@ -18,6 +18,7 @@ import {
   Role,
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 export interface ProgrammeDocumentsProps {
   data: any;
@@ -33,6 +34,7 @@ export interface ProgrammeDocumentsProps {
   useConnection: any;
   useUserContext: any;
   translator: any;
+  methodologyDocumentUpdated: any;
 }
 
 export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
@@ -52,6 +54,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     useConnection,
     useUserContext,
     translator,
+    methodologyDocumentUpdated,
   } = props;
   const t = translator.t;
   const { userInfoState } = useUserContext();
@@ -140,28 +143,18 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
 
     setLoading(true);
     const logoBase64 = await getBase64(file as RcFile);
-    let imgData = logoBase64;
-    if (type !== DocType.MONITORING_REPORT) {
-      const logoUrls = logoBase64.split(",");
-      imgData = logoUrls[1];
-    }
-
     try {
-      if (
-        (type === DocType.DESIGN_DOCUMENT &&
-          file?.type === "application/pdf") ||
-        (type === DocType.METHODOLOGY_DOCUMENT &&
-          file?.type ===
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-      ) {
+      if (isValidateFileType(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
-          data: imgData,
+          data: logoBase64,
           programmeId: programmeId,
         });
+        console.log(response);
         fileInputRefMeth.current = null;
         if (response?.data) {
           setDocData([...docData, response?.data]);
+          methodologyDocumentUpdated();
           message.open({
             type: "success",
             content: `${t("programme:isUploaded")}`,
@@ -374,7 +367,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         type="file"
                         ref={fileInputRef}
                         style={{ display: "none" }}
-                        accept=".pdf"
+                        accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                         onChange={(e: any) => {
                           const selectedFile = e.target.files[0];
                           e.target.value = null;
@@ -432,7 +425,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     type="file"
                     ref={fileInputRef}
                     style={{ display: "none" }}
-                    accept=".pdf"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
@@ -601,7 +594,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         type="file"
                         ref={fileInputRefMeth}
                         style={{ display: "none" }}
-                        accept=".xlsx,.xls"
+                        accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                         onChange={(e: any) => {
                           const selectedFile = e.target.files[0];
                           e.target.value = null;
@@ -665,7 +658,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     type="file"
                     ref={fileInputRefMeth}
                     style={{ display: "none" }}
-                    accept=".xlsx,.xls"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;

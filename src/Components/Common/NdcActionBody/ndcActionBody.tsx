@@ -18,6 +18,7 @@ import {
   Role,
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 export interface NdcActionBodyProps {
   data?: any;
@@ -93,23 +94,12 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     }
     setLoading(true);
     const logoBase64 = await getBase64(file as RcFile);
-    let imgData = logoBase64;
-    if (type !== DocType.MONITORING_REPORT) {
-      const logoUrls = logoBase64.split(",");
-      imgData = logoUrls[1];
-    }
-
+    
     try {
-      if (
-        file?.type === "application/pdf" ||
-        (type === DocType.MONITORING_REPORT &&
-          (file?.type ===
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-            file?.type === "text/csv"))
-      ) {
+      if (isValidateFileType(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
-          data: imgData,
+          data: logoBase64,
           programmeId: programmeId,
           actionId: ndcActionId,
         });
@@ -359,7 +349,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                     type="file"
                     ref={fileInputMonitoringRef}
                     style={{ display: "none" }}
-                    accept=".pdf,.xlsx,.csv,.xls"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
@@ -441,7 +431,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                     type="file"
                     ref={fileInputMonitoringRef}
                     style={{ display: "none" }}
-                    accept=".pdf,.xlsx,.csv,.xls"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;
@@ -586,7 +576,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                       type="file"
                       ref={fileInputVerificationRef}
                       style={{ display: "none" }}
-                      accept=".pdf"
+                      accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                       onChange={(e: any) => {
                         const selectedFile = e.target.files[0];
                         e.target.value = null;
@@ -672,7 +662,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
                     type="file"
                     ref={fileInputVerificationRef}
                     style={{ display: "none" }}
-                    accept=".pdf"
+                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                     onChange={(e: any) => {
                       const selectedFile = e.target.files[0];
                       e.target.value = null;

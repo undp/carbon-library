@@ -22,6 +22,7 @@ import { ObjectionLetterGen } from "./objection.letter.gen";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { Region } from "../entities/region.entity";
 import { AuthorizationLetterGen } from "./authorisation.letter.gen";
+import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
 
 @Module({
   imports: [
@@ -65,7 +66,8 @@ import { AuthorizationLetterGen } from "./authorisation.letter.gen";
     Logger,
     ConfigurationSettingsService,
     ObjectionLetterGen,
-    AuthorizationLetterGen
+    AuthorizationLetterGen,
+    LetterOfIntentRequestGen
   ],
   exports: [
     CounterService,
@@ -74,7 +76,8 @@ import { AuthorizationLetterGen } from "./authorisation.letter.gen";
     PasswordResetService,
     ConfigurationSettingsService,
     ObjectionLetterGen,
-    AuthorizationLetterGen
+    AuthorizationLetterGen,
+    LetterOfIntentRequestGen
   ],
 })
 export class UtilModule {}

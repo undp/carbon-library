@@ -85,6 +85,7 @@ import { SYSTEM_TYPE } from "../enum/system.names.enum";
 import { ProgrammeAuth } from "../dto/programme.auth";
 import { AuthorizationLetterGen } from "../util/authorisation.letter.gen";
 import { ProgrammeDocumentRegistryDto } from "../dto/programme.document.registry.dto";
+import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -131,7 +132,21 @@ export class ProgrammeService {
     @InjectRepository(NDCAction) private ndcActionRepo: Repository<NDCAction>,
     @InjectRepository(NDCActionViewEntity)
     private ndcActionViewRepo: Repository<NDCActionViewEntity>,
+    private letterOfIntentRequestGen: LetterOfIntentRequestGen,
   ) {}
+
+  private fileExtensionMap = new Map([
+    ["pdf", "pdf"],
+    ["vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"],
+    ["vnd.ms-excel", "xls"],
+    ["vnd.ms-powerpoint", "ppt"],
+    ["vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"],
+    ["msword", "doc"],
+    ["vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"],
+    ["csv", "cvs"],
+    ["png", "png"],
+    ["jpeg" , "jpg"]
+  ]);
 
   private toProgramme(programmeDto: ProgrammeDto): Programme {
     const data = instanceToPlain(programmeDto);
@@ -495,7 +510,7 @@ export class ProgrammeService {
         continue;
       }
 
-      if (!ownershipMap[fromCompanyId] ||  ownershipMap[fromCompanyId] < req.percentage[j] || !propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage) {
+      if (!propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
             "programme.invalidCompPercentageForGivenComp",
@@ -581,18 +596,26 @@ export class ProgrammeService {
     return null;
   }
 
+  getFileExtension = (file: string): string => {
+    let fileType = file.split(';')[0].split('/')[1];
+    fileType = this.fileExtensionMap.get(fileType);
+    return fileType;
+  }
+
   async uploadDocument(type: DocType, id: string, data: string) {
-    let filetype = type == DocType.METHODOLOGY_DOCUMENT ? "xlsx" : "pdf";
-    if(type === DocType.MONITORING_REPORT){
-      //determine filetype of base64 data
+    let filetype;
       try {
-        filetype = data.split(';')[0].split('/')[1];
-        if(filetype === 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
-          filetype = 'xlsx'
-        }else if(filetype === 'vnd.ms-excel'){
-          filetype = 'xls'
-        }
+        filetype = this.getFileExtension(data);
         data = data.split(',')[1];
+        if (filetype == undefined) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "programme.invalidDocumentUpload",
+              []
+            ),
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
+        }
       }
       catch(Exception:any){
         throw new HttpException(
@@ -603,7 +626,7 @@ export class ProgrammeService {
           HttpStatus.INTERNAL_SERVER_ERROR
         );
       }
-    }
+    
     const response: any = await this.fileHandler.uploadFile(
       `documents/${this.helperService.enumToString(DocType, type)}${
         id ? "_" + id : ""
@@ -781,9 +804,19 @@ export class ProgrammeService {
       }
     }
     else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
-      if (certifierId && program) {
-        await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
-      } else if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
+      if (certifierId && program ) {
+        if(program.certifierId){
+          const index = program.certifierId.findIndex((element:any) => {
+            return Number(element) === certifierId
+          })
+          if (index === -1) {
+            await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+          }
+        }else{
+          await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+        }
+      } 
+      if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
       }
     }
@@ -799,7 +832,6 @@ export class ProgrammeService {
         }
       );
     }
-    
   }
 
   async updateProgrammeCertifier(programme: Programme, certifierId: number, update: any) {
@@ -920,8 +952,16 @@ export class ProgrammeService {
   }
 
   async addDocument(documentDto: ProgrammeDocumentDto, user: User) {
-    const programme = await this.findById(documentDto.programmeId);
-
+    
+    let programme;
+    if (documentDto.programmeId) {
+      programme = await this.findById(documentDto.programmeId);
+      documentDto.externalId = programme.externalId;
+    } else if (documentDto.externalId) {
+      programme = await this.findByExternalId(documentDto.externalId);
+      documentDto.programmeId = programme.programmeId;
+    }
+    
     if (!programme) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -1419,6 +1459,14 @@ export class ProgrammeService {
     }
 
     if (savedProgramme) {
+      const letterOfIntentRequestLetterUrl = await this.letterOfIntentRequestGen.generateLetter(
+        programme.programmeId,
+        programme.title,
+        orgNamesList,
+        programme.programmeProperties.geographicalLocation,
+        programmeDto.designDocument
+      );
+
       const hostAddress = this.configService.get("host");
       await this.emailHelperService.sendEmailToGovernmentAdmins(
         EmailTemplates.PROGRAMME_CREATE,
@@ -1427,6 +1475,10 @@ export class ProgrammeService {
           programmePageLink:
             hostAddress +
             `/programmeManagement/view?id=${programme.programmeId}`,
+        },undefined,undefined,
+        {
+          filename: 'REQUEST_FOR_LETTER_OF_INTENT.pdf',
+          path: letterOfIntentRequestLetterUrl
         }
       );
     }
@@ -1495,7 +1547,7 @@ export class ProgrammeService {
       const document = (ndcActionDto.coBenefitsProperties as any)
         .assessmentDetails.document;
       if (document) {
-        const filetype = "pdf";
+        const filetype = this.getFileExtension(document);
         const response: any = await this.fileHandler.uploadFile(
           `documents/FEASIBILITY_REPORT${"_" + ndcAction.id}.${filetype}`,
           document
@@ -1512,7 +1564,7 @@ export class ProgrammeService {
     this.calcAddNDCFields(ndcAction, program);
 
     if (ndcAction.action == NDCActionType.Enablement && ndcAction.enablementProperties.report) {
-      const filetype = "pdf";
+      const filetype = this.getFileExtension(ndcAction.enablementProperties.report);
       const response: any = await this.fileHandler.uploadFile( `documents/ENABLEMENT_REPORT${ "_" + ndcAction.id}.${filetype}`, ndcAction.enablementProperties.report);
       ndcAction.enablementProperties.report = response
     }
@@ -3816,7 +3868,7 @@ export class ProgrammeService {
           geographicalLocationCordintes: programme.geographicalLocationCordintes
         }
       )
-      .catch((err) => {
+      .catch((err) =>{
         this.logger.error(err);
         return err;
       });
