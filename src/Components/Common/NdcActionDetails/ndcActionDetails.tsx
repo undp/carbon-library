@@ -987,12 +987,8 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                 rules={[
                   {
                     validator: async (rule, file) => {
-                      let isCorrectFormat = false;
                       if (file && file.length > 0) {
-                        if (isValidateFileType(file[0]?.type)) {
-                          isCorrectFormat = true;
-                        }
-                        if (!isCorrectFormat) {
+                        if (!isValidateFileType(file[0]?.type)) {
                           throw new Error(
                             `${t("ndcAction:invalidFileFormat")}`
                           );

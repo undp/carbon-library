@@ -766,11 +766,7 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   {
                                     validator: async (rule, file) => {
                                       if (file?.length > 0) {
-                                        let isCorrectFormat = false;
-                                        if (isValidateFileType(file[0]?.type)) {
-                                          isCorrectFormat = true;
-                                        }
-                                        if (!isCorrectFormat) {
+                                        if (!isValidateFileType(file[0]?.type)) {
                                           throw new Error(
                                             `${t(
                                               "addProgramme:invalidFileFormat"

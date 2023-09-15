@@ -230,11 +230,7 @@ export const AddNdcActionComponent = (props: any) => {
                 {
                   validator: async (rule, file) => {
                     if (file?.length > 0) {
-                      let isCorrectFormat = false;
-                      if (isValidateFileType(file[0]?.type)) {
-                        isCorrectFormat = true;
-                      }
-                      if (!isCorrectFormat) {
+                      if (!isValidateFileType(file[0]?.type)) {
                         throw new Error(`${t("ndcAction:invalidFileFormat")}`);
                       } else if (file[0]?.size > maximumImageSize) {
                         // default size format of files would be in bytes -> 1MB = 1000000bytes

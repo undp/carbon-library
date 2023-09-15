@@ -256,6 +256,14 @@ export const CompanyProfileComponent = (props: any) => {
                     </Row>
                     <Row className="field">
                       <Col span={12} className="field-key">
+                        {t("companyProfile:paymentId")}
+                      </Col>
+                      <Col span={12} className="field-value nextline-overflow">
+                        {companyDetails.paymentId ? companyDetails.paymentId : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
                         {t("companyProfile:companyRole")}
                       </Col>
                       <Col span={12} className="field-value">
