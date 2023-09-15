@@ -3497,7 +3497,7 @@ export class ProgrammeService {
           geographicalLocationCordintes: programme.geographicalLocationCordintes
         }
       )
-      .catch((err) => {
+      .catch((err) =>{
         this.logger.error(err);
         return err;
       });
