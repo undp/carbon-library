@@ -26,6 +26,17 @@ export class AsyncOperationsHandlerService {
           return await this.registryClient.issueCredit(dataObject);
         case AsyncActionType.RejectProgramme.toString():
           return await this.registryClient.rejectProgramme(dataObject);
+        
+        case AsyncActionType.ProgrammeCreate.toString():
+          return this.registryClient.createProgramme(dataObject);
+        case AsyncActionType.ProgrammeAccept.toString():
+          return this.registryClient.programmeAccept(dataObject);
+        case AsyncActionType.DocumentUpload.toString():
+          return this.registryClient.addDocument(dataObject);
+        case AsyncActionType.OwnershipUpdate.toString():
+          return this.registryClient.updateOwnership(dataObject);
+        case AsyncActionType.AddMitigation.toString():
+          return this.registryClient.addMitigation(dataObject);
       }
     }
   }
