@@ -25,7 +25,7 @@ import { DataCountResponseDto } from "../shared/dto/data.count.response";
 import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
 import { InvestmentStatus } from "../shared/enum/investment.status";
-import { SYSTEM_NAMES } from "../shared/enum/system.names.enum";
+import { SYSTEM_TYPE } from "../shared/enum/system.names.enum";
 
 @Injectable()
 export class AggregateAPIService {
@@ -735,12 +735,12 @@ export class AggregateAPIService {
     statCache,
     companyId,
     companyRole,
-    system:SYSTEM_NAMES
+    system:SYSTEM_TYPE
   ) {
     const key = stat.key ? stat.key : stat.type;
     console.log(stat.type)
     switch (system){
-      case SYSTEM_NAMES.CARBON_TRANSPARENCY:
+      case SYSTEM_TYPE.CARBON_TRANSPARENCY:
         switch (stat.type){
           case StatType.MY_AGG_PROGRAMME_BY_SECTOR:
           case StatType.AGG_PROGRAMME_BY_SECTOR:
@@ -864,7 +864,7 @@ export class AggregateAPIService {
             break;
         }
         break;
-      case SYSTEM_NAMES.CARBON_REGISTRY:
+      case SYSTEM_TYPE.CARBON_REGISTRY:
         switch (stat.type){
           case StatType.AGG_PROGRAMME_BY_STATUS:
           case StatType.AGG_PROGRAMME_BY_SECTOR:
@@ -1358,7 +1358,7 @@ export class AggregateAPIService {
     query: StatList,
     companyId: any,
     companyRole: CompanyRole,
-    system: SYSTEM_NAMES
+    system: SYSTEM_TYPE
   ): Promise<DataCountResponseDto> {
     let results = {};
     let lastTimeForWhere = {};

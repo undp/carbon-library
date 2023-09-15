@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from "class-validator";
 import { Stat } from "./stat.dto";
-import { SYSTEM_NAMES } from "../enum/system.names.enum";
+import { SYSTEM_TYPE } from "../enum/system.names.enum";
 
 export class StatList {
   @ApiProperty({ isArray: true, type: Stat })
@@ -37,5 +37,5 @@ export class StatList {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  system: SYSTEM_NAMES
+  system: SYSTEM_TYPE
 }

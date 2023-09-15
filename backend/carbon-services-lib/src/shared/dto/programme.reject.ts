@@ -12,4 +12,9 @@ export class ProgrammeReject {
     @IsString()
     @Length(0, 200)
     comment: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    externalId?:string
 }

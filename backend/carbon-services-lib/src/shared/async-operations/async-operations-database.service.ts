@@ -28,7 +28,7 @@ export class AsyncOperationsDatabaseService
 
   public async AddAction(action: AsyncAction): Promise<boolean> {
 
-    if ([AsyncActionType.AuthProgramme, AsyncActionType.DocumentUpload, AsyncActionType.IssueCredit, AsyncActionType.RegistryCompanyCreate, AsyncActionType.RejectProgramme].includes(action.actionType) && !this.configService.get("registry.syncEnable")) {
+    if ([AsyncActionType.AuthProgramme, AsyncActionType.DocumentUpload, AsyncActionType.IssueCredit, AsyncActionType.RegistryCompanyCreate, AsyncActionType.RejectProgramme,AsyncActionType.AddMitigation,AsyncActionType.ProgrammeAccept,AsyncActionType.ProgrammeCreate,AsyncActionType.OwnershipUpdate].includes(action.actionType) && !this.configService.get("registry.syncEnable")) {
       this.logger.log(`Dropping sync event ${action.actionType} due to sync disabled`)
       return false;
     }

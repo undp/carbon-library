@@ -37,5 +37,4 @@ export class OwnershipUpdateDto {
     @IsNumber()
     shareFromOwner: number;
 
-
 }
