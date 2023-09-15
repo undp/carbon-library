@@ -1339,7 +1339,7 @@ export class ProgrammeService {
         programme.programmeId,
         programme.title,
         orgNamesList,
-        programme.geographicalLocationCordintes,
+        programme.programmeProperties.geographicalLocation,
         programmeDto.designDocument
       );
 
