@@ -69,8 +69,8 @@ export default () => ({
   },
   registry: {
     syncEnable: process.env.SYNC_ENABLE || false,
-    endpoint: process.env.MRV_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
-    apiToken: process.env.MRV_API_TOKEN
+    endpoint: process.env.CLIENT_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
+    apiToken: process.env.CLIENT_API_TOKEN
   },
   docGenerate: {
     ministerName: process.env.MINISTER_NAME || 'Minister X',
