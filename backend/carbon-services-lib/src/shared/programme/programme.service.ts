@@ -1426,32 +1426,32 @@ export class ProgrammeService {
         }
       }
       
-      if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
-  
-        savedProgramme = await this.entityManager
-          .transaction(async (em) => {
-            if (ndcAc) {
-              await em.save<NDCAction>(ndcAc);
-              if (monitoringReport) {
-                await em.save<ProgrammeDocument>(monitoringReport);
-              }
+      savedProgramme = await this.entityManager
+        .transaction(async (em) => {
+          if (ndcAc) {
+            await em.save<NDCAction>(ndcAc);
+            if (monitoringReport) {
+              await em.save<ProgrammeDocument>(monitoringReport);
             }
-            if (dr) {
-              await em.save<ProgrammeDocument>(dr);
-            }
-            return await em.save<Programme>(programme);
-          })
-          .catch((err: any) => {
-            console.log(err);
-            if (err instanceof QueryFailedError) {
-              throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-            } else {
-              this.logger.error(`Programme add error ${err}`);
-            }
-            return err;
-          });
-      }
+          }
+          if (dr) {
+            await em.save<ProgrammeDocument>(dr);
+          }
+          if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
+          return await em.save<Programme>(programme);
+          }
+        })
+        .catch((err: any) => {
+          console.log(err);
+          if (err instanceof QueryFailedError) {
+            throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+          } else {
+            this.logger.error(`Programme add error ${err}`);
+          }
+          return err;
+      });
     }
+    
     
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
         this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
