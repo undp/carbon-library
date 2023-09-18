@@ -20,7 +20,7 @@ export class ProgrammeIssue {
     comment: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     externalId?: string;
 }
