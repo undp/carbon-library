@@ -232,8 +232,6 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     userInfoState?.userRole !== Role.ViewOnly;
 
   const designDocPending = designDocStatus === DocumentStatus.PENDING;
-  console.log('designDocPending',designDocPending);
-  console.log('designDocActionPermission',designDocActionPermission);
   return loading ? (
     <Skeleton />
   ) : (
