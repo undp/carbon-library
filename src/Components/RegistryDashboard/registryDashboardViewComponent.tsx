@@ -256,8 +256,9 @@ export const RegistryDashboardComponent = (props: any) => {
     useState<MapSourceData>();
   const [programmeLocationsMapLayer, setProgrammeLocationsMapLayer] =
     useState<any>();
-  const [fileList, setFileList] = useState<{ programmeId: string; url: string }[]>([]);
+  const [fileList, setFileList] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState("-");
+  const [selectedurl, setSelectedurl] = useState(null);
   const mapType = process.env.REACT_APP_MAP_TYPE
     ? process.env.REACT_APP_MAP_TYPE
     : "None";
@@ -2132,6 +2133,7 @@ ${total}
     operation: string;
     value: any;
   };
+  
   useEffect(() => {
     const fetchProgrammeIds = async () => {
       const filter: FilterType[] = [
@@ -2149,11 +2151,11 @@ ${total}
         filterAnd: filter,
       };
         try {
-          const response = await post('stats/programme/annualreportDocs', 
+          const response: any = await post('stats/programme/annualreportDocs', 
           body
           ,undefined,
           process.env.REACT_APP_STAT_URL);
-          setFileList(response.data as { programmeId: string; url: string }[]);
+          setFileList(response.data);
         } catch (error) {
           console.error('Error fetching programmeIds:', error);
         }
@@ -2161,10 +2163,9 @@ ${total}
     fetchProgrammeIds();
   }, []);  
 
-  const menuItems : MenuProps["items"] = fileList.map((file, index) => ({
-    label: file.programmeId.slice(2), // Extracting year from programmeId
-    key: file.url, // Using url as the key
-    icon: <DownloadOutlined />,
+  const menuItems : MenuProps["items"] = fileList.map((item) => ({
+    label: item?.programmeId,
+    key: item?.url,
   }));
 
   console.log(menuItems)
@@ -2172,7 +2173,6 @@ ${total}
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     setSelectedFile(e.key);
     message.info('Click on menu item.');
-    console.log('click', e);
   };
   useEffect(() => {
     if (selectedFile) {
