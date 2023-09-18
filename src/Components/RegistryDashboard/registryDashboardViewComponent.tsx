@@ -125,7 +125,6 @@ export const RegistryDashboardComponent = (props: any) => {
     totalProgrammesSectorOptionsLabels,
     setTotalProgrammesSectorOptionsLabels,
   ] = useState<any[]>([]);
-
   // states for totalCredits chart
   const [totalCreditsSeries, setTotalCreditsSeries] = useState<
     ChartSeriesItem[]
@@ -257,8 +256,8 @@ export const RegistryDashboardComponent = (props: any) => {
     useState<MapSourceData>();
   const [programmeLocationsMapLayer, setProgrammeLocationsMapLayer] =
     useState<any>();
-  const [fileList, setFileList] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileList, setFileList] = useState<{ programmeId: string; url: string }[]>([]);
+  const [selectedFile, setSelectedFile] = useState("-");
   const mapType = process.env.REACT_APP_MAP_TYPE
     ? process.env.REACT_APP_MAP_TYPE
     : "None";
@@ -2154,55 +2153,35 @@ ${total}
           body
           ,undefined,
           process.env.REACT_APP_STAT_URL);
-          setFileList(response.data);
+          setFileList(response.data as { programmeId: string; url: string }[]);
         } catch (error) {
           console.error('Error fetching programmeIds:', error);
         }
     };
     fetchProgrammeIds();
-  },  [fileList]);  
-  console.log(fileList)
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    message.info("Click on left button.");
-    console.log("click left button", e);
-  };
+  }, []);  
 
-  const handleMenuClick: MenuProps["onClick"] = (e) => {
-    message.info(`Selected file: ${e.item.label}`);
-    setSelectedFile(e.item);
+  const menuItems : MenuProps["items"] = fileList.map((file, index) => ({
+    label: file.programmeId.slice(2), // Extracting year from programmeId
+    key: file.url, // Using url as the key
+    icon: <DownloadOutlined />,
+  }));
+
+  console.log(menuItems)
+  
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    setSelectedFile(e.key);
+    message.info('Click on menu item.');
+    console.log('click', e);
   };
   useEffect(() => {
     if (selectedFile) {
       console.log(`Selected file:`, selectedFile);
     }
   }, [selectedFile]);
-  const items: MenuProps["items"] = [
-    {
-      label: "2020",
-      key: "1",
-      icon: <DownloadOutlined />,
-    },
-    {
-      label: "2021",
-      key: "2",
-      icon: <DownloadOutlined />,
-    },
-    {
-      label: "2022",
-      key: "3",
-      icon: <DownloadOutlined />,
-      danger: true,
-    },
-    {
-      label: "2023",
-      key: "4",
-      icon: <DownloadOutlined />,
-      danger: true,
-      disabled: true,
-    },
-  ];
+  
   const menuProps = {
-    items,
+    menuItems,
     onClick: handleMenuClick,
   };
 
@@ -2344,11 +2323,13 @@ ${total}
           </Col>
         </Row>
       </div>
+      {(userInfoState?.companyRole === CompanyRole.GOVERNMENT || userInfoState?.companyRole === CompanyRole.CERTIFIER || userInfoState?.companyRole === CompanyRole.MINISTRY )&& (
       <div className="annual-report">
         <div>Annual Statistic Report</div>
         <Dropdown menu={menuProps}>
           <Button className="annual-report-dropdownbutton">
             <Space>
+              {selectedFile}
               <CaretDownOutlined />
             </Space>
           </Button>
@@ -2359,6 +2340,7 @@ ${total}
           </Space>
         </Button>
       </div>
+      )}
       <div className="filter-container">
         <div className="date-filter">
           <RangePicker
