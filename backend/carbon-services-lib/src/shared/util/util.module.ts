@@ -23,6 +23,7 @@ import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { Region } from "../entities/region.entity";
 import { AuthorizationLetterGen } from "./authorisation.letter.gen";
 import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
+import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
 
 @Module({
   imports: [
@@ -67,7 +68,8 @@ import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
     ConfigurationSettingsService,
     ObjectionLetterGen,
     AuthorizationLetterGen,
-    LetterOfIntentRequestGen
+    LetterOfIntentRequestGen,
+    LetterOfIntentResponseGen
   ],
   exports: [
     CounterService,
@@ -77,7 +79,8 @@ import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
     ConfigurationSettingsService,
     ObjectionLetterGen,
     AuthorizationLetterGen,
-    LetterOfIntentRequestGen
+    LetterOfIntentRequestGen,
+    LetterOfIntentResponseGen
   ],
 })
 export class UtilModule {}

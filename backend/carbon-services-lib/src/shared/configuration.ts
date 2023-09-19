@@ -75,7 +75,8 @@ export default () => ({
   docGenerate: {
     ministerName: process.env.MINISTER_NAME || 'Minister X',
     ministryName: "Ministry of Environment, Forestry & Tourism",
-    countryCapital: process.env.COUNTRY_CAPITAL || "Capital X"
+    countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
+    contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM"
 });
