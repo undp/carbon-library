@@ -11,7 +11,7 @@ import { DocType } from '../../shared/enum/document.type';
 @Injectable()
 export class AnnualReportImport implements ImporterInterface {
   constructor(
-    @InjectRepository(ProgrammeDocumentViewEntity)
+    @InjectRepository(ProgrammeDocument)
     private documentRepo: Repository<ProgrammeDocument>,
     private configService: ConfigService,
     private annualReportGen: AnnualReportGen,

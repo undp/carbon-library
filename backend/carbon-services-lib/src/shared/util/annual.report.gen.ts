@@ -273,7 +273,7 @@ export class AnnualReportGen {
     const authprogrammestable = await this.programmeRepo.query(authqry);
     const transfertable = await this.programmeTransfer.query(tranfretireqry);
     const programecount = authprogrammestable.length + transfertable.length;
-
+    addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
     for (const programme of authprogrammestable) {
       const programmeid = programme.programmeId;
       const programmename = programme.title;
@@ -505,7 +505,7 @@ export class AnnualReportGen {
       ]);
     }
     drawTable();
-
+    addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
     doc
       .lineCap('butt')
       .strokeColor('#000000')

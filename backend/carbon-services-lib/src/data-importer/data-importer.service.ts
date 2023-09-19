@@ -11,13 +11,12 @@ import { CompanyService } from '../shared/company/company.service';
 import { Company } from '../shared/entities/company.entity';
 import { AnnualReportImport } from './importers/annual-report.service';
 import { ProgrammeDocument } from '../shared/entities/programme.document';
-import { ProgrammeDocumentViewEntity } from '../shared/entities/document.view.entity';
 import { AnnualReportGen } from '../shared/util/annual.report.gen';
 @Injectable()
 export class DataImporterService {
   constructor(
     @InjectRepository(Company) private companyRepo: Repository<Company>,
-    @InjectRepository(ProgrammeDocumentViewEntity)
+    @InjectRepository(ProgrammeDocument)
     private documentRepo: Repository<ProgrammeDocument>,
     private logger: Logger,
     private configService: ConfigService,

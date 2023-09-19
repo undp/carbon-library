@@ -26,7 +26,6 @@ import { UtilModule } from '../shared/util/util.module';
     TypeOrmModule.forFeature([
       Programme,
       Company,
-      ProgrammeDocumentViewEntity,
       ProgrammeDocument,
     ]),
     ProgrammeModule,
