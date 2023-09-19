@@ -1501,9 +1501,6 @@ export class ProgrammeService {
     
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
         this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
-          if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
-            programme.currentStage = ProgrammeStage.NEW;
-          }
       savedProgramme = await this.programmeLedger.createProgramme(programme);
     }
 
