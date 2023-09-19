@@ -154,6 +154,21 @@ export const EmailTemplates = {
         The {{countryName}} Carbon Credit Registry Team
         `,
   },
+  DOCUMENT_APPROVED: {
+    id: "DOCUMENT_APPROVED",
+    subject: "Document approved",
+    html: `
+        Hi {{name}}, <br><br>
+
+        The {{documentType}} of the programme {{programmeName}} owned by your organisation has been approved. <br><br>
+        
+        Click <a href="{{programmePageLink}}">here</a> for more details of the programme. 
+        <br><br>
+         
+        Sincerely,  <br>
+        The {{countryName}} Transparency System Team 
+        `,
+  },
   CREDIT_ISSUANCE: {
     id: "CREDIT_ISSUANCE",
     subject: "Credits Issued",
