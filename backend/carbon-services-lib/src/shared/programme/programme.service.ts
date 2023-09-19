@@ -1477,7 +1477,7 @@ export class ProgrammeService {
             `/programmeManagement/view?id=${programme.programmeId}`,
         },undefined,undefined,
         {
-          filename: 'REQUEST_FOR_LETTER_OF_INTENT.pdf',
+          filename: 'Request For Letter Of Intent.pdf',
           path: letterOfIntentRequestLetterUrl
         }
       );
@@ -1493,7 +1493,7 @@ export class ProgrammeService {
             `/programmeManagement/view?id=${programme.programmeId}`,
           },undefined,undefined,undefined,
           {
-            filename: 'REQUEST_FOR_LETTER_OF_INTENT.pdf',
+            filename: 'Request For Letter Of Intent.pdf',
             path: letterOfIntentRequestLetterUrl
           }
         );
