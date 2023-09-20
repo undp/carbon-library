@@ -26,9 +26,8 @@ export class AnnualReportGen {
     const date = Number(new Date().getFullYear()) - 1;
     //Report in PDF format
     const doc = new PDFDocument({ margin: 30, size: 'B0' });
-    const stream = fs.createWriteStream(
-      './tmp/' + `Annual_Report_${country}_${date}.pdf`,
-    );
+    const filepath = `Annual_Report_${country}_${date}.pdf`
+    const stream = fs.createWriteStream("/tmp/" + filepath);
     doc.pipe(stream);
     doc.font('Times-Roman');
     doc.fontSize(11);
@@ -553,20 +552,19 @@ export class AnnualReportGen {
       );
 
     doc.end();
+    
     const content = await new Promise<string>((resolve) => {
-      stream.on('finish', function () {
-        const contents = fs.readFileSync(
-          '/tmp/' + `Annual_Report_${country}_${date}.pdf`,
-          {
-            encoding: 'base64',
-          },
-        );
+      stream.on("finish", function () {
+        const contents = fs.readFileSync("/tmp/" + filepath, {
+          encoding: "base64",
+        });
         resolve(contents);
       });
     });
+
     const url = await this.fileHandler.uploadFile(
-      'documents/' + `Annual_Report_${country}_${date}.pdf`,
-      content,
+      "documents/" + filepath,
+      content
     );
 
     return url;
