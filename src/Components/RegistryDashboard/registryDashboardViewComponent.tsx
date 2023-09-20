@@ -8,8 +8,16 @@ import {
   Skeleton,
   Tooltip,
   message,
+  Dropdown,
+  Space,
 } from "antd";
+import type { MenuProps } from "antd";
 import "./dashboard.scss";
+import {
+  LinkOutlined,
+  DownloadOutlined,
+  CaretDownOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import {
   ClockHistory,
@@ -117,7 +125,6 @@ export const RegistryDashboardComponent = (props: any) => {
     totalProgrammesSectorOptionsLabels,
     setTotalProgrammesSectorOptionsLabels,
   ] = useState<any[]>([]);
-
   // states for totalCredits chart
   const [totalCreditsSeries, setTotalCreditsSeries] = useState<
     ChartSeriesItem[]
@@ -250,6 +257,9 @@ export const RegistryDashboardComponent = (props: any) => {
   const [programmeLocationsMapLayer, setProgrammeLocationsMapLayer] =
     useState<any>();
 
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [selectedFile, setSelectedFile] = useState("-");
+  const [selectedurl, setSelectedurl] = useState<string>(" ");
   const mapType = process.env.REACT_APP_MAP_TYPE
     ? process.env.REACT_APP_MAP_TYPE
     : "None";
@@ -282,7 +292,6 @@ export const RegistryDashboardComponent = (props: any) => {
       ],
     };
   };
-
   const getAllProgrammeAnalyticsStatsParams = () => {
     if (userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER) {
       return {
@@ -2120,6 +2129,71 @@ ${total}
 
     return currentMarkers;
   };
+  const fetchProgrammeIds = async () => {
+    try {
+      const responses = await post("national/programme/queryDocs", {
+        page: 1,
+        size: 100,
+        filterAnd: [
+          {
+            key: "type",
+            operation: "=",
+            value: "6",
+          },
+        ],
+      });
+      let data = await responses.data;
+      if (data && data.length > 0) {
+        // response.data.map((item:any)=>{
+        //   setFileList(item?.programmeId)
+        //   setSelectedurl(item?.url)
+        // })
+        // setFileList(responses.data[0] ?? [])
+       
+        const initlist = [];
+        for (let i = 0; i < data.length; i++) {
+          const newreports = {
+            label: data[i].programmeId.slice(2),
+            key: data[i].url,
+          };
+          initlist.push(newreports);
+        }
+        setFileList(initlist);
+      }
+    } catch (error) {
+      console.error("Error fetching AnnualReports:", error);
+    }
+  };
+  useEffect(() => {
+    if (userInfoState?.companyRole !== CompanyRole.PROGRAMME_DEVELOPER) {
+      fetchProgrammeIds();
+    }
+  }, []);
+  const fileListFlat = fileList.flat();
+  const items: MenuProps["items"] = fileListFlat.map((item) => ({
+    label: item.label,
+    key: item.key,
+  }));
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    setSelectedurl(String(e.key));
+    const parts = String(e.key).split("/");
+    const fileName = parts[parts.length - 1];
+    const fileNameWithoutExtension = fileName.replace(".pdf", "");
+    const lastFourElements = fileNameWithoutExtension.slice(-4);
+    setSelectedFile(lastFourElements);
+  };
+  useEffect(() => {
+    if (selectedurl) {
+      // console.log(`Selected file:`, selectedurl);
+      // console.log("Selected url", selectedFile);
+    }
+  }, [selectedurl, selectedFile]);
+
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
 
   return (
     <div className="dashboard-main-container">
@@ -2259,6 +2333,37 @@ ${total}
           </Col>
         </Row>
       </div>
+      {(userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+        userInfoState?.companyRole === CompanyRole.CERTIFIER ||
+        userInfoState?.companyRole === CompanyRole.MINISTRY) &&
+        fileList.length > 0 && (
+          <div className="annual-report">
+            <div>Annual Statistic Report</div>
+            <Dropdown menu={menuProps}>
+              <Button className="annual-report-dropdownbutton">
+                <Space>
+                  {selectedFile}
+                  <CaretDownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+            <Button className="annual-report-downloadbutton">
+              <Space>
+                <a
+                  href={selectedurl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                >
+                  <LinkOutlined
+                    className="common-progress-icon"
+                    style={{ color: "#3F3A47" }}
+                  />
+                </a>
+              </Space>
+            </Button>
+          </div>
+        )}
       <div className="filter-container">
         <div className="date-filter">
           <RangePicker

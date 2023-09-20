@@ -22,9 +22,12 @@ import { ObjectionLetterGen } from "./objection.letter.gen";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { Region } from "../entities/region.entity";
 import { AuthorizationLetterGen } from "./authorisation.letter.gen";
+import { AnnualReportGen } from "./annual.report.gen";
+import { Programme } from "../entities/programme.entity";
+import { ProgrammeTransfer } from "../entities/programme.transfer";
+import { Company } from "../entities/company.entity";
 import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,28 +38,31 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
       imports: undefined,
-    }),
+    }),FileHandlerModule,
     I18nModule.forRoot({
-      fallbackLanguage: "en",
+      fallbackLanguage: 'en',
       loaderOptions: {
-        path: path.join(__dirname, "../../i18n/"),
+        path: path.join(__dirname, '../../i18n/'),
         watch: true,
       },
       resolvers: [
-        { use: QueryResolver, options: ["lang"] },
+        { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
       ],
     }),
     TypeOrmModule.forFeature([
       Counter,
       Country,
+      Company,
       PasswordReset,
       User,
+      Programme,
+      ProgrammeTransfer,
       ConfigurationSettings,
-      Region
+      Region,
     ]),
     forwardRef(() => AsyncOperationsModule),
-    FileHandlerModule
+    FileHandlerModule,
   ],
   providers: [
     CounterService,
@@ -69,7 +75,8 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     ObjectionLetterGen,
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
-    LetterOfIntentResponseGen
+    LetterOfIntentResponseGen,
+    AnnualReportGen
   ],
   exports: [
     CounterService,
@@ -80,7 +87,8 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     ObjectionLetterGen,
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
-    LetterOfIntentResponseGen
+    LetterOfIntentResponseGen,
+    AnnualReportGen
   ],
 })
 export class UtilModule {}
