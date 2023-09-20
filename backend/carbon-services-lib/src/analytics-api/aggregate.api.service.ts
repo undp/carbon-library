@@ -1985,15 +1985,4 @@ export class AggregateAPIService {
 
     return data;
   }
-  
-  findAll(query: QueryDto) {
-    return this.documentRepo
-      .createQueryBuilder('annualreport')
-      .select(['annualreport.programmeId', 'annualreport.externalId', 'annualreport.url', 'annualreport.type', 'annualreport.txTime'])
-      .where(this.helperService.generateWhereSQL(query, undefined))
-      .orderBy(query?.sort?.key && `"${query?.sort?.key}"`, query?.sort?.order)
-      .offset(query.size * query.page - query.size)
-      .limit(query.size) 
-      .getManyAndCount();
-  }
 }

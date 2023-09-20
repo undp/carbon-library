@@ -2131,7 +2131,7 @@ ${total}
   };
   const fetchProgrammeIds = async () => {
     try {
-      const responses = await post("stats/programme/annualreportDocs", {
+      const responses = await post("national/programme/queryDocs", {
         page: 1,
         size: 100,
         filterAnd: [

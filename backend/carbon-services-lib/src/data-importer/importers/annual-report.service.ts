@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ImporterInterface } from '../importer.interface';
 import { AnnualReportGen } from '../../shared/util/annual.report.gen';
-import { ProgrammeDocumentViewEntity } from '../../shared/entities/document.view.entity';
 import { ProgrammeDocument } from '../../shared/entities/programme.document';
 import { DocumentStatus } from '../../shared/enum/document.status';
 import { DocType } from '../../shared/enum/document.type';

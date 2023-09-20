@@ -46,8 +46,4 @@ export class ProgrammeController {
       query.system
     );
   }
-  @Post('annualreportDocs')
-  findAll(@Body() query: QueryDto): any{
-   return this.aggService.findAll(query);
-  }
 }
