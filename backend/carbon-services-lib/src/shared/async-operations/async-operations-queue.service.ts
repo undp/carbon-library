@@ -57,7 +57,7 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
         },
       },
       MessageBody: JSON.stringify(action.actionProps),
-      MessageGroupId: action.actionType.toString() + new Date().getTime()
+      MessageGroupId: this.configService.get("systemType")
     });
 
     try {
