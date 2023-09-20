@@ -2142,14 +2142,14 @@ ${total}
           },
         ],
       });
-
-      let data = await responses.data[0];
+      let data = await responses.data;
       if (data && data.length > 0) {
         // response.data.map((item:any)=>{
         //   setFileList(item?.programmeId)
         //   setSelectedurl(item?.url)
         // })
         // setFileList(responses.data[0] ?? [])
+       
         const initlist = [];
         for (let i = 0; i < data.length; i++) {
           const newreports = {

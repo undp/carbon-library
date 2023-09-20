@@ -73,7 +73,10 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     Logger,
     ConfigurationSettingsService,
     ObjectionLetterGen,
-    AuthorizationLetterGen
+    AuthorizationLetterGen,
+    LetterOfIntentRequestGen,
+    LetterOfIntentResponseGen,
+    AnnualReportGen
   ],
   exports: [
     CounterService,
