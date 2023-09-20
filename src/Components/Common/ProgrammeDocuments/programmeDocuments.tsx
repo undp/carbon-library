@@ -56,6 +56,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     translator,
     methodologyDocumentUpdated,
   } = props;
+  
   const t = translator.t;
   const { userInfoState } = useUserContext();
   const { delete: del, post } = useConnection();
@@ -232,7 +233,6 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     userInfoState?.userRole !== Role.ViewOnly;
 
   const designDocPending = designDocStatus === DocumentStatus.PENDING;
-
   return loading ? (
     <Skeleton />
   ) : (

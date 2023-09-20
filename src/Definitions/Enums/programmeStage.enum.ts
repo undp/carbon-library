@@ -1,5 +1,6 @@
 export enum ProgrammeStageR {
   AwaitingAuthorization = "Pending",
+  Approved = "Approved",
   Authorised = "Authorised",
   Rejected = "Rejected",
 }

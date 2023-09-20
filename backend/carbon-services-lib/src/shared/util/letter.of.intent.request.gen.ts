@@ -41,7 +41,7 @@ export class LetterOfIntentRequestGen {
             align: "right",
         });
 
-        doc.text(`\n\nDear Ministry of Environment, Forestry and Tourism`, {
+        doc.text(`\n\nDear Ministry of Environment, Forestry and Tourism,`, {
             align: "left",
         });
 
@@ -63,11 +63,11 @@ export class LetterOfIntentRequestGen {
             align: "left",
         });
 
-        doc.text(`\n\nThank you`, {
+        doc.text(`\n\nThank you.`, {
             align: "left",
         });
 
-        doc.text(`\n\nYours faithfully`, {
+        doc.text(`\n\nYours faithfully,`, {
             align: "left",
         });
 

@@ -294,9 +294,11 @@ export class EmailHelperService {
           ),
         },
       };
+
       if(attachments){
         action.actionProps["attachments"] = attachments;
       }
+      
       await this.asyncOperationsInterface.AddAction(action);
     });
   }

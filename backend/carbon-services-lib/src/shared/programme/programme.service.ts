@@ -86,6 +86,7 @@ import { ProgrammeAuth } from "../dto/programme.auth";
 import { AuthorizationLetterGen } from "../util/authorisation.letter.gen";
 import { ProgrammeDocumentRegistryDto } from "../dto/programme.document.registry.dto";
 import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
+import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -133,6 +134,7 @@ export class ProgrammeService {
     @InjectRepository(NDCActionViewEntity)
     private ndcActionViewRepo: Repository<NDCActionViewEntity>,
     private letterOfIntentRequestGen: LetterOfIntentRequestGen,
+    private letterOfIntentResponseGen: LetterOfIntentResponseGen
   ) {}
 
   private fileExtensionMap = new Map([
@@ -934,6 +936,10 @@ export class ProgrammeService {
       
     });
 
+    if (resp && d.type === DocType.DESIGN_DOCUMENT) {
+      await this.sendLetterOfIntentResponse(pr);
+    }
+
     return new BasicResponseDto(
       HttpStatus.OK,
       this.helperService.formatReqMessagesString(
@@ -941,6 +947,46 @@ export class ProgrammeService {
         []
       )
     );
+  }
+
+  async sendLetterOfIntentResponse(programme: Programme) {
+
+    const programCreatedDate = new Date(programme.createdAt);
+
+    const month = programCreatedDate.toLocaleString("default", { month: "long" });
+    const year = programCreatedDate.getFullYear();
+    const hostAddress = this.configService.get("host");
+
+    for (const companyId of programme.companyId) {
+      const company = await this.companyService.findByCompanyId(companyId);
+      const letterOfIntentResponseLetterUrl =
+        await this.letterOfIntentResponseGen.generateLetter(
+          programme.programmeId,
+          programme.title,
+          company.companyId,
+          company.name,
+          company.address,
+          month,
+          year
+        );
+
+      await this.emailHelperService.sendEmailToOrganisationAdmins(
+        companyId,
+        EmailTemplates.DOCUMENT_APPROVED,
+        {
+          documentType: "Design document",
+          programmeName: programme.title,
+          programmePageLink:
+            hostAddress +
+            `/programmeManagement/view?id=${programme.programmeId}`,
+        }, undefined, undefined, undefined,
+        {
+          filename: 'Letter of Intent Response.pdf',
+          path: letterOfIntentResponseLetterUrl
+        }
+      );
+    }
+
   }
 
   async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
@@ -1426,32 +1472,32 @@ export class ProgrammeService {
         }
       }
       
-      if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
-  
-        savedProgramme = await this.entityManager
-          .transaction(async (em) => {
-            if (ndcAc) {
-              await em.save<NDCAction>(ndcAc);
-              if (monitoringReport) {
-                await em.save<ProgrammeDocument>(monitoringReport);
-              }
+      savedProgramme = await this.entityManager
+        .transaction(async (em) => {
+          if (ndcAc) {
+            await em.save<NDCAction>(ndcAc);
+            if (monitoringReport) {
+              await em.save<ProgrammeDocument>(monitoringReport);
             }
-            if (dr) {
-              await em.save<ProgrammeDocument>(dr);
-            }
-            return await em.save<Programme>(programme);
-          })
-          .catch((err: any) => {
-            console.log(err);
-            if (err instanceof QueryFailedError) {
-              throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-            } else {
-              this.logger.error(`Programme add error ${err}`);
-            }
-            return err;
-          });
-      }
+          }
+          if (dr) {
+            await em.save<ProgrammeDocument>(dr);
+          }
+          if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
+          return await em.save<Programme>(programme);
+          }
+        })
+        .catch((err: any) => {
+          console.log(err);
+          if (err instanceof QueryFailedError) {
+            throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+          } else {
+            this.logger.error(`Programme add error ${err}`);
+          }
+          return err;
+      });
     }
+    
     
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
         this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
@@ -1477,10 +1523,27 @@ export class ProgrammeService {
             `/programmeManagement/view?id=${programme.programmeId}`,
         },undefined,undefined,
         {
-          filename: 'REQUEST_FOR_LETTER_OF_INTENT.pdf',
+          filename: 'Request For Letter Of Intent.pdf',
           path: letterOfIntentRequestLetterUrl
         }
       );
+
+      savedProgramme.companyId.forEach(async (companyId) => {
+        await this.emailHelperService.sendEmailToOrganisationAdmins(
+          companyId,
+          EmailTemplates.PROGRAMME_CREATE,
+          {
+            organisationName: orgNamesList,
+            programmePageLink:
+            hostAddress +
+            `/programmeManagement/view?id=${programme.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'Request For Letter Of Intent.pdf',
+            path: letterOfIntentRequestLetterUrl
+          }
+        );
+      });
     }
 
     return savedProgramme;
