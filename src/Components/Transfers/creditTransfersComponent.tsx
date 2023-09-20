@@ -98,6 +98,9 @@ export const CreditTransferComponent = (props: any) => {
   const [companyIdsVal, setCompanyIdsVal] = useState<number[]>();
   const [creditAmount, setCreditAmount] = useState<number>(0);
   const { isTransferFrozen, setTransferFrozen } = useSettingsContext();
+  const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
+  const [ministryLevelFilter, setMinistryLevelFilter] =
+    useState<boolean>(false);
 
   const onStatusQuery = async (checkedValues: CheckboxValueType[]) => {
     console.log(checkedValues);
@@ -176,6 +179,14 @@ export const CreditTransferComponent = (props: any) => {
       };
     }
 
+    let filterBy: any;
+    if (ministryLevelFilter) {
+      filterBy = {
+        key: "ministryLevel",
+        value: ministrySectoralScope,
+      };
+    }
+
     try {
       const response: any = await post("national/programme/transferQuery", {
         page: currentPage,
@@ -183,6 +194,7 @@ export const CreditTransferComponent = (props: any) => {
         filterAnd: filter,
         filterOr: dataFilter,
         sort: sort,
+        filterBy: filterBy,
       });
 
       console.log(response);
@@ -201,6 +213,36 @@ export const CreditTransferComponent = (props: any) => {
     }
   };
 
+    const getUserDetails = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/user/query", {
+        page: 1,
+        size: 10,
+        filterAnd: [
+          {
+            key: "id",
+            operation: "=",
+            value: userInfoState?.id,
+          },
+        ],
+      });
+      if (response && response.data) {
+        if (
+          response?.data[0]?.companyRole === CompanyRole.MINISTRY &&
+          response?.data[0]?.company &&
+          response?.data[0]?.company?.sectoralScope
+        ) {
+          setMinistrySectoralScope(response?.data[0]?.company?.sectoralScope);
+        }
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in getting users", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
@@ -211,7 +253,13 @@ export const CreditTransferComponent = (props: any) => {
 
   useEffect(() => {
     getAllTransfers();
-  }, [currentPage, pageSize, sortField, sortOrder, search]);
+  }, [currentPage, pageSize, sortField, sortOrder, search, ministryLevelFilter]);
+
+  useEffect(() => {
+    if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
+      getUserDetails();
+    }
+  }, []);
 
   const handleRequestOk = async (
     reqId: number,
@@ -808,6 +856,21 @@ export const CreditTransferComponent = (props: any) => {
                 >
                   {t("view:seeMine")}
                 </Checkbox>
+
+                {userInfoState?.companyRole === CompanyRole.MINISTRY && (
+                  <Checkbox
+                    className="label"
+                    onChange={(v) => {
+                      if (v.target.checked) {
+                        setMinistryLevelFilter(true);
+                      } else {
+                        setMinistryLevelFilter(false);
+                      }
+                    }}
+                  >
+                    {t("ndcAction:ministryLevel")}
+                  </Checkbox>
+                )}
               </div>
               <div className="search-bar">
                 <Search

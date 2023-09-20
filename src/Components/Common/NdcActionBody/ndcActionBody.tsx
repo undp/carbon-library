@@ -35,7 +35,9 @@ export interface NdcActionBodyProps {
   uploadDocUserPermission: any;
 }
 
-export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps) => {
+export const NdcActionBody: FC<NdcActionBodyProps> = (
+  props: NdcActionBodyProps
+) => {
   const {
     data,
     programmeId,
@@ -94,7 +96,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     }
     setLoading(true);
     const logoBase64 = await getBase64(file as RcFile);
-    
+
     try {
       if (isValidateFileType(file?.type)) {
         const response: any = await post("national/programme/addDocument", {
@@ -196,9 +198,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
   }, [data]);
 
   const companyRolePermission =
-    (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
-      (userInfoState?.companyRole === CompanyRole.MINISTRY &&
-        ministryLevelPermission)) &&
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
     userInfoState?.userRole !== Role.ViewOnly;
 
   const verficationCompanyRolePermission =
@@ -240,7 +240,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
             <div className="icon">
               {monitoringReportData?.url ? (
                 monitoringReportPending ? (
-                  companyRolePermission && (
+                  (companyRolePermission || ministryLevelPermission) && (
                     <>
                       <LikeOutlined
                         onClick={() =>
@@ -466,7 +466,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
             <div className="icon">
               {verificationReportData?.url ? (
                 verifcationReportPending ? (
-                  verficationCompanyRolePermission && (
+                  (verficationCompanyRolePermission ||
+                    ministryLevelPermission) && (
                     <>
                       <LikeOutlined
                         onClick={() =>
@@ -690,4 +691,3 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (props: NdcActionBodyProps)
     </>
   );
 };
-
