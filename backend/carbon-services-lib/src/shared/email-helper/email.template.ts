@@ -110,13 +110,13 @@ export const EmailTemplates = {
   },
   PROGRAMME_CREATE: {
     id: "PROGRAMME_CREATE",
-    subject: "New Programme Received for Authorisation",
+    subject: "New Programme Created",
     html: `
         Hi {{name}}, <br><br>
 
-        A new programme owned by {{organisationName}} is awaiting authorisation. <br><br>
+        A new programme owned by {{organisationName}} has been created in the Carbon Registry. <br><br>
 
-        Click <a href="{{programmePageLink}}">here</a> to access all the programmes that require authorisation.
+        Click <a href="{{programmePageLink}}">here</a> for more details of the programme.
         <br><br>
 
         Sincerely,  <br>
@@ -152,6 +152,21 @@ export const EmailTemplates = {
 
         Sincerely, <br>
         The {{countryName}} Carbon Credit Registry Team
+        `,
+  },
+  DOCUMENT_APPROVED: {
+    id: "DOCUMENT_APPROVED",
+    subject: "Document approved",
+    html: `
+        Hi {{name}}, <br><br>
+
+        The {{documentType}} of the programme {{programmeName}} owned by your organisation has been approved. <br><br>
+        
+        Click <a href="{{programmePageLink}}">here</a> for more details of the programme. 
+        <br><br>
+         
+        Sincerely,  <br>
+        The {{countryName}} Transparency System Team 
         `,
   },
   CREDIT_ISSUANCE: {

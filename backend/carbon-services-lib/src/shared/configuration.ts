@@ -2,6 +2,7 @@ export default () => ({
   stage: process.env.STAGE || "local",
   systemCountry: process.env.systemCountryCode || "NG",
   systemCountryName: process.env.systemCountryName || "CountryX",
+  systemContinentName: process.env.systemContinentName || "CountryX",
   defaultCreditUnit: process.env.defaultCreditUnit || "ITMO",
   dateTimeFormat: "DD LLLL yyyy @ HH:mm",
   dateFormat: "DD LLLL yyyy",
@@ -68,12 +69,14 @@ export default () => ({
   },
   registry: {
     syncEnable: process.env.SYNC_ENABLE || false,
-    endpoint: process.env.MRV_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
-    apiToken: process.env.MRV_API_TOKEN
+    endpoint: process.env.SYNC_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
+    apiToken: process.env.SYNC_API_TOKEN
   },
   docGenerate: {
     ministerName: process.env.MINISTER_NAME || 'Minister X',
     ministryName: "Ministry of Environment, Forestry & Tourism",
-    countryCapital: process.env.COUNTRY_CAPITAL || "Capital X"
-  }
+    countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
+    contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
+  },
+  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM"
 });

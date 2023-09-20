@@ -27,7 +27,6 @@ import {
 } from "../../../Definitions/Definitions/programme.definitions";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { ProgrammeManagementColumns } from "../../../Definitions/Enums/programme.management.columns.enum";
-import { User } from "../../../Definitions/Entities/user";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";

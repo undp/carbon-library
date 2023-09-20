@@ -1,31 +1,33 @@
-import { forwardRef, Logger, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
-import * as path from 'path';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import configuration from '../configuration';
-import { Counter } from '../entities/counter.entity';
-import { Country } from '../entities/country.entity';
-import { TypeOrmConfigService } from '../typeorm.config.service';
-import { CounterService } from './counter.service';
-import { CountryService } from './country.service';
-import { HelperService } from './helpers.service';
-import { IsValidCountryConstraint } from './validcountry.decorator';
-import { PasswordReset } from '../entities/userPasswordResetToken.entity';
-import { PasswordResetService } from './passwordReset.service';
-import { User } from '../entities/user.entity';
-import { UserModule } from '../user/user.module';
-import { AsyncOperationsModule } from '../async-operations/async-operations.module';
-import { ConfigurationSettingsService } from './configurationSettings.service';
-import { ConfigurationSettings } from '../entities/configuration.settings';
-import { ObjectionLetterGen } from './objection.letter.gen';
-import { FileHandlerModule } from '../file-handler/filehandler.module';
-import { Region } from '../entities/region.entity';
-import { AuthorizationLetterGen } from './authorisation.letter.gen';
+import { forwardRef, Logger, Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { AcceptLanguageResolver, I18nModule, QueryResolver } from "nestjs-i18n";
+import * as path from "path";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import configuration from "../configuration";
+import { Counter } from "../entities/counter.entity";
+import { Country } from "../entities/country.entity";
+import { TypeOrmConfigService } from "../typeorm.config.service";
+import { CounterService } from "./counter.service";
+import { CountryService } from "./country.service";
+import { HelperService } from "./helpers.service";
+import { IsValidCountryConstraint } from "./validcountry.decorator";
+import { PasswordReset } from "../entities/userPasswordResetToken.entity";
+import { PasswordResetService } from "./passwordReset.service";
+import { User } from "../entities/user.entity";
+import { UserModule } from "../user/user.module";
+import { AsyncOperationsModule } from "../async-operations/async-operations.module";
+import { ConfigurationSettingsService } from "./configurationSettings.service";
+import { ConfigurationSettings } from "../entities/configuration.settings";
+import { ObjectionLetterGen } from "./objection.letter.gen";
+import { FileHandlerModule } from "../file-handler/filehandler.module";
+import { Region } from "../entities/region.entity";
+import { AuthorizationLetterGen } from "./authorisation.letter.gen";
 import { AnnualReportGen } from "./annual.report.gen";
 import { Programme } from "../entities/programme.entity";
 import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { Company } from "../entities/company.entity";
+import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
+import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -71,8 +73,7 @@ import { Company } from "../entities/company.entity";
     Logger,
     ConfigurationSettingsService,
     ObjectionLetterGen,
-    AuthorizationLetterGen,
-    AnnualReportGen
+    AuthorizationLetterGen
   ],
   exports: [
     CounterService,
@@ -82,6 +83,8 @@ import { Company } from "../entities/company.entity";
     ConfigurationSettingsService,
     ObjectionLetterGen,
     AuthorizationLetterGen,
+    LetterOfIntentRequestGen,
+    LetterOfIntentResponseGen,
     AnnualReportGen
   ],
 })

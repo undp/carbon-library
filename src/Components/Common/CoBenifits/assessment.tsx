@@ -17,6 +17,7 @@ import React, { useEffect, useState } from "react";
 import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import { RcFile } from "antd/lib/upload";
 import { RadioButtonStatus, getBase64, titleList } from "../../../Definitions";
+import { isValidateFileType } from "../../../Utils/DocumentValidator";
 
 const Assessment = (props: any) => {
   const {
@@ -117,11 +118,12 @@ const Assessment = (props: any) => {
           const base64Value = await getBase64(
             changedField.value[0].originFileObj as RcFile
           );
-          const values = base64Value.split(",");
+          console.log("FEAsibility document : ", base64Value);
+          const values = base64Value;
 
           setCobenefitsAssessmentDetails((pre: any) => ({
             ...pre,
-            document: values[1],
+            document: values,
           }));
         } else {
           changedValues[changedField.name[0]] = changedField.value;
@@ -800,11 +802,7 @@ const Assessment = (props: any) => {
                       {
                         validator: async (rule, file) => {
                           if (file?.length > 0) {
-                            let isCorrectFormat = false;
-                            if (file[0]?.type === "application/pdf") {
-                              isCorrectFormat = true;
-                            }
-                            if (!isCorrectFormat) {
+                            if (!isValidateFileType(file[0]?.type)) {
                               throw new Error(`${t("invalidFileFormat")}`);
                             } else if (file[0]?.size > maximumFileSize) {
                               throw new Error(`${t("common:maxSizeVal")}`);
@@ -815,7 +813,7 @@ const Assessment = (props: any) => {
                     ]}
                   >
                     <Upload
-                      accept=".pdf"
+                      accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
                       beforeUpload={(file: any) => {
                         return false;
                       }}
