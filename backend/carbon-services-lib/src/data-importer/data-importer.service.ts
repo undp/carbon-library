@@ -36,8 +36,7 @@ export class DataImporterService {
           this.userService,
           this.programmeService,
         );
-    }
-    switch (type) {
+        break;
       case 'CERTIFIER_SCRAPING':
         return new CertifierScrapeService(
           this.companyRepo,
@@ -46,14 +45,14 @@ export class DataImporterService {
           this.companyService,
           this.userService,
         );
-    }
-    switch (type) {
+        break
       case 'ANNUAL_REPORT':
         return new AnnualReportImport(
           this.documentRepo,
           this.configService,
           this.annualReportGen,
         );
+        break
     }
     return null;
   }
