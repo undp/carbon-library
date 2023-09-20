@@ -56,7 +56,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     translator,
     methodologyDocumentUpdated,
   } = props;
-  
+
   const t = translator.t;
   const { userInfoState } = useUserContext();
   const { delete: del, post } = useConnection();
@@ -251,32 +251,33 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 >
                   {t("programme:designDoc")}
                 </div>
-                {designDocPending && designDocActionPermission && (
-                  <>
-                    <LikeOutlined
-                      onClick={() =>
-                        docAction(designDocId, DocumentStatus.ACCEPTED)
-                      }
-                      className="common-progress-icon"
-                      style={{ color: "#976ED7" }}
-                    />
-                    <DislikeOutlined
-                      onClick={() => {
-                        setRejectDocData({ id: designDocId });
-                        setActionInfo({
-                          action: "Reject",
-                          headerText: `${t("programme:rejectDocHeader")}`,
-                          text: `${t("programme:rejectDocBody")}`,
-                          type: "reject",
-                          icon: <DislikeOutlined />,
-                        });
-                        setOpenRejectDocConfirmationModal(true);
-                      }}
-                      className="common-progress-icon margin-left-1"
-                      style={{ color: "#FD6F70" }}
-                    />
-                  </>
-                )}
+                {designDocPending &&
+                  (designDocActionPermission || ministryLevelPermission) && (
+                    <>
+                      <LikeOutlined
+                        onClick={() =>
+                          docAction(designDocId, DocumentStatus.ACCEPTED)
+                        }
+                        className="common-progress-icon"
+                        style={{ color: "#976ED7" }}
+                      />
+                      <DislikeOutlined
+                        onClick={() => {
+                          setRejectDocData({ id: designDocId });
+                          setActionInfo({
+                            action: "Reject",
+                            headerText: `${t("programme:rejectDocHeader")}`,
+                            text: `${t("programme:rejectDocBody")}`,
+                            type: "reject",
+                            icon: <DislikeOutlined />,
+                          });
+                          setOpenRejectDocConfirmationModal(true);
+                        }}
+                        className="common-progress-icon margin-left-1"
+                        style={{ color: "#FD6F70" }}
+                      />
+                    </>
+                  )}
                 {designDocStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
@@ -476,7 +477,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   {t("programme:methDoc")}
                 </div>
                 {methodDocStatus === DocumentStatus.PENDING &&
-                  companyRolePermission && (
+                  (companyRolePermission || ministryLevelPermission) && (
                     <>
                       <LikeOutlined
                         onClick={() =>
@@ -716,4 +717,3 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     </>
   );
 };
-
