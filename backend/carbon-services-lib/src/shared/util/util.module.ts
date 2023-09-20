@@ -24,6 +24,7 @@ import { Region } from "../entities/region.entity";
 import { AuthorizationLetterGen } from "./authorisation.letter.gen";
 import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
+import { LetterOfAuthorisationRequestGen } from "./letter.of.authorisation.request.gen";
 
 @Module({
   imports: [
@@ -69,7 +70,8 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     ObjectionLetterGen,
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
-    LetterOfIntentResponseGen
+    LetterOfIntentResponseGen,
+    LetterOfAuthorisationRequestGen
   ],
   exports: [
     CounterService,
@@ -80,7 +82,8 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     ObjectionLetterGen,
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
-    LetterOfIntentResponseGen
+    LetterOfIntentResponseGen,
+    LetterOfAuthorisationRequestGen
   ],
 })
 export class UtilModule {}

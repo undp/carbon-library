@@ -166,7 +166,7 @@ export const EmailTemplates = {
         <br><br>
          
         Sincerely,  <br>
-        The {{countryName}} Transparency System Team 
+        The {{countryName}} Carbon Credit Registry Team 
         `,
   },
   CREDIT_ISSUANCE: {
@@ -342,6 +342,20 @@ export const EmailTemplates = {
 
         Sincerely, <br>
         The {{countryName}} Carbon Credit Registry Team
+        `,
+  },
+  PROGRAMME_APPROVED: {
+    id: "PROGRAMME_APPROVED",
+    subject: "New Programme Received for Authorisation",
+    html: `
+        Hi {{name}},<br><br>
+
+        A new programme owned by {{organisationName}} is awaiting authorisation. <br><br>
+
+        Click <a href="{{programmePageLink}}">here</a> to access all the programmes that require authorisation. <br><br>
+        
+        Sincerely, <br>
+        The {{countryName}} Transparency System Team
         `,
   },
   PROGRAMME_CERTIFICATION: {
