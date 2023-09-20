@@ -556,7 +556,7 @@ export class AnnualReportGen {
     const content = await new Promise<string>((resolve) => {
       stream.on('finish', function () {
         const contents = fs.readFileSync(
-          './tmp/' + `Annual_Report_${country}_${date}.pdf`,
+          '/tmp/' + `Annual_Report_${country}_${date}.pdf`,
           {
             encoding: 'base64',
           },

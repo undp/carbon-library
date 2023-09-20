@@ -15,7 +15,6 @@ import { Action } from "../shared/casl/action.enum";
 import { PoliciesGuardEx } from "../shared/casl/policy.guard";
 import { Stat } from "../shared/dto/stat.dto";
 import { AggregateAPIService } from "./aggregate.api.service";
-import { QueryDto } from "../shared/dto/query.dto";
 
 @ApiTags("Programme")
 @ApiBearerAuth()

@@ -15,7 +15,6 @@ import { TypeOrmConfigService } from "../shared/typeorm.config.service";
 import { ProgrammeController } from "./programme.controller";
 import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
-import { ProgrammeDocument } from "../shared/entities/programme.document";
 
 @Module({
   imports: [
@@ -31,7 +30,6 @@ import { ProgrammeDocument } from "../shared/entities/programme.document";
     TypeOrmModule.forFeature([
       Programme,
       ProgrammeTransfer,
-      ProgrammeDocument,
       ProgrammeTransferViewEntityQuery,
       Company,
       NDCActionViewEntity,
