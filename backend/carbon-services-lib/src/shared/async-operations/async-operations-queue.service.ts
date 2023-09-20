@@ -50,7 +50,6 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
 
     const params = new SendMessageCommand({
       QueueUrl: this.configService.get("asyncQueueName"),
-      DelaySeconds: 10,
       MessageAttributes: {
         actionType: {
           DataType: "Number",
