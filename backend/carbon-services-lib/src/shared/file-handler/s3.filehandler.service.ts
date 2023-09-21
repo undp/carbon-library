@@ -27,7 +27,7 @@ export class S3FileHandlerService implements FileHandlerInterface {
       Key: path,
       Body: imgBuffer,
       ContentEncoding: "base64",
-      ContentType: "image/png",
+      //ContentType: "image/png",
     })
     const resp = await this.client.send(putCommand)
 
