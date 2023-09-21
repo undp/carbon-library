@@ -3210,7 +3210,7 @@ export class ProgrammeService {
       this.configService.get("systemCountry")
     );
 
-    if (requestedCompany.companyRole != CompanyRole.GOVERNMENT) {
+    if (requestedCompany.companyRole != CompanyRole.GOVERNMENT && requestedCompany.companyRole != CompanyRole.MINISTRY) {
       if (!req.fromCompanyIds) {
         req.fromCompanyIds = [requester.companyId];
       }
