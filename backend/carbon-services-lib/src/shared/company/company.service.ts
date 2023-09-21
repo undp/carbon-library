@@ -488,4 +488,13 @@ export class CompanyService {
 
     return response;
   }
+
+  async getSectoralScopeMinistry(sectorId: any) {
+    const resp = await this.companyRepo
+      .createQueryBuilder()
+      .where(`"companyRole" = 'Ministry' AND '${sectorId}' = ANY("sectoralScope")`)
+      .getMany();
+
+    return resp;
+  }
 }

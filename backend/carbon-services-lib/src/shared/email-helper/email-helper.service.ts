@@ -308,7 +308,8 @@ export class EmailHelperService {
     templateData: any,
     programmeId?: string,
     companyId?: number,
-    attachments?: any
+    attachments?: any,
+    ccSenders?: string[]
   ) {
     if (this.isEmailDisabled) return;
     const systemCountryName = this.configService.get("systemCountryName");
@@ -375,6 +376,7 @@ export class EmailHelperService {
         actionProps: {
           emailType: template.id,
           sender: user.user_email,
+          cc: ccSenders,
           subject: this.helperService.getEmailTemplateMessage(
             template["subject"],
             templateData,

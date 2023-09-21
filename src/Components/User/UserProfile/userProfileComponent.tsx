@@ -199,6 +199,16 @@ export const UserProfileComponent = (props: any) => {
                     </Row>
                     <Row className="field">
                       <Col span={12} className="field-key">
+                        {t("userProfile:paymentId")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.paymentId
+                          ? organisationDetails.paymentId
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
                         {t("userProfile:companyRole")}
                       </Col>
                       <Col span={12} className="field-value">

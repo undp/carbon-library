@@ -34,6 +34,7 @@ export class EmailService {
           {
             from: this.sourceEmail,
             to: emailDataObj?.sender,
+            cc: emailDataObj?.cc,
             subject: emailDataObj?.subject,
             text: emailDataObj?.emailBody,
             html: emailDataObj?.emailBody,

@@ -87,6 +87,7 @@ import { AuthorizationLetterGen } from "../util/authorisation.letter.gen";
 import { ProgrammeDocumentRegistryDto } from "../dto/programme.document.registry.dto";
 import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
+import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -134,7 +135,8 @@ export class ProgrammeService {
     @InjectRepository(NDCActionViewEntity)
     private ndcActionViewRepo: Repository<NDCActionViewEntity>,
     private letterOfIntentRequestGen: LetterOfIntentRequestGen,
-    private letterOfIntentResponseGen: LetterOfIntentResponseGen
+    private letterOfIntentResponseGen: LetterOfIntentResponseGen,
+    private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen
   ) {}
 
   private fileExtensionMap = new Map([
@@ -940,6 +942,10 @@ export class ProgrammeService {
       await this.sendLetterOfIntentResponse(pr);
     }
 
+    if (resp && d.type === DocType.METHODOLOGY_DOCUMENT) {
+      await this.sendRequestForLetterOfAuthorisation(pr);
+    }
+
     return new BasicResponseDto(
       HttpStatus.OK,
       this.helperService.formatReqMessagesString(
@@ -956,6 +962,27 @@ export class ProgrammeService {
     const month = programCreatedDate.toLocaleString("default", { month: "long" });
     const year = programCreatedDate.getFullYear();
     const hostAddress = this.configService.get("host");
+    let sectorialMinistries: string[] = [];
+
+    if (programme.sectoralScope) {
+      for (const sectoralScopeId of programme.sectoralScope) {
+        const ministry = await this.companyService.getSectoralScopeMinistry(sectoralScopeId);
+        ministry.forEach((company) => {
+          if (!sectorialMinistries.includes(company?.name)) {
+            sectorialMinistries.push(company.name);
+          }
+        })
+
+      }
+    }
+
+    let sectoralMinistryNames: string;
+    if (sectorialMinistries.length > 2) {
+      sectoralMinistryNames = sectorialMinistries.slice(0, sectorialMinistries.length - 1).join(", ");
+      sectoralMinistryNames += " and " + sectorialMinistries[sectorialMinistries.length - 1];
+    } else {
+      sectoralMinistryNames = sectorialMinistries.join(" and ");
+    }
 
     for (const companyId of programme.companyId) {
       const company = await this.companyService.findByCompanyId(companyId);
@@ -963,6 +990,7 @@ export class ProgrammeService {
         await this.letterOfIntentResponseGen.generateLetter(
           programme.programmeId,
           programme.title,
+          sectoralMinistryNames,
           company.companyId,
           company.name,
           company.address,
@@ -986,6 +1014,58 @@ export class ProgrammeService {
         }
       );
     }
+
+  }
+
+  async sendRequestForLetterOfAuthorisation(programme: Programme) {
+
+    const programCreatedDate = new Date(programme.createdAt);
+
+    const month = programCreatedDate.toLocaleString("default", { month: "long" });
+    const year = programCreatedDate.getFullYear();
+    const hostAddress = this.configService.get("host");
+    let companies: string[] = [];
+    let companyEmails: string[] = [];
+    const programmeSectoralScopeKey = Object.keys(SectoralScope).find(
+      (key) => SectoralScope[key] === programme.sectoralScope
+    );
+
+    for (const companyId of programme.companyId) {
+      const company = await this.companyService.findByCompanyId(companyId);
+      companies.push(company.name);
+      companyEmails.push(company.email);
+    }
+
+    let companyNames: string;
+    if (companies.length > 2) {
+      companyNames = companies.slice(0, companies.length - 1).join(", ");
+      companyNames += " and " + companies[companies.length - 1];
+  } else {
+    companyNames = companies.join(" and ");
+  }
+
+    const letterOfRequestForAuthorizationLetterUrl =
+    await this.letterOfAuthorisationRequestGen.generateLetter(
+      programme.programmeId,
+      programme.title,
+      programmeSectoralScopeKey,
+      companyNames,
+      programme.programmeProperties?.geographicalLocation
+    );
+
+    await this.emailHelperService.sendEmailToGovernmentAdmins(
+      EmailTemplates.PROGRAMME_APPROVED,
+      {
+        organisationName: companyNames,
+        programmePageLink:
+          hostAddress + `/programmeManagement/view?id=${programme.programmeId}`,
+      },undefined,undefined,
+      {
+        filename: 'Letter of Request for Authorisation.pdf',
+        path: letterOfRequestForAuthorizationLetterUrl
+      }, 
+      companyEmails
+    );
 
   }
 
@@ -1116,6 +1196,19 @@ export class ProgrammeService {
         });
       }
     });
+
+    if (user.companyRole === CompanyRole.GOVERNMENT ||
+      (user.companyRole === CompanyRole.MINISTRY &&
+        permissionForMinistryLevel)) {
+      if (resp && dr.type === DocType.DESIGN_DOCUMENT) {
+        await this.sendLetterOfIntentResponse(programme);
+      }
+
+      if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT) {
+        await this.sendRequestForLetterOfAuthorisation(programme);
+      }
+    }
+    
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 

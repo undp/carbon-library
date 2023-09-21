@@ -28,6 +28,8 @@ import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { Company } from "../entities/company.entity";
 import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
+import { LetterOfAuthorisationRequestGen } from "./letter.of.authorisation.request.gen";
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -76,7 +78,8 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
     LetterOfIntentResponseGen,
-    AnnualReportGen
+    AnnualReportGen,
+    LetterOfAuthorisationRequestGen,
   ],
   exports: [
     CounterService,
@@ -88,7 +91,8 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
     LetterOfIntentResponseGen,
-    AnnualReportGen
+    AnnualReportGen,
+    LetterOfAuthorisationRequestGen,
   ],
 })
 export class UtilModule {}
