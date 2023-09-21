@@ -32,6 +32,7 @@ export interface ProgrammeTransferFormProps {
   companyRole: string;
   translator: any;
   useConnection: any;
+  ministryLevelPermission?: boolean;
 }
 
 export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
@@ -50,6 +51,7 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
     companyRole,
     translator,
     useConnection,
+    ministryLevelPermission = false,
   } = props;
   const t = translator.t;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
@@ -136,7 +138,8 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
         userCompanyId !== Number(programme.companyId[index])) ||
         (!toCompanyDefault &&
           (userCompanyId === Number(programme.companyId[index]) ||
-            companyRole === CompanyRole.GOVERNMENT))) &&
+            companyRole === CompanyRole.GOVERNMENT ||
+            ministryLevelPermission))) &&
       parseInt(companies[Number(programme.companyId[index])].state) ===
         CompanyState.ACTIVE.valueOf()
     ) {
