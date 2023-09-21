@@ -142,6 +142,7 @@ export interface ProgrammePropertiesU extends ProgrammeProperties {
 
 export interface Programme {
   programmeId: string;
+  externalId: string;
   serialNo: string;
   title: string;
   sectoralScope: string;

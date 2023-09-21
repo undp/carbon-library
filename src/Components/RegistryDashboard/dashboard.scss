@@ -20,7 +20,22 @@
   flex-direction: column;
   border: 1px solid gray;
 }
+.annual-report{
+  display:flex;
+  margin-top:30px;
+  margin-left:22px;
+}
+.ant-btn.annual-report-downloadbutton{
 
+  border-radius:0px 5px 5px 0px !important;
+
+}
+.ant-btn.annual-report-dropdownbutton{
+
+  margin-left:20px; 
+  border-radius:5px 0px 0px 0px !important;
+
+}
 .margin-top-6 {
   margin-top: 7.5rem;
 }

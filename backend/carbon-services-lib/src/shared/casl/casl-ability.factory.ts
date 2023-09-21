@@ -27,6 +27,7 @@ import { Investment } from "../entities/investment.entity";
 import { InvestmentStatus } from "../enum/investment.status";
 import { ProgrammeDocumentViewEntity } from "../entities/document.view.entity";
 import { NDCActionViewEntity } from "../entities/ndc.view.entity";
+import { ProgrammeDocument } from "../entities/programme.document";
 
 type Subjects = InferSubjects<typeof EntitySubject> | "all";
 
@@ -132,6 +133,7 @@ export class CaslAbilityFactory {
           can(Action.Manage, Programme);
           can(Action.Manage, DocumentAction);
           can(Action.Manage, Investment);
+          can(Action.Manage, ProgrammeTransferRequest);
         } else {
           can(Action.Read, Investment);
           can(Action.Read, Programme);
@@ -257,7 +259,9 @@ export class CaslAbilityFactory {
         cannot(Action.Update, Company);
       }
     }
-
+    if (user.companyRole == CompanyRole.GOVERNMENT || user.companyRole == CompanyRole.CERTIFIER || user.companyRole == CompanyRole.MINISTRY) {
+      can([Action.Read], ProgrammeDocument);
+    }
     return build({
       detectSubjectType: (item) =>
         item.constructor as ExtractSubjectType<Subjects>,

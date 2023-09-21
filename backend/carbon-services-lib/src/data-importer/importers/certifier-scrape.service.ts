@@ -12,8 +12,6 @@ import { Role } from "../../shared/casl/role.enum";
 import { OrganisationDto } from "../../shared/dto/organisation.dto";
 import { UserDto } from "../../shared/dto/user.dto";
 import { Company } from "../../shared/entities/company.entity";
-import { UserUpdateDto } from "../../shared/dto/user.update.dto";
-import { OrganisationUpdateDto } from "../../shared/dto/organisation.update.dto";
 @Injectable()
 export class CertifierScrapeService implements ImporterInterface {
     constructor(

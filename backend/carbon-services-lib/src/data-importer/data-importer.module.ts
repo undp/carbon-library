@@ -9,22 +9,30 @@ import { UserModule } from '../shared/user/user.module';
 import { ProgrammeModule } from '../shared/programme/programme.module';
 import { TypeOrmConfigService } from '../shared/typeorm.config.service';
 import { Company } from '../shared/entities/company.entity';
+import { ProgrammeDocument } from '../shared/entities/programme.document';
+import { UtilModule } from '../shared/util/util.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`]
+      envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`],
     }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
-    TypeOrmModule.forFeature([Programme,Company]),
+    TypeOrmModule.forFeature([
+      Programme,
+      Company,
+      ProgrammeDocument,
+    ]),
     ProgrammeModule,
     CompanyModule,
-    UserModule
+    UserModule,
+    UtilModule
+    
   ],
-  providers: [Logger, DataImporterService]
+  providers: [Logger, DataImporterService],
 })
 export class DataImporterModule {}

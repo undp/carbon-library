@@ -3463,6 +3463,20 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST
       );
     }
+
+    if (user.companyRole === CompanyRole.MINISTRY) {
+      const permission = await this.findPermissionForMinistryUser(
+        user,
+        program.sectoralScope
+      );
+      if (!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+    
     let updated: any = await this.programmeLedger.issueProgrammeStatus(
       req.programmeId,
       this.configService.get("systemCountry"),
