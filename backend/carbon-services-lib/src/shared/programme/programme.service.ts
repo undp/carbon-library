@@ -962,6 +962,27 @@ export class ProgrammeService {
     const month = programCreatedDate.toLocaleString("default", { month: "long" });
     const year = programCreatedDate.getFullYear();
     const hostAddress = this.configService.get("host");
+    let sectorialMinistries: string[] = [];
+
+    if (programme.sectoralScope) {
+      for (const sectoralScopeId of programme.sectoralScope) {
+        const ministry = await this.companyService.getSectoralScopeMinistry(sectoralScopeId);
+        ministry.forEach((company) => {
+          if (!sectorialMinistries.includes(company?.name)) {
+            sectorialMinistries.push(company.name);
+          }
+        })
+
+      }
+    }
+
+    let sectoralMinistryNames: string;
+    if (sectorialMinistries.length > 2) {
+      sectoralMinistryNames = sectorialMinistries.slice(0, sectorialMinistries.length - 1).join(", ");
+      sectoralMinistryNames += " and " + sectorialMinistries[sectorialMinistries.length - 1];
+    } else {
+      sectoralMinistryNames = sectorialMinistries.join(" and ");
+    }
 
     for (const companyId of programme.companyId) {
       const company = await this.companyService.findByCompanyId(companyId);
@@ -969,6 +990,7 @@ export class ProgrammeService {
         await this.letterOfIntentResponseGen.generateLetter(
           programme.programmeId,
           programme.title,
+          sectoralMinistryNames,
           company.companyId,
           company.name,
           company.address,
@@ -1174,6 +1196,19 @@ export class ProgrammeService {
         });
       }
     });
+
+    if (user.companyRole === CompanyRole.GOVERNMENT ||
+      (user.companyRole === CompanyRole.MINISTRY &&
+        permissionForMinistryLevel)) {
+      if (resp && dr.type === DocType.DESIGN_DOCUMENT) {
+        await this.sendLetterOfIntentResponse(programme);
+      }
+
+      if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT) {
+        await this.sendRequestForLetterOfAuthorisation(programme);
+      }
+    }
+    
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 

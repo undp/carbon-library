@@ -40,7 +40,7 @@ export class LetterOfAuthorisationRequestGen {
             align: "right",
         });
 
-        doc.text(`\n\nDear CMS,`, {
+        doc.text(`\n\nDear Ministry of Environment, Forestry and Tourism,`, {
             align: "left",
         });
 

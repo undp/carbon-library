@@ -156,7 +156,7 @@ export const EmailTemplates = {
   },
   DOCUMENT_APPROVED: {
     id: "DOCUMENT_APPROVED",
-    subject: "Document approved",
+    subject: "Document Approved",
     html: `
         Hi {{name}}, <br><br>
 

@@ -12,7 +12,7 @@ export class LetterOfIntentResponseGen {
         private fileHandler: FileHandlerInterface) {
     }
 
-    async generateLetter(programmeId: string, programmeName: string, orgId: number, orgName: string, orgAddress: string, requestMonth: string, requestYear: number) {
+    async generateLetter(programmeId: string, programmeName: string, sectoralMinistry: string, orgId: number, orgName: string, orgAddress: string, requestMonth: string, requestYear: number) {
         const filepath = `RESPONSE_FOR_LETTER_OF_INTENT_${programmeId}_${orgId}.pdf`;
         const country = this.configService.get("systemCountryName");
         const minister = this.configService.get("docGenerate.ministerName");
@@ -48,15 +48,15 @@ export class LetterOfIntentResponseGen {
         doc.font("fonts/Inter-Regular.ttf");
 
         const paragraphs = [
-            `The CMS takes note of your proposed ${programmeName} contained in your letter dated ${requestMonth}, ${requestYear} on the above subject matter. The project intends to reduce emissions.`,
+            `The Ministry of Environment, Forestry and Tourism takes note of your proposed ${programmeName} contained in your letter dated ${requestMonth}, ${requestYear} on the above subject matter. The project intends to reduce emissions.`,
 
-            `By this letter, the CMS can confirm that the proposed project aligns with ${country}'s Nationally Determined Contributions (NDC) and Sustainable Development Goals priorities.`,
+            `By this letter, the Ministry of Environment, Forestry and Tourism can confirm that the proposed project aligns with ${country}'s Nationally Determined Contributions (NDC) and Sustainable Development Goals priorities.`,
 
-            `Therefore, the CMS stands ready for future collaboration with ${orgName} in the project development phase to generate mitigation outcomes towards Article 6.2 or Voluntary Carbon Markets.`,
+            `Therefore, the Ministry of Environment, Forestry and Tourism stands ready for future collaboration with ${orgName} in the project development phase to generate mitigation outcomes towards Article 6.2 or Voluntary Carbon Markets.`,
 
-            `Note that the CMS has the mandate, as the designated national body, to oversee the technical arrangements of the carbon market instrumented under Article 6.2 of the Paris Agreement.`,
+            `Note that the Ministry of Environment, Forestry and Tourism has the mandate, as the designated national body, to oversee the technical arrangements of the carbon market instruments under Article 6.2 of the Paris Agreement.`,
 
-            `Furthermore, kindly note that in developing the ${programmeName} for the carbon market, you will be requested to show evidence of your engagements with the ${ministry} to meet regulatory requirements for the project.`,
+            `Furthermore, kindly note that in developing the ${programmeName} for the carbon market, you will be requested to show evidence of your engagements with the ${sectoralMinistry} to meet regulatory requirements for the project.`,
 
             `Contact us through ${contactEmailForQuestions} for any clarifications.`,
         ];
