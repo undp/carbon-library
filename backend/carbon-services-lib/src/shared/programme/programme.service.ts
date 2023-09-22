@@ -207,6 +207,8 @@ export class ProgrammeService {
       resp = await this.programmeLedger.updateOwnership(programme.externalId, programme.companyId, programme.proponentTaxVatId, programme.proponentPercentage, transfer.toCompanyId, transfer.fromCompanyId, transfer.shareFromOwner, user);
     }
 
+    console.log('resp', resp);
+
     const savedProgramme = await this.entityManager
       .transaction(async (em) => {
         await em.update(
@@ -245,11 +247,17 @@ export class ProgrammeService {
         return err;
       });
 
-    if (savedProgramme.affected > 0) {
+    console.log('savedProgramme', savedProgramme);
+
+    if (savedProgramme && savedProgramme.affected > 0) {
       if(toCompanyIndex < 0 && programme.currentStage === ProgrammeStage.AUTHORISED && this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
         this.companyService.increaseProgrammeCount(investor.companyId);
       }
       return new DataResponseDto(HttpStatus.OK, resp!=undefined?resp:savedProgramme);
+    }
+
+    if(resp){
+      return true;
     }
 
     throw new HttpException(
