@@ -10,7 +10,7 @@ export class ObjectionLetterGen {
 
     async generateReport(orgs, programmeName, programmeId) {
 
-        const minister = this.configService.get('docGenerate.ministerName')
+        const ministerWithDesignation = this.configService.get('docGenerate.ministerNameAndDesignation')
         const ministry = this.configService.get('docGenerate.ministryName')
         const country = this.configService.get('systemCountryName');
         const capital = this.configService.get('docGenerate.countryCapital');
@@ -58,7 +58,7 @@ export class ObjectionLetterGen {
     
         doc.text(`\n\nWe confirm that our national process for ascertaining no-objection to the programme as included in the proposal has been duly followed.\n\nWe confirm that our no-objection applies to all projects or activities to be implemented within the scope of the programme.\n\nWe acknowledge that this letter will be made publicly available on the Carbon Transparency website, registered under ${programmeId}.`)
     
-        doc.text(`\n\nSincerely,\nHonorable ${minister}\nMinister\n${ministry}\nGovernment of ${country}`)
+        doc.text(`\n\nSincerely,\n${ministerWithDesignation}\nGovernment of ${country}`)
         // Finalize PDF file
         doc.end();
 
