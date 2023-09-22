@@ -74,6 +74,7 @@ export default () => ({
   },
   docGenerate: {
     ministerName: process.env.MINISTER_NAME || 'Minister X',
+    ministerNameAndDesignation: process.env.MINISTER_NAME_AND_DESIGNATION || '\nHonorable Minister X\nMinister\nMinistry of Environment, Forestry & Tourism',
     ministryName: "Ministry of Environment, Forestry & Tourism",
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
