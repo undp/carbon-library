@@ -1208,7 +1208,7 @@ export class ProgrammeService {
         await this.sendRequestForLetterOfAuthorisation(programme);
       }
     }
-    
+
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
@@ -3689,6 +3689,8 @@ export class ProgrammeService {
         methodologyDocUrl
       );
 
+      console.log('Auth letter URL - ', authLetterUrl);
+
       const dr = new ProgrammeDocument();
       dr.programmeId = programme.programmeId;
       dr.externalId = programme.externalId;
@@ -3831,26 +3833,124 @@ export class ProgrammeService {
       });
     }
 
-    const hostAddress = this.configService.get("host");
-    let authDate = new Date(updated.txTime);
-    let date = authDate.getDate().toString().padStart(2, "0");
-    let month = authDate.toLocaleString("default", { month: "long" });
-    let year = authDate.getFullYear();
-    let formattedDate = `${date} ${month} ${year}`;
+    if (updated && updated.affected > 0) {
+      const orgNames = await this.companyService.queryNames({
+        size: 10,
+        page: 1,
+        filterAnd: [{
+          key: 'companyId',
+          operation: 'IN',
+          value: program.companyId
+        }],
+        filterOr: undefined,
+        sort: undefined,
+        filterBy: undefined
+      }, undefined) ;
 
-    updated.company.forEach(async (company) => {
-      await this.emailHelperService.sendEmailToOrganisationAdmins(
-        company.companyId,
-        EmailTemplates.PROGRAMME_AUTHORISATION,
-        {
-          programmeName: updated.title,
-          authorisedDate: formattedDate,
-          serialNumber: updated.serialNo,
-          programmePageLink:
-            hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+      const documents = await this.documentRepo.find({
+        where: [
+          { programmeId: program.programmeId, status: DocumentStatus.ACCEPTED,type: DocType.DESIGN_DOCUMENT },
+          { programmeId: program.programmeId, status: DocumentStatus.ACCEPTED,type: DocType.METHODOLOGY_DOCUMENT},
+        ]
+      });
+
+      let designDoc, designDocUrl, methodologyDoc, methodologyDocUrl;
+
+      if(documents && documents.length > 0){
+        designDoc = documents.find(d=>d.type === DocType.DESIGN_DOCUMENT);
+        if(designDoc){
+          designDocUrl = designDoc.url;
         }
+        methodologyDoc = documents.find(d=>d.type === DocType.METHODOLOGY_DOCUMENT);
+        if(methodologyDoc){
+          methodologyDocUrl = methodologyDoc.url;
+        }
+      }
+
+      const authLetterUrl = await this.authLetterGen.generateLetter(
+        program.programmeId,
+        program.title,
+        (user as any).companyName,
+        orgNames.data.map(e => e['name']),
+        designDocUrl,
+        methodologyDocUrl
       );
-    });
+
+      console.log('Auth letter URL - ', authLetterUrl);
+
+      const dr = new ProgrammeDocument();
+      dr.programmeId = program.programmeId;
+      dr.externalId = program.externalId;
+      dr.status = DocumentStatus.ACCEPTED;
+      dr.type = DocType.AUTHORISATION_LETTER;
+      dr.txTime = new Date().getTime();
+      dr.url = authLetterUrl;
+      await this.documentRepo.save(dr);
+
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.DocumentUpload,
+        actionProps: {
+          type: this.helperService.enumToString(DocType, dr.type),
+          data: dr.url,
+          externalId: dr.externalId
+        },
+      });
+
+      console.log("CALLED THE OTHER AUTH METHOD");
+      const hostAddress = this.configService.get("host");
+      let authDate = new Date(updated.txTime);
+      let date = authDate.getDate().toString().padStart(2, "0");
+      let month = authDate.toLocaleString("default", { month: "long" });
+      let year = authDate.getFullYear();
+      let formattedDate = `${date} ${month} ${year}`;
+
+
+      updated.company.forEach(async (company) => {
+        await this.emailHelperService.sendEmailToOrganisationAdmins(
+          company.companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: updated.title,
+            authorisedDate: formattedDate,
+            serialNumber: updated.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'AUTHORISATION_LETTER.pdf',
+            path: authLetterUrl
+          }
+        );
+      });
+    }
+
+
+
+
+
+
+
+    // console.log("CALLED THE OTHER AUTH METHOD");
+    // const hostAddress = this.configService.get("host");
+    // let authDate = new Date(updated.txTime);
+    // let date = authDate.getDate().toString().padStart(2, "0");
+    // let month = authDate.toLocaleString("default", { month: "long" });
+    // let year = authDate.getFullYear();
+    // let formattedDate = `${date} ${month} ${year}`;
+
+    // updated.company.forEach(async (company) => {
+    //   await this.emailHelperService.sendEmailToOrganisationAdmins(
+    //     company.companyId,
+    //     EmailTemplates.PROGRAMME_AUTHORISATION,
+    //     {
+    //       programmeName: updated.title,
+    //       authorisedDate: formattedDate,
+    //       serialNumber: updated.serialNo,
+    //       programmePageLink:
+    //         hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+    //     }
+    //   );
+    // });
 
     return new DataResponseDto(HttpStatus.OK, updated);
   }
