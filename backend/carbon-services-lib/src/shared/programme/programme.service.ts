@@ -3595,6 +3595,7 @@ export class ProgrammeService {
   }
 
   async authProgramme(auth: ProgrammeAuth) {
+    console.log('authProgramme called - ', auth);
     const programme = await this.findByExternalId(auth.externalId);
     if (!programme) {
       throw new HttpException(
@@ -3745,6 +3746,7 @@ export class ProgrammeService {
   }
 
   async approveProgramme(req: ProgrammeApprove, user: User) {
+    console.log('approveProgramme called - ', req);
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`
     );
