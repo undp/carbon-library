@@ -3019,6 +3019,32 @@ export class ProgrammeService {
       `Programme ${req.programmeId} certification received by ${user.id}`
     );
 
+    if (!add && user.companyRole === CompanyRole.MINISTRY) {
+      const program = await this.programmeLedger.getProgrammeById(
+        req.programmeId
+      );
+      if (!program) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.programmeNotExist",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const permission = await this.findPermissionForMinistryUser(
+        user,
+        program.sectoralScope
+      );
+      if (!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
     if (add && user.companyRole != CompanyRole.CERTIFIER) {
       throw new HttpException(
         this.helperService.formatReqMessagesString("programme.unAuth", []),
@@ -3028,7 +3054,7 @@ export class ProgrammeService {
 
     if (
       !add &&
-      ![CompanyRole.CERTIFIER, CompanyRole.GOVERNMENT].includes(
+      ![CompanyRole.CERTIFIER, CompanyRole.GOVERNMENT, CompanyRole.MINISTRY].includes(
         user.companyRole
       )
     ) {
@@ -3042,7 +3068,7 @@ export class ProgrammeService {
     }
 
     let certifierId;
-    if (user.companyRole === CompanyRole.GOVERNMENT) {
+    if (user.companyRole === CompanyRole.GOVERNMENT || user.companyRole === CompanyRole.MINISTRY) {
       if (!req.certifierId) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
@@ -4126,6 +4152,18 @@ export class ProgrammeService {
           []
         ),
         HttpStatus.BAD_REQUEST
+      );
+    }
+
+    if (
+      investment.fromCompanyId != requester.companyId
+    ) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.invalidApproverForInvestmentReq",
+          []
+        ),
+        HttpStatus.FORBIDDEN
       );
     }
 
