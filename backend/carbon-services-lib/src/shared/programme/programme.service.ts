@@ -1339,7 +1339,7 @@ export class ProgrammeService {
     }
 
     const pr = await this.findByExternalId(programmeDto.externalId);
-    if (pr) {
+    if (pr && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.programmeExistsWithSameExetrnalId",
@@ -1594,12 +1594,12 @@ export class ProgrammeService {
     }
     
     
-    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
-        this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
+    if((this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
+        this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED) && !pr){
       savedProgramme = await this.programmeLedger.createProgramme(programme);
     }
 
-    if (savedProgramme) {
+    if (savedProgramme || pr) {
       const letterOfIntentRequestLetterUrl = await this.letterOfIntentRequestGen.generateLetter(
         programme.programmeId,
         programme.title,
@@ -1623,7 +1623,7 @@ export class ProgrammeService {
         }
       );
 
-      savedProgramme.companyId.forEach(async (companyId) => {
+      programme.companyId.forEach(async (companyId) => {
         await this.emailHelperService.sendEmailToOrganisationAdmins(
           companyId,
           EmailTemplates.PROGRAMME_CREATE,
@@ -1641,7 +1641,7 @@ export class ProgrammeService {
       });
     }
 
-    return savedProgramme;
+    return savedProgramme?savedProgramme:pr;
   }
 
   async addNDCAction(ndcActionDto: NDCActionDto, user: User): Promise<DataResponseDto> {
