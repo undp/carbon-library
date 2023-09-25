@@ -1,5 +1,6 @@
 const allowedFileTypes = [
     "application/pdf", 
+    "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "application/vnd.ms-powerpoint",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -11,6 +12,6 @@ const allowedFileTypes = [
 ];
 
 export const isValidateFileType = (fileType: string): boolean => {
-    console.log("isValidateFileType called with type with new file type change 8 : ", fileType)
+    console.log("isValidateFileType called with type with new file type change 9 : ", fileType)
     return allowedFileTypes.includes(fileType);
 }
