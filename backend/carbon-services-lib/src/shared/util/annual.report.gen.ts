@@ -23,7 +23,7 @@ export class AnnualReportGen {
   async generateAnnualReportpdf() {
     const country = this.configService.get('systemCountryName');
     const host = this.configService.get('host');
-    const date = Number(new Date().getFullYear());
+    const date = this.configService.get('year');  //Number(new Date().getFullYear()) - 1;
     //Report in PDF format
     const doc = new PDFDocument({ margin: 30, size: 'B0' });
     const filepath = `Annual_Report_${country}_${date}.pdf`
@@ -267,8 +267,8 @@ export class AnnualReportGen {
     }
     const january1st = new Date(date, 0, 1).getTime() / 1000;
     const december31st = new Date(date, 11, 31, 23, 59, 59).getTime() / 1000;
-    const authqry = `SELECT * FROM public.programme WHERE "authTime">= '${january1st}' AND "authTime"<='${december31st}' AND  "currentStage"='Authorised' `;
-    const tranfretireqry = `SELECT * FROM public.programme_transfer WHERE ("status"='Approved' OR "status"='Recognised') AND "authTime">= '${january1st}' AND "authTime"<='${december31st}'`;
+    const authqry = `SELECT * FROM public.programme WHERE "authTime">= '${january1st}' AND "authTime"<='${december31st*100000}' AND  "currentStage"='Authorised' `;
+    const tranfretireqry = `SELECT * FROM public.programme_transfer WHERE ("status"='Approved' OR "status"='Recognised') AND "authTime">= '${january1st}' AND "authTime"<='${december31st*100000}'`;
     const authprogrammestable = await this.programmeRepo.query(authqry);
     const transfertable = await this.programmeTransfer.query(tranfretireqry);
     const programecount = authprogrammestable.length + transfertable.length;
