@@ -41,3 +41,15 @@ jobs:
               workflow_id: 'web-lib-update.yml',
               ref: 'develop'
             })
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'xeptagondev',
+              repo: 'carbon-registry',
+              workflow_id: 'web-lib-update.yml',
+              ref: 'unified'
+            })
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'xeptagondev',
+              repo: 'carbon-transparency',
+              workflow_id: 'web-lib-update.yml',
+              ref: 'develop'
+            })
