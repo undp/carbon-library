@@ -4,6 +4,7 @@ export default () => ({
   systemCountryName: process.env.systemCountryName || "CountryX",
   systemContinentName: process.env.systemContinentName || "CountryX",
   defaultCreditUnit: process.env.defaultCreditUnit || "ITMO",
+  year: parseInt(process.env.REPORT_YEAR) || 2023
   dateTimeFormat: "DD LLLL yyyy @ HH:mm",
   dateFormat: "DD LLLL yyyy",
   database: {
