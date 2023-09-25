@@ -2089,13 +2089,13 @@ export class ProgrammeService {
       resp.length > 1 ? resp[1] : undefined
     );
   }
-
+  
   async queryProgrammeTransfers(
     query: QueryDto,
     abilityCondition: string,
     user: User
   ): Promise<any> {
-    const resp = await this.programmeTransferViewRepo
+    let queryBuilder = await this.programmeTransferViewRepo
       .createQueryBuilder("programme_transfer")
       .where(
         this.helperService.generateWhereSQL(
@@ -2105,20 +2105,27 @@ export class ProgrammeService {
             abilityCondition
           )
         )
-      )
-      .orderBy(
-        query?.sort?.key &&
-          this.helperService.generateSortCol(query?.sort?.key),
-        query?.sort?.order,
-        query?.sort?.nullFirst !== undefined
-          ? query?.sort?.nullFirst === true
-            ? "NULLS FIRST"
-            : "NULLS LAST"
-          : undefined
-      )
-      .offset(query.size * query.page - query.size)
-      .limit(query.size)
-      .getManyAndCount();
+    );
+
+    if (query.filterBy !== null && query.filterBy !== undefined && query.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.andWhere("programme_transfer.programmeSectoralScope IN (:...allowedScopes)", {
+        allowedScopes: query.filterBy.value
+      });
+    }
+
+    const resp = await  queryBuilder.orderBy(
+      query?.sort?.key &&
+        this.helperService.generateSortCol(query?.sort?.key),
+      query?.sort?.order,
+      query?.sort?.nullFirst !== undefined
+        ? query?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
+    .offset(query.size * query.page - query.size)
+    .limit(query.size)
+    .getManyAndCount();
 
     if (resp && resp.length > 0) {
       for (const e of resp[0]) {
