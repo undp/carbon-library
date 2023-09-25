@@ -23,7 +23,7 @@ export class AnnualReportGen {
   async generateAnnualReportpdf() {
     const country = this.configService.get('systemCountryName');
     const host = this.configService.get('host');
-    const date = Number(new Date().getFullYear()) - 1;
+    const date = Number(new Date().getFullYear());
     //Report in PDF format
     const doc = new PDFDocument({ margin: 30, size: 'B0' });
     const filepath = `Annual_Report_${country}_${date}.pdf`
