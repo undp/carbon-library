@@ -147,7 +147,7 @@ export class ProgrammeService {
     ["vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"],
     ["msword", "doc"],
     ["vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"],
-    ["csv", "cvs"],
+    ["csv", "csv"],
     ["png", "png"],
     ["jpeg" , "jpg"]
   ]);
