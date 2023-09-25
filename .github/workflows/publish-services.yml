@@ -33,3 +33,13 @@ jobs:
         working-directory: backend/carbon-services-lib/dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'xeptagondev',
+              repo: 'carbon-registry',
+              workflow_id: 'service-lib-update.yml',
+              ref: 'develop'
+            })
