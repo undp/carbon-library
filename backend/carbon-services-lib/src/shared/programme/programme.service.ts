@@ -1260,6 +1260,11 @@ export class ProgrammeService {
       await this.documentRepo.save(dr);
 
       await this.asyncOperationsInterface.AddAction({
+        actionType: action,
+        actionProps: req,
+      });
+
+      await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.DocumentUpload,
         actionProps: {
           type: this.helperService.enumToString(DocType, dr.type),
@@ -1267,6 +1272,8 @@ export class ProgrammeService {
           externalId: dr.externalId
         },
       });
+      
+      return 
     }
 
     await this.asyncOperationsInterface.AddAction({
