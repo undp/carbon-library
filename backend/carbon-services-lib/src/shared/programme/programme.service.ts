@@ -990,7 +990,8 @@ export class ProgrammeService {
         sectoralMinistryNames = sectorialMinistries.join(" and ");
       }
     } else {
-      sectoralMinistryNames = this.configService.get("systemCountryName");;
+      const country = this.configService.get('systemCountryName');
+      sectoralMinistryNames = "Government of " + country;
     }
 
     for (const companyId of programme.companyId) {
