@@ -958,8 +958,11 @@ export class ProgrammeService {
   }
 
   async sendLetterOfIntentResponse(programme: Programme) {
+    let programCreatedDate = new Date();
 
-    const programCreatedDate = new Date(programme.createdAt);
+    if (programme.createdAt) {
+      programCreatedDate = new Date(programme.createdAt);
+    }
 
     const month = programCreatedDate.toLocaleString("default", { month: "long" });
     const year = programCreatedDate.getFullYear();
@@ -979,11 +982,16 @@ export class ProgrammeService {
     }
 
     let sectoralMinistryNames: string;
-    if (sectorialMinistries.length > 2) {
-      sectoralMinistryNames = sectorialMinistries.slice(0, sectorialMinistries.length - 1).join(", ");
-      sectoralMinistryNames += " and " + sectorialMinistries[sectorialMinistries.length - 1];
+    if (sectorialMinistries.length > 0) {
+      if (sectorialMinistries.length > 2) {
+        sectoralMinistryNames = sectorialMinistries.slice(0, sectorialMinistries.length - 1).join(", ");
+        sectoralMinistryNames += " and " + sectorialMinistries[sectorialMinistries.length - 1];
+      } else {
+        sectoralMinistryNames = sectorialMinistries.join(" and ");
+      }
     } else {
-      sectoralMinistryNames = sectorialMinistries.join(" and ");
+      const country = this.configService.get('systemCountryName');
+      sectoralMinistryNames = "Government of " + country;
     }
 
     for (const companyId of programme.companyId) {
@@ -1461,6 +1469,7 @@ export class ProgrammeService {
       programme.creditOwnerPercentage = [100];
     }
     let savedProgramme:any
+    let dr;
 
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY ||
       this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
@@ -1487,7 +1496,7 @@ export class ProgrammeService {
         programmeDto.ndcAction.constantVersion = ndcAc.constantVersion;
       }
 
-      let dr;
+      
       if (programmeDto.designDocument) {
         dr = new ProgrammeDocument();
         dr.programmeId = programme.programmeId;
@@ -1639,6 +1648,10 @@ export class ProgrammeService {
           }
         );
       });
+
+      if (dr.status = DocumentStatus.ACCEPTED && dr.type === DocType.DESIGN_DOCUMENT) {
+        await this.sendLetterOfIntentResponse(savedProgramme);
+      }
     }
 
     return savedProgramme?savedProgramme:pr;
