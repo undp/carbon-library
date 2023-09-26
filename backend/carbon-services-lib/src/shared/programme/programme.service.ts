@@ -1469,7 +1469,8 @@ export class ProgrammeService {
       programme.creditOwnerPercentage = [100];
     }
     let savedProgramme:any
-    let dr;
+    let designDocumentApproved: boolean = false;
+    
 
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY ||
       this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
@@ -1496,7 +1497,7 @@ export class ProgrammeService {
         programmeDto.ndcAction.constantVersion = ndcAc.constantVersion;
       }
 
-      
+      let dr;
       if (programmeDto.designDocument) {
         dr = new ProgrammeDocument();
         dr.programmeId = programme.programmeId;
@@ -1557,6 +1558,7 @@ export class ProgrammeService {
           if (certifierId) {
             programme.certifierId = [certifierId];
           }
+          designDocumentApproved = true;
         }
 
         if (monitoringReport) {
@@ -1649,7 +1651,7 @@ export class ProgrammeService {
         );
       });
 
-      if (dr.status = DocumentStatus.ACCEPTED && dr.type === DocType.DESIGN_DOCUMENT) {
+      if (designDocumentApproved) {
         await this.sendLetterOfIntentResponse(savedProgramme);
       }
     }
