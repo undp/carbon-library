@@ -1713,7 +1713,7 @@ export class ProgrammeService {
         const filetype = this.getFileExtension(document);
         const response: any = await this.fileHandler.uploadFile(
           `documents/FEASIBILITY_REPORT${"_" + ndcAction.id}.${filetype}`,
-          document
+          document.split(',')[1]
         );
         (ndcActionDto.coBenefitsProperties as any).assessmentDetails.document =
           response;
@@ -1728,7 +1728,7 @@ export class ProgrammeService {
 
     if (ndcAction.action == NDCActionType.Enablement && ndcAction.enablementProperties.report) {
       const filetype = this.getFileExtension(ndcAction.enablementProperties.report);
-      const response: any = await this.fileHandler.uploadFile( `documents/ENABLEMENT_REPORT${ "_" + ndcAction.id}.${filetype}`, ndcAction.enablementProperties.report);
+      const response: any = await this.fileHandler.uploadFile( `documents/ENABLEMENT_REPORT${ "_" + ndcAction.id}.${filetype}`, ndcAction.enablementProperties.report.split(',')[1]);
       ndcAction.enablementProperties.report = response
     }
 
