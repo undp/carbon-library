@@ -3413,7 +3413,7 @@ export class ProgrammeService {
       // await this.programmeTransferRepo.save(transfer);
 
       const hostAddress = this.configService.get("host");
-      if (requester.companyId != toCompany.companyId) {
+      if (requester.companyId != toCompany.companyId && requestedCompany.companyRole != CompanyRole.MINISTRY) {
         transfer.status = TransferStatus.PENDING;
         await this.emailHelperService.sendEmailToGovernmentAdmins(
           EmailTemplates.CREDIT_RETIREMENT_BY_DEV,
