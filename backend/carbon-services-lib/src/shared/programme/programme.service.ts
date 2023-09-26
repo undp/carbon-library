@@ -909,6 +909,14 @@ export class ProgrammeService {
       documentCreatedUser = await this.userService.findById(Number(d.remark));
       if(documentCreatedUser){
         cid = (documentCreatedUser.companyRole === CompanyRole.CERTIFIER ? Number(documentCreatedUser.companyId): undefined);
+        if(cid){
+          const company = await this.companyRepo.findOne({
+            where: { companyId: documentCreatedUser.companyId }
+          });
+          if(company){
+            documentCreatedUser.companyName = company.name;
+          }
+        }
       }
     }
 
