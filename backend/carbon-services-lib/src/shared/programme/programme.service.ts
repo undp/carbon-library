@@ -783,7 +783,7 @@ export class ProgrammeService {
     return ndc;
   }
 
-  async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme) {
+  async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme, certifierUser?:User) {
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
       const updT = {}    
       if (
@@ -816,10 +816,10 @@ export class ProgrammeService {
             return Number(element) === certifierId
           })
           if (index === -1) {
-            await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+            await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, certifierUser ? this.getUserRef(certifierUser): '', d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
           }
         }else{
-          await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, "TODO", d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
+          await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, certifierUser ? this.getUserRef(certifierUser):'', d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
         }
       } 
       if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
@@ -904,8 +904,9 @@ export class ProgrammeService {
 
     let program;
     let cid;
+    let documentCreatedUser;
     if(d.remark){
-      const documentCreatedUser = await this.userService.findById(Number(d.remark));
+      documentCreatedUser = await this.userService.findById(Number(d.remark));
       if(documentCreatedUser){
         cid = (documentCreatedUser.companyRole === CompanyRole.CERTIFIER ? Number(documentCreatedUser.companyId): undefined);
       }
@@ -925,7 +926,7 @@ export class ProgrammeService {
 
     const resp = await this.entityManager.transaction(async (em) => {
       if (documentAction.status === DocumentStatus.ACCEPTED) {
-         await this.approveDocumentCommit(em, d, ndc, cid, program);
+         await this.approveDocumentCommit(em, d, ndc, cid, program,cid ? documentCreatedUser : undefined);
       }
       return await em.update(
         ProgrammeDocument,
