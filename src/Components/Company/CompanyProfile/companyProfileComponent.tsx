@@ -8,7 +8,9 @@ import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
-import OrganisationStatus from "../../Common/OrganisationStatus/organisationStatus";
+import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
+import { addCommSep, SectoralScope } from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
@@ -136,6 +138,16 @@ export const CompanyProfileComponent = (props: any) => {
     setErrorMsg("");
     setOpenReactivateModal(true);
   };
+  const getEnumKeysFromValues = (values: string[]): string[] => {
+    const enumKeys: string[] = [];
+    for (const key in SectoralScope) {
+      if (values.includes(SectoralScope[key as keyof typeof SectoralScope])) {
+        enumKeys.push(key);
+      }
+    }
+
+    return enumKeys;
+  };
 
   return (
     <div className="content-container company-profile">
@@ -244,12 +256,46 @@ export const CompanyProfileComponent = (props: any) => {
                     </Row>
                     <Row className="field">
                       <Col span={12} className="field-key">
+                        {t("companyProfile:paymentId")}
+                      </Col>
+                      <Col span={12} className="field-value nextline-overflow">
+                        {companyDetails.paymentId ? companyDetails.paymentId : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
                         {t("companyProfile:companyRole")}
                       </Col>
                       <Col span={12} className="field-value">
                         <CompanyRoleIcon role={companyDetails.companyRole} />
                       </Col>
                     </Row>
+                    {companyDetails?.companyRole === CompanyRole.MINISTRY && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:ministerName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.nameOfMinister
+                              ? companyDetails.nameOfMinister
+                              : "-"}
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:sectoralScope")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.sectoralScope
+                              ? getEnumKeysFromValues(
+                                  companyDetails.sectoralScope
+                                ).join(", ")
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                     <Row className="field">
                       <Col span={12} className="field-key">
                         {t("companyProfile:email")}
@@ -316,7 +362,7 @@ export const CompanyProfileComponent = (props: any) => {
                       </Col>
                       <Col span={12} className="field-value">
                         {companyDetails.creditBalance
-                          ? companyDetails.creditBalance
+                          ? addCommSep(companyDetails.creditBalance)
                           : "-"}
                       </Col>
                     </Row>

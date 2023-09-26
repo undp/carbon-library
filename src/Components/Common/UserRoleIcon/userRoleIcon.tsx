@@ -21,7 +21,7 @@ export interface UserRoleIconProps {
   role: string;
 }
 
-const UserRoleIcon: FC<UserRoleIconProps> = (props: UserRoleIconProps) => {
+export const UserRoleIcon: FC<UserRoleIconProps> = (props: UserRoleIconProps) => {
   const { role } = props;
   return (
     <div
@@ -53,4 +53,3 @@ const UserRoleIcon: FC<UserRoleIconProps> = (props: UserRoleIconProps) => {
   );
 };
 
-export default UserRoleIcon;

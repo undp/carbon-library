@@ -5,82 +5,23 @@ import {
   CertBGColor,
   DevBGColor,
 } from "../../Styles/role.color.constants";
-
-export enum ProgrammeStage {
-  AwaitingAuthorization = "Pending",
-  Authorised = "Authorised",
-  // Transferred = 'Transferred',
-  // Retired = 'Retired',
-  Rejected = "Rejected",
-  // Frozen = 'Frozen',
-}
-
-export enum ProgrammeStageMRV {
-  AwaitingAuthorization = "Pending",
-  Authorised = "Authorised",
-  Approved = "Approved",
-  Rejected = "Rejected",
-}
-
-// export enum ProgrammeTransferStage {
-//   APPROVED = 'Approved',
-//   REJECTED = 'Rejected',
-//   PENDING = 'Pending',
-//   // Frozen = 'Frozen',
-// }
-
-export enum Role {
-  Root = "Root",
-  Admin = "Admin",
-  Manager = "Manager",
-  ViewOnly = "ViewOnly",
-}
-
-export enum RetireType {
-  CROSS_BORDER = "0",
-  LEGAL_ACTION = "1",
-  OTHER = "2",
-}
-
-export enum CreditTransferStage {
-  Pending = "Pending",
-  Approved = "Accepted",
-  Rejected = "Rejected",
-  Cancelled = "Cancelled",
-  Recognised = "Recognised",
-  NotRecognised = "NotRecognised",
-}
-
-export enum TxType {
-  CREATE = "0",
-  REJECT = "1",
-  ISSUE = "2",
-  TRANSFER = "3",
-  CERTIFY = "4",
-  RETIRE = "5",
-  REVOKE = "6",
-  FREEZE = "7",
-  AUTH = "8",
-  UNFREEZE = "9",
-}
-
-export enum SectoralScope {
-  "Energy Industry" = "1",
-  "Energy Distribution" = "2",
-  "Agriculture" = "15",
-}
-
-export enum TypeOfMitigation {
-  AGRICULTURE = "Agriculture",
-  SOLAR = "Solar",
-}
+import {
+  ProgrammeStageR,
+  ProgrammeStageMRV,
+  ProgrammeStageUnified,
+} from "../Enums/programmeStage.enum";
+import { TypeOfMitigation } from "../Enums/typeOfMitigation.enum";
+import { CreditTransferStage } from "../Enums/creditTransferStage.enum";
+import { SectoralScope } from "../Enums/sectoralScope.enum";
+import { RcFile } from "rc-upload/lib/interface";
+import { CarbonSystemType } from "../Enums/carbonSystemType.enum";
 
 export const getStageEnumVal = (value: string) => {
-  const index = Object.keys(ProgrammeStage).indexOf(value);
+  const index = Object.keys(ProgrammeStageUnified).indexOf(value);
   if (index < 0) {
     return value;
   }
-  return Object.values(ProgrammeStage)[index];
+  return Object.values(ProgrammeStageUnified)[index];
 };
 
 export const getCreditStageVal = (value: string) => {
@@ -111,13 +52,15 @@ export const getStageTransferEnumVal = (
   return Object.values(CreditTransferStage)[index];
 };
 
-export const getStageTagType = (stage: ProgrammeStage) => {
+export const getStageTagType = (
+  stage: ProgrammeStageR | ProgrammeStageUnified
+) => {
   switch (getStageEnumVal(stage)) {
-    case ProgrammeStage.AwaitingAuthorization:
+    case ProgrammeStageR.AwaitingAuthorization:
       return "error";
-    case ProgrammeStage.Authorised:
+    case ProgrammeStageR.Authorised:
       return "processing";
-    // case ProgrammeStage.Transferred:
+    // case ProgrammeStageR.Transferred:
     //   return 'success';
     default:
       return "default";
@@ -169,17 +112,9 @@ export class UnitField {
   constructor(public unit: string, public value: any) {}
 }
 
-export enum CompanyRole {
-  CERTIFIER = "Certifier",
-  PROGRAMME_DEVELOPER = "ProgrammeDeveloper",
-  MRV = "MRV",
-  GOVERNMENT = "Government",
-}
-
 export interface ProgrammeProperties {
   maxInternationalTransferAmount: string;
   creditingPeriodInYears: number;
-  programmeCostUSD: number;
   sourceOfFunding: any;
   grantEquivalentAmount: number;
   carbonPriceUSDPerTon: number;
@@ -191,14 +126,29 @@ export interface ProgrammeProperties {
   projectMaterial: [];
 }
 
+export interface ProgrammePropertiesR extends ProgrammeProperties {
+  programmeCostUSD: number;
+  estimatedProgrammeCostUSD: number;
+}
+
+export interface ProgrammePropertiesT extends ProgrammeProperties {
+  estimatedProgrammeCostUSD: number;
+}
+
+export interface ProgrammePropertiesU extends ProgrammeProperties {
+  estimatedProgrammeCostUSD: number;
+  programmeCostUSD: number;
+}
+
 export interface Programme {
   programmeId: string;
+  externalId: string;
   serialNo: string;
   title: string;
   sectoralScope: string;
   sector: string;
   countryCodeA2: string;
-  currentStage: ProgrammeStage;
+  currentStage: ProgrammeStageR | ProgrammeStageMRV | ProgrammeStageUnified;
   startTime: number;
   endTime: number;
   creditChange: number;
@@ -225,10 +175,30 @@ export interface Programme {
   txRef: string;
   typeOfMitigation: TypeOfMitigation;
   geographicalLocationCordintes: any;
+  mitigationActions: any;
 }
 
-export const getGeneralFields = (programme: Programme) => {
-  return {
+export interface ProgrammeR extends Programme {
+  currentStage: ProgrammeStageR;
+  programmeProperties: ProgrammePropertiesR;
+}
+
+export interface ProgrammeT extends Programme {
+  currentStage: ProgrammeStageMRV;
+  programmeProperties: ProgrammePropertiesT;
+  emissionReductionExpected: number;
+  emissionReductionAchieved: number;
+}
+
+export interface ProgrammeU extends Programme {
+  currentStage: ProgrammeStageUnified;
+  programmeProperties: ProgrammePropertiesU;
+  emissionReductionExpected: number;
+  emissionReductionAchieved: number;
+}
+
+export const getGeneralFields = (programme: Programme |ProgrammeU | ProgrammeR | ProgrammeT, system?:CarbonSystemType) => {
+  let res: Record<string,any>={
     title: programme.title,
     serialNo: programme.serialNo,
     currentStatus: programme.currentStage,
@@ -244,6 +214,12 @@ export const getGeneralFields = (programme: Programme) => {
     endDate: DateTime.fromSeconds(Number(programme.endTime)),
     buyerCountry: programme.programmeProperties.buyerCountryEligibility,
   };
+  if(system===CarbonSystemType.UNIFIED || system===CarbonSystemType.MRV){
+    let prog:any=programme
+    res.emissionsReductionExpected = prog.emissionReductionExpected
+    res.emissionsReductionAchieved = prog.emissionReductionAchieved
+  }
+  return res
 };
 
 export const addCommSep = (value: any) => {
@@ -277,15 +253,22 @@ export const addSpaces = (text: string) => {
   return text.replace(/([A-Z])/g, " $1").trim();
 };
 
-export const getFinancialFields = (programme: Programme) => {
+export const getFinancialFields = (
+  programme: ProgrammeU | ProgrammeR | ProgrammeT
+) => {
   return {
-    programmeCost: addCommSep(programme.programmeProperties.programmeCostUSD),
+    estimatedProgrammeCostUSD: addCommSep(
+      programme.programmeProperties.estimatedProgrammeCostUSD
+    ),
+    creditEst: addCommSep(programme.creditEst),
     financingType: addSpaces(programme.programmeProperties.sourceOfFunding),
     grantEquivalent: new UnitField(
       "USD",
       addCommSep(programme.programmeProperties.grantEquivalentAmount)
     ),
-    carbonPrice: addCommSep(programme.programmeProperties.carbonPriceUSDPerTon),
+    carbonPriceUSDPerTon: addCommSep(
+      programme.programmeProperties.carbonPriceUSDPerTon
+    ),
   };
 };
 
@@ -320,3 +303,11 @@ export const sumArray = (arrList: any[]) => {
 
   return arrList.reduce((a, b) => Number(a) + Number(b), 0);
 };
+
+export const getBase64 = (file: RcFile): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });

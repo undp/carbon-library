@@ -23,17 +23,19 @@ import {
   getStageEnumVal,
   getStageTagType,
   getStageTagTypeMRV,
-  ProgrammeStage,
-  ProgrammeStageMRV,
   sumArray,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { ProgrammeManagementColumns } from "../../../Definitions/Enums/programme.management.columns.enum";
-import { User } from "../../../Definitions/Entities/user";
 import { Action } from "../../../Definitions/Enums/action.enum";
 import { PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
-
+import {
+  ProgrammeEntity,
+  ProgrammeStageR,
+  ProgrammeStageMRV,
+} from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 const { Search } = Input;
 
 export const ProgrammeManagementComponent = (props: any) => {
@@ -45,6 +47,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     onNavigateToProgrammeView,
     onClickAddProgramme,
     enableAddProgramme,
+    useAbilityContext,
   } = props;
   const { get, delete: del, post } = useConnection();
   const [totalProgramme, setTotalProgramme] = useState<number>();
@@ -58,9 +61,13 @@ export const ProgrammeManagementComponent = (props: any) => {
   const [dataFilter, setDataFilter] = useState<any>();
   const [sortOrder, setSortOrder] = useState<string>();
   const [sortField, setSortField] = useState<string>();
+  const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
+  const [ministryLevelFilter, setMinistryLevelFilter] =
+    useState<boolean>(false);
   const { userInfoState } = useUserContext();
+  const ability = useAbilityContext();
 
-  const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStage;
+  const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStageR;
 
   const statusOptions = Object.keys(stageObject).map((k, index) => ({
     label: Object.values(stageObject)[index],
@@ -152,11 +159,7 @@ export const ProgrammeManagementComponent = (props: any) => {
             </Tooltip>
           );
         });
-        return (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {elements}
-          </div>
-        );
+        return <div className="org-list">{elements}</div>;
       },
     },
     {
@@ -218,14 +221,13 @@ export const ProgrammeManagementComponent = (props: any) => {
         return item ? addCommSep(sumArray(item)) : "-";
       },
     },
-
     {
       title: t("programme:emissionsReductionExpected"),
       dataIndex: "emissionReductionExpected",
       key: ProgrammeManagementColumns.emissionReductionExpected,
       align: "right" as const,
       render: (item: any) => {
-        return item ? item : "-";
+        return item ? addCommSep(item) : "-";
       },
     },
     {
@@ -234,7 +236,16 @@ export const ProgrammeManagementComponent = (props: any) => {
       key: ProgrammeManagementColumns.emissionReductionAchieved,
       align: "right" as const,
       render: (item: any) => {
-        return item ? item : "-";
+        return item ? addCommSep(item) : "-";
+      },
+    },
+    {
+      title: t("programme:emissionReductionAchievedandCreditIssued"),
+      dataIndex: "emissionReductionAchieved",
+      key: ProgrammeManagementColumns.emissionReductionAchievedandCreditIssued,
+      align: "right" as const,
+      render: (item: any) => {
+        return item ? addCommSep(item) : "-";
       },
     },
     {
@@ -284,6 +295,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     setLoading(true);
 
     const filter: any[] = [];
+    const filterOr: any[] = [];
 
     if (dataFilter) {
       filter.push(dataFilter);
@@ -299,6 +311,16 @@ export const ProgrammeManagementComponent = (props: any) => {
       });
     }
 
+    if (ministryLevelFilter) {
+      ministrySectoralScope?.map((secScope: any) => {
+        filterOr.push({
+          key: "sectoralScope",
+          operation: "=",
+          value: secScope,
+        });
+      });
+    }
+
     let sort: any;
     if (sortOrder && sortField) {
       sort = {
@@ -308,7 +330,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       };
     } else {
       sort = {
-        key: "programmeId",
+        key: "createdTime",
         order: "DESC",
       };
     }
@@ -318,6 +340,7 @@ export const ProgrammeManagementComponent = (props: any) => {
         page: currentPage,
         size: pageSize,
         filterAnd: filter,
+        filterOr: filterOr?.length > 0 ? filterOr : undefined,
         sort: sort,
       });
       setTableData(response.data);
@@ -331,6 +354,36 @@ export const ProgrammeManagementComponent = (props: any) => {
         duration: 3,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
+      setLoading(false);
+    }
+  };
+
+  const getUserDetails = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/user/query", {
+        page: 1,
+        size: 10,
+        filterAnd: [
+          {
+            key: "id",
+            operation: "=",
+            value: userInfoState?.id,
+          },
+        ],
+      });
+      if (response && response.data) {
+        if (
+          response?.data[0]?.companyRole === CompanyRole.MINISTRY &&
+          response?.data[0]?.company &&
+          response?.data[0]?.company?.sectoralScope
+        ) {
+          setMinistrySectoralScope(response?.data[0]?.company?.sectoralScope);
+        }
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in getting users", error);
       setLoading(false);
     }
   };
@@ -349,7 +402,20 @@ export const ProgrammeManagementComponent = (props: any) => {
 
   useEffect(() => {
     getAllProgramme();
-  }, [currentPage, pageSize, sortField, sortOrder, search]);
+  }, [
+    currentPage,
+    pageSize,
+    sortField,
+    sortOrder,
+    search,
+    ministryLevelFilter,
+  ]);
+
+  useEffect(() => {
+    if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
+      getUserDetails();
+    }
+  }, []);
 
   const onChange: PaginationProps["onChange"] = (page, size) => {
     setCurrentPage(page);
@@ -377,22 +443,25 @@ export const ProgrammeManagementComponent = (props: any) => {
           <div className="body-sub-title">{t("programme:desc")}</div>
         </div>
         <div className="actions">
-          <div className="action-bar">
-            <Button
-              type="primary"
-              size="large"
-              block
-              icon={<PlusOutlined />}
-              onClick={onClickAddProgramme}
-            >
-              {t("programme:addProgramme")}
-            </Button>
-          </div>
+          {ability.can(Action.Manage, ProgrammeEntity) &&
+            enableAddProgramme && (
+              <div className="action-bar">
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  icon={<PlusOutlined />}
+                  onClick={onClickAddProgramme}
+                >
+                  {t("programme:addProgramme")}
+                </Button>
+              </div>
+            )}
         </div>
       </div>
       <div className="content-card">
         <Row className="table-actions-section">
-          <Col lg={{ span: 16 }} md={{ span: 16 }}>
+          <Col lg={{ span: 15 }} md={{ span: 14 }}>
             <div className="action-bar">
               <Checkbox
                 className="all-check"
@@ -413,24 +482,34 @@ export const ProgrammeManagementComponent = (props: any) => {
               />
             </div>
           </Col>
-          <Col lg={{ span: 8 }} md={{ span: 8 }}>
+          <Col lg={{ span: 9 }} md={{ span: 10 }}>
             <div className="filter-section">
               <div className="search-filter">
                 <Checkbox
                   className="label"
-                  onChange={(v) =>
-                    setDataFilter(
-                      v.target.checked
-                        ? {
-                            key: "companyId",
-                            operation: "ANY",
-                            value: userInfoState?.companyId,
-                          }
-                        : undefined
-                    )
-                  }
+                  onChange={(v) => {
+                    if (userInfoState.companyRole === CompanyRole.MINISTRY) {
+                      if (v.target.checked) {
+                        setMinistryLevelFilter(true);
+                      } else {
+                        setMinistryLevelFilter(false);
+                      }
+                    } else {
+                      setDataFilter(
+                        v.target.checked
+                          ? {
+                              key: "companyId",
+                              operation: "ANY",
+                              value: userInfoState?.companyId,
+                            }
+                          : undefined
+                      );
+                    }
+                  }}
                 >
-                  {t("view:seeMine")}
+                  {userInfoState.companyRole === CompanyRole.MINISTRY
+                    ? t("view:ministryLevel")
+                    : t("view:seeMine")}
                 </Checkbox>
               </div>
               <div className="search-bar">

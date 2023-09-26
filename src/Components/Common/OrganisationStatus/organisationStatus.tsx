@@ -6,7 +6,7 @@ export interface OrganisationStatusProps {
   t: any;
 }
 
-const OrganisationStatus = (props: OrganisationStatusProps) => {
+export const OrganisationStatus = (props: OrganisationStatusProps) => {
   const { organisationStatus, t } = props;
 
   return organisationStatus === 1 ? (
@@ -18,4 +18,3 @@ const OrganisationStatus = (props: OrganisationStatusProps) => {
   );
 };
 
-export default OrganisationStatus;

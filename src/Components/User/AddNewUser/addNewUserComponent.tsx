@@ -5,7 +5,6 @@ import {
   Button,
   Form,
   Input,
-  Select,
   message,
   Radio,
   Tooltip,
@@ -20,11 +19,10 @@ import { User } from "../../../Definitions/Entities/user";
 import * as Icon from "react-bootstrap-icons";
 import { plainToClass } from "class-transformer";
 import { Action } from "../../../Definitions/Enums/action.enum";
-import { Role } from "../../../Definitions/Definitions/programme.definitions";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import ChangePasswordModel from "../../Common/Models/changePasswordModel";
+import { Role } from "../../../Definitions";
 
-const { Option } = Select;
 
 export const AddNewUserComponent = (props: any) => {
   const {
@@ -35,6 +33,7 @@ export const AddNewUserComponent = (props: any) => {
     useUserContext,
     useLocation,
     useAbilityContext,
+    themeColor,
   } = props;
   const { post, put, delete: del, get } = useConnection();
   const [formOne] = Form.useForm();
@@ -53,7 +52,6 @@ export const AddNewUserComponent = (props: any) => {
   const ability = useAbilityContext();
   const [countries, setCountries] = useState<[]>([]);
   const [isCountryListLoading, setIsCountryListLoading] = useState(false);
-
 
   const getCountryList = async () => {
     setIsCountryListLoading(true);
@@ -490,6 +488,7 @@ export const AddNewUserComponent = (props: any) => {
         openModal={openPasswordChangeModal}
         errorMsg={errorMsg}
         loadingBtn={isLoading}
+        themeColor={themeColor}
       ></ChangePasswordModel>
     </div>
   );

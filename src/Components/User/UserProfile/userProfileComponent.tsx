@@ -2,10 +2,12 @@ import { Row, Col, Card, Button, Skeleton } from "antd";
 import { UserOutlined, BankOutlined } from "@ant-design/icons";
 import "./userProfileComponent.scss";
 import { useEffect, useState } from "react";
-import UserRoleIcon from "../../Common/UserRoleIcon/userRoleIcon";
+import { UserRoleIcon } from "../../Common/UserRoleIcon/userRoleIcon";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import LanguageSelection from "../../Common/LanguageSelection/languageSelection";
 import React from "react";
+import { SectoralScope, addCommSep } from "../../../Definitions";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const UserProfileComponent = (props: any) => {
   const {
@@ -40,6 +42,16 @@ export const UserProfileComponent = (props: any) => {
         setIsLoading(false);
       }
     } catch (exception) {}
+  };
+
+  const getEnumKeysFromValues = (values: string[]): string[] => {
+    const enumKeys: string[] = [];
+    for (const key in SectoralScope) {
+      if (values.includes(SectoralScope[key as keyof typeof SectoralScope])) {
+        enumKeys.push(key);
+      }
+    }
+    return enumKeys;
   };
 
   useEffect(() => {
@@ -187,6 +199,16 @@ export const UserProfileComponent = (props: any) => {
                     </Row>
                     <Row className="field">
                       <Col span={12} className="field-key">
+                        {t("userProfile:paymentId")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {organisationDetails.paymentId
+                          ? organisationDetails.paymentId
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
                         {t("userProfile:companyRole")}
                       </Col>
                       <Col span={12} className="field-value">
@@ -195,6 +217,33 @@ export const UserProfileComponent = (props: any) => {
                         />
                       </Col>
                     </Row>
+                    {organisationDetails?.companyRole ===
+                      CompanyRole.MINISTRY && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("userProfile:ministerName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {organisationDetails.nameOfMinister
+                              ? organisationDetails.nameOfMinister
+                              : "-"}
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("userProfile:sectoralScope")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {organisationDetails.sectoralScope
+                              ? getEnumKeysFromValues(
+                                  organisationDetails.sectoralScope
+                                ).join(", ")
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                     <Row className="field">
                       <Col span={12} className="field-key">
                         {t("userProfile:email")}
@@ -258,7 +307,7 @@ export const UserProfileComponent = (props: any) => {
                       </Col>
                       <Col span={12} className="field-value">
                         {organisationDetails.creditBalance
-                          ? organisationDetails.creditBalance
+                          ? addCommSep(organisationDetails.creditBalance)
                           : "-"}
                       </Col>
                     </Row>

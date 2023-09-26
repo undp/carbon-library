@@ -1,4 +1,5 @@
 import {
+  AuditOutlined,
   BankOutlined,
   ExperimentOutlined,
   FilterOutlined,
@@ -31,6 +32,8 @@ import {
   DevColor,
   GovBGColor,
   GovColor,
+  MinBGColor,
+  MinColor,
 } from "../../../Styles/role.color.constants";
 import { addCommSep } from "../../../Definitions/Definitions/programme.definitions";
 import { CompanyTableDataType } from "../../../Definitions/Definitions/companyManagement.definitions";
@@ -38,6 +41,7 @@ import { Action } from "../../../Definitions/Enums/action.enum";
 import { Company } from "../../../Definitions/Entities/company";
 import { CompanyManagementColumns } from "../../../Definitions/Enums/company.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
+import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 const { Search } = Input;
 
@@ -95,14 +99,16 @@ export const CompanyManagementComponent = (props: any) => {
   const getCompanyRoleComponent = (item: string) => {
     return (
       <div style={{ display: "flex", alignItems: "center" }}>
-        {item === "Government" ? (
+        {item === CompanyRole.GOVERNMENT ? (
           <RoleIcon icon={<BankOutlined />} bg={GovBGColor} color={GovColor} />
-        ) : item === "Certifier" ? (
+        ) : item === CompanyRole.CERTIFIER ? (
           <RoleIcon
             icon={<SafetyOutlined />}
             bg={CertBGColor}
             color={CertColor}
           />
+        ) : item === CompanyRole.MINISTRY ? (
+          <RoleIcon icon={<AuditOutlined />} bg={MinBGColor} color={MinColor} />
         ) : (
           <RoleIcon
             icon={<ExperimentOutlined />}
@@ -110,7 +116,7 @@ export const CompanyManagementComponent = (props: any) => {
             color={DevColor}
           />
         )}
-        {item === "ProgrammeDeveloper" ? (
+        {item === CompanyRole.PROGRAMME_DEVELOPER ? (
           <div>{t("company:developer")}</div>
         ) : (
           <div>{item}</div>
@@ -193,7 +199,7 @@ export const CompanyManagementComponent = (props: any) => {
       sorter: true,
       align: "left" as const,
       render: (item: any) => {
-        return item ? item : "-";
+        return item ? addCommSep(item) : "-";
       },
     },
     {
@@ -288,8 +294,13 @@ export const CompanyManagementComponent = (props: any) => {
         "national/organisation/query",
         getAllOrganisationParams()
       );
-      setTableData(response.data);
-      setTotalCompany(response.response.data.total);
+      if (response && response.data) {
+        const availableCompanies = response.data.filter(
+          (company: any) => company.companyRole !== CompanyRole.API
+        );
+        setTableData(availableCompanies);
+        setTotalCompany(response?.response?.data?.total);
+      }
       setLoading(false);
     } catch (error: any) {
       message.open({
@@ -330,7 +341,7 @@ export const CompanyManagementComponent = (props: any) => {
       title: "Filter by",
       label: (
         <div className="filter-menu-item">
-          <div className="filter-title">{t("company:creditBalance")}</div>
+          <div className="filter-title">{t("company:filterByOrgType")}</div>
           <Radio.Group
             onChange={onFilterOrganisationType}
             value={filterByOrganisationType}
@@ -338,6 +349,7 @@ export const CompanyManagementComponent = (props: any) => {
             <Space direction="vertical">
               <Radio value="All">{t("company:all")}</Radio>
               <Radio value="Government">{t("company:gov")}</Radio>
+              <Radio value="Ministry">{t("company:min")}</Radio>
               <Radio value="ProgrammeDeveloper">{t("company:developer")}</Radio>
               <Radio value="Certifier">{t("company:certifier")}</Radio>
             </Space>
