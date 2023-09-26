@@ -1652,7 +1652,7 @@ export class ProgrammeService {
       });
 
       if (designDocumentApproved) {
-        await this.sendLetterOfIntentResponse(savedProgramme);
+        await this.sendLetterOfIntentResponse(programme);
       }
     }
 
