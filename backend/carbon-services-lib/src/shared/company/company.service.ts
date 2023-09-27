@@ -32,6 +32,7 @@ import { SystemActionType } from "../enum/system.action.type";
 import { FileHandlerInterface } from "../file-handler/filehandler.interface";
 import { CounterType } from "../util/counter.type.enum";
 import { CounterService } from "../util/counter.service";
+import { LocationInterface } from "../location/location.interface";
 
 @Injectable()
 export class CompanyService {
@@ -46,7 +47,8 @@ export class CompanyService {
     @InjectRepository(ProgrammeTransfer)
     private programmeTransferRepo: Repository<ProgrammeTransfer>,
     private fileHandler: FileHandlerInterface,
-    private counterService: CounterService
+    private counterService: CounterService,
+    private locationService: LocationInterface
   ) {}
 
   async suspend(
@@ -403,6 +405,15 @@ export class CompanyService {
           HttpStatus.INTERNAL_SERVER_ERROR
         );
       }
+    }
+
+    if(companyUpdateDto.regions){
+      companyUpdateDto.geographicalLocationCordintes = await this.locationService
+      .getCoordinatesForRegion(companyUpdateDto.regions)
+      .then((response: any) => {
+        console.log("response from forwardGeoCoding function -> ", response);
+        return  [...response];
+      });
     }
 
     const { companyId, ...companyUpdateFields } = companyUpdateDto;
