@@ -15,6 +15,7 @@ import { PasswordReset } from "../entities/userPasswordResetToken.entity";
 import { PasswordResetService } from "../util/passwordReset.service";
 import { AsyncAction, AsyncOperationsInterface } from "../async-operations/async-operations.interface";
 import { AsyncActionType } from "../enum/async.action.type.enum";
+import { PasswordHashService } from "../util/passwordHash.service";
 
 @Injectable()
 export class AuthService {
@@ -27,10 +28,12 @@ export class AuthService {
     private passwordReset: PasswordResetService,
     public caslAbilityFactory: CaslAbilityFactory,
     private asyncOperationsInterface: AsyncOperationsInterface,
+    private passwordHashService: PasswordHashService
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.userService.getUserCredentials(username?.toLowerCase());
+    pass = this.passwordHashService.getPasswordHash(pass);
     if (user && user.password === pass) {
       const { password, ...result } = user;
       return result;

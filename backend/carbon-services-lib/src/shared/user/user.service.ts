@@ -49,6 +49,7 @@ import { AsyncActionType } from "../enum/async.action.type.enum";
 import { DataResponseMessageDto } from "../dto/data.response.message";
 import { AsyncOperationType } from "../enum/async.operation.type.enum";
 import { LocationInterface } from "../location/location.interface";
+import { PasswordHashService } from "../util/passwordHash.service";
 
 @Injectable()
 export class UserService {
@@ -64,7 +65,8 @@ export class UserService {
     private countryService: CountryService,
     private fileHandler: FileHandlerInterface,
     private asyncOperationsInterface: AsyncOperationsInterface,
-    private locationService: LocationInterface
+    private locationService: LocationInterface,
+    private passwordHashService: PasswordHashService
   ) {}
 
   private async generateApiKey(email) {
@@ -205,6 +207,10 @@ export class UserService {
       )
       .addSelect(["User.password"])
       .getOne();
+    
+    passwordResetDto.oldPassword = this.passwordHashService.getPasswordHash(passwordResetDto.oldPassword);
+    passwordResetDto.newPassword = this.passwordHashService.getPasswordHash(passwordResetDto.newPassword);
+    
     if (!user || user.password != passwordResetDto.oldPassword) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -528,7 +534,9 @@ export class UserService {
       u.country = this.configService.get("systemCountry");
     }
 
-    u.password = this.helperService.generateRandomPassword();
+    let generatedPassword = this.helperService.generateRandomPassword();
+    u.password = this.passwordHashService.getPasswordHash(generatedPassword);
+
     if (userDto.role == Role.Admin && u.companyRole == CompanyRole.API) {
       u.apiKey = await this.generateApiKey(userDto.email);
     }
@@ -608,7 +616,7 @@ export class UserService {
     const templateData = {
       name: u.name,
       countryName: this.configService.get("systemCountryName"),
-      tempPassword: u.password,
+      tempPassword: generatedPassword,
       home: hostAddress,
       email: u.email,
       address: this.configService.get("email.adresss"),
