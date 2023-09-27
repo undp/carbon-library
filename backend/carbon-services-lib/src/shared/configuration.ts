@@ -22,6 +22,7 @@ export default () => ({
     expiresIn: process.env.EXPIRES_IN || "7200",
     userSecret: process.env.USER_JWT_SECRET || "1324",
     adminSecret: process.env.ADMIN_JWT_SECRET || "8654",
+    encodePassword: process.env.ENCODE_PASSWORD || false
   },
   ledger: {
     name: "carbon-registry-" + (process.env.NODE_ENV || "dev"),
