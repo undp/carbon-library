@@ -7,6 +7,7 @@ import { CompanyModule } from '../company/company.module';
 import { ProgrammeModule } from '../programme/programme.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProgrammeDocument } from '../entities/programme.document';
+import { EmailHelperModule } from '../email-helper/email-helper.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { ProgrammeDocument } from '../entities/programme.document';
     ]),
     UtilModule,
     CompanyModule,
-    ProgrammeModule
+    ProgrammeModule,
+    EmailHelperModule
   ],
   providers: [RegistryClientService, Logger],
   exports: [RegistryClientService]
