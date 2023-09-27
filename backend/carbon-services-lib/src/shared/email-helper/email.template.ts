@@ -5,7 +5,7 @@ export const EmailTemplates = {
     html: `
         Welcome {{organisationName}},<br><br>
         Your Organisation has been registered with the {{countryName}} Carbon Registry as a {{organisationRole}} Organisation. <br><br>
-        Explore the Registry here {{home}}. <br><br>
+        Explore the Registry <a href="{{home}}">here</a>. <br><br>
 
         Sincerely,<br>
         The {{countryName}} Carbon Credit Registry Team
@@ -18,14 +18,14 @@ export const EmailTemplates = {
         Welcome {{name}}, <br><br>
 
         Your account has been created for the {{countryName}} Carbon Credit
-        Registry. You can access your account using the temporary Homepage: {{home}} <br><br>
+        Registry. You can access your account using the temporary Homepage: <a href="{{home}}">{{home}}</a> <br><br>
 
         User: {{email}} <br>
         Password (temporary): {{tempPassword}} <br><br>
 
         If you have any questions, feel free to email our customer success
         team <a href="mailto:help@carbreg.org?subject=I Need Help With The {{countryName}} Carbon Credit Registry">customer success team</a>
-        (We’re lightning quick at replying.) We also offer live chat {{liveChat}}.
+        (We’re lightning quick at replying.) We also offer live chat <a href="{{liveChat}}">{{liveChat}}</a>.
         <br><br>
 
         Sincerely, <br>
