@@ -69,6 +69,7 @@ import { DocumentStatus } from "../enum/document.status";
 import { ObjectionLetterGen } from "../util/objection.letter.gen";
 import { ProgrammeDocumentViewEntity } from "../entities/document.view.entity";
 import { SectoralScope } from "@undp/serial-number-gen";
+import { SectoralScope as SectoralScopeDef} from "../enum/sectoral.scope.enum";
 import { Sector } from "../enum/sector.enum";
 import { sectoralScopesMapped } from "../sectoralSecor.mapped";
 import { NDCStatus } from "../enum/ndc.status";
@@ -949,11 +950,11 @@ export class ProgrammeService {
       
     });
 
-    if (resp && d.type === DocType.DESIGN_DOCUMENT) {
+    if (resp && d.type === DocType.DESIGN_DOCUMENT && documentAction.status === DocumentStatus.ACCEPTED) {
       await this.sendLetterOfIntentResponse(pr);
     }
 
-    if (resp && d.type === DocType.METHODOLOGY_DOCUMENT) {
+    if (resp && d.type === DocType.METHODOLOGY_DOCUMENT && documentAction.status === DocumentStatus.ACCEPTED) {
       await this.sendRequestForLetterOfAuthorisation(pr);
     }
 
@@ -979,15 +980,12 @@ export class ProgrammeService {
     let sectorialMinistries: string[] = [];
 
     if (programme.sectoralScope) {
-      for (const sectoralScopeId of programme.sectoralScope) {
-        const ministry = await this.companyService.getSectoralScopeMinistry(sectoralScopeId);
-        ministry.forEach((company) => {
-          if (!sectorialMinistries.includes(company?.name)) {
-            sectorialMinistries.push(company.name);
-          }
-        })
-
-      }
+      const ministry = await this.companyService.getSectoralScopeMinistry(programme.sectoralScope);
+      ministry.forEach((company) => {
+        if (!sectorialMinistries.includes(company?.name)) {
+          sectorialMinistries.push(company.name);
+        }
+      })
     }
 
     let sectoralMinistryNames: string;
@@ -1045,8 +1043,8 @@ export class ProgrammeService {
     const hostAddress = this.configService.get("host");
     let companies: string[] = [];
     let companyEmails: string[] = [];
-    const programmeSectoralScopeKey = Object.keys(SectoralScope).find(
-      (key) => SectoralScope[key] === programme.sectoralScope
+    const programmeSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+      (key) => SectoralScopeDef[key] === programme.sectoralScope
     );
 
     for (const companyId of programme.companyId) {
@@ -1219,11 +1217,11 @@ export class ProgrammeService {
     if (user.companyRole === CompanyRole.GOVERNMENT ||
       (user.companyRole === CompanyRole.MINISTRY &&
         permissionForMinistryLevel)) {
-      if (resp && dr.type === DocType.DESIGN_DOCUMENT) {
+      if (resp && dr.type === DocType.DESIGN_DOCUMENT && dr.status === DocumentStatus.ACCEPTED) {
         await this.sendLetterOfIntentResponse(programme);
       }
 
-      if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT) {
+      if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT && dr.status === DocumentStatus.ACCEPTED) {
         await this.sendRequestForLetterOfAuthorisation(programme);
       }
     }
