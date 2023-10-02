@@ -355,7 +355,7 @@ export const EmailTemplates = {
         Click <a href="{{programmePageLink}}">here</a> to access all the programmes that require authorisation. <br><br>
         
         Sincerely, <br>
-        The {{countryName}} Transparency System Team
+        The {{countryName}} Carbon Credit Registry Team
         `,
   },
   PROGRAMME_CERTIFICATION: {

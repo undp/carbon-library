@@ -503,7 +503,10 @@ export class CompanyService {
   async getSectoralScopeMinistry(sectorId: any) {
     const resp = await this.companyRepo
       .createQueryBuilder()
-      .where(`"companyRole" = 'Ministry' AND '${sectorId}' = ANY("sectoralScope")`)
+      .where(`"companyRole" = 'Ministry' AND :sectorId = ANY("sectoralScope")`,
+      {
+        sectorId: sectorId,
+      })
       .getMany();
 
     return resp;
