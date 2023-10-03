@@ -8,6 +8,7 @@ const fs = require('fs');
 import { Programme } from '../entities/programme.entity';
 import { ProgrammeTransfer } from '../entities/programme.transfer';
 import { Company } from '../entities/company.entity';
+import { Country } from '../entities/country.entity';
 
 @Injectable()
 export class AnnualReportGen {
@@ -16,16 +17,19 @@ export class AnnualReportGen {
     @InjectRepository(Company) private CompanyRepo: Repository<Company>,
     @InjectRepository(ProgrammeTransfer)
     private programmeTransfer: Repository<ProgrammeTransfer>,
+    @InjectRepository(Country) private CountryRepo: Repository<Country>,
     private configService: ConfigService,
     private fileHandler: FileHandlerInterface,
   ) {}
 
-  async generateAnnualReportpdf() {
+  async generateAnnualReportpdf(
+    date
+    ) {
     const country = this.configService.get('systemCountryName');
     const host = this.configService.get('host');
-    const date = this.configService.get('year');  //Number(new Date().getFullYear()) - 1;
+    let currentPage = 0;
     //Report in PDF format
-    const doc = new PDFDocument({ margin: 30, size: 'B0' });
+    const doc = new PDFDocument({ margin: 30, size: 'B0' ,bufferPages: true});
     const filepath = `Annual_Report_${country}_${date}.pdf`
     const stream = fs.createWriteStream("/tmp/" + filepath);
     doc.pipe(stream);
@@ -69,118 +73,94 @@ export class AnnualReportGen {
     );
 
     doc.font('Times-Bold').fontSize(11).text('\n\nTable 2: Actions');
-    // Table 2 Main Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(26, 205)
-      .lineTo(2625, 205)
-      .stroke();
-    // ITMO Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(225, 225)
-      .lineTo(1400, 225)
-      .stroke();
-    // Actions Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(1920, 225)
-      .lineTo(2625, 225)
-      .stroke();
-    // Unique identifier Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(225, 245)
-      .lineTo(600, 245)
-      .stroke();
-    // Metric and quantity Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(630, 245)
-      .lineTo(1000, 245)
-      .stroke();
-    // ITMO details Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(1025, 245)
-      .lineTo(1400, 245)
-      .stroke();
-    // Authorization Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(1430, 245)
-      .lineTo(1810, 245)
-      .stroke();
-    // Action details Line
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(1)
-      .moveTo(1920, 245)
-      .lineTo(2520, 245)
-      .stroke();
-    doc
-      .font('Times-Italic')
-      .text('ITMO', 750, 210, { continued: true })
-      .text('Action', 2300, 210);
-    doc
-      .font('Times-Italic')
-      .text('Unique identifier', 350, 230, { continued: true })
-      .text('Metric and quantity', 670, 230, { continued: true })
-      .text('ITMO details', 990, 230, { continued: true })
-      .text('Authorization', 1350, 230, { continued: true })
-      .text('Action details', 1900, 230);
+    function columnnames(){
+      // Table 2 Main Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(26, 205)
+        .lineTo(2625, 205)
+        .stroke();
+      // ITMO Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(225, 225)
+        .lineTo(1400, 225)
+        .stroke();
+      // Actions Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(1920, 225)
+        .lineTo(2625, 225)
+        .stroke();
+      // Unique identifier Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(225, 245)
+        .lineTo(600, 245)
+        .stroke();
+      // Metric and quantity Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(630, 245)
+        .lineTo(1000, 245)
+        .stroke();
+      // ITMO details Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(1025, 245)
+        .lineTo(1400, 245)
+        .stroke();
+      // Authorization Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(1430, 245)
+        .lineTo(1810, 245)
+        .stroke();
+      // Action details Line
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(1)
+        .moveTo(1920, 245)
+        .lineTo(2520, 245)
+        .stroke();
+      doc
+        .font('Times-Italic')
+        .text('ITMO', 750, 210, { continued: true })
+        .text('Actions', 2300, 210);
+      doc
+        .font('Times-Italic')
+        .text('Unique identifier', 350, 230, { continued: true })
+        .text('Metric and quantity', 670, 230, { continued: true })
+        .text('ITMO details', 990, 230, { continued: true })
+        .text('Authorization', 1350, 230, { continued: true })
+        .text('Action details', 1900, 230);
 
-    const lorem = [
-      'Article 6 database record ID',
-      '  Cooperative \t approach(a)',
-      'First unique identifier(b)',
-      'Last unique identifier(c)',
-      'Underlying unit block start ID(d)',
-      'Underlying unit last block end(e)',
-      'Metric(f)',
-      'Quantity (expressed in metric)(g)',
-      'Quantity (t CO2 eq)',
-      'Conversion factor  (reporting Party)(h)',
-      'First transferring participating Party(i)',
-      'Vintage(j)',
-      'Sector(s)(k)',
-      'Activity type(s)(l)',
-      'Date of authorization(m)',
-      'Authorization ID(n)',
-      'Purposes for authorization',
-      'OIMP authorized by the Party(o)',
-      'First transfer definition(p)',
-      'Action date(q)',
-      'Action type(r)',
-      'Transferring participating Party(s)',
-      'Acquiring participating Party(t)',
-      'Purposes for cancellation(u)',
-      'Using participating Party or authorized entity or entities',
-      'First transfer(v)',
-    ];
-    for (const rows in lorem) {
-      const isBold = [
+      const lorem = [
         'Article 6 database record ID',
-        '  Cooperative \t approach(a)',
+        '  Cooperative approach(a)',
         'First unique identifier(b)',
         'Last unique identifier(c)',
+        'Underlying unit block start ID(d)',
+        'Underlying unit last block end(e)',
         'Metric(f)',
+        'Quantity (expressed in metric)(g)',
         'Quantity (t CO2 eq)',
+        'Conversion factor  (reporting Party)(h)',
         'First transferring participating Party(i)',
         'Vintage(j)',
         'Sector(s)(k)',
@@ -197,21 +177,56 @@ export class AnnualReportGen {
         'Purposes for cancellation(u)',
         'Using participating Party or authorized entity or entities',
         'First transfer(v)',
-      ].includes(lorem[rows]);
-      if (isBold) {
-        doc.font('Times-BoldItalic');
+      ];
+      for (const rows in lorem) {
+        const isBold = [
+          'Article 6 database record ID',
+          '  Cooperative approach(a)',
+          'First unique identifier(b)',
+          'Last unique identifier(c)',
+          'Metric(f)',
+          'Quantity (t CO2 eq)',
+          'First transferring participating Party(i)',
+          'Vintage(j)',
+          'Sector(s)(k)',
+          'Activity type(s)(l)',
+          'Date of authorization(m)',
+          'Authorization ID(n)',
+          'Purposes for authorization',
+          'OIMP authorized by the Party(o)',
+          'First transfer definition(p)',
+          'Action date(q)',
+          'Action type(r)',
+          'Transferring participating Party(s)',
+          'Acquiring participating Party(t)',
+          'Purposes for cancellation(u)',
+          'Using participating Party or authorized entity or entities',
+          'First transfer(v)',
+        ].includes(lorem[rows]);
+        if (isBold) {
+          doc.font('Times-BoldItalic');
+        }
+        doc.text(lorem[rows], Number(rows) * 100 + 40, 270, {
+          columns: 1,
+          lineGap: 0,
+          width: 90,
+        });
+        doc.font('Times-Italic');
       }
-      doc.text(lorem[rows], Number(rows) * 100 + 40, 270, {
-        columns: 1,
-        lineGap: 0,
-        width: 90,
-      });
-      doc.font('Times-Italic');
+      doc
+        .lineCap('butt')
+        .strokeColor('#000000')
+        .lineWidth(2)
+        .moveTo(26, 335)
+        .lineTo(2625, 335)
+        .stroke();
     }
+    columnnames()
     const table = {
       rows: [],
       columnWidths: [80, 80, 80, 80, 80],
       yStart: doc.y + 65,
+      yStartNewpage: doc.y + 65,
       margin: 15,
     };
 
@@ -263,6 +278,14 @@ export class AnnualReportGen {
           //   });
         });
         y += maxCellHeight + 10;
+        if (y > doc.page.height - 50) { // Adjust the threshold as needed
+          currentPage++;
+          doc.addPage();
+          doc.switchToPage(currentPage);
+          columnnames()
+          addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
+          y = table.yStartNewpage;
+        }
       });
     }
     const january1st = new Date(date, 0, 1).getTime() / 1000;
@@ -301,11 +324,15 @@ export class AnnualReportGen {
       const date = new Date(Number(programme.createdTime));
       const vintage = date.getFullYear();
       const compid = await this.programmeRepo.query(
-        `SELECT "companyId"[1] FROM public.programme WHERE "programmeId"='${programme.programmeId}'`,
+        `SELECT "companyId" FROM public.programme WHERE "programmeId"='${programme.programmeId}'`,
       );
-      const firstowner = await this.CompanyRepo.query(
-        `SELECT * FROM public.company WHERE "companyId"='${compid[0].companyId}'`,
-      );
+      var compname  = []
+      for (const id of compid[0].companyId){
+        const firstowner = await this.CompanyRepo.query(
+          `SELECT * FROM public.company WHERE "companyId"='${id}'`,
+        );
+        compname.push(firstowner[0].name)
+      }
       const authDate = new Date(Number(programme.authTime))
         .toISOString()
         .split('T')[0];
@@ -320,21 +347,21 @@ export class AnnualReportGen {
         '',
         authcredit,
         '',
-        firstowner.name,
-        vintage,
+        compname.join(","),
+        "  "+vintage,
         sector,
         'Authorisation',
         authDate,
-        `Programme-${programmeid}`,
+        `Programme-ID-${programmeid}`,
         '    NDC',
         ' ',
         'Authorisation',
         authDate,
         'Authorisation',
-        firstowner.name,
-        firstowner.name,
+        compname.join(","),
+        "  "+compname.join(","),
         '',
-        firstowner.name,
+        compname.join(","),
         ' \n',
       ]);
     }
@@ -371,11 +398,15 @@ export class AnnualReportGen {
         const date = new Date(Number(programme.createdTime));
         const vintage = date.getFullYear();
         const compid = await this.programmeRepo.query(
-          `SELECT "companyId"[1] FROM public.programme WHERE "programmeId"='${programme.programmeId}'`,
+          `SELECT "companyId" FROM public.programme WHERE "programmeId"='${programme.programmeId}'`,
         );
-        const firstowner = await this.CompanyRepo.query(
-          `SELECT * FROM public.company WHERE "companyId"='${compid[0].companyId}'`,
-        );
+        var compname  = []
+        for (const id of compid[0].companyId){
+          const firstowner = await this.CompanyRepo.query(
+            `SELECT * FROM public.company WHERE "companyId"='${id}'`,
+          );
+          compname.push(firstowner[0].name)
+        }
         const authDate = new Date(Number(programme.authTime))
           .toISOString()
           .split('T')[0];
@@ -390,33 +421,36 @@ export class AnnualReportGen {
           '',
           authcredit,
           '',
-          firstowner.name,
-          vintage,
+          compname.join(","),
+          "  "+vintage,
           sector,
           'Issuance',
           authDate,
-          `Programme-${programmeid}`,
+          `Programme-ID-${programmeid}`,
           '    NDC',
           ' ',
           'Issuance ',
           authDate,
           'Issuance ',
-          firstowner.name,
-          firstowner.name,
+          compname.join(","),
+          "  "+compname.join(","),
           '',
-          firstowner.name,
+          compname.join(","),
           ' \n',
         ]);
       }
     }
-
     for (const tnrprogramme of transfertable) {
       const findprogrammeqry = `SELECT * FROM public.programme WHERE "programmeId"='${tnrprogramme.programmeId}'`;
       const findprogramme = await this.programmeRepo.query(findprogrammeqry);
       const programmename = findprogramme[0].title;
-      const firstowner = await this.CompanyRepo.query(
-        `SELECT * FROM public.company WHERE "companyId"='${tnrprogramme.initiator}'`,
-      );
+      var compname = []
+      for (const id of findprogramme[0].companyId){
+        const firstowner = await this.CompanyRepo.query(
+          `SELECT * FROM public.company WHERE "companyId"='${id}'`,
+        );
+        compname.push(firstowner[0].name)
+      }
       const serialNo = String(findprogramme[0].serialNo);
       let type: string;
       let def: string;
@@ -451,7 +485,7 @@ export class AnnualReportGen {
       let purpose: string;
       if (def == 'Cancellation') {
         if (tnrprogramme.retirementType == '0') {
-          purpose = 'CROSS_BORDER';
+          purpose = 'Cross-border transfer';
         } else if (tnrprogramme.retirementType == '1') {
           purpose = 'Legal Action';
         } else {
@@ -462,11 +496,22 @@ export class AnnualReportGen {
       }
       const date = new Date(Number(findprogramme[0].createdTime));
       const vintage = date.getFullYear();
-      const receive = await this.CompanyRepo.query(
-        `SELECT * FROM public.company WHERE "companyId"='${tnrprogramme.toCompanyId}'`,
-      );
+      let receiver:string
+      if (tnrprogramme.toCompanyMeta !=null){
+        const alpha2 = tnrprogramme.toCompanyMeta.country
+        const receive = await this.CountryRepo.query(
+          `SELECT * FROM public.country WHERE "alpha2"='${alpha2}'`,
+        );
+        receiver = receive[0].name
+      }
+      else{
+        const receive = await this.CompanyRepo.query(
+          `SELECT * FROM public.company WHERE "companyId"='${tnrprogramme.toCompanyId}'`,
+        );
+        receiver = receive[0].name
+      }
       const send = await this.CompanyRepo.query(
-        `SELECT * FROM public.company WHERE "companyId"='${tnrprogramme.initiatorCompanyId}'`,
+        `SELECT * FROM public.company WHERE "companyId"='${tnrprogramme.fromCompanyId}'`,
       );
       const authDate = new Date(Number(tnrprogramme.authTime))
         .toISOString()
@@ -485,33 +530,26 @@ export class AnnualReportGen {
         '',
         credit,
         '',
-        firstowner.name,
-        vintage,
+        compname.join(","),
+        "  "+vintage,
         sector,
         type,
         authDate,
-        `Programme-${tnrprogramme.programmeId}`,
+        `Programme-ID-${tnrprogramme.programmeId}`,
         '    NDC',
         ' ',
         def,
         authDate,
         def,
-        send.name,
-        receive.name,
+        send[0].name,
+        receiver,
         purpose,
-        receive.name,
+        receiver,
         '\n',
       ]);
     }
     drawTable();
     addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
-    doc
-      .lineCap('butt')
-      .strokeColor('#000000')
-      .lineWidth(2)
-      .moveTo(26, 335)
-      .lineTo(2625, 335)
-      .stroke();
 
     doc
       .lineCap('butt')
