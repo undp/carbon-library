@@ -51,6 +51,7 @@ import { AsyncOperationType } from "../enum/async.operation.type.enum";
 import { LocationInterface } from "../location/location.interface";
 import { CompanyState } from "../enum/company.state.enum";
 import { OrganisationDto } from "../dto/organisation.dto";
+import { PasswordHashService } from "../util/passwordHash.service";
 
 @Injectable()
 export class UserService {
@@ -67,6 +68,7 @@ export class UserService {
     private fileHandler: FileHandlerInterface,
     private asyncOperationsInterface: AsyncOperationsInterface,
     private locationService: LocationInterface,
+    private passwordHashService: PasswordHashService
   ) {}
 
   private async generateApiKey(email) {
@@ -208,6 +210,10 @@ export class UserService {
       )
       .addSelect(["User.password"])
       .getOne();
+    
+    passwordResetDto.oldPassword = this.passwordHashService.getPasswordHash(passwordResetDto.oldPassword);
+    passwordResetDto.newPassword = this.passwordHashService.getPasswordHash(passwordResetDto.newPassword);
+    
     if (!user || user.password != passwordResetDto.oldPassword) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -360,7 +366,7 @@ export class UserService {
           },
           {
             isPending: false,
-            password: generatedPassword,
+            password: this.passwordHashService.getPasswordHash(generatedPassword),
           }
         ).catch((err: any) => {
           this.logger.error(err);
@@ -398,7 +404,7 @@ export class UserService {
 
           const userDto = new UserDto();
           userDto.email = user.user_email;
-          userDto.role = user.user_role; // Assuming Role.Admin is a valid role value
+          userDto.role = user.user_role;
           userDto.name = user.user_name;
           userDto.phoneNo = user.user_phoneNo;
           userDto.password = user.user_password;
@@ -643,7 +649,9 @@ export class UserService {
       u.country = this.configService.get("systemCountry");
     }
 
-    u.password = this.helperService.generateRandomPassword();
+    let generatedPassword = this.helperService.generateRandomPassword();
+    u.password = this.passwordHashService.getPasswordHash(generatedPassword);
+
     if (userDto.role == Role.Admin && u.companyRole == CompanyRole.API) {
       u.apiKey = await this.generateApiKey(userDto.email);
     }
@@ -735,7 +743,9 @@ export class UserService {
           email: user.email,
           organisationName: company.name,
           systemName: this.configService.get("systemName"),
-          organisationRole: company.companyRole,
+          organisationRole: company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
+              ? "Programme Developer"
+              : company.companyRole,
           organisationPageLink:
             hostAddress +
             `/companyManagement/viewAll`,
@@ -743,7 +753,7 @@ export class UserService {
         const action: AsyncAction = {
           actionType: AsyncActionType.Email,
           actionProps: {
-            emailType: EmailTemplates.ORGANISATION_REGISTRATION,
+            emailType: EmailTemplates.ORGANISATION_REGISTRATION.id,
             sender: user.user_email,
             subject: this.helperService.getEmailTemplateMessage(
               EmailTemplates.ORGANISATION_REGISTRATION["subject"],
@@ -764,7 +774,7 @@ export class UserService {
       const templateData = {
         name: u.name,
         countryName: this.configService.get("systemCountryName"),
-        tempPassword: u.password,
+        tempPassword: generatedPassword,
         home: hostAddress,
         email: u.email,
         address: this.configService.get("email.adresss"),

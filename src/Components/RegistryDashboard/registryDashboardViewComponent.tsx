@@ -2338,7 +2338,7 @@ ${total}
         userInfoState?.companyRole === CompanyRole.MINISTRY) &&
         fileList.length > 0 && (
           <div className="annual-report">
-            <div>Annual Statistic Report</div>
+            <div>Annual Statistics Report</div>
             <Dropdown menu={menuProps}>
               <Button className="annual-report-dropdownbutton">
                 <Space>

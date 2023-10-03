@@ -39,6 +39,7 @@ import {
   AsyncOperationsInterface,
 } from "../async-operations/async-operations.interface";
 import { AsyncActionType } from "../enum/async.action.type.enum";
+import { LocationInterface } from "../location/location.interface";
 
 @Injectable()
 export class CompanyService {
@@ -57,6 +58,7 @@ export class CompanyService {
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private asyncOperationsInterface: AsyncOperationsInterface,
+    private locationService: LocationInterface
   ) {}
 
   async suspend(
@@ -246,7 +248,7 @@ export class CompanyService {
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
-        `"companyId" = '${companyId}' and state in ['2', '3']${abilityCondition
+        `"companyId" = '${companyId}' and (state ='2' or  state ='3') ${abilityCondition
           ? " AND (" +
           this.helperService.parseMongoQueryToSQL(abilityCondition) +
           ")"
@@ -631,6 +633,15 @@ export class CompanyService {
       }
     }
 
+    if(companyUpdateDto.regions){
+      companyUpdateDto.geographicalLocationCordintes = await this.locationService
+      .getCoordinatesForRegion(companyUpdateDto.regions)
+      .then((response: any) => {
+        console.log("response from forwardGeoCoding function -> ", response);
+        return  [...response];
+      });
+    }
+
     const { companyId, ...companyUpdateFields } = companyUpdateDto;
     if (!companyUpdateFields.hasOwnProperty("website")) {
       companyUpdateFields["website"] = "";
@@ -718,7 +729,10 @@ export class CompanyService {
   async getSectoralScopeMinistry(sectorId: any) {
     const resp = await this.companyRepo
       .createQueryBuilder()
-      .where(`"companyRole" = 'Ministry' AND '${sectorId}' = ANY("sectoralScope")`)
+      .where(`"companyRole" = 'Ministry' AND :sectorId = ANY("sectoralScope")`,
+      {
+        sectorId: sectorId,
+      })
       .getMany();
 
     return resp;

@@ -17,9 +17,13 @@ export class AnnualReportImport implements ImporterInterface {
   ) {}
 
   async start(type: string): Promise<any> {
+    let year
+    year =  this.configService.get('year');
+    if (!year){
+       year = Number(new Date().getFullYear()) - 1;
+    }
     const annualreporturl =
-      await this.annualReportGen.generateAnnualReportpdf();
-    const year = Number(new Date().getFullYear()) - 1;
+      await this.annualReportGen.generateAnnualReportpdf(year);
     const d = await this.documentRepo.query(`SELECT "programmeId" FROM public.programme_document WHERE "programmeId"='AR${year}'`)
     const country = this.configService.get('systemCountryName');
     if(d.length <= 0){

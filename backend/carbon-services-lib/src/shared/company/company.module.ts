@@ -13,6 +13,7 @@ import { EmailHelperModule } from "../email-helper/email-helper.module";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { UserModule } from "../user/user.module";
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
+import { LocationModule } from "../location/location.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AsyncOperationsModule } from '../async-operations/async-operations.modu
     forwardRef(() => EmailHelperModule),
     forwardRef(() => UserModule),
     AsyncOperationsModule,
+    LocationModule
   ],
   providers: [CompanyService, Logger],
   exports: [CompanyService],

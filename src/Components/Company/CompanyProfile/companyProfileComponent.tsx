@@ -154,6 +154,7 @@ export const CompanyProfileComponent = (props: any) => {
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
       getCompanyDetails(companyDetails.companyId);
+      getUserDetails(companyDetails.companyId);
     } catch (exception: any) {
       setErrorMsg(exception.message);
     } finally {
@@ -519,7 +520,7 @@ export const CompanyProfileComponent = (props: any) => {
                   </Skeleton>
                 </div>
               </Card>
-              {(state.record?.state == "2" || state.record?.state == "3") &&
+              {(companyDetails?.state == "2" || companyDetails?.state == "3") &&
                 <Card className="card-container">
                   <div className="info-view">
                     <div className="title">
