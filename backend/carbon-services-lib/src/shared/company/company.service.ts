@@ -32,6 +32,13 @@ import { SystemActionType } from "../enum/system.action.type";
 import { FileHandlerInterface } from "../file-handler/filehandler.interface";
 import { CounterType } from "../util/counter.type.enum";
 import { CounterService } from "../util/counter.service";
+import { FilterEntry } from "../dto/filter.entry";
+import { UserService } from "../user/user.service";
+import {
+  AsyncAction,
+  AsyncOperationsInterface,
+} from "../async-operations/async-operations.interface";
+import { AsyncActionType } from "../enum/async.action.type.enum";
 
 @Injectable()
 export class CompanyService {
@@ -46,7 +53,10 @@ export class CompanyService {
     @InjectRepository(ProgrammeTransfer)
     private programmeTransferRepo: Repository<ProgrammeTransfer>,
     private fileHandler: FileHandlerInterface,
-    private counterService: CounterService
+    private counterService: CounterService,
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
+    private asyncOperationsInterface: AsyncOperationsInterface,
   ) {}
 
   async suspend(
@@ -227,7 +237,223 @@ export class CompanyService {
     );
   }
 
-  async query(query: QueryDto, abilityCondition: string): Promise<any> {
+
+  async approve(
+    companyId: number,
+    abilityCondition: string
+  ): Promise<any> {
+    this.logger.verbose("approve company", companyId);
+    const company = await this.companyRepo
+      .createQueryBuilder()
+      .where(
+        `"companyId" = '${companyId}' and state in ['2', '3']${abilityCondition
+          ? " AND (" +
+          this.helperService.parseMongoQueryToSQL(abilityCondition) +
+          ")"
+          : ""
+        }`
+      )
+      .getOne();
+    if (!company) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "company.noPendingCompany",
+          []
+        ),
+        HttpStatus.UNAUTHORIZED
+      );
+    }
+    const result = await this.companyRepo
+      .update(
+        {
+          companyId: companyId,
+        },
+        {
+          state: CompanyState.ACTIVE,
+        }
+      )
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+
+    if (result.affected > 0) {
+      try {
+        const hostAddress = this.configService.get("host");
+        const res = await this.userService.approveUser(company);
+        const templateData = {
+          organisationName: company.name,
+          countryName: this.configService.get("systemCountryName"),
+          organisationRole:
+            company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
+              ? "Programme Developer"
+              : company.companyRole,
+          home: hostAddress,
+        };
+
+        const action: AsyncAction = {
+          actionType: AsyncActionType.Email,
+          actionProps: {
+            emailType: EmailTemplates.ORGANISATION_CREATE.id,
+            sender: company.email,
+            subject: this.helperService.getEmailTemplateMessage(
+              EmailTemplates.ORGANISATION_CREATE["subject"],
+              templateData,
+              true
+            ),
+            emailBody: this.helperService.getEmailTemplateMessage(
+              EmailTemplates.ORGANISATION_CREATE["html"],
+              templateData,
+              false
+            ),
+          },
+        };
+        await this.asyncOperationsInterface.AddAction(action);
+      } catch (error) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "company.companyApprovalFailed",
+            []
+          ),
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+      return new BasicResponseDto(
+        HttpStatus.OK,
+        this.helperService.formatReqMessagesString(
+          "company.companyApprovalSuccess",
+          []
+        )
+      );
+    }
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "company.companyApprovalFailed",
+        []
+      ),
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+
+
+  async reject(
+    companyId: number,
+    user: User,
+    remarks: string,
+    abilityCondition: string
+  ): Promise<any> {
+    this.logger.verbose("approve company", companyId);
+    const company = await this.companyRepo
+      .createQueryBuilder()
+      .where(
+        `"companyId" = '${companyId}' and state = '2' ${abilityCondition
+          ? " AND (" +
+          this.helperService.parseMongoQueryToSQL(abilityCondition) +
+          ")"
+          : ""
+        }`
+      )
+      .getOne();
+    if (!company) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "company.noPendingCompany",
+          []
+        ),
+        HttpStatus.UNAUTHORIZED
+      );
+    }
+    const result = await this.companyRepo
+      .update(
+        {
+          companyId: companyId,
+        },
+        {
+          state: CompanyState.REJECTED,
+        }
+      )
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+
+    if (result.affected > 0) {
+
+      const hostAddress = this.configService.get("host");
+      const templateData = {
+        name: company.name,
+        countryName: this.configService.get("systemCountryName"),
+        organisationRole:
+          company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
+            ? "Programme Developer"
+            : company.companyRole,
+        remarks: remarks,
+        systemName: this.configService.get("systemName"),
+        home: hostAddress,
+      };
+
+      const action: AsyncAction = {
+        actionType: AsyncActionType.Email,
+        actionProps: {
+          emailType: EmailTemplates.ORGANISATION_REGISTRATION_REJECTED.id,
+          sender: company.email,
+          subject: this.helperService.getEmailTemplateMessage(
+            EmailTemplates.ORGANISATION_REGISTRATION_REJECTED["subject"],
+            templateData,
+            true
+          ),
+          emailBody: this.helperService.getEmailTemplateMessage(
+            EmailTemplates.ORGANISATION_REGISTRATION_REJECTED["html"],
+            templateData,
+            false
+          ),
+        },
+      };
+      await this.asyncOperationsInterface.AddAction(action);
+
+      return new BasicResponseDto(
+        HttpStatus.OK,
+        this.helperService.formatReqMessagesString(
+          "company.companyRejectionSuccess",
+          []
+        )
+      );
+    }
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "company.companyRejectionFailed",
+        []
+      ),
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+  
+
+  async query(query: QueryDto, abilityCondition: string, companyRole: string): Promise<any> {
+    let filterWithCompanyStatesIn: number[];
+
+    if (companyRole === CompanyRole.GOVERNMENT) {
+      filterWithCompanyStatesIn = [0, 1, 2, 3]
+    } else {
+      filterWithCompanyStatesIn = [0, 1]
+    }
+
+    if (query.filterAnd) {
+      query.filterAnd.push({
+        key: "state",
+        operation: "in",
+        value: filterWithCompanyStatesIn,
+      });
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: "state",
+        operation: "in",
+        value: filterWithCompanyStatesIn,
+      });
+      query.filterAnd = filterAnd;
+    }
+
     const resp = await this.companyRepo
       .createQueryBuilder()
       .where(

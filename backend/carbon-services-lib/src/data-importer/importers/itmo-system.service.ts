@@ -12,6 +12,7 @@ import { TypeOfMitigation } from "../../shared/enum/typeofmitigation.enum";
 import { Sector } from "../../shared/enum/sector.enum";
 import { CompanyRole } from "../../shared/enum/company.role.enum";
 import { ProgrammeStage } from "../../shared/enum/programme-status.enum";
+import { CompanyState } from "src/shared/enum/company.state.enum";
 
 function flatten(ary) {
   if (!ary) {
@@ -148,6 +149,7 @@ export class ITMOSystemImporter implements ImporterInterface {
                     phoneNo: "00",
                     company: {
                       taxId: taxId,
+                      paymentId: undefined, //double check this
                       companyId: undefined,
                       name: project.company,
                       email: email,
@@ -160,7 +162,8 @@ export class ITMOSystemImporter implements ImporterInterface {
                       country: this.configService.get("systemCountry"),
                       companyRole: CompanyRole.PROGRAMME_DEVELOPER,
                       createdTime: undefined,
-                      regions: []
+                      regions: [],
+                      state: CompanyState.ACTIVE //double check this
                     },
                     password: undefined,
                     companyId: undefined,

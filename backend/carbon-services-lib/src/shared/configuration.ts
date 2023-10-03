@@ -80,5 +80,6 @@ export default () => ({
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
-  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM"
+  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
+  systemName: process.env.SYSTEM_NAME || "System X"
 });
