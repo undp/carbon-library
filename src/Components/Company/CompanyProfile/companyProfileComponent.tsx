@@ -259,7 +259,9 @@ export const CompanyProfileComponent = (props: any) => {
                         {t("companyProfile:paymentId")}
                       </Col>
                       <Col span={12} className="field-value nextline-overflow">
-                        {companyDetails.paymentId ? companyDetails.paymentId : "-"}
+                        {companyDetails.paymentId
+                          ? companyDetails.paymentId
+                          : "-"}
                       </Col>
                     </Row>
                     <Row className="field">
@@ -379,6 +381,20 @@ export const CompanyProfileComponent = (props: any) => {
                       </Row>
                     ) : (
                       ""
+                    )}
+                    {companyDetails?.companyRole === CompanyRole.GOVERNMENT && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:nationalSopValue")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.nationalSopValue
+                              ? companyDetails.nationalSopValue
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
                     )}
                   </Skeleton>
                 </div>

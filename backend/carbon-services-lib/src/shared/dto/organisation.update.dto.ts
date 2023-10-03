@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
@@ -73,4 +74,12 @@ export class OrganisationUpdateDto {
       "Invalid role. Supported following roles:" + Object.values(CompanyRole),
   })
   companyRole: CompanyRole;
+
+  @ValidateIf(
+    (c) => CompanyRole.GOVERNMENT==c.companyRole
+  )
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty()
+  nationalSopValue: number;
 }

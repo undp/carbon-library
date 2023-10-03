@@ -8,5 +8,6 @@
     "companyTaxIdExist": "This Company Tax ID already exists",
     "companyUpdateFailed": "Company update failed. Please try again",
     "cantSuspendUrOwn": "Can not suspend your own company",
-    "cantActivateUrOwn": "Can not activate your own company"
+    "cantActivateUrOwn": "Can not activate your own company",
+    "nationalSopValue": "National Share of Proceeds"
 }
