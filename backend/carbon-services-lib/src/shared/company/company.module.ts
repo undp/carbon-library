@@ -11,6 +11,7 @@ import { ProgrammeLedgerModule } from "../programme-ledger/programme-ledger.modu
 import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { EmailHelperModule } from "../email-helper/email-helper.module";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
+import { LocationModule } from "../location/location.module";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FileHandlerModule } from "../file-handler/filehandler.module";
     ProgrammeLedgerModule,
     FileHandlerModule,
     forwardRef(() => EmailHelperModule),
+    LocationModule
   ],
   providers: [CompanyService, Logger],
   exports: [CompanyService],

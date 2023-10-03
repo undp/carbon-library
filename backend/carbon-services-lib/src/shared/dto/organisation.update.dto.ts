@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
+  ArrayMinSize,
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -74,6 +76,16 @@ export class OrganisationUpdateDto {
       "Invalid role. Supported following roles:" + Object.values(CompanyRole),
   })
   companyRole: CompanyRole;
+
+  @ApiPropertyOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @MaxLength(100, { each: true })
+  @IsNotEmpty({ each: true })
+  @IsOptional()
+  regions: string[];
+
+  geographicalLocationCordintes?: any
 
   @ValidateIf(
     (c) => CompanyRole.GOVERNMENT==c.companyRole

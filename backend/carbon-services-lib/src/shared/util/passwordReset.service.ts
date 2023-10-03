@@ -13,6 +13,7 @@ import { ConfigService } from "@nestjs/config";
 import { AsyncAction, AsyncOperationsInterface } from "../async-operations/async-operations.interface";
 import { AsyncActionType } from "../enum/async.action.type.enum";
 import { EmailTemplates } from "../email-helper/email.template";
+import { PasswordHashService } from "./passwordHash.service";
 
 @Injectable()
 export class PasswordResetService {
@@ -24,6 +25,7 @@ export class PasswordResetService {
     private configService: ConfigService,
     private logger: Logger,
     private asyncOperationsInterface: AsyncOperationsInterface,
+    private passwordHashService: PasswordHashService,
   ) {}
 
   async insertPasswordResetD(passwordResetD) {
@@ -75,6 +77,8 @@ export class PasswordResetService {
         HttpStatus.EXPECTATION_FAILED
       );
     }
+    
+    passwordResetDto.newPassword = this.passwordHashService.getPasswordHash(passwordResetDto.newPassword);
     const result = await this.userRepo
       .update(
         {
