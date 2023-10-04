@@ -406,13 +406,8 @@ export class UserService {
           userDto.email = user.user_email;
           userDto.role = user.user_role;
           userDto.name = user.user_name;
-          userDto.phoneNo = user.user_phoneNo;
-          userDto.password = user.user_password;
-          userDto.apiKey = user.user_apiKey; 
-          userDto.companyId = company.companyId;
 
           const organisationDto = new OrganisationDto();
-          organisationDto.companyId = company.companyId;
           organisationDto.taxId = company.taxId;
           organisationDto.paymentId = company.paymentId;
           organisationDto.name = company.name;
@@ -421,12 +416,8 @@ export class UserService {
           organisationDto.website = company.website;
           organisationDto.address = company.address;
           organisationDto.logo = company.logo;
-          organisationDto.country = company.country;
           organisationDto.companyRole = company.companyRole;
-          organisationDto.nameOfMinister = company.nameOfMinister;
-          organisationDto.sectoralScope = company.sectoralScope;
-          organisationDto.createdTime = company.createdTime; // Timestamp
-          organisationDto.state = CompanyState.ACTIVE;
+          organisationDto.regions = company.regions;
 
           userDto.company = organisationDto;
 
