@@ -272,7 +272,7 @@ export const CompanyProfileComponent = (props: any) => {
         <div className="flex-display">
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
           !isLoading &&
-          parseInt(companyDetails.state) !== 0 ? (
+          parseInt(companyDetails?.state) === 1 ? (
             <Button
               danger
               className="btn-danger"
@@ -286,7 +286,7 @@ export const CompanyProfileComponent = (props: any) => {
 
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
           !isLoading &&
-          parseInt(companyDetails.state) !== 1 ? (
+          parseInt(companyDetails?.state) === 0 ? (
             <Button className="btn-activate" onClick={onReActivateOrganisation}>
               {t("companyProfile:reActivate")}
             </Button>
