@@ -11,6 +11,8 @@ import { ProgrammeLedgerModule } from "../programme-ledger/programme-ledger.modu
 import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { EmailHelperModule } from "../email-helper/email-helper.module";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
+import { UserModule } from "../user/user.module";
+import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { LocationModule } from "../location/location.module";
 
 @Module({
@@ -30,6 +32,8 @@ import { LocationModule } from "../location/location.module";
     ProgrammeLedgerModule,
     FileHandlerModule,
     forwardRef(() => EmailHelperModule),
+    forwardRef(() => UserModule),
+    AsyncOperationsModule,
     LocationModule
   ],
   providers: [CompanyService, Logger],

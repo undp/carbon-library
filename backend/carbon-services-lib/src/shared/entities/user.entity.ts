@@ -54,4 +54,7 @@ export class User  implements EntitySubject{
     createdTime: number;
 
     companyState: number;
+
+    @Column({type: "boolean", nullable: false, default: false})
+    isPending: boolean;
 }

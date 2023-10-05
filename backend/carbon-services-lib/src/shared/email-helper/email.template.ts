@@ -11,6 +11,34 @@ export const EmailTemplates = {
         The {{countryName}} Carbon Credit Registry Team
         `,
   },
+  ORGANISATION_REGISTRATION: {
+    id: "ORGANISATION_REGISTRATION",
+    subject: "Organisation Registration Request",
+    html: `
+        Hi {{name}},<br><br>
+
+        New Organisation {{organisationName}} has requested to register with the {{countryName}} {{systemName}} as a {{organisationRole}} Organisation. <br><br> 
+        Click <a href="{{organisationPageLink}}">here</a> for more details of the Organisation.
+
+        <br><br>
+        Sincerely,<br>
+        The {{countryName}} Carbon Credit Registry Team
+        `,
+  },
+  ORGANISATION_REGISTRATION_REJECTED: {
+    id: "ORGANISATION_REGISTRATION_REJECTED",
+    subject: "Organisation Registration Request Rejected",
+    html: `
+        Hi {{name}},<br><br>
+
+        Registration request made by your Organisation to register with the {{countryName}} {{systemName}} as a {{organisationRole}} Organisation has been rejected due to the following reason/s:<br>
+        {{remarks}}
+
+        <br><br>
+        Sincerely,<br>
+        The {{countryName}} Carbon Credit Registry Team
+        `,
+  },
   USER_CREATE: {
     id: "USER_CREATE",
     subject: "Welcome!",
@@ -355,7 +383,7 @@ export const EmailTemplates = {
         Click <a href="{{programmePageLink}}">here</a> to access all the programmes that require authorisation. <br><br>
         
         Sincerely, <br>
-        The {{countryName}} Transparency System Team
+        The {{countryName}} Carbon Credit Registry Team
         `,
   },
   PROGRAMME_CERTIFICATION: {
