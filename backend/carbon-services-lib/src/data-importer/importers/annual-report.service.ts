@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ImporterInterface } from '../importer.interface';
-import { AnnualReportGen } from '../../shared/util/annual.report.gen';
+import { AnnualReportGen } from '../../shared/annualreport/annual.report.gen';
 import { ProgrammeDocument } from '../../shared/entities/programme.document';
 import { DocumentStatus } from '../../shared/enum/document.status';
 import { DocType } from '../../shared/enum/document.type';

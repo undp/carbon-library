@@ -22,7 +22,6 @@ import { ObjectionLetterGen } from "./objection.letter.gen";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { Region } from "../entities/region.entity";
 import { AuthorizationLetterGen } from "./authorisation.letter.gen";
-import { AnnualReportGen } from "./annual.report.gen";
 import { Programme } from "../entities/programme.entity";
 import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { Company } from "../entities/company.entity";
@@ -79,7 +78,6 @@ import { PasswordHashService } from "./passwordHash.service";
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
     LetterOfIntentResponseGen,
-    AnnualReportGen,
     LetterOfAuthorisationRequestGen,
     PasswordHashService
   ],
@@ -93,7 +91,6 @@ import { PasswordHashService } from "./passwordHash.service";
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
     LetterOfIntentResponseGen,
-    AnnualReportGen,
     LetterOfAuthorisationRequestGen,
     PasswordHashService
   ],
