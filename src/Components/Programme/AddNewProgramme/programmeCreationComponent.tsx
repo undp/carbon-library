@@ -359,6 +359,7 @@ export const ProgrammeCreationComponent = (props: any) => {
           ...(includedInNDC !== undefined &&
             includedInNDC !== null && { includedInNdc: includedInNDC }),
         },
+        environmentalAssessmentRegistrationNo: values?.environmentalAssessmentRegistrationNo
       };
       if (logoBase64?.length > 0) {
         programmeDetails.designDocument = logoBase64;
@@ -999,6 +1000,35 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   );
                                 }}
                               </Form.List>
+                              <Form.Item
+                                label={t("addProgramme:environmentalAssessmentRegistrationNo")}
+                                name="environmentalAssessmentRegistrationNo"
+                                initialValue={state?.record?.environmentalAssessmentRegistrationNo}
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "", 
+                                  },
+                                  {
+                                    validator: async (rule, value) => {
+                                      if (
+                                        String(value).trim() === "" ||
+                                        String(value).trim() === undefined ||
+                                        value === null ||
+                                        value === undefined
+                                      ) {
+                                        throw new Error(
+                                          `${t("addProgramme:environmentalAssessmentRegistrationNo")} ${t(
+                                            "isRequired"
+                                          )}`
+                                        );
+                                      }
+                                    },
+                                  },
+                                ]}
+                              >
+                                <Input size="large" />
+                              </Form.Item>
                             </div>
                           </Col>
                           <Col xl={12} md={24}>

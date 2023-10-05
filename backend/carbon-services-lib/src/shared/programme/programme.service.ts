@@ -1371,6 +1371,18 @@ export class ProgrammeService {
       );
     }
 
+    const prg = await this.findByEnvironmentalAssessmentRegistrationNo(programmeDto.environmentalAssessmentRegistrationNo);
+    if (prg && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.programmeExistsWithAssessmentRegId",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+
 
     if(user.companyRole === CompanyRole.MINISTRY) {
       const permission = await this.findPermissionForMinistryUser(user, programme.sectoralScope);
@@ -4067,6 +4079,14 @@ export class ProgrammeService {
     return await this.programmeRepo.findOne({
       where: {
         externalId: externalId,
+      },
+    });
+  }
+
+  async findByEnvironmentalAssessmentRegistrationNo(registrationNo: string): Promise<Programme | undefined> {
+    return await this.programmeRepo.findOne({
+      where: {
+        environmentalAssessmentRegistrationNo: registrationNo,
       },
     });
   }

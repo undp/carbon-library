@@ -148,6 +148,9 @@ export class Programme implements EntitySubject {
   })
   geographicalLocationCordintes: any;
 
+  @Column({ unique: true, nullable: true })
+  environmentalAssessmentRegistrationNo: string;
+
   @Column({ type: 'timestamptz', nullable: true })
   createdAt: Date;
 
