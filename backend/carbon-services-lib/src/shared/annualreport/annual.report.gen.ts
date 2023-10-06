@@ -297,7 +297,6 @@ export class AnnualReportGen {
         const authissueqry = `SELECT * FROM public.programme WHERE  "currentStage"='Authorised' ORDER BY "authTime" ASC`;
         const authissuestable = await this.programmeRepo.query(authissueqry);
         addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
-        let firstowners = []
         for (const programme of authissuestable) {
             const programmeid = programme.programmeId;
             const programmename = programme.title;
@@ -324,6 +323,7 @@ export class AnnualReportGen {
             } else {
                 sector = 'Waste';
             }
+            var firstowners = []
             const historydata = await this.programmeLedgerService.getProgrammeHistory(programmeid);
             for (const creditdata of historydata){
                 if(creditdata.data.txType=='0'){
