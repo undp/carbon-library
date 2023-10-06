@@ -9,7 +9,6 @@ import { AnnualReportGen } from "./annual.report.gen";
 import { Programme } from "../entities/programme.entity";
 import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { ProgrammeLedgerModule } from "../programme-ledger/programme-ledger.module";
-import { Investment } from "../entities/investment.entity";
 import { ProgrammeModule } from "../programme/programme.module";
 import { CompanyModule } from "../company/company.module";
 @Module({
@@ -22,7 +21,6 @@ import { CompanyModule } from "../company/company.module";
     TypeOrmModule.forFeature([
       Country,
       Programme,
-      Investment,
       ProgrammeTransfer,
       ConfigurationSettings,
     ]),

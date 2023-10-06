@@ -9,7 +9,6 @@ import { Programme } from '../entities/programme.entity';
 import { ProgrammeTransfer } from '../entities/programme.transfer';
 import { Country } from '../entities/country.entity';
 import { ProgrammeLedgerService } from '../programme-ledger/programme-ledger.service';
-import { Investment } from '../entities/investment.entity';
 import { ProgrammeService } from '../programme/programme.service';
 import { CompanyService } from '../company/company.service';
 @Injectable()
@@ -19,7 +18,6 @@ export class AnnualReportGen {
     @InjectRepository(ProgrammeTransfer)
     private programmeTransfer: Repository<ProgrammeTransfer>,
     @InjectRepository(Country) private CountryRepo: Repository<Country>,
-    @InjectRepository(Investment) private InvestRepo: Repository<Investment>,
     private configService: ConfigService,
     private fileHandler: FileHandlerInterface,
     private programmeLedgerService: ProgrammeLedgerService,
@@ -325,8 +323,15 @@ export class AnnualReportGen {
             } else {
                 sector = 'Waste';
             }
+            var firstowners = []
             const historydata = await this.programmeLedgerService.getProgrammeHistory(programmeid);
             for (const creditdata of historydata){
+                if(creditdata.data.txType=='0'){
+                    for (const id of creditdata.data.companyId){
+                        const company = await this.companyService.findByCompanyId(id)
+                        firstowners.push(company.name)
+                    }
+                }
                 if (january1st*1000< creditdata.data.txTime && creditdata.data.txTime<december31st*1000
                     && creditdata.data.currentStage=='Authorised'
                     && (creditdata.data.txType=='8'|| creditdata.data.txType=='2')){
@@ -337,25 +342,17 @@ export class AnnualReportGen {
                     let credit:number
                     let status:string
                     if (creditissue==0 && creditdata.data.txType=='8'){
-                        status='Authorised'  
+                        status='Authorisation'  
                         credit = creditdata.data.creditEst;     
                     }
                     if (creditissue>0 && creditdata.data.txType=='2'){
                         status = 'Issuance'
                         credit = creditdata.data.creditChange;
                     }
-                    var compname  = []
                     var sendrecive = []
                     for (const id of creditdata.data.companyId){
                         const company = await this.companyService.findByCompanyId(id)
                         sendrecive.push(company.name)
-                        const investowner = await this.InvestRepo.query(
-                            `SELECT * FROM public.investment WHERE "status"='Approved' AND "toCompanyId"=${id} AND "programmeId"='${programmeid}'`
-                            );
-                        if (investowner.length<=0){
-                            const firstowner = await this.companyService.findByCompanyId(id)
-                            compname.push(firstowner.name)
-                        }
                     }
                     addTableRow([
                         programmeid,
@@ -368,7 +365,7 @@ export class AnnualReportGen {
                         '',
                         credit,
                         '',
-                        compname.join(","),
+                        firstowners.join(","),
                         "  "+vintage,
                         sector,
                         status,
@@ -450,17 +447,6 @@ export class AnnualReportGen {
                         const receive = await this.companyService.findByCompanyId(tnrprogramme.toCompanyId);
                         receiver = receive.name
                     }
-                    var compname = []
-                    for (const id of findprogramme.companyId){
-                            
-                        const investowner = await this.InvestRepo.query(
-                            `SELECT * FROM public.investment WHERE "status"='Approved' AND "toCompanyId"=${id} AND "programmeId"='${tnrprogramme.programmeId}'`
-                        );
-                        if (investowner.length<=0){
-                            const firstowner = await this.companyService.findByCompanyId(id)
-                            compname.push(firstowner.name)
-                        }
-                    }
                     const send = await this.companyService.findByCompanyId(tnrprogramme.fromCompanyId);
                     const authDate = new Date(Number(tnrprogramme.authTime))
                     .toISOString()
@@ -476,7 +462,7 @@ export class AnnualReportGen {
                         '',
                         credit,
                         '',
-                        compname.join(","),
+                        firstowners.join(","),
                         "  "+vintage,
                         sector,
                         type,
