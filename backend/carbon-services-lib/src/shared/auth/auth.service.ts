@@ -34,7 +34,7 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.userService.getUserCredentials(username?.toLowerCase());
     pass = this.passwordHashService.getPasswordHash(pass);
-    if (user && user.password === pass) {
+    if (user && user.password === pass && !user.isPending) {
       const { password, ...result } = user;
       return result;
     }
@@ -87,7 +87,7 @@ export class AuthService {
   async forgotPassword(email: any) {
     const hostAddress = this.configService.get("host");
     const userDetails = await this.userService.findOne(email);
-    if (userDetails) {
+    if (userDetails && !userDetails.isPending) {
       console.table(userDetails);
       const requestId = this.helperService.generateRandomPassword();
       const date = Date.now();

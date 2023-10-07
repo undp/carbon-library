@@ -21,4 +21,30 @@
     width: 110px;
     text-align: center;
   }
+
+  .organisation-status-pending {
+    border-radius: 20px;
+    background-color: rgba(#b089f4, 0.4);
+    padding: 4px 15px;
+    height: 28px;
+    color: #976ed7;
+    margin-left: auto;
+    margin-right: auto;
+    width: 110px;
+    text-align: center;
+  }
+
+  .organisation-status-rejected {
+    border-radius: 20px;
+    background-color: rgba(#fff7e6, 0.4);
+    padding: 4px 15px;
+    height: 28px;
+    color: #ff8f56;
+    margin-left: auto;
+    margin-right: auto;
+    width: 110px;
+    text-align: center;
+    outline-style: solid;
+    outline-width: thin;
+  }
   
