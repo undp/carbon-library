@@ -4,13 +4,18 @@ import {
   IsArray,
   IsEmail,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   IsUrl,
+  Max,
   MaxLength,
+  Min,
   ValidateIf,
+  max,
 } from "class-validator";
 import { CompanyRole } from "../enum/company.role.enum";
 
@@ -92,6 +97,9 @@ export class OrganisationUpdateDto {
   )
   @IsNotEmpty()
   @IsNumber()
+  @IsInt()
+  @Min(0)
+  @Max(99)
   @ApiProperty()
   nationalSopValue: number;
 }

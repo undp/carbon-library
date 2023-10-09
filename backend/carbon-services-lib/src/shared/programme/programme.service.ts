@@ -1304,7 +1304,16 @@ export class ProgrammeService {
     const programme: Programme = this.toProgramme(programmeDto);
     this.logger.verbose("Programme create", JSON.stringify(programme));
 
-    
+    const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
+    if(Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId)){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.govermentOwnershipOfProgramme",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
     if (
       programmeDto.proponentTaxVatId.length > 1 &&
       (!programmeDto.proponentPercentage ||
@@ -1421,10 +1430,10 @@ export class ProgrammeService {
         );
       }
 
-      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER) {
+      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER && projectCompany.companyRole != CompanyRole.GOVERNMENT) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "programme.proponentIsNotAProgrammeDev",
+            "programme.proponentIsNotAProgrammeDevOrGov ",
             []
           ),
           HttpStatus.BAD_REQUEST
@@ -1634,19 +1643,21 @@ export class ProgrammeService {
       );
 
       const hostAddress = this.configService.get("host");
-      await this.emailHelperService.sendEmailToGovernmentAdmins(
-        EmailTemplates.PROGRAMME_CREATE,
-        {
-          organisationName: orgNamesList,
-          programmePageLink:
-            hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
-        },undefined,undefined,
-        {
-          filename: 'Request For Letter Of Intent.pdf',
-          path: letterOfIntentRequestLetterUrl
-        }
-      );
+      if(govProfile.nationalSopValue==0){
+        await this.emailHelperService.sendEmailToGovernmentAdmins(
+          EmailTemplates.PROGRAMME_CREATE,
+          {
+            organisationName: orgNamesList,
+            programmePageLink:
+              hostAddress +
+              `/programmeManagement/view?id=${programme.programmeId}`,
+          },undefined,undefined,
+          {
+            filename: 'Request For Letter Of Intent.pdf',
+            path: letterOfIntentRequestLetterUrl
+          }
+        );
+      }
 
       programme.companyId.forEach(async (companyId) => {
         await this.emailHelperService.sendEmailToOrganisationAdmins(

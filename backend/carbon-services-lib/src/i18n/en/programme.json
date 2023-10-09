@@ -93,5 +93,7 @@
     "investmentCancelSuccess": "The investment request has been cancelled successfully",
     "totalUserEstimateCreditsInvalidMsg": "Total user estimated credits cannot be greater than the programme estimated credits",
     "wrongSectorAndScopeMapping": "The sectoral scope doesn't match the sector",
-    "wrongMItigationSectorMapping": "The Mitigation type doesn't match the sector. The correct mapping is Energy - Biomass energy, Coal bed/mine methane, EE households, EE industry, EE own generation, EE service, EE supply side, Energy distribution, Fossil fuel switch, Geothermal, Hydro, Solar, Wind Health - none Education - none Transport - Transport Manufacturing -Cement, CCS, HFCs, PFCs, SF6 Hospitality - none Forestry - Forestry Waste - Landfills, Fugitive, Methane avoidance  Agriculture - Agriculture Other - Marine, N2O"
+    "wrongMItigationSectorMapping": "The Mitigation type doesn't match the sector. The correct mapping is Energy - Biomass energy, Coal bed/mine methane, EE households, EE industry, EE own generation, EE service, EE supply side, Energy distribution, Fossil fuel switch, Geothermal, Hydro, Solar, Wind Health - none Education - none Transport - Transport Manufacturing -Cement, CCS, HFCs, PFCs, SF6 Hospitality - none Forestry - Forestry Waste - Landfills, Fugitive, Methane avoidance  Agriculture - Agriculture Other - Marine, N2O",
+    "govermentOwnershipOfProgramme":"Goverment should be a programme owner.",
+    "proponentIsNotAProgrammeDevOrGov": "Proponent is not a programme developer or government"
   }
