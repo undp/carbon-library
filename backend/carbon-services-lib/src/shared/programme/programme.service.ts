@@ -1671,7 +1671,7 @@ export class ProgrammeService {
         filterOr: undefined,
         sort: undefined,
         filterBy: undefined
-      }, undefined);
+      }, undefined, CompanyRole.GOVERNMENT);
 
       const programmeSectoralScopeKey = Object.keys(SectoralScopeDef).find(
         (key) => SectoralScopeDef[key] === programme.sectoralScope
