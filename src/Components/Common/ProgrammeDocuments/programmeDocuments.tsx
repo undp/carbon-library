@@ -62,6 +62,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
   const { delete: del, post } = useConnection();
   const fileInputRef: any = useRef(null);
   const fileInputRefMeth: any = useRef(null);
+  const fileInputRefImpactAssessment: any = useRef(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [designDocUrl, setDesignDocUrl] = useState<any>("");
   const [noObjectionDocUrl, setNoObjectionDocUrl] = useState<any>("");
@@ -80,6 +81,10 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     useState(false);
   const [actionInfo, setActionInfo] = useState<any>({});
   const [rejectDocData, setRejectDocData] = useState<any>({});
+  const [impactAssessmentUrl,setImpactAssessmentUrl] = useState<any>("");
+  const [impactAssessmentDate,setImpactAssessmentDate] = useState<any>("");
+  const [impactAssessmentStatus,setImpactAssessmentStatus] = useState<any>("");
+  const [impactAssessmentId,setImpactAssessmentId] = useState<any>("");
   const maximumImageSize = process.env.REACT_APP_MAXIMUM_FILE_SIZE
     ? parseInt(process.env.REACT_APP_MAXIMUM_FILE_SIZE)
     : 5000000;
@@ -91,6 +96,10 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
   const handleMethodologyFileUpload = () => {
     fileInputRefMeth?.current?.click();
   };
+
+  const handleImpactAssessmentFileUpload = () => {
+    fileInputRefImpactAssessment?.current?.click();
+  }
 
   useEffect(() => {
     setDocData(data);
@@ -119,6 +128,12 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           setAuthorisationDocUrl(item?.url);
           setAuthorisationDocDate(item?.txTime);
         }
+        if (item?.url?.includes("ENVIRONMENTAL_IMPACT_ASSESSMENT")) {
+          setImpactAssessmentUrl(item?.url);
+          setImpactAssessmentDate(item?.txTime);
+          setImpactAssessmentStatus(item?.status);
+          setImpactAssessmentId(item?.id);
+        }
       });
     }
   }, [docData]);
@@ -145,7 +160,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     setLoading(true);
     const logoBase64 = await getBase64(file as RcFile);
     try {
-      if (isValidateFileType(file?.type)) {
+      if (isValidateFileType(file?.type, type)) {
         const response: any = await post("national/programme/addDocument", {
           type: type,
           data: logoBase64,
@@ -703,6 +718,200 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
               </Col>
             </Row>
           )}
+          <Row className="field" key="Environmental Impact Assessment">
+              <Col span={14} className="field-key">
+                <div className="label-container">
+                  <div className={impactAssessmentUrl !== "" ? "label-uploaded" : "label"}>
+                    {t("programme:environmentalImpactAssessment")}
+                  </div>
+                  {impactAssessmentStatus === DocumentStatus.PENDING && (ministryLevelPermission || companyRolePermission) && (
+                    <>
+                      <LikeOutlined
+                        onClick={() =>
+                          docAction(impactAssessmentId, DocumentStatus.ACCEPTED)
+                        }
+                        className="common-progress-icon"
+                        style={{ color: "#976ED7" }}
+                      />
+                      <DislikeOutlined
+                        onClick={() => {
+                          setRejectDocData({ id: impactAssessmentId });
+                          setActionInfo({
+                            action: "Reject",
+                            headerText: `${t("programme:rejectDocHeader")}`,
+                            text: `${t("programme:rejectDocBody")}`,
+                            type: "reject",
+                            icon: <DislikeOutlined />,
+                          });
+                          setOpenRejectDocConfirmationModal(true);
+                        }}
+                        className="common-progress-icon margin-left-1"
+                        style={{ color: "#FD6F70" }}
+                      />
+                    </>
+                  )}
+                  {impactAssessmentStatus === DocumentStatus.ACCEPTED && (
+                    <CheckCircleOutlined
+                      className="common-progress-icon"
+                      style={{ color: "#5DC380" }}
+                    />
+                  )}
+                  {impactAssessmentStatus === DocumentStatus.REJECTED && (
+                    <Tooltip
+                      arrowPointAtCenter
+                      placement="top"
+                      trigger="hover"
+                      title={t("programme:rejectTip")}
+                      overlayClassName="custom-tooltip"
+                    >
+                      <ExclamationCircleOutlined
+                        className="common-progress-icon"
+                        style={{ color: "#FD6F70" }}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+                {impactAssessmentUrl !== "" && (
+                <div className="time">
+                  {moment(parseInt(impactAssessmentDate)).format(
+                    "DD MMMM YYYY @ HH:mm"
+                  )}
+                </div>
+              )}
+              </Col>
+              <Col span={10} className="field-value">
+                {impactAssessmentUrl !== "" ? (
+                  <div className="link">
+                    {linkDocVisible(impactAssessmentStatus) && (
+                      <a
+                        href={impactAssessmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                      >
+                        <LinkOutlined
+                          className="common-progress-icon margin-right-1"
+                          style={{ color: "#3F3A47" }}
+                        />
+                      </a>
+                    )}
+                    {impactAssessmentStatus !== DocumentStatus.ACCEPTED && (
+                      <>
+                        <Tooltip
+                          arrowPointAtCenter
+                          placement="top"
+                          trigger="hover"
+                          title={
+                            userInfoState?.userRole === Role.ViewOnly ||
+                            userInfoState?.companyRole === CompanyRole.CERTIFIER
+                              ? t("programme:notAuthToUploadDoc")
+                              : !uploadDocUserPermission(
+                                  userInfoState,
+                                  DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+                                  programmeOwnerId,
+                                  ministryLevelPermission
+                                ) && t("programme:orgNotAuth")
+                          }
+                          overlayClassName="custom-tooltip"
+                        >
+                          <FileAddOutlined
+                            className="common-progress-icon"
+                            style={
+                              uploadDocUserPermission(
+                                userInfoState,
+                                DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+                                programmeOwnerId,
+                                ministryLevelPermission
+                              )
+                                ? { color: "#3F3A47", cursor: "pointer" }
+                                : { color: "#cacaca", cursor: "default" }
+                            }
+                            onClick={() =>
+                              uploadDocUserPermission(
+                                userInfoState,
+                                DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+                                programmeOwnerId,
+                                ministryLevelPermission
+                              ) && handleImpactAssessmentFileUpload()
+                            }
+                          />
+                        </Tooltip>
+                        <input
+                          type="file"
+                          ref={fileInputRefImpactAssessment}
+                          style={{ display: "none" }}
+                          accept=".doc, .docx, .pdf, .png, .jpg"
+                          onChange={(e: any) => {
+                            const selectedFile = e.target.files[0];
+                            e.target.value = null;
+                            onUploadDocument(
+                              selectedFile,
+                              DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT
+                            );
+                          }}
+                        />
+                      </>
+                    )}
+                  </div>
+                ):(
+                  <>
+                    <Tooltip
+                      arrowPointAtCenter
+                      placement="top"
+                      trigger="hover"
+                      title={
+                        userInfoState?.userRole === Role.ViewOnly ||
+                        userInfoState?.companyRole === CompanyRole.CERTIFIER
+                          ? t("programme:notAuthToUploadDoc")
+                          : !uploadDocUserPermission(
+                              userInfoState,
+                              DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+                              programmeOwnerId,
+                              ministryLevelPermission
+                            ) && t("programme:orgNotAuth")
+                      }
+                      overlayClassName="custom-tooltip"
+                    >
+                      <FileAddOutlined
+                        className="common-progress-icon"
+                        style={
+                          uploadDocUserPermission(
+                            userInfoState,
+                            DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+                            programmeOwnerId,
+                            ministryLevelPermission
+                          )
+                            ? { color: "#3F3A47", cursor: "pointer" }
+                            : { color: "#cacaca", cursor: "default" }
+                        }
+                        onClick={() =>
+                          uploadDocUserPermission(
+                            userInfoState,
+                            DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+                            programmeOwnerId,
+                            ministryLevelPermission
+                          ) && handleImpactAssessmentFileUpload()
+                        }
+                      />
+                    </Tooltip>
+                    <input
+                      type="file"
+                      ref={fileInputRefImpactAssessment}
+                      style={{ display: "none" }}
+                      accept=".doc, .docx, .pdf, .png, .jpg"
+                      onChange={(e: any) => {
+                        const selectedFile = e.target.files[0];
+                        e.target.value = null;
+                        onUploadDocument(
+                          selectedFile,
+                          DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT
+                        );
+                      }}
+                    />
+                  </>
+                ) }
+              </Col>
+          </Row>
         </div>
       </div>
       <RejectDocumentationConfirmationModel
