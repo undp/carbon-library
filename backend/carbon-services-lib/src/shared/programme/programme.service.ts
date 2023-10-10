@@ -440,6 +440,17 @@ export class ProgrammeService {
       }
     }
 
+    const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
+    if(req.fromCompanyIds.includes(govProfile.companyId) && req.percentage[req.fromCompanyIds.indexOf(govProfile.companyId)]!==0){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.cannotInvestOnGovernmentOwnership",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     this.logger.verbose(`Investment on programme ${JSON.stringify(programme)}`);
 
     if (

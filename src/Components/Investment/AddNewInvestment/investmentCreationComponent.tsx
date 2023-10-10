@@ -51,6 +51,7 @@ export const InvestmentCreationComponent = (props: any) => {
   const [organisationsList, setOrganisationList] = useState<any[]>([]);
   const [instrument, setInstrument] = useState<string[]>([]);
   const [stepOneData, setStepOneData] = useState<any>();
+  const [govData, setGovData] = useState<any>();
 
   const instrumentOptions = Object.keys(Instrument).map((k, index) => ({
     label: addSpaces(Object.values(Instrument)[index]),
@@ -65,6 +66,33 @@ export const InvestmentCreationComponent = (props: any) => {
     setCurrentPercTotal(
       formTwo.getFieldValue("percentage").reduce((a: any, b: any) => a + b, 0)
     );
+  };
+
+  const getGovernmentDetails = async () => {
+    setLoading(true);
+    try {
+      console.log("getting government profile");
+      const response = await post("national/organisation/query", {
+        page: 1,
+        size: 100,
+        filterAnd: [
+          {
+            key: "companyRole",
+            operation: "=",
+            value: CompanyRole.GOVERNMENT,
+          },
+        ],
+      });
+      if (response.data) {
+        setGovData(response?.data[0]);
+        console.log("gov profile", response?.data[0]);
+        return response?.data[0];
+      }
+    } catch (error: any) {
+      console.log("Error in getting government data", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getOrganisationsDetails = async () => {
@@ -85,7 +113,7 @@ export const InvestmentCreationComponent = (props: any) => {
           operation: "!=",
           value: userInfoState?.companyId,
         });
-      }
+      } 
       for (const c of data!.companyId) {
         filterAnd.push({
           key: "companyId",
@@ -119,11 +147,13 @@ export const InvestmentCreationComponent = (props: any) => {
 
   useEffect(() => {
     getOrganisationsDetails();
+    getGovernmentDetails();
   }, [data]);
 
-  if (!data) {
+  if (!data ) {
     return <Loading />;
   }
+  console.log('data',data)
 
   const companyName: any = {};
   for (const company of data!.company) {
@@ -713,6 +743,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                     <InputNumber
                                       placeholder=""
                                       controls={false}
+                                      disabled={govData.companyId==companyId}
                                       // disabled={userInfoState?.companyId === Number(companyId)}
                                       onKeyPress={(event) => {
                                         if (!/[0-9\.]/.test(event.key)) {

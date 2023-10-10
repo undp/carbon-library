@@ -33,6 +33,7 @@ import { FileHandlerInterface } from "../file-handler/filehandler.interface";
 import { CounterType } from "../util/counter.type.enum";
 import { CounterService } from "../util/counter.service";
 import { LocationInterface } from "../location/location.interface";
+import { SYSTEM_TYPE } from "../enum/system.names.enum";
 
 @Injectable()
 export class CompanyService {
@@ -416,17 +417,16 @@ export class CompanyService {
       });
     }
 
-    const { companyId, ...companyUpdateFields } = companyUpdateDto;
+    const { companyId, nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
     if (!companyUpdateFields.hasOwnProperty("website")) {
       companyUpdateFields["website"] = "";
     }
-
     const result = await this.companyRepo
       .update(
         {
           companyId: company.companyId,
         },
-        companyUpdateFields
+        this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
       )
       .catch((err: any) => {
         this.logger.error(err);
