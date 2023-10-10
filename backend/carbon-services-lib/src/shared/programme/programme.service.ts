@@ -1304,7 +1304,7 @@ export class ProgrammeService {
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
     this.logger.verbose("ProgrammeDTO received", JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
-    this.logger.verbose("Programme create", JSON.stringify(programme));
+    this.logger.verbose("Programme  create", JSON.stringify(programme));
 
     
     if (
@@ -1551,6 +1551,23 @@ export class ProgrammeService {
         );
       }
 
+      let environmentalImpactAssessmentDoc;
+      if(programmeDto.environmentalImpactAssessment){
+        programmeDto.environmentalImpactAssessment = await this.uploadDocument(
+          DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+          programme.programmeId,
+          programmeDto.environmentalImpactAssessment
+        );
+
+        environmentalImpactAssessmentDoc = new ProgrammeDocument();
+        environmentalImpactAssessmentDoc.programmeId = programme.programmeId;
+        environmentalImpactAssessmentDoc.externalId = programme.externalId;
+        environmentalImpactAssessmentDoc.status = DocumentStatus.PENDING;
+        environmentalImpactAssessmentDoc.type = DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT;
+        environmentalImpactAssessmentDoc.txTime = new Date().getTime();
+        environmentalImpactAssessmentDoc.url = programmeDto.environmentalImpactAssessment;
+      }
+
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.ProgrammeCreate,
         actionProps: programmeDto,
@@ -1602,6 +1619,18 @@ export class ProgrammeService {
             actionId: monitoringReport.actionId
           },ndcAc, monitoringReport.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
         }
+
+        if(environmentalImpactAssessmentDoc){
+          this.logger.log(`Approving environmentalImpactAssessment report since the user is ${user.companyRole}`)
+          environmentalImpactAssessmentDoc.status = DocumentStatus.ACCEPTED;
+
+          await this.queueDocument(AsyncActionType.DocumentUpload, {
+            type: this.helperService.enumToString(DocType, environmentalImpactAssessmentDoc.type),
+            data: environmentalImpactAssessmentDoc.url,
+            externalId: environmentalImpactAssessmentDoc.externalId,
+            actionId: environmentalImpactAssessmentDoc.actionId
+          },undefined, environmentalImpactAssessmentDoc.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
+        }
       }
       
       savedProgramme = await this.entityManager
@@ -1614,6 +1643,9 @@ export class ProgrammeService {
           }
           if (dr) {
             await em.save<ProgrammeDocument>(dr);
+          }
+          if(environmentalImpactAssessmentDoc) {
+            await em.save<ProgrammeDocument>(environmentalImpactAssessmentDoc);
           }
           if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
           return await em.save<Programme>(programme);
