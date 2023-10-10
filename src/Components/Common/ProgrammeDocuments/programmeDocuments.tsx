@@ -259,7 +259,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
         </div>
         <div>
           <Row className="field" key="Design Document">
-            <Col span={14} className="field-key">
+            <Col span={18} className="field-key">
               <div className="label-container">
                 <div
                   className={designDocUrl !== "" ? "label-uploaded" : "label"}
@@ -322,7 +322,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 </div>
               )}
             </Col>
-            <Col span={10} className="field-value">
+            <Col span={6} className="field-value">
               {designDocUrl !== "" ? (
                 <div className="link">
                   {linkDocVisible(designDocStatus) && (
@@ -454,7 +454,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           </Row>
           {noObjectionDocUrl !== "" && (
             <Row className="field" key="Objection Document">
-              <Col span={14} className="field-key">
+              <Col span={18} className="field-key">
                 <div className="label-uploaded">
                   {t("programme:objectionLett")}
                 </div>
@@ -464,7 +464,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   )}
                 </div>
               </Col>
-              <Col span={10} className="field-value">
+              <Col span={6} className="field-value">
                 <div className="link">
                   <a
                     href={noObjectionDocUrl}
@@ -482,7 +482,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
             </Row>
           )}
           <Row className="field" key="Methodology Document">
-            <Col span={14} className="field-key">
+            <Col span={18} className="field-key">
               <div className="label-container">
                 <div
                   className={
@@ -547,7 +547,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 </div>
               )}
             </Col>
-            <Col span={10} className="field-value">
+            <Col span={6} className="field-value">
               {methodologyDocUrl !== "" ? (
                 <div className="link">
                   {linkDocVisible(methodDocStatus) && (
@@ -691,7 +691,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           </Row>
           {authorisationDocUrl !== "" && (
             <Row className="field" key="Authorisation Document">
-              <Col span={14} className="field-key">
+              <Col span={18} className="field-key">
                 <div className="label-uploaded">
                   {t("programme:authLetterLabel")}
                 </div>
@@ -701,7 +701,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   )}
                 </div>
               </Col>
-              <Col span={10} className="field-value">
+              <Col span={6} className="field-value">
                 <div className="link">
                   <a
                     href={authorisationDocUrl}
@@ -719,7 +719,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
             </Row>
           )}
           <Row className="field" key="Environmental Impact Assessment">
-              <Col span={14} className="field-key">
+              <Col span={18} className="field-key">
                 <div className="label-container">
                   <div className={impactAssessmentUrl !== "" ? "label-uploaded" : "label"}>
                     {t("programme:environmentalImpactAssessment")}
@@ -779,7 +779,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 </div>
               )}
               </Col>
-              <Col span={10} className="field-value">
+              <Col span={6} className="field-value">
                 {impactAssessmentUrl !== "" ? (
                   <div className="link">
                     {linkDocVisible(impactAssessmentStatus) && (
