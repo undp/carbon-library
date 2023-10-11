@@ -711,8 +711,8 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          {(userInfoState?.companyRole !==
-                            CompanyRole.MINISTRY) && (
+                          {userInfoState?.companyRole !==
+                            CompanyRole.MINISTRY && (
                             <div className="minister-radio-container">
                               <Tooltip
                                 placement="top"
