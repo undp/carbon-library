@@ -570,7 +570,7 @@ export class UserService {
       if(company.companyRole === CompanyRole.MINISTRY && companyRole === CompanyRole.MINISTRY) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "user.minUserCannotCreateMin",
+            "user.userUnAUth",
             []
           ),
           HttpStatus.FORBIDDEN
