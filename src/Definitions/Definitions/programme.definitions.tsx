@@ -176,6 +176,7 @@ export interface Programme {
   typeOfMitigation: TypeOfMitigation;
   geographicalLocationCordintes: any;
   mitigationActions: any;
+  environmentalAssessmentRegistrationNo: any;
 }
 
 export interface ProgrammeR extends Programme {
@@ -213,6 +214,7 @@ export const getGeneralFields = (programme: Programme |ProgrammeU | ProgrammeR |
     startDate: DateTime.fromSeconds(Number(programme.startTime)),
     endDate: DateTime.fromSeconds(Number(programme.endTime)),
     buyerCountry: programme.programmeProperties.buyerCountryEligibility,
+    environmentalAssessmentRegistrationNo: programme.environmentalAssessmentRegistrationNo
   };
   if(system===CarbonSystemType.UNIFIED || system===CarbonSystemType.MRV){
     let prog:any=programme

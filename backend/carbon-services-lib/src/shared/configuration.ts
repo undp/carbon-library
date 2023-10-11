@@ -4,7 +4,7 @@ export default () => ({
   systemCountryName: process.env.systemCountryName || "CountryX",
   systemContinentName: process.env.systemContinentName || "CountryX",
   defaultCreditUnit: process.env.defaultCreditUnit || "ITMO",
-  year: parseInt(process.env.REPORT_YEAR) || 2023 ,
+  year: parseInt(process.env.REPORT_YEAR),
   dateTimeFormat: "DD LLLL yyyy @ HH:mm",
   dateFormat: "DD LLLL yyyy",
   database: {
@@ -81,5 +81,6 @@ export default () => ({
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
-  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM"
+  systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
+  systemName: process.env.SYSTEM_NAME || "System X"
 });

@@ -1,4 +1,4 @@
-import { BankOutlined } from "@ant-design/icons";
+import { BankOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Card, Col, message, Row, Skeleton } from "antd";
 import { plainToClass } from "class-transformer";
 import React, { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
-import { addCommSep, SectoralScope } from "../../../Definitions";
+import { addCommSep, CompanyState, SectoralScope } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const CompanyProfileComponent = (props: any) => {
@@ -22,14 +22,17 @@ export const CompanyProfileComponent = (props: any) => {
     onNavigateToCompanyEdit,
     regionField,
   } = props;
-  const { get, put } = useConnection();
+  const { get, put, post } = useConnection();
   const [companyDetails, setCompanyDetails] = useState<any>(undefined);
+  const [userDetails, setUserDetails] = useState<any>(undefined);
   const { state } = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [actionInfo, setActionInfo] = useState<any>({});
   const [openDeauthorisationModal, setOpenDeauthorisationModal] =
     useState(false);
   const [openReactivateModal, setOpenReactivateModal] = useState(false);
+  const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [openRejectModal, setOpenRejectModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [userRole, setUserRole] = useState<any>("");
   const [companyRole, setCompanyRole] = useState<any>("");
@@ -48,6 +51,30 @@ export const CompanyProfileComponent = (props: any) => {
     } catch (exception) {}
   };
 
+  const getUserDetails = async (companyId: string) => {
+    setIsLoading(true);
+    try {
+      const response: any = await post("national/user/query", {
+        page: 1,
+        size: 10,
+        filterAnd: [
+          {
+            key: "companyId",
+            operation: "=",
+            value: companyId,
+          },
+        ],
+      });
+      if (response && response.data) {
+        setUserDetails(response.data[0]);
+      }
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log("Error in getting users", error);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!state) {
       onNavigateToCompanyManagement();
@@ -56,6 +83,9 @@ export const CompanyProfileComponent = (props: any) => {
       const userRoleValue = localStorage.getItem("userRole") as string;
       setUserRole(userRoleValue);
       setCompanyRole(localStorage.getItem("companyRole") as string);
+      if (state.record?.state == "2" || state.record?.state == "3") {
+        getUserDetails(state.record.companyId)
+      }
     }
   }, []);
 
@@ -107,6 +137,64 @@ export const CompanyProfileComponent = (props: any) => {
     }
   };
 
+  const onApproveOrgConfirmed = async (remarks: string) => {
+    try {
+      setIsLoading(true);
+      const response: any = await put(
+        `national/organisation/approve?id=${companyDetails.companyId}`,
+        {
+          remarks: remarks,
+        }
+      );
+      setOpenApproveModal(false);
+      message.open({
+        type: "success",
+        content: t("companyProfile:approvedSuccessfully"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      getCompanyDetails(companyDetails.companyId);
+      getUserDetails(companyDetails.companyId);
+    } catch (exception: any) {
+      setErrorMsg(exception.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onApproveOrgCanceled = () => {
+    setOpenApproveModal(false);
+  };
+
+
+  const onRejectOrgConfirmed = async (remarks: string) => {
+    try {
+      setIsLoading(true);
+      const response: any = await put(
+        `national/organisation/reject?id=${companyDetails.companyId}`,
+        {
+          remarks: remarks,
+        }
+      );
+      setOpenRejectModal(false);
+      message.open({
+        type: "success",
+        content: t("companyProfile:rejectedSuccessfully"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      getCompanyDetails(companyDetails.companyId);
+    } catch (exception: any) {
+      setErrorMsg(exception.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onRejectOrgCanceled = () => {
+    setOpenRejectModal(false);
+  };
+
   const onDeauthoriseOrgCanceled = () => {
     setOpenDeauthorisationModal(false);
   };
@@ -138,6 +226,31 @@ export const CompanyProfileComponent = (props: any) => {
     setErrorMsg("");
     setOpenReactivateModal(true);
   };
+
+  const onApproveOrganisation = () => {
+    setActionInfo({
+      action: `${t("companyProfile:approve")}`,
+      headerText: `${t("companyProfile:approveConfirmHeaderText")}`,
+      text: `${t("companyProfile:approveConfirmText")}`,
+      type: "primary",
+      icon: <Icon.ClipboardCheck />,
+    });
+    setErrorMsg("");
+    setOpenApproveModal(true);
+  };
+
+  const onRejectOrganisation = () => {
+    setActionInfo({
+      action: `${t("companyProfile:reject")}`,
+      headerText: `${t("companyProfile:rejectConfirmHeaderText")}`,
+      text: `${t("companyProfile:rejectConfirmText")}`,
+      type: "danger",
+      icon: <Icon.ClipboardX />,
+    });
+    setErrorMsg("");
+    setOpenRejectModal(true);
+  };
+
   const getEnumKeysFromValues = (values: string[]): string[] => {
     const enumKeys: string[] = [];
     for (const key in SectoralScope) {
@@ -159,7 +272,7 @@ export const CompanyProfileComponent = (props: any) => {
         <div className="flex-display">
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
           !isLoading &&
-          parseInt(companyDetails.state) !== 0 ? (
+          parseInt(companyDetails?.state) === 1 ? (
             <Button
               danger
               className="btn-danger"
@@ -173,7 +286,7 @@ export const CompanyProfileComponent = (props: any) => {
 
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
           !isLoading &&
-          parseInt(companyDetails.state) !== 1 ? (
+          parseInt(companyDetails?.state) === 0 ? (
             <Button className="btn-activate" onClick={onReActivateOrganisation}>
               {t("companyProfile:reActivate")}
             </Button>
@@ -190,6 +303,30 @@ export const CompanyProfileComponent = (props: any) => {
                 onClick={() => onNavigateToCompanyEdit(companyDetails)}
               >
                 {t("common:edit")}
+              </Button>
+            )}
+          {(parseInt(companyDetails?.state) === 2) &&
+            ability.can(Action.Reject, plainToClass(Company, companyDetails)) &&
+            !isLoading &&
+            companyDetails && (
+              <Button
+                className="mg-left-1 btn-reject"
+                type="primary"
+                onClick={onRejectOrganisation}
+              >
+                {t("common:reject")}
+              </Button>
+            )}
+          {(parseInt(companyDetails?.state) === 2 || parseInt(companyDetails?.state) === 3) &&
+            ability.can(Action.Approve, plainToClass(Company, companyDetails)) &&
+            !isLoading &&
+            companyDetails && (
+              <Button
+                className="mg-left-1 btn-approve"
+                type="primary"
+                onClick={onApproveOrganisation}
+              >
+                {t("common:approve")}
               </Button>
             )}
         </div>
@@ -402,6 +539,43 @@ export const CompanyProfileComponent = (props: any) => {
                   </Skeleton>
                 </div>
               </Card>
+              {(companyDetails?.state == "2" || companyDetails?.state == "3") &&
+                <Card className="card-container">
+                  <div className="info-view">
+                    <div className="title">
+                      <span className="title-icon">
+                        <UserOutlined />
+                      </span>
+                      <span className="title-text">
+                        {t("companyProfile:adminDetailsHeading")}
+                      </span>
+                    </div>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:adminName")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {userDetails?.name
+                          ? userDetails?.name
+                          : "-"}
+                      </Col>
+                    </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:adminEmail")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {userDetails?.email
+                          ? userDetails?.email
+                          : "-"}
+                      </Col>
+                    </Row>
+
+                  </div>
+
+                </Card>
+              }
+              
             </Col>
           </Row>
         </div>
@@ -423,6 +597,26 @@ export const CompanyProfileComponent = (props: any) => {
         onActionConfirmed={onReactivateOrgConfirmed}
         onActionCanceled={onReactivateOrgCanceled}
         openModal={openReactivateModal}
+        errorMsg={errorMsg}
+        loading={isLoading}
+      />
+
+      <UserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onApproveOrgConfirmed}
+        onActionCanceled={onApproveOrgCanceled}
+        openModal={openApproveModal}
+        errorMsg={errorMsg}
+        loading={isLoading}
+      />
+
+      <UserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onRejectOrgConfirmed}
+        onActionCanceled={onRejectOrgCanceled}
+        openModal={openRejectModal}
         errorMsg={errorMsg}
         loading={isLoading}
       />

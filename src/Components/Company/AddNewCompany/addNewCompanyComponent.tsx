@@ -46,6 +46,8 @@ export const AddNewCompanyComponent = (props: any) => {
     useUserContext,
     useLocation,
     regionField,
+    isGuest,
+    onNavigateToHome,
     systemType,
   } = props;
   const [formOne] = Form.useForm();
@@ -174,21 +176,36 @@ export const AddNewCompanyComponent = (props: any) => {
       );
       const logoUrls = logoBase64.split(",");
       requestData.company.logo = logoUrls[1];
-      const response = await post("national/user/add", requestData);
-      if (response.status === 200 || response.status === 201) {
-        if (isUpdate) {
-          setUserInfo({
-            companyLogo: response.data.logo,
-          } as UserProps);
+
+      if (isGuest) {
+        const response = await post("national/user/register", requestData);
+        if (response.status === 200 || response.status === 201) {
+          message.open({
+            type: "success",
+            content: t("companyRegisteredSuccess"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
+          onNavigateToHome();
+          setLoading(false);
         }
-        message.open({
-          type: "success",
-          content: t("companyAddedSuccess"),
-          duration: 3,
-          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-        });
-        onNavigateToCompanyManagement();
-        setLoading(false);
+      } else {
+        const response = await post("national/user/add", requestData);
+        if (response.status === 200 || response.status === 201) {
+          if (isUpdate) {
+            setUserInfo({
+              companyLogo: response.data.logo,
+            } as UserProps);
+          }
+          message.open({
+            type: "success",
+            content: t("companyAddedSuccess"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
+          onNavigateToCompanyManagement();
+          setLoading(false);
+        }
       }
     } catch (error: any) {
       message.open({
@@ -694,8 +711,8 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          {userInfoState?.companyRole !==
-                            CompanyRole.MINISTRY && (
+                          {(userInfoState?.companyRole !==
+                            CompanyRole.MINISTRY) && (
                             <div className="minister-radio-container">
                               <Tooltip
                                 placement="top"
@@ -704,6 +721,7 @@ export const AddNewCompanyComponent = (props: any) => {
                                 <Radio.Button
                                   className="minister"
                                   value="Ministry"
+                                  disabled={isGuest}
                                 >
                                   <AuditOutlined className="role-icons" />
                                   Ministry
