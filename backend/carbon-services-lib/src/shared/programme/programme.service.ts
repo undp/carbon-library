@@ -1316,7 +1316,7 @@ export class ProgrammeService {
     this.logger.verbose("Programme create", JSON.stringify(programme));
 
     const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
-    if(Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId)){
+    if(Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId) && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY){
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.govermentOwnershipOfProgramme",
@@ -3418,7 +3418,6 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
-
       if (companyAvailableCredit < transferCompanyCredit) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(

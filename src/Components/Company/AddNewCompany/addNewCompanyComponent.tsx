@@ -553,6 +553,55 @@ export const AddNewCompanyComponent = (props: any) => {
                       <Input.TextArea rows={3} maxLength={100} />
                     </Form.Item>
                   )}
+                  {companyRole === CompanyRole.GOVERNMENT && (
+                    <div className="space-container" style={{ width: "100%" }}>
+                      <Space
+                        wrap={true}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="center"
+                        size={"large"}
+                      >
+                        <Form.Item
+                          style={{ width: "100%" }}
+                          name="nationalSopValue"
+                          label="National Share of Proceeds"
+                          initialValue={state?.record?.nationalSopValue}
+                          rules={[
+                            { required: true, message: "" },
+                            {
+                              validator: async (rule, value) => {
+                                if (
+                                  String(value).trim() === "" ||
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
+                                  throw new Error(
+                                    `National Share of Proceeds  ${t(
+                                      "isRequired"
+                                    )}`
+                                  );
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            style={{ width: "100%" }}
+                            size="large"
+                            min={0}
+                            max={99}
+                            formatter={(value) => `${value}%`}
+                            parser={(value: any) => value.replace("%", "")}
+                            disabled={systemType == CarbonSystemType.REGISTRY}
+                          />
+                        </Form.Item>
+                      </Space>
+                    </div>
+                  )}
                 </div>
               </Col>
               <Col xl={12} md={24}>
@@ -816,56 +865,6 @@ export const AddNewCompanyComponent = (props: any) => {
                     >
                       <Input.TextArea rows={3} maxLength={100} />
                     </Form.Item>
-                  )}
-                  {companyRole === CompanyRole.GOVERNMENT && (
-                    <div className="space-container" style={{ width: "100%" }}>
-                      <Space
-                        wrap={true}
-                        style={{
-                          display: "flex",
-                          marginBottom: 8,
-                          
-                        }}
-                        align="center"
-                        size={"large"}
-                      >
-                        <Form.Item
-                          style={{ width: "100%" }}
-                          name="nationalSopValue"
-                          label="National Share of Proceeds"
-                          initialValue={state?.record?.nationalSopValue}
-                          rules={[
-                            { required: true, message: "" },
-                            {
-                              validator: async (rule, value) => {
-                                if (
-                                  String(value).trim() === "" ||
-                                  String(value).trim() === undefined ||
-                                  value === null ||
-                                  value === undefined
-                                ) {
-                                  throw new Error(
-                                    `National Share of Proceeds  ${t(
-                                      "isRequired"
-                                    )}`
-                                  );
-                                }
-                              },
-                            },
-                          ]}
-                        >
-                          <InputNumber
-                            style={{ width: "100%" }}
-                            size="large"
-                            min={0}
-                            max={99}
-                            formatter={(value) => `${value}%`}
-                            parser={(value: any) => value.replace("%", "")}
-                            disabled={systemType == CarbonSystemType.REGISTRY}
-                          />
-                        </Form.Item>
-                      </Space>
-                    </div>
                   )}
                 </div>
               </Col>
