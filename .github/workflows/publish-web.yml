@@ -20,8 +20,6 @@ jobs:
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
-          git config pull.rebase true
-          git pull origin HEAD
           yarn version --patch
           git push --follow-tags
         env:
@@ -31,8 +29,6 @@ jobs:
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
-          git config pull.rebase true
-          git pull origin HEAD
           yarn version --prerelease --preid ${{ github.head_ref || github.ref_name }} 
           git push --follow-tags
         env:
