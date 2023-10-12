@@ -232,7 +232,8 @@ export class RegistryClientService {
         "proponentTaxVatId": programme.proponentTaxVatId,
         "proponentPercentage": programme.proponentPercentage,
         "programmeProperties": props,
-        "creditEst": programme.creditEst
+        "creditEst": programme.creditEst,
+        "environmentalAssessmentRegistrationNo": programme.environmentalAssessmentRegistrationNo
       }
 
     if (programme.ndcAction && (programme.ndcAction.action === NDCActionType.Mitigation || programme.ndcAction.action === NDCActionType.CrossCutting) && programme.ndcAction.typeOfMitigation) {

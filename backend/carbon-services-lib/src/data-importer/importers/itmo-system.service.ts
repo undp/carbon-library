@@ -202,6 +202,7 @@ export class ITMOSystemImporter implements ImporterInterface {
                   greenHouseGasses: [GHGs.CO2],
                 },
                 creditEst: 100,
+                environmentalAssessmentRegistrationNo: projectDetails.environmentalAssessmentRegistrationNo
               };
 
               if (step.files && step.files.length > 0) {

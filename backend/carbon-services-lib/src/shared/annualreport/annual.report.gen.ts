@@ -1,4 +1,4 @@
-import { Inject,Injectable,forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -7,22 +7,17 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 import { Programme } from '../entities/programme.entity';
 import { ProgrammeTransfer } from '../entities/programme.transfer';
-import { Company } from '../entities/company.entity';
 import { Country } from '../entities/country.entity';
 import { ProgrammeLedgerService } from '../programme-ledger/programme-ledger.service';
-import { Investment } from '../entities/investment.entity';
 import { ProgrammeService } from '../programme/programme.service';
 import { CompanyService } from '../company/company.service';
-import { UserService } from '../user/user.service';
 @Injectable()
 export class AnnualReportGen {
   constructor(
     @InjectRepository(Programme) private programmeRepo: Repository<Programme>,
-    @InjectRepository(Company) private CompanyRepo: Repository<Company>,
     @InjectRepository(ProgrammeTransfer)
     private programmeTransfer: Repository<ProgrammeTransfer>,
     @InjectRepository(Country) private CountryRepo: Repository<Country>,
-    @InjectRepository(Investment) private InvestRepo: Repository<Investment>,
     private configService: ConfigService,
     private fileHandler: FileHandlerInterface,
     private programmeLedgerService: ProgrammeLedgerService,
@@ -250,7 +245,7 @@ export class AnnualReportGen {
             let maxCellHeight = 0;
             row.forEach((cell, columnIndex) => {
             const cellHeight = doc.heightOfString(cell, {
-                width: 100,
+                width: 90,
                 align: 'left',
             });
             if (cellHeight > maxCellHeight) {
@@ -265,7 +260,7 @@ export class AnnualReportGen {
                 .font('Times-Roman')
                 .text(cell, 30 + table.margin + columnIndex * 100, y, {
                     link: `${host}/programmeManagement/view?id=${id}`,
-                    width: 100,
+                    width: 90,
                     align: 'left',
                 });
             } else {
@@ -274,7 +269,7 @@ export class AnnualReportGen {
                 .fontSize(8)
                 .font('Times-Roman')
                 .text(cell, 30 + table.margin + columnIndex * 100, y, {
-                    width: 100,
+                    width: 90,
                     align: 'left',
                 });
             }
@@ -300,9 +295,7 @@ export class AnnualReportGen {
         const january1st = new Date(date, 0, 1).getTime() / 1000;
         const december31st = new Date(date, 11, 31, 23, 59, 59).getTime() / 1000;
         const authissueqry = `SELECT * FROM public.programme WHERE  "currentStage"='Authorised' ORDER BY "authTime" ASC`;
-        const tranfretireqry = `SELECT * FROM public.programme_transfer WHERE ("status"='Approved' OR "status"='Recognised') ORDER BY "authTime" ASC`;
         const authissuestable = await this.programmeRepo.query(authissueqry);
-        const transfertable = await this.programmeTransfer.query(tranfretireqry);
         addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
         for (const programme of authissuestable) {
             const programmeid = programme.programmeId;
@@ -330,8 +323,15 @@ export class AnnualReportGen {
             } else {
                 sector = 'Waste';
             }
+            var firstowners = []
             const historydata = await this.programmeLedgerService.getProgrammeHistory(programmeid);
             for (const creditdata of historydata){
+                if(creditdata.data.txType=='0'){
+                    for (const id of creditdata.data.companyId){
+                        const company = await this.companyService.findByCompanyId(id)
+                        firstowners.push(company.name)
+                    }
+                }
                 if (january1st*1000< creditdata.data.txTime && creditdata.data.txTime<december31st*1000
                     && creditdata.data.currentStage=='Authorised'
                     && (creditdata.data.txType=='8'|| creditdata.data.txType=='2')){
@@ -342,25 +342,17 @@ export class AnnualReportGen {
                     let credit:number
                     let status:string
                     if (creditissue==0 && creditdata.data.txType=='8'){
-                        status='Authorised'  
+                        status='Authorisation'  
                         credit = creditdata.data.creditEst;     
                     }
                     if (creditissue>0 && creditdata.data.txType=='2'){
                         status = 'Issuance'
                         credit = creditdata.data.creditChange;
                     }
-                    var compname  = []
                     var sendrecive = []
                     for (const id of creditdata.data.companyId){
                         const company = await this.companyService.findByCompanyId(id)
                         sendrecive.push(company.name)
-                        const investowner = await this.InvestRepo.query(
-                            `SELECT * FROM public.investment WHERE "status"='Approved' AND "toCompanyId"=${id} AND "programmeId"='${programmeid}'`
-                            );
-                        if (investowner.length<=0){
-                            const firstowner = await this.companyService.findByCompanyId(id)
-                            compname.push(firstowner.name)
-                        }
                     }
                     addTableRow([
                         programmeid,
@@ -373,7 +365,7 @@ export class AnnualReportGen {
                         '',
                         credit,
                         '',
-                        compname.join(","),
+                        firstowners.join(","),
                         "  "+vintage,
                         sector,
                         status,
@@ -385,122 +377,113 @@ export class AnnualReportGen {
                         txDate,
                         status,
                         sendrecive.join(","),
-                        "  "+sendrecive.join(","),
+                        sendrecive.join(","),
                         '',
                         sendrecive.join(","),
                         ' \n',
                     ]);
                 }
             }
-        }
-        for (const tnrprogramme of transfertable) {
-            if(january1st*1000< tnrprogramme.txTime && tnrprogramme.txTime<december31st*1000){
-                const findprogramme = await this.programmeService.findById(tnrprogramme.programmeId)
-                const programmename = findprogramme.title;
-                const serialNo = String(findprogramme.serialNo);
-                const date = new Date(Number(findprogramme.createdTime));
-                const vintage = date.getFullYear();
-                let type: string;
-                let def: string;
-                if (tnrprogramme.status == `Recognised`) {
-                    type = 'Retirement';
-                    def = 'Cancellation';
-                } else {
-                    type = 'Transfer';
-                    def = 'Use';
-                }
-                const credit = Number(tnrprogramme.creditAmount);
-                const scope = findprogramme.sectoralScope;
-                let sector: string;
-                if (scope == '1' || scope == '2' || scope == '3' || scope == '7') {
-                    sector = 'Energy';
-                } else if (
-                    scope == '4' ||
-                    scope == '5' ||
-                    scope == '6' ||
-                    scope == '8' ||
-                    scope == '9' ||
-                    scope == '10' ||
-                    scope == '11' ||
-                    scope == '12'
-                ) {
-                    sector = 'IPPU';
-                } else if (scope == '14' || scope == '15') {
-                    sector = 'AFOLU';
-                } else {
-                    sector = 'Waste';
-                }
-                let purpose: string;
-                if (def == 'Cancellation') {
-                    if (tnrprogramme.retirementType == '0') {
-                    purpose = 'Cross-border transfer';
-                    } else if (tnrprogramme.retirementType == '1') {
-                    purpose = 'Legal Action';
+            const tranfretireqry = `SELECT * FROM public.programme_transfer WHERE ("status"='Approved' OR "status"='Recognised') AND "programmeId"= '${programmeid}'  ORDER BY "authTime" ASC`;
+            const transfertable = await this.programmeTransfer.query(tranfretireqry);
+            for (const tnrprogramme of transfertable) {
+                if(january1st*1000< tnrprogramme.txTime && tnrprogramme.txTime<december31st*1000){
+                    const findprogramme = await this.programmeService.findById(tnrprogramme.programmeId)
+                    const programmename = findprogramme.title;
+                    const serialNo = String(findprogramme.serialNo);
+                    const date = new Date(Number(findprogramme.createdTime));
+                    const vintage = date.getFullYear();
+                    let type: string;
+                    let def: string;
+                    if (tnrprogramme.status == `Recognised`) {
+                        type = 'Retirement';
+                        def = 'Cancellation';
                     } else {
-                    purpose = 'Other';
+                        type = 'Transfer';
+                        def = 'Use';
                     }
-                } else {
-                    purpose = '';
-                }
-                let receiver:string
-                if (tnrprogramme.toCompanyMeta !=null){
-                    const alpha2 = tnrprogramme.toCompanyMeta.country
-                    const receive = await this.CountryRepo.query(
-                    `SELECT * FROM public.country WHERE "alpha2"='${alpha2}'`,
-                    );
-                    receiver = receive[0].name
-                }
-                else{
-                    const receive = await this.companyService.findByCompanyId(tnrprogramme.toCompanyId);
-                    receiver = receive.name
-                }
-                var compname = []
-                for (const id of findprogramme.companyId){
-                        
-                    const investowner = await this.InvestRepo.query(
-                        `SELECT * FROM public.investment WHERE "status"='Approved' AND "toCompanyId"=${id} AND "programmeId"='${tnrprogramme.programmeId}'`
-                    );
-                    if (investowner.length<=0){
-                        const firstowner = await this.companyService.findByCompanyId(id)
-                        compname.push(firstowner.name)
+                    const credit = Number(tnrprogramme.creditAmount);
+                    const scope = findprogramme.sectoralScope;
+                    let sector: string;
+                    if (scope == '1' || scope == '2' || scope == '3' || scope == '7') {
+                        sector = 'Energy';
+                    } else if (
+                        scope == '4' ||
+                        scope == '5' ||
+                        scope == '6' ||
+                        scope == '8' ||
+                        scope == '9' ||
+                        scope == '10' ||
+                        scope == '11' ||
+                        scope == '12'
+                    ) {
+                        sector = 'IPPU';
+                    } else if (scope == '14' || scope == '15') {
+                        sector = 'AFOLU';
+                    } else {
+                        sector = 'Waste';
                     }
-                }
-                const send = await this.companyService.findByCompanyId(tnrprogramme.fromCompanyId);
-                const authDate = new Date(Number(tnrprogramme.authTime))
-                .toISOString()
-                .split('T')[0];
-                addTableRow([
-                    tnrprogramme.programmeId,
-                    programmename,
-                    serialNo.split('-')[6],
-                    serialNo.split('-')[7],
-                    '',
-                    '',
-                    'GHG',
-                    '',
-                    credit,
-                    '',
-                    compname.join(","),
-                    "  "+vintage,
-                    sector,
-                    type,
-                    authDate,
-                    `Programme-ID-${tnrprogramme.programmeId}`,
-                    '    NDC',
-                    ' ',
-                    def,
-                    authDate,
-                    def,
-                    send.name,
-                    receiver,
-                    purpose,
-                    receiver,
-                    '\n',
-                ]);  
-            }     
+                    let purpose: string;
+                    if (def == 'Cancellation') {
+                        if (tnrprogramme.retirementType == '0') {
+                        purpose = 'Cross-border transfer';
+                        } else if (tnrprogramme.retirementType == '1') {
+                        purpose = 'Legal Action';
+                        } else {
+                        purpose = 'Other';
+                        }
+                    } else {
+                        purpose = '';
+                    }
+                    let receiver:string
+                    if (tnrprogramme.toCompanyMeta !=null){
+                        const alpha2 = tnrprogramme.toCompanyMeta.country
+                        const receive = await this.CountryRepo.query(
+                        `SELECT * FROM public.country WHERE "alpha2"='${alpha2}'`,
+                        );
+                        receiver = receive[0].name
+                    }
+                    else{
+                        const receive = await this.companyService.findByCompanyId(tnrprogramme.toCompanyId);
+                        receiver = receive.name
+                    }
+                    const send = await this.companyService.findByCompanyId(tnrprogramme.fromCompanyId);
+                    const authDate = new Date(Number(tnrprogramme.authTime))
+                    .toISOString()
+                    .split('T')[0];
+                    addTableRow([
+                        tnrprogramme.programmeId,
+                        programmename,
+                        serialNo.split('-')[6],
+                        serialNo.split('-')[7],
+                        '',
+                        '',
+                        'GHG',
+                        '',
+                        credit,
+                        '',
+                        firstowners.join(","),
+                        "  "+vintage,
+                        sector,
+                        type,
+                        authDate,
+                        `Programme-ID-${tnrprogramme.programmeId}`,
+                        '    NDC',
+                        ' ',
+                        def,
+                        authDate,
+                        def,
+                        send.name,
+                        receiver,
+                        purpose,
+                        receiver,
+                        '\n',
+                    ]);  
+                }     
+            }
         }
-        drawTable();
         addTableRow([" "," "," "," ",'','','','',' ',' ',' ',' ',' ', ' ', ' ', ` `, ' ',  ' ',  ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' \n',]);
+        drawTable();
 
         doc
         .lineCap('butt')

@@ -259,7 +259,7 @@ export const RegistryDashboardComponent = (props: any) => {
 
   const [fileList, setFileList] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState("-");
-  const [selectedurl, setSelectedurl] = useState<string>(" ");
+  const [selectedurl, setSelectedurl] = useState<string>("");
   const mapType = process.env.REACT_APP_MAP_TYPE
     ? process.env.REACT_APP_MAP_TYPE
     : "None";
@@ -2347,21 +2347,33 @@ ${total}
                 </Space>
               </Button>
             </Dropdown>
-            <Button className="annual-report-downloadbutton">
-              <Space>
-                <a
-                  href={selectedurl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                >
+            {selectedurl.trim().length === 0 && (
+              <Button className="annual-report-downloadbutton">
+                <Space>
                   <LinkOutlined
                     className="common-progress-icon"
                     style={{ color: "#3F3A47" }}
                   />
-                </a>
-              </Space>
-            </Button>
+                </Space>
+              </Button>
+            )}
+            {selectedurl.trim().length > 0 && (
+              <a
+                href={selectedurl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+              >
+                <Button className="annual-report-downloadbutton">
+                  <Space>
+                    <LinkOutlined
+                      className="common-progress-icon"
+                      style={{ color: "#3F3A47" }}
+                    />
+                  </Space>
+                </Button>
+              </a>
+            )}
           </div>
         )}
       <div className="filter-container">

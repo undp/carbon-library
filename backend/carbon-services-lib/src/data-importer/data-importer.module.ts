@@ -10,7 +10,7 @@ import { ProgrammeModule } from '../shared/programme/programme.module';
 import { TypeOrmConfigService } from '../shared/typeorm.config.service';
 import { Company } from '../shared/entities/company.entity';
 import { ProgrammeDocument } from '../shared/entities/programme.document';
-import { AnnualReportModule } from 'src/shared/annualreport/annual-report.module';
+import { AnnualReportModule } from '../shared/annualreport/annual-report.module';
 
 @Module({
   imports: [
