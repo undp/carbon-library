@@ -66,6 +66,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
   translator.setDefaultNamespace("ndcAction");
   const t = translator.t;
   const [ndcActionType, setNdcActionType] = useState();
+  const [methodology, setMethodology] = useState();
   const [mitigationType, setmitigationType] = useState();
   const [mitigationSubType, setMitigationSubType] = useState("");
   const [sector, setSector] = useState<any>("");
@@ -96,6 +97,13 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID,
     MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR,
     MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA,
+  ]
+
+  const methodologyOptions = [
+    { value: 'UNFCCC CDM', label: 'UNFCCC CDM' },
+    { value: 'Gold Standard', label: 'Gold Standard' },
+    { value: 'Verra VCS', label: 'Verra VCS' },
+    { value: 'Other', label: 'Other' },
   ]
 
   useEffect(() => {
@@ -310,6 +318,10 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     });
   };
 
+  const handleMethodologyChange = (selectedMethodology: any) => {
+    setMethodology(selectedMethodology);
+  };
+
   const onNdcActionDetailsFormSubmit = async (ndcActionFormvalues: any) => {
     const ndcActionDetailObj: any = {};
     ndcActionDetailObj.action = ndcActionFormvalues.ndcActionType;
@@ -317,7 +329,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
       ndcActionFormvalues.ndcActionType === NdcActionTypes.Mitigation ||
       ndcActionFormvalues.ndcActionType === NdcActionTypes.CrossCutting
     ) {
-      ndcActionDetailObj.methodology = t("ndcAction:goldStandard");
+      ndcActionDetailObj.methodology = ndcActionFormvalues.methodology;
       ndcActionDetailObj.typeOfMitigation = ndcActionFormvalues.mitigationType;
       ndcActionDetailObj.subTypeOfMitigation = ndcActionFormvalues.mitigationSubType;
       if (ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE 
@@ -389,22 +401,6 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
           subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
           weight: ndcActionFormvalues.tonnesOnDryBasis,
         };
-      }
-      if (
-        (ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR ||
-        ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE || 
-        ndcActionFormvalues.mitigationType === MitigationTypes.EE_HOUSEHOLDS) &&
-        subTypesForValidEstimatedCredits.includes(ndcActionFormvalues.mitigationSubType)
-      ) {
-        if (parseFloat(ndcActionFormvalues.methodologyEstimatedCredits) <= 0) {
-          message.open({
-            type: "error",
-            content: t("methodologyEstimatedCreditsInvalid"),
-            duration: 4,
-            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-          });
-          return;
-        }
       }
 
       if (
@@ -552,68 +548,91 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
 
         {(ndcActionType === NdcActionTypes.Mitigation ||
           ndcActionType === NdcActionTypes.CrossCutting) && (
-          <>
-            <Row justify="start" align="middle">
-              <Col>
-                <Form.Item
-                  label={t("ndcAction:mitigationType")}
-                  name="mitigationType"
-                  rules={[
-                    {
-                      required: true,
-                      message: `${t("ndcAction:mitigationType")} ${t(
-                        "ndcAction:isRequired"
-                      )}`,
-                    },
-                  ]}
-                >
-                  <Select
-                    size="large"
-                    onChange={handleMitigationTypeChange}
-                    style={{
-                      width: "249px",
-                      borderRadius: "4px",
-                    }}
-                    options={
-                      programmeDetails?.sector === Sector.Health ||
-                      programmeDetails?.sector === Sector.Education ||
-                      programmeDetails?.sector === Sector.Hospitality
-                        ? mitigationTypeList
-                        : sectorMitigationTypesListMapped[sector]
-                    }
-                  ></Select>
-                </Form.Item>
-              </Col>
-              {(ndcActionType === NdcActionTypes.Mitigation ||
-                ndcActionType === NdcActionTypes.CrossCutting) &&
-                mitigationType && mitigationSubTypesListMapped[mitigationType] && (
-                  <Col style={{ marginLeft: "38px" }}>
-                    <Form.Item
-                      label={t("ndcAction:mitigationSubType")}
-                      name="mitigationSubType"
-                      rules={[
-                        {
-                          required: true,
-                          message: `${t("ndcAction:mitigationSubType")} ${t(
-                            "ndcAction:isRequired"
-                          )}`,
-                        },
-                      ]}
-                    >
-                      <Select
-                        size="large"
-                        onChange={handleMitigationSubTypeChange}
-                        style={{
-                          width: "249px",
-                          borderRadius: "4px",
-                        }}
-                        options={mitigationSubTypesListMapped[mitigationType]}
-                        value={mitigationSubType}
-                      ></Select>
-                    </Form.Item>
-                  </Col>)}
-              <Col style={{ marginLeft: "38px" }}>
-                <Form.Item
+            <>
+              <Row justify="start" align="middle">
+                <Col>
+                  <Form.Item
+                    label={t("ndcAction:mitigationType")}
+                    name="mitigationType"
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t("ndcAction:mitigationType")} ${t(
+                          "ndcAction:isRequired"
+                        )}`,
+                      },
+                    ]}
+                  >
+                    <Select
+                      size="large"
+                      onChange={handleMitigationTypeChange}
+                      style={{
+                        width: "249px",
+                        borderRadius: "4px",
+                      }}
+                      options={
+                        programmeDetails?.sector === Sector.Health ||
+                          programmeDetails?.sector === Sector.Education ||
+                          programmeDetails?.sector === Sector.Hospitality
+                          ? mitigationTypeList
+                          : sectorMitigationTypesListMapped[sector]
+                      }
+                    ></Select>
+                  </Form.Item>
+                </Col>
+                {(ndcActionType === NdcActionTypes.Mitigation ||
+                  ndcActionType === NdcActionTypes.CrossCutting) &&
+                  mitigationType && mitigationSubTypesListMapped[mitigationType] && (
+                    <Col style={{ marginLeft: "38px" }}>
+                      <Form.Item
+                        label={t("ndcAction:mitigationSubType")}
+                        name="mitigationSubType"
+                        rules={[
+                          {
+                            required: true,
+                            message: `${t("ndcAction:mitigationSubType")} ${t(
+                              "ndcAction:isRequired"
+                            )}`,
+                          },
+                        ]}
+                      >
+                        <Select
+                          size="large"
+                          onChange={handleMitigationSubTypeChange}
+                          style={{
+                            width: "249px",
+                            borderRadius: "4px",
+                          }}
+                          options={mitigationSubTypesListMapped[mitigationType]}
+                          value={mitigationSubType}
+                        ></Select>
+                      </Form.Item>
+                    </Col>)}
+                <Col style={{ marginLeft: "38px" }}>
+                  <Form.Item
+                    label={t("ndcAction:methodology")}
+                    name="methodology"
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t("ndcAction:methodology")} ${t(
+                          "ndcAction:isRequired"
+                        )}`,
+                      },
+                    ]}
+                  >
+                    <Select
+                      size="large"
+                      onChange={handleMethodologyChange}
+                      style={{
+                        width: "154px",
+                        borderRadius: "4px",
+                      }}
+                      options={methodologyOptions}
+                      value={methodology}
+                    ></Select>
+                  </Form.Item>
+                  {/* <Form.Item
                   label={t("ndcAction:methodology")}
                   name="methodology"
                 >
@@ -633,11 +652,11 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                     {" "}
                     {t("ndcAction:goldStandard")}
                   </span>
-                </Form.Item>
-              </Col>
-            </Row>
-          </>
-        )}
+                </Form.Item> */}
+                </Col>
+              </Row>
+            </>
+          )}
 
         {(ndcActionType === NdcActionTypes.Mitigation ||
           ndcActionType === NdcActionTypes.CrossCutting) &&
