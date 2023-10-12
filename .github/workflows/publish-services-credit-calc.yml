@@ -1,8 +1,6 @@
 name: Publish to NPM carbon-credit-calculator
 on:
   push:
-    branches:
-      - main
     paths:
       - backend/carbon-credit-calculator/**
 
