@@ -21,6 +21,10 @@ import {
   AgricultureCreationRequest,
   SolarCreationRequest,
   calculateCredit,
+  SoilEnrichmentCreationRequest,
+  StovesHousesNamibiaCreationRequest,
+  SolarWaterPumpingOffGridCreationRequest,
+  SolarWaterPumpingOnGridCreationRequest
 } from "@undp/carbon-credit-calculator";
 import {
   MitigationTypes,
@@ -34,6 +38,8 @@ import {
   mitigationTypeList,
   ndcActionTypeList,
   sectorMitigationTypesListMapped,
+  mitigationSubTypesListMapped,
+  MitigationSubTypes,
 } from "../../../Definitions";
 import { InfoCircle } from "react-bootstrap-icons";
 import { enablementTypesAndValues } from "../../../Definitions/Enums/enablementTypes.enum";
@@ -61,6 +67,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
   const t = translator.t;
   const [ndcActionType, setNdcActionType] = useState();
   const [mitigationType, setmitigationType] = useState();
+  const [mitigationSubType, setMitigationSubType] = useState("");
   const [sector, setSector] = useState<any>("");
   const [ndcActionTypeListFiltered, setNdcActionTypeListFiltered] =
     useState<any[]>(ndcActionTypeList);
@@ -82,6 +89,14 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     : 5000000;
 
   const ghgEmissionsGas = ["CO2", "CH4", "N20", "HFCs", "PFCs", "SF6"];
+  const subTypesForValidEstimatedCredits = [
+    MitigationSubTypes.RICE_CROPS,
+    MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV,
+    MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID,
+    MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID,
+    MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR,
+    MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA,
+  ]
 
   useEffect(() => {
     if (programmeDetails) {
@@ -96,6 +111,10 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
       }
       if (ndcActionDetails?.typeOfMitigation) {
         setmitigationType(ndcActionDetails?.typeOfMitigation);
+      }
+
+      if (ndcActionDetails?.subTypeOfMitigation) {
+        setMitigationSubType(ndcActionDetails?.subTypeOfMitigation);
       }
 
       if (ndcActionDetails?.includedInNAP) {
@@ -114,6 +133,7 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
       form.setFieldsValue({
         ndcActionType: ndcActionDetails?.action,
         mitigationType: ndcActionDetails?.typeOfMitigation,
+        mitigationSubType: ndcActionDetails?.subTypeOfMitigation,
         energyGeneration: ndcActionDetails?.solarProperties?.energyGeneration,
         energyGenerationUnit:
           ndcActionDetails?.solarProperties?.energyGenerationUnit,
@@ -201,17 +221,39 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
         formValues.ndcActionType === NdcActionTypes.CrossCutting
       ) {
         if (formValues.mitigationType === MitigationTypes.AGRICULTURE) {
-          creditRequest = new AgricultureCreationRequest();
-          creditRequest.landArea = formValues.eligibleLandArea;
-          creditRequest.landAreaUnit = formValues.landAreaUnit;
-          creditRequest.duration =
-            programmeDetails.endTime - programmeDetails.startTime;
-          creditRequest.durationUnit = "s";
+          if (formValues.mitigationSubType === MitigationSubTypes.RICE_CROPS) {
+            creditRequest = new AgricultureCreationRequest();
+            creditRequest.landArea = formValues.eligibleLandArea;
+            creditRequest.landAreaUnit = formValues.landAreaUnit;
+            creditRequest.duration =
+              programmeDetails.endTime - programmeDetails.startTime;
+            creditRequest.durationUnit = "s";
+          } else if (formValues.mitigationSubType === MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR) {
+            creditRequest = new SoilEnrichmentCreationRequest();
+            creditRequest.weight = formValues.tonnesOnDryBasis;
+          }
+
         } else if (formValues.mitigationType === MitigationTypes.SOLAR) {
-          creditRequest = new SolarCreationRequest();
-          creditRequest.buildingType = formValues.consumerGroup;
-          creditRequest.energyGeneration = formValues.energyGeneration;
-          creditRequest.energyGenerationUnit = formValues.energyGenerationUnit;
+          if (formValues.mitigationSubType === MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV) {
+            creditRequest = new SolarCreationRequest();
+            creditRequest.buildingType = formValues.consumerGroup;
+            creditRequest.energyGeneration = formValues.energyGeneration;
+            creditRequest.energyGenerationUnit = formValues.energyGenerationUnit;
+          } else if (formValues.mitigationSubType === MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID) {
+            creditRequest = new SolarWaterPumpingOffGridCreationRequest();
+            creditRequest.energyGeneration = formValues.energyGeneration;
+            creditRequest.energyGenerationUnit = formValues.energyGenerationUnit;
+          } else if (formValues.mitigationSubType === MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID) {
+            creditRequest = new SolarWaterPumpingOnGridCreationRequest();
+            creditRequest.energyGeneration = formValues.energyGeneration;
+            creditRequest.energyGenerationUnit = formValues.energyGenerationUnit;
+          }
+
+        } else if (formValues.mitigationType === MitigationTypes.EE_HOUSEHOLDS
+          && formValues.mitigationSubType === MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA) {
+          creditRequest = new StovesHousesNamibiaCreationRequest();
+          creditRequest.numberOfDays = formValues.numberOfDays;
+          creditRequest.numberOfPeopleInHousehold = formValues.numberOfPeople;
         }
       }
       const creditResponse = calculateCredit(creditRequest);
@@ -238,7 +280,34 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
 
   const handleMitigationTypeChange = (selectedMitigationType: any) => {
     setmitigationType(selectedMitigationType);
+    form.setFieldsValue({
+      mitigationSubType: "",
+      tonnesOnDryBasis: "",
+      numberOfPeople: "",
+      numberOfDays: "",
+      landAreaUnit: "",
+      eligibleLandArea: "",
+      consumerGroup: "",
+      energyGenerationUnit: "",
+      energyGeneration: "",
+      methodologyEstimatedCredits: 0,
+    });
     calculateMethodologyEstimatedCredits();
+  };
+
+  const handleMitigationSubTypeChange = (selectedSubMitigationType: any) => {
+    setMitigationSubType(selectedSubMitigationType);
+    form.setFieldsValue({
+      tonnesOnDryBasis: "",
+      numberOfPeople: "",
+      numberOfDays: "",
+      landAreaUnit: "",
+      eligibleLandArea: "",
+      consumerGroup: "",
+      energyGenerationUnit: "",
+      energyGeneration: "",
+      methodologyEstimatedCredits: 0,
+    });
   };
 
   const onNdcActionDetailsFormSubmit = async (ndcActionFormvalues: any) => {
@@ -250,14 +319,25 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     ) {
       ndcActionDetailObj.methodology = t("ndcAction:goldStandard");
       ndcActionDetailObj.typeOfMitigation = ndcActionFormvalues.mitigationType;
-      if (ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE) {
+      ndcActionDetailObj.subTypeOfMitigation = ndcActionFormvalues.mitigationSubType;
+      if (ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE 
+        && ndcActionFormvalues.mitigationSubType === MitigationSubTypes.RICE_CROPS) {
         ndcActionDetailObj.agricultureProperties = {
           landArea: ndcActionFormvalues.eligibleLandArea
             ? ndcActionFormvalues.eligibleLandArea
             : 0,
           landAreaUnit: ndcActionFormvalues.landAreaUnit,
         };
-      } else if (ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR) {
+        ndcActionDetailObj.creditCalculationProperties = {
+          typeOfMitigation: ndcActionFormvalues.mitigationType,
+          subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
+          landArea: ndcActionFormvalues.eligibleLandArea
+            ? ndcActionFormvalues.eligibleLandArea
+            : 0,
+          landAreaUnit: ndcActionFormvalues.landAreaUnit,
+        };
+      } else if (ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR
+        && ndcActionFormvalues.mitigationSubType === MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV) {
         ndcActionDetailObj.solarProperties = {
           energyGeneration: ndcActionFormvalues.energyGeneration
             ? ndcActionFormvalues.energyGeneration
@@ -265,10 +345,56 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
           energyGenerationUnit: ndcActionFormvalues.energyGenerationUnit,
           consumerGroup: ndcActionFormvalues.consumerGroup,
         };
+        ndcActionDetailObj.creditCalculationProperties = {
+          typeOfMitigation: ndcActionFormvalues.mitigationType,
+          subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
+          energyGeneration: ndcActionFormvalues.energyGeneration
+            ? ndcActionFormvalues.energyGeneration
+            : 0,
+          energyGenerationUnit: ndcActionFormvalues.energyGenerationUnit,
+          consumerGroup: ndcActionFormvalues.consumerGroup,
+        };
+      } else if (ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR
+        && ndcActionFormvalues.mitigationSubType === MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID) {
+        ndcActionDetailObj.creditCalculationProperties = {
+          typeOfMitigation: ndcActionFormvalues.mitigationType,
+          subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
+          energyGeneration: ndcActionFormvalues.energyGeneration
+            ? ndcActionFormvalues.energyGeneration
+            : 0,
+          energyGenerationUnit: ndcActionFormvalues.energyGenerationUnit,
+        };
+      } else if (ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR
+        && ndcActionFormvalues.mitigationSubType === MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID) {
+        ndcActionDetailObj.creditCalculationProperties = {
+          typeOfMitigation: ndcActionFormvalues.mitigationType,
+          subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
+          energyGeneration: ndcActionFormvalues.energyGeneration
+            ? ndcActionFormvalues.energyGeneration
+            : 0,
+          energyGenerationUnit: ndcActionFormvalues.energyGenerationUnit,
+        };
+      } else if (ndcActionFormvalues.mitigationType === MitigationTypes.EE_HOUSEHOLDS
+        && ndcActionFormvalues.mitigationSubType === MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA) {
+        ndcActionDetailObj.creditCalculationProperties = {
+          typeOfMitigation: ndcActionFormvalues.mitigationType,
+          subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
+          numberOfDays: ndcActionFormvalues.numberOfDays,
+          numberOfPeopleInHousehold: ndcActionFormvalues.numberOfPeople,
+        };
+      } else if (ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE
+        && ndcActionFormvalues.mitigationSubType === MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR) {
+        ndcActionDetailObj.creditCalculationProperties = {
+          typeOfMitigation: ndcActionFormvalues.mitigationType,
+          subTypeOfMitigation: ndcActionFormvalues.mitigationSubType,
+          weight: ndcActionFormvalues.tonnesOnDryBasis,
+        };
       }
       if (
-        ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR ||
-        ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE
+        (ndcActionFormvalues.mitigationType === MitigationTypes.SOLAR ||
+        ndcActionFormvalues.mitigationType === MitigationTypes.AGRICULTURE || 
+        ndcActionFormvalues.mitigationType === MitigationTypes.EE_HOUSEHOLDS) &&
+        subTypesForValidEstimatedCredits.includes(ndcActionFormvalues.mitigationSubType)
       ) {
         if (parseFloat(ndcActionFormvalues.methodologyEstimatedCredits) <= 0) {
           message.open({
@@ -458,6 +584,34 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                   ></Select>
                 </Form.Item>
               </Col>
+              {(ndcActionType === NdcActionTypes.Mitigation ||
+                ndcActionType === NdcActionTypes.CrossCutting) &&
+                mitigationType && mitigationSubTypesListMapped[mitigationType] && (
+                  <Col style={{ marginLeft: "38px" }}>
+                    <Form.Item
+                      label={t("ndcAction:mitigationSubType")}
+                      name="mitigationSubType"
+                      rules={[
+                        {
+                          required: true,
+                          message: `${t("ndcAction:mitigationSubType")} ${t(
+                            "ndcAction:isRequired"
+                          )}`,
+                        },
+                      ]}
+                    >
+                      <Select
+                        size="large"
+                        onChange={handleMitigationSubTypeChange}
+                        style={{
+                          width: "249px",
+                          borderRadius: "4px",
+                        }}
+                        options={mitigationSubTypesListMapped[mitigationType]}
+                        value={mitigationSubType}
+                      ></Select>
+                    </Form.Item>
+                  </Col>)}
               <Col style={{ marginLeft: "38px" }}>
                 <Form.Item
                   label={t("ndcAction:methodology")}
@@ -487,7 +641,10 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
 
         {(ndcActionType === NdcActionTypes.Mitigation ||
           ndcActionType === NdcActionTypes.CrossCutting) &&
-          mitigationType === MitigationTypes.SOLAR && (
+          mitigationType === MitigationTypes.SOLAR &&
+          (mitigationSubType === MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV ||
+            mitigationSubType === MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID ||
+            mitigationSubType === MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID) && (
             <>
               <Row justify="start" align="middle">
                 <Col>
@@ -545,31 +702,34 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                   </Form.Item>
                 </Col>
               </Row>
-              <Form.Item
-                label={t("ndcAction:consumerGroup")}
-                name="consumerGroup"
-                rules={[
-                  {
-                    required: true,
-                    message: `${t("ndcAction:consumerGroup")} ${t(
-                      "ndcAction:isRequired"
-                    )}`,
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  style={{ width: 442 }}
-                  onChange={calculateMethodologyEstimatedCredits}
-                  options={consumerGroupList}
-                />
-              </Form.Item>
+              {mitigationSubType === MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV && (
+                <Form.Item
+                  label={t("ndcAction:consumerGroup")}
+                  name="consumerGroup"
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t("ndcAction:consumerGroup")} ${t(
+                        "ndcAction:isRequired"
+                      )}`,
+                    },
+                  ]}
+                >
+                  <Select
+                    size="large"
+                    style={{ width: 442 }}
+                    onChange={calculateMethodologyEstimatedCredits}
+                    options={consumerGroupList}
+                  />
+                </Form.Item>
+              )}
             </>
           )}
 
         {(ndcActionType === NdcActionTypes.Mitigation ||
           ndcActionType === NdcActionTypes.CrossCutting) &&
-          mitigationType === MitigationTypes.AGRICULTURE && (
+          mitigationType === MitigationTypes.AGRICULTURE && 
+          mitigationSubType === MitigationSubTypes.RICE_CROPS && (
             <Row justify="start" align="middle">
               <Col>
                 <Form.Item
@@ -626,6 +786,123 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                 </Form.Item>
               </Col>
             </Row>
+          )}
+
+        {(ndcActionType === NdcActionTypes.Mitigation ||
+          ndcActionType === NdcActionTypes.CrossCutting) &&
+          mitigationType === MitigationTypes.AGRICULTURE && 
+          mitigationSubType === MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR && (
+            <Row justify="start" align="middle">
+              <Col>
+                <Form.Item
+                  label={t("ndcAction:tonnesOnDryBasis")}
+                  name="tonnesOnDryBasis"
+                  rules={[
+                    {
+                      required: true,
+                      message: ``,
+                    },
+                    {
+                      validator: async (rule, value) => {
+                        if (
+                          String(value).trim() === "" ||
+                          String(value).trim() === undefined ||
+                          value === null ||
+                          value === undefined
+                        ) {
+                          throw new Error(
+                            `${t("ndcAction:tonnesOnDryBasis")} ${t(
+                              "ndcAction:isRequired"
+                            )}`
+                          );
+                        }
+                      },
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    style={{ width: 442, paddingRight: 12 }}
+                    onChange={calculateMethodologyEstimatedCredits}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          )}
+
+        {(ndcActionType === NdcActionTypes.Mitigation ||
+          ndcActionType === NdcActionTypes.CrossCutting) &&
+          mitigationType === MitigationTypes.EE_HOUSEHOLDS && 
+          mitigationSubType === MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA && (
+            <>
+              <Row justify="start" align="middle">
+                <Col>
+                  <Form.Item
+                    label={t("ndcAction:numberOfDays")}
+                    rules={[
+                      {
+                        required: true,
+                        message: ``,
+                      },
+                      {
+                        validator: async (rule, value) => {
+                          if (
+                            String(value).trim() === "" ||
+                            String(value).trim() === undefined ||
+                            value === null ||
+                            value === undefined
+                          ) {
+                            throw new Error(
+                              `${t("ndcAction:numberOfDays")} ${t(
+                                "ndcAction:isRequired"
+                              )}`
+                            );
+                          }
+                        },
+                      },
+                    ]}
+                    name="numberOfDays"
+                  >
+                    <InputNumber
+                      style={{ width: 442, paddingRight: 12 }}
+                      onChange={calculateMethodologyEstimatedCredits}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col style={{ marginLeft: "38px" }}>
+                <Form.Item
+                    label={t("ndcAction:numberOfPeople")}
+                    rules={[
+                      {
+                        required: true,
+                        message: ``,
+                      },
+                      {
+                        validator: async (rule, value) => {
+                          if (
+                            String(value).trim() === "" ||
+                            String(value).trim() === undefined ||
+                            value === null ||
+                            value === undefined
+                          ) {
+                            throw new Error(
+                              `${t("ndcAction:numberOfPeople")} ${t(
+                                "ndcAction:isRequired"
+                              )}`
+                            );
+                          }
+                        },
+                      },
+                    ]}
+                    name="numberOfPeople"
+                  >
+                    <InputNumber
+                      style={{ width: 442, paddingRight: 12 }}
+                      onChange={calculateMethodologyEstimatedCredits}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </>
           )}
 
         {(ndcActionType === NdcActionTypes.Mitigation ||
