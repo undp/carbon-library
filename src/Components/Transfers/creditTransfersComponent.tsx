@@ -46,7 +46,6 @@ type CompanyInfo = {
   name: string;
   credit: number;
 };
-
 type PopupInfo = {
   title: string;
   icon: any;
