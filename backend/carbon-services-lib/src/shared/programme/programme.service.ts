@@ -1025,7 +1025,7 @@ export class ProgrammeService {
           programmeName: programme.title,
           programmePageLink:
             hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
+            `/programmeManagement/view/${programme.programmeId}`,
         }, undefined, undefined, undefined,
         {
           filename: 'Letter of Intent Response.pdf',
@@ -1077,7 +1077,7 @@ export class ProgrammeService {
       {
         organisationName: companyNames,
         programmePageLink:
-          hostAddress + `/programmeManagement/view?id=${programme.programmeId}`,
+          hostAddress + `/programmeManagement/view/${programme.programmeId}`,
       },undefined,undefined,
       {
         filename: 'Letter of Request for Authorisation.pdf',
@@ -1684,7 +1684,7 @@ export class ProgrammeService {
           organisationName: orgNamesList,
           programmePageLink:
             hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
+            `/programmeManagement/view/${programme.programmeId}`,
         },undefined,undefined,
         {
           filename: 'Request For Letter Of Intent.pdf',
@@ -1724,7 +1724,7 @@ export class ProgrammeService {
             organisationName: orgNamesList,
             programmePageLink:
             hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
+            `/programmeManagement/view/${programme.programmeId}`,
           },undefined,undefined,undefined,
           [
             {
@@ -3655,7 +3655,7 @@ export class ProgrammeService {
           credits: req.issueAmount,
           serialNumber: updated.serialNo,
           pageLink:
-            hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+            hostAddress + `/programmeManagement/view/${updated.programmeId}`,
         }
       );
     });
@@ -3881,7 +3881,7 @@ export class ProgrammeService {
               serialNumber: auth.serialNo,
               programmePageLink:
                 hostAddress +
-                `/programmeManagement/view?id=${programme.programmeId}`,
+                `/programmeManagement/view/${programme.programmeId}`,
             },undefined,undefined,undefined,
             {
               filename: 'AUTHORISATION_LETTER.pdf',
@@ -4001,7 +4001,7 @@ export class ProgrammeService {
             authorisedDate: formattedDate,
             serialNumber: updated.serialNo,
             programmePageLink:
-              hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+              hostAddress + `/programmeManagement/view/${updated.programmeId}`,
           }
         );
       });

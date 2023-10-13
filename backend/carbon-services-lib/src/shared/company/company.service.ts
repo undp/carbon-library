@@ -141,7 +141,7 @@ export class CompanyService {
                 serialNumber: programme.serialNo,
                 pageLink:
                   hostAddress +
-                  `/programmeManagement/view?id=${programme.programmeId}`,
+                  `/programmeManagement/view/${programme.programmeId}`,
               }
             );
           }
