@@ -1684,7 +1684,7 @@ export class ProgrammeService {
           organisationName: orgNamesList,
           programmePageLink:
             hostAddress +
-            `/programmeManagement/view/${programme.programmeId}`,
+            `/programmeManagement/view`,
         },undefined,undefined,
         {
           filename: 'Request For Letter Of Intent.pdf',
@@ -1724,7 +1724,7 @@ export class ProgrammeService {
             organisationName: orgNamesList,
             programmePageLink:
             hostAddress +
-            `/programmeManagement/view/${programme.programmeId}`,
+            `/programmeManagement/view`,
           },undefined,undefined,undefined,
           [
             {
