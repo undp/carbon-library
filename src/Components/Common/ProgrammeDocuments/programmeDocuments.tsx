@@ -7,7 +7,7 @@ import {
   ExclamationCircleOutlined,
   FileAddOutlined,
   LikeOutlined,
-  LinkOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import { RcFile } from "antd/lib/upload";
 import moment from "moment";
@@ -332,7 +332,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       rel="noopener noreferrer"
                       download
                     >
-                      <LinkOutlined
+                      <BookOutlined
                         className="common-progress-icon margin-right-1"
                         style={{ color: "#3F3A47" }}
                       />
@@ -472,7 +472,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     rel="noopener noreferrer"
                     download
                   >
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon"
                       style={{ color: "#3F3A47" }}
                     />
@@ -557,7 +557,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       rel="noopener noreferrer"
                       download
                     >
-                      <LinkOutlined
+                      <BookOutlined
                         className="common-progress-icon margin-right-1"
                         style={{ color: "#3F3A47" }}
                       />
@@ -709,7 +709,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     rel="noopener noreferrer"
                     download
                   >
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon"
                       style={{ color: "#3F3A47" }}
                     />
@@ -789,7 +789,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         rel="noopener noreferrer"
                         download
                       >
-                        <LinkOutlined
+                        <BookOutlined
                           className="common-progress-icon margin-right-1"
                           style={{ color: "#3F3A47" }}
                         />
