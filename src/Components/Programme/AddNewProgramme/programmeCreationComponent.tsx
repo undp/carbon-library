@@ -794,7 +794,7 @@ export const ProgrammeCreationComponent = (props: any) => {
                                           } else if (
                                             file[0]?.size > maximumImageSize
                                           ) {
-                                            // default size format of files would be in bytes -> 1MB = 1000000bytes
+                                            // default size format of files would be in bytes ->  1MB = 1000000bytes
                                             throw new Error(
                                               `${t("common:maxSizeVal")}`
                                             );
