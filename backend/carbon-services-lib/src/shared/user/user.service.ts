@@ -381,7 +381,7 @@ export class UserService {
             email: user.user_email,
             address: this.configService.get("email.adresss"),
             liveChat: this.configService.get("liveChat"),
-            helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
+            helpDoc: hostAddress +`/help`,
           };
           const action: AsyncAction = {
             actionType: AsyncActionType.Email,
@@ -770,7 +770,7 @@ export class UserService {
         email: u.email,
         address: this.configService.get("email.adresss"),
         liveChat: this.configService.get("liveChat"),
-        helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
+        helpDoc: hostAddress +`/help`,
       };
   
       const action: AsyncAction = {
