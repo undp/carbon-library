@@ -40,6 +40,7 @@ import {
   sectorMitigationTypesListMapped,
   mitigationSubTypesListMapped,
   MitigationSubTypes,
+  methodologyOptions,
 } from "../../../Definitions";
 import { InfoCircle } from "react-bootstrap-icons";
 import { enablementTypesAndValues } from "../../../Definitions/Enums/enablementTypes.enum";
@@ -90,21 +91,6 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     : 5000000;
 
   const ghgEmissionsGas = ["CO2", "CH4", "N20", "HFCs", "PFCs", "SF6"];
-  const subTypesForValidEstimatedCredits = [
-    MitigationSubTypes.RICE_CROPS,
-    MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV,
-    MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID,
-    MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID,
-    MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR,
-    MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA,
-  ]
-
-  const methodologyOptions = [
-    { value: 'UNFCCC CDM', label: 'UNFCCC CDM' },
-    { value: 'Gold Standard', label: 'Gold Standard' },
-    { value: 'Verra VCS', label: 'Verra VCS' },
-    { value: 'Other', label: 'Other' },
-  ]
 
   useEffect(() => {
     if (programmeDetails) {
@@ -608,7 +594,9 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                         ></Select>
                       </Form.Item>
                     </Col>)}
-                <Col style={{ marginLeft: "38px" }}>
+              </Row>
+              <Row justify="start" align="middle">
+                <Col span={20}>
                   <Form.Item
                     label={t("ndcAction:methodology")}
                     name="methodology"
@@ -625,34 +613,19 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                       size="large"
                       onChange={handleMethodologyChange}
                       style={{
-                        width: "154px",
                         borderRadius: "4px",
                       }}
-                      options={methodologyOptions}
                       value={methodology}
-                    ></Select>
+                    >
+                      {
+                        methodologyOptions.map((option) => (
+                          <Select.Option key={option} value={option}>
+                            {option}
+                          </Select.Option>
+                        ))
+                      }
+                    </Select>
                   </Form.Item>
-                  {/* <Form.Item
-                  label={t("ndcAction:methodology")}
-                  name="methodology"
-                >
-                  <span
-                    style={{
-                      display: "inline-block",
-                      border: "1px solid #D9D9D9",
-                      width: "154px",
-                      height: "38px",
-                      borderRadius: "4px",
-                      padding: "7px 8px",
-                      fontSize: "14px",
-                      backgroundColor: "#F0F0F0",
-                      color: "#8C8C8C",
-                    }}
-                  >
-                    {" "}
-                    {t("ndcAction:goldStandard")}
-                  </span>
-                </Form.Item> */}
                 </Col>
               </Row>
             </>
