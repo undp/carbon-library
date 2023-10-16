@@ -47,7 +47,7 @@ export const EmailTemplates = {
 
         Thank you for supporting the {{countryName}} Carbon Registry.<br><br>
 
-        Your account has been created on: <a href="{{home}}">{{home}}</a> <br><br>
+        Your account has been created on: <a href="{{home}}">{{home}}</a> <br>
         User: {{email}} <br>
         Password (temporary): {{tempPassword}} <br><br>
 
