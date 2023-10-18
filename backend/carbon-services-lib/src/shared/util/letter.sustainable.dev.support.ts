@@ -55,7 +55,9 @@ export class LetterSustainableDevSupportLetterGen {
 
         doc.font("fonts/Inter-Regular.ttf");
 
-        doc.text(`\n\n${country} became a Party to the Paris Agreement in April 2016 and maintained its updated NDC published in 2022 in the NDC registry. The Carbon Market Secretariat has granted authorisation to ${programmeOwner} as the ${sectoralScope} Developer and is eligible to request for Sustainable Development support letter for ${programmeName} ${country} will host. The ${programmeName} aligns with eligible list of ${country}'s NDC mitigation programmes. After reviewing your request for a sustainable development support letter for ${programmeName} to be host in ${country}, the Carbon Market Secretariat affirms the following: `, {            align: "left",
+        doc.text(`\n\n${country} became a Party to the Paris Agreement in April 2016 and maintained its updated NDC published in 2022 in the NDC registry. The Carbon Market Secretariat has granted authorisation to ${programmeOwner} as the ${sectoralScope} Developer and is eligible to request for Sustainable Development support letter for ${programmeName} ${country} will host. The ${programmeName} aligns with eligible list of ${country}'s NDC mitigation programmes. After reviewing your request for a sustainable development support letter for ${programmeName} to be host in ${country}, the Carbon Market Secretariat affirms the following: `, {
+            
+            align: "left",
         });
 
         doc.text(`\n\nThe mechanism activity developer has compiled with sustainable development requirements in ${country} as follows:`, {
