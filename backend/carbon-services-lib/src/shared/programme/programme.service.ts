@@ -1301,6 +1301,15 @@ export class ProgrammeService {
       actionType: action,
       actionProps: req,
     });
+
+    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED &&
+    (docType === DocType.MONITORING_REPORT || docType === DocType.VERIFICATION_REPORT) &&
+    (ndcAction.action === NDCActionType.Mitigation || ndcAction.action === NDCActionType.CrossCutting) && 
+    ndcAction && ndcAction.typeOfMitigation
+    ){
+      const certifierId = (await this.companyService.findByTaxId(req.certifierTaxId))?.companyId;
+      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.type, 0, certifierId);
+    }
   }
 
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
@@ -1797,8 +1806,6 @@ export class ProgrammeService {
               HttpStatus.BAD_REQUEST
       );
       }
-      ndcAction.ndcFinancing.issuedCredits=0
-      ndcAction.ndcFinancing.availableCredits=ndcAction.ndcFinancing.userEstimatedCredits
     }
     ndcAction.id = await this.createNDCActionId(
       ndcActionDto,
@@ -1838,10 +1845,25 @@ export class ProgrammeService {
       ndcActionDto.action == NDCActionType.Mitigation ||
       ndcActionDto.action == NDCActionType.CrossCutting
     ) {
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.AddMitigation,
-        actionProps: ndcAction,
-      });
+      ndcAction.ndcFinancing.issuedCredits=0
+      ndcAction.ndcFinancing.availableCredits=ndcAction.ndcFinancing.userEstimatedCredits
+      if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
+        const addMitigationLedger = {
+          typeOfMitigation: ndcAction.typeOfMitigation,
+          userEstimatedCredits: ndcAction.ndcFinancing?.userEstimatedCredits,
+          methodology: ndcAction?.methodology ? ndcAction?.methodology : '-',
+          systemEstimatedCredits: ndcAction.ndcFinancing?.systemEstimatedCredits ? ndcAction.ndcFinancing?.systemEstimatedCredits : 0,
+          actionId: ndcAction.id,
+          constantVersion: '' + ndcAction.constantVersion,
+          properties: (ndcAction.agricultureProperties ? ndcAction.agricultureProperties : ndcAction.solarProperties ? ndcAction.solarProperties : undefined)
+        };
+        await this.programmeLedger.addMitigation(program.externalId, addMitigationLedger);
+      }else{
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.AddMitigation,
+          actionProps: ndcAction,
+        });
+      }
     }
 
     let dr;
@@ -3602,7 +3624,7 @@ export class ProgrammeService {
     let totalCreditIssuance=0
     let countedActions=[]
     program.mitigationActions.map(action=>{
-      if(this.isVerfiedMitigationAction(action.projectMaterial)){
+      if(action.projectMaterial && this.isVerfiedMitigationAction(action.projectMaterial)){
         verfiedMitigationMap[action.actionId]=action.properties
       }
     })
@@ -3786,7 +3808,7 @@ export class ProgrammeService {
       programme.creditIssued = 0;
     }
 
-    const ndcQuery:QueryDto={page:1,size:10,filterAnd:[{ key: "action", operation: "=", value: NDCActionType.Mitigation },{ key: "status", operation: "=", value: NDCStatus.APPROVED }],sort:{key:"txTime",order:"DESC"},filterBy:undefined,filterOr:undefined}
+    const ndcQuery:QueryDto={page:1,size:10,filterAnd:[{ key: "status", operation: "=", value: NDCStatus.APPROVED }],sort:{key:"txTime",order:"DESC"},filterBy:undefined,filterOr:[{ key: "action", operation: "=", value: NDCActionType.CrossCutting },{ key: "action", operation: "=", value: NDCActionType.Mitigation }]}
     const approvedMitigationActions= await this.queryNdcActions(ndcQuery,abilityCondition)
     let verfiedMitigationMap={}
     let totalCreditIssuance=0
