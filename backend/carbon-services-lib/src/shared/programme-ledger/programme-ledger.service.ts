@@ -1117,7 +1117,8 @@ export class ProgrammeLedgerService {
     countryCodeA2: string,
     companyIds: number[],
     issueCredit: number,
-    user: string
+    user: string,
+    mitigationActions:any
   ): Promise<Programme> {
     this.logger.log(`Issue programme credit ${programmeId}`);
 
@@ -1223,7 +1224,8 @@ export class ProgrammeLedgerService {
           txTime: programme.txTime,
           txType: programme.txType,
           creditOwnerPercentage: programme.creditOwnerPercentage,
-          emissionReductionAchieved: programme.emissionReductionAchieved
+          emissionReductionAchieved: programme.emissionReductionAchieved,
+          mitigationActions:mitigationActions
         };
         updateWhereMap[this.ledger.tableName] = {
           programmeId: programmeId,
@@ -1522,7 +1524,11 @@ export class ProgrammeLedgerService {
           programme.mitigationActions = [];
         }
 
-        programme.mitigationActions.push(mitigation);
+        programme.mitigationActions.push({...mitigation,
+        properties:{
+          issuedCredits:0,
+          availableCredits:mitigation.userEstimatedCredits
+        }});
         updateMap[this.ledger.tableName] = {
           txRef: programme.txRef,
           txTime: programme.txTime,

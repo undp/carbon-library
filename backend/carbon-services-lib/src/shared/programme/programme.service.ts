@@ -90,6 +90,8 @@ import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
+import { MitigationProperties } from "../dto/mitigation.properties";
+import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -1795,6 +1797,8 @@ export class ProgrammeService {
               HttpStatus.BAD_REQUEST
       );
       }
+      ndcAction.ndcFinancing.issuedCredits=0
+      ndcAction.ndcFinancing.availableCredits=ndcAction.ndcFinancing.userEstimatedCredits
     }
     ndcAction.id = await this.createNDCActionId(
       ndcActionDto,
@@ -3567,7 +3571,7 @@ export class ProgrammeService {
     return new DataListResponseDto(allTransferList, allTransferList.length);
   }
 
-  async issueProgrammeCredit(req: ProgrammeIssue, user: User) {
+  async issueProgrammeCredit(req: ProgrammeMitigationIssue, user: User) {
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`
     );
@@ -3593,7 +3597,50 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST
       );
     }
-    if (program.creditEst - program.creditIssued < req.issueAmount) {
+
+    let verfiedMitigationMap={}
+    let totalCreditIssuance=0
+    let countedActions=[]
+    program.mitigationActions.map(action=>{
+      if(this.isVerfiedMitigationAction(action.projectMaterial)){
+        verfiedMitigationMap[action.actionId]=action.properties
+      }
+    })
+    req.issueAmount.map(action=>{
+      if(countedActions.includes(action.actionId)){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.duplicateMitigationActionIds",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      countedActions.push(action.actionId)
+      if(!verfiedMitigationMap[action.actionId]){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.noVerfiedMitigationActionUnderActionId",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      if(action.issueCredit>verfiedMitigationMap[action.actionId].availableCredits){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.issuedCreditCannotExceedEstMitigationActionCredits",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
+      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
+      totalCreditIssuance+=action.issueCredit
+      this.updateMitigationProps(program.mitigationActions,action.actionId,verfiedMitigationMap[action.actionId])
+    })
+    if ((program.creditEst - program.creditIssued )< totalCreditIssuance) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.issuedCreditAmountcantExceedPendingCredit",
@@ -3620,8 +3667,9 @@ export class ProgrammeService {
       req.programmeId,
       this.configService.get("systemCountry"),
       program.companyId,
-      req.issueAmount,
-      this.getUserRefWithRemarks(user, req.comment)
+      totalCreditIssuance,
+      this.getUserRefWithRemarks(user, req.comment),
+      program.mitigationActions
     );
     if (!updated) {
       return new BasicResponseDto(
@@ -3652,7 +3700,7 @@ export class ProgrammeService {
         EmailTemplates.CREDIT_ISSUANCE,
         {
           programmeName: updated.title,
-          credits: req.issueAmount,
+          credits: totalCreditIssuance,
           serialNumber: updated.serialNo,
           pageLink:
             hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
@@ -3671,7 +3719,7 @@ export class ProgrammeService {
     if (suspendedCompanies.length > 0) {
       updated = await this.programmeLedger.freezeIssuedCredit(
         req.programmeId,
-        req.issueAmount,
+        totalCreditIssuance,
         this.getUserRef(user),
         suspendedCompanies
       );
@@ -3698,7 +3746,22 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, updated);
   }
 
-  async issueCredit(issue: ProgrammeIssue) {
+  isVerfiedMitigationAction(documents:string[]):boolean{
+    for(var document of documents){
+      if(document.includes('VERIFICATION_REPORT'))return true
+    }
+    return false
+  }
+
+  updateMitigationProps(mitigationActions:MitigationProperties[],actionId:string,props:any){
+    mitigationActions.map(mitigationAction=>{
+      if(mitigationAction.actionId==actionId){
+        mitigationAction.properties=props
+      }
+    })
+  }
+
+  async issueCredit(issue: ProgrammeMitigationIssue,abilityCondition: string) {
     const programme = await this.findByExternalId(issue.externalId?issue.externalId:issue.programmeId);
     if (!programme) {
       throw new HttpException(
@@ -3709,13 +3772,64 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST
       );
     }
+    if (programme.currentStage != ProgrammeStage.AUTHORISED) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.notInAUthorizedState",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
     if (!programme.creditIssued) {
       programme.creditIssued = 0;
     }
 
+    const ndcQuery:QueryDto={page:1,size:10,filterAnd:[{ key: "action", operation: "=", value: NDCActionType.Mitigation },{ key: "status", operation: "=", value: NDCStatus.APPROVED }],sort:{key:"txTime",order:"DESC"},filterBy:undefined,filterOr:undefined}
+    const approvedMitigationActions= await this.queryNdcActions(ndcQuery,abilityCondition)
+    let verfiedMitigationMap={}
+    let totalCreditIssuance=0
+    let countedActions=[]
+    approvedMitigationActions.data.map(action=>{
+      verfiedMitigationMap[action.id]=action.ndcFinancing
+    })
+    issue.issueAmount.map(action=>{
+      if(countedActions.includes(action.actionId)){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.duplicateMitigationActionIds",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      countedActions.push(action.actionId)
+      if(!verfiedMitigationMap[action.actionId]){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.noVerfiedMitigationActionUnderActionId",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      if(action.issueCredit>verfiedMitigationMap[action.actionId].availableCredits){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.issuedCreditCannotExceedEstMitigationActionCredits",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
+      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
+      totalCreditIssuance+=action.issueCredit
+    })
+    
     if (
-      parseFloat(String(programme.creditIssued)) + issue.issueAmount >
+      parseFloat(String(programme.creditIssued)) + totalCreditIssuance >
       programme.creditEst
     ) {
       throw new HttpException(
@@ -3727,10 +3841,20 @@ export class ProgrammeService {
       );
     }
 
-    const issued =
-      parseFloat(String(programme.creditIssued)) + issue.issueAmount;
+    const issued = parseFloat(String(programme.creditIssued)) + totalCreditIssuance;
     programme.creditIssued = issued;
     programme.emissionReductionAchieved = issued;
+
+    for (const actionId in verfiedMitigationMap){
+      await this.ndcActionRepo.update(
+        {
+          id:actionId
+        },
+        {
+          ndcFinancing:verfiedMitigationMap[actionId]
+        }
+      )
+    }
 
     const resp = await this.programmeRepo.update(
       {
