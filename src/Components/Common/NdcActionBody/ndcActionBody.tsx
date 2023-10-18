@@ -204,8 +204,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
       if (item?.verificationReport) {
         setVerificationReportData(item?.verificationReport);
         const versionfull =
-          item?.monitoringReport.url.split("_")[
-            item?.monitoringReport.url.split("_").length - 1
+          item?.verificationReport.url.split("_")[
+            item?.verificationReport.url.split("_").length - 1
           ];
         const version = versionfull ? versionfull.split(".")[0] : "V1";
         setVerificationReportversion(version.startsWith("V") ? version : "V1");
