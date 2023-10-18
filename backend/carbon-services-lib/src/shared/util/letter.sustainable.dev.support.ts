@@ -11,7 +11,7 @@ export class LetterSustainableDevSupportLetterGen {
         private fileHandler: FileHandlerInterface) {
     }
 
-    async generateLetter(programmeId: string, programmeName: string, programmeOwners: [], sectoralScope: string) {
+    async generateLetter(programmeId: string, programmeName: string, programmeOwners: [], sectoralScope: string, sector: string) {
         const filepath = `LETTER_OF_SUSTAINABLE_DEV_SUPPORT${programmeId}.pdf`;
         const country = this.configService.get("systemCountryName");
         const date = new Date().toDateString();
@@ -55,8 +55,7 @@ export class LetterSustainableDevSupportLetterGen {
 
         doc.font("fonts/Inter-Regular.ttf");
 
-        doc.text(`\n\n${country} became a Party to the Paris Agreement in April 2016 and maintained its updated NDC published in 2022 in the NDC registry. The Carbon Market Secretariat has granted authorisation to ${programmeOwner} as the ${sectoralScope} and is eligible to request for Sustainable Development support letter for ${programmeName} ${country} will host. The ${programmeName} aligns with eligible list of ${country}'s NDC mitigation programmes. After reviewing your request for a sustainable development support letter for ${programmeName} to be host in ${country}, the Carbon Market Secretariat affirms the following: `, {
-            align: "left",
+        doc.text(`\n\n${country} became a Party to the Paris Agreement in April 2016 and maintained its updated NDC published in 2022 in the NDC registry. The Carbon Market Secretariat has granted authorisation to ${programmeOwner} as the ${sectoralScope} Developer and is eligible to request for Sustainable Development support letter for ${programmeName} ${country} will host. The ${programmeName} aligns with eligible list of ${country}'s NDC mitigation programmes. After reviewing your request for a sustainable development support letter for ${programmeName} to be host in ${country}, the Carbon Market Secretariat affirms the following: `, {            align: "left",
         });
 
         doc.text(`\n\nThe mechanism activity developer has compiled with sustainable development requirements in ${country} as follows:`, {
@@ -77,7 +76,7 @@ export class LetterSustainableDevSupportLetterGen {
         });
 
         doc.text(
-            `to safeguard any negative social or environmental-related impacts caused by the activity, including on air and water quality, biodiversity, and worksite safety.`,
+            ` to safeguard any negative social or environmental-related impacts caused by the activity, including on air and water quality, biodiversity, and worksite safety.`,
             {
                 indent: 15,
             }
@@ -98,7 +97,7 @@ export class LetterSustainableDevSupportLetterGen {
             }
         );
 
-        doc.text(`\n\nThe mechanism activity contributes to achieving ${country}'s sustainable development priorities in the ${sectoralScope} sectors or the objective of NDC or long-term low emission development plan. By this sustainable development support letter, ${country}'s Carbon Market Secretariat has reserved NO objection for the authorised entity to proceed to the next stage of the development of the mitigation activity under the mechanism.`, {
+        doc.text(`\n\nThe mechanism activity contributes to achieving ${country}'s sustainable development priorities in the ${sector} sector or the objective of NDC or long-term low emission development plan. By this sustainable development support letter, ${country}'s Carbon Market Secretariat has reserved NO objection for the authorised entity to proceed to the next stage of the development of the mitigation activity under the mechanism.`, {
             align: "left",
         });
 

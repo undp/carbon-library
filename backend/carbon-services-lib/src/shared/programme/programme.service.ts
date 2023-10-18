@@ -1704,7 +1704,8 @@ export class ProgrammeService {
         programme.programmeId,
         programme.title,
         orgNames.data.map(e => ({name:e['name'],address:e['address']})),
-        programmeSectoralScopeKey
+        programmeSectoralScopeKey,
+        programme.sector
       );
 
       programme.companyId.forEach(async (companyId) => {
