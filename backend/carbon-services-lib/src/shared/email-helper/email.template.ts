@@ -52,7 +52,7 @@ export const EmailTemplates = {
         Password (temporary): {{tempPassword}} <br><br>
 
         If you have any questions, feel free to email our <a href="mailto:help@carbreg.org?subject=I Need Help With The {{countryName}} Carbon Registry">customer success team</a>. 
-        We also offer <a href="{{helpDoc}}">help documentation</a> and <a href="{{liveChat}}">chat</a>.
+        We also offer <a href="{{helpDoc}}">help documentation</a> and <a href="{{liveChat}}">chat</a>.<br><br>
 
         Sincerely, <br>
         The {{countryName}} Carbon Registry Team <br><br>

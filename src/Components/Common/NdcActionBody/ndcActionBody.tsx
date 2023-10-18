@@ -58,7 +58,11 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
   const { get, put, post } = useConnection();
   const [loading, setLoading] = useState<boolean>(false);
   const [monitoringReportData, setMonitoringReportData] = useState<any>();
+  const [monitoringReportversion, setMonitoringReportversion] =
+    useState<any>("");
   const [verificationReportData, setVerificationReportData] = useState<any>();
+  const [verificationReportVersion, setVerificationReportversion] =
+    useState<any>("");
   const [ndcActionId, setNdcActionId] = useState<any>();
   const [openRejectDocConfirmationModal, setOpenRejectDocConfirmationModal] =
     useState(false);
@@ -190,9 +194,21 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
       setNdcActionId(item?.id);
       if (item?.monitoringReport) {
         setMonitoringReportData(item?.monitoringReport);
+        const versionfull =
+          item?.monitoringReport.url.split("_")[
+            item?.monitoringReport.url.split("_").length - 1
+          ];
+        const version = versionfull ? versionfull.split(".")[0] : "V1";
+        setMonitoringReportversion(version.startsWith("V") ? version : "V1");
       }
       if (item?.verificationReport) {
         setVerificationReportData(item?.verificationReport);
+        const versionfull =
+          item?.monitoringReport.url.split("_")[
+            item?.monitoringReport.url.split("_").length - 1
+          ];
+        const version = versionfull ? versionfull.split(".")[0] : "V1";
+        setVerificationReportversion(version.startsWith("V") ? version : "V1");
       }
     });
   }, [data]);
@@ -234,6 +250,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                   {moment(parseInt(monitoringReportData?.txTime)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ " + monitoringReportversion}
                 </div>
               )}
             </div>
@@ -460,6 +477,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                   {moment(parseInt(verificationReportData?.txTime)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ " + verificationReportVersion}
                 </div>
               )}
             </div>
