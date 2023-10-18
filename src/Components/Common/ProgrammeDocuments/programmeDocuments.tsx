@@ -142,7 +142,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           setImpactAssessmentDate(item?.txTime);
           setImpactAssessmentStatus(item?.status);
           setImpactAssessmentId(item?.id);
-          const versionfull = (item?.url).split("_")[(item?.url).split('_').length-1]
+          const versionfull = (item?.url).split("_")[(item?.url).split("_").length-1]
           const version = versionfull? versionfull.split('.')[0]: "1"
           setImpactAssessmentversion(version.startsWith("V")? version:"V1")
         }
