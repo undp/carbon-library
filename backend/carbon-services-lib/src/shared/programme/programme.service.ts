@@ -92,6 +92,7 @@ import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
+import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -3690,7 +3691,7 @@ export class ProgrammeService {
       this.configService.get("systemCountry"),
       program.companyId,
       totalCreditIssuance,
-      this.getUserRefWithRemarks(user, req.comment),
+      `${this.getUserRefWithRemarks(user, req.comment)}#${this.getNdcCreditIssuanceRef(req.issueAmount)}`,
       program.mitigationActions
     );
     if (!updated) {
@@ -4347,6 +4348,14 @@ export class ProgrammeService {
   private getUserRefWithRemarks = (user: any, remarks: string) => {
     return `${user.companyId}#${user.companyName}#${user.id}#${remarks}`;
   };
+
+  private getNdcCreditIssuanceRef = (issueAmount: mitigationIssueProperties[]) =>{
+    let ref =""
+    issueAmount.map(action=>{
+      ref+=`${action.actionId}?${action.issueCredit}&`
+    })
+    return ref.slice(0,-1)
+  }
 
   async queryInvestment(query: QueryDto, abilityCondition: any, user: User) {
     let queryBuilder = await this.investmentViewRepo
