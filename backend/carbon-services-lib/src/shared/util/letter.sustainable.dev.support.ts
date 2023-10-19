@@ -15,6 +15,7 @@ export class LetterSustainableDevSupportLetterGen {
         const filepath = `LETTER_OF_SUSTAINABLE_DEV_SUPPORT${programmeId}.pdf`;
         const country = this.configService.get("systemCountryName");
         const date = new Date().toDateString();
+        const environmentalManagementActHyperlink = this.configService.get("environmentalManagementActHyperlink");
 
         const doc = new PDFDocument();
         const stream = fs.createWriteStream("/tmp/" + filepath);
@@ -73,7 +74,7 @@ export class LetterSustainableDevSupportLetterGen {
         );
 
         doc.text("Environmental Management Act, 2007 & Environmental Impact Assessment (EIA) Regulations 2012", {
-            link: 'http://www.eia.met.gov.na/',
+            link: environmentalManagementActHyperlink,
             continued: true,
         });
 

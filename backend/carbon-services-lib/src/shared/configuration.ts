@@ -82,5 +82,6 @@ export default () => ({
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
-  systemName: process.env.SYSTEM_NAME || "System X"
+  systemName: process.env.SYSTEM_NAME || "SystemX",
+  environmentalManagementActHyperlink: process.env.ENVIRONMENTAL_MANAGEMENT_ACT_HYPERLINK  || "",
 });
