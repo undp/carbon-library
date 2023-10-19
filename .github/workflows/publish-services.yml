@@ -3,7 +3,8 @@ on:
   push:
     paths:
       - backend/carbon-services-lib/**
-
+concurrency:
+  group: ${{ github.ref }}
 jobs:
   publish_carbon_libs:
     runs-on: ubuntu-latest
