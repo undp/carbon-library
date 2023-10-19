@@ -26,6 +26,7 @@ import moment from "moment";
 import { RcFile } from "antd/lib/upload";
 import {
   CompanyRole,
+  DocType,
   Sector,
   SectoralScope,
   addCommSepRound,
@@ -312,6 +313,13 @@ export const ProgrammeCreationComponent = (props: any) => {
         values?.designDocument[0]?.originFileObj as RcFile
       );
     }
+    let environmentalImpactAssessmentData = "";
+    if(values?.environmentalImpactAssessment?.length > 0) {
+      environmentalImpactAssessmentData = await getBase64(
+        values?.environmentalImpactAssessment[0]?.originFileObj as RcFile
+      );
+    }
+    
     const propTaxIds =
       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
       userInfoState?.companyRole !== CompanyRole.MINISTRY
@@ -359,9 +367,13 @@ export const ProgrammeCreationComponent = (props: any) => {
           ...(includedInNDC !== undefined &&
             includedInNDC !== null && { includedInNdc: includedInNDC }),
         },
+        environmentalAssessmentRegistrationNo: values?.environmentalAssessmentRegistrationNo
       };
       if (logoBase64?.length > 0) {
         programmeDetails.designDocument = logoBase64;
+      }
+      if(environmentalImpactAssessmentData?.length > 0) {
+        programmeDetails.environmentalImpactAssessment = environmentalImpactAssessmentData;
       }
       setLoading(false);
       console.log(programmeDetails);
@@ -999,6 +1011,85 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   );
                                 }}
                               </Form.List>
+                              <Form.Item
+                                label={t("addProgramme:environmentalAssessmentRegistrationNo")}
+                                name="environmentalAssessmentRegistrationNo"
+                                initialValue={state?.record?.environmentalAssessmentRegistrationNo}
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "", 
+                                  },
+                                  {
+                                    validator: async (rule, value) => {
+                                      if (
+                                        String(value).trim() === "" ||
+                                        String(value).trim() === undefined ||
+                                        value === null ||
+                                        value === undefined
+                                      ) {
+                                        throw new Error(
+                                          `${t("addProgramme:environmentalAssessmentRegistrationNo")} ${t(
+                                            "isRequired"
+                                          )}`
+                                        );
+                                      }
+                                    },
+                                  },
+                                ]}
+                              >
+                                <Input size="large" />
+                              </Form.Item>
+                              <Form.Item
+                                label={t("addProgramme:environmentalImpactAssessment")}
+                                name="environmentalImpactAssessment"
+                                valuePropName="fileList"
+                                getValueFromEvent={normFile}
+                                required={false}
+                                rules={[
+                                  {
+                                    validator: async (rule, file) => {
+                                      if (file?.length > 0) {
+                                        if (!isValidateFileType(file[0]?.type, DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT)) {
+                                          throw new Error(
+                                            `${t(
+                                              "addProgramme:invalidFileFormat"
+                                            )}`
+                                          );
+                                        } else if (
+                                          file[0]?.size > maximumImageSize
+                                        ) {
+                                          // default size format of files would be in bytes -> 1MB = 1000000bytes
+                                          throw new Error(
+                                            `${t("common:maxSizeVal")}`
+                                          );
+                                        }
+                                      }
+                                    },
+                                  },
+                                ]}
+                              >
+                                <Upload
+                                  accept=".doc, .docx, .pdf, .png, .jpg"
+                                  beforeUpload={(file: any) => {
+                                    return false;
+                                  }}
+                                  className="design-upload-section"
+                                  name="design"
+                                  action="/upload.do"
+                                  listType="picture"
+                                  multiple={false}
+                                  maxCount={1}
+                                >
+                                  <Button
+                                    className="upload-doc"
+                                    size="large"
+                                    icon={<UploadOutlined />}
+                                  >
+                                    Upload
+                                  </Button>
+                                </Upload>
+                              </Form.Item>
                             </div>
                           </Col>
                           <Col xl={12} md={24}>

@@ -49,6 +49,10 @@ import { AsyncActionType } from "../enum/async.action.type.enum";
 import { DataResponseMessageDto } from "../dto/data.response.message";
 import { AsyncOperationType } from "../enum/async.operation.type.enum";
 import { LocationInterface } from "../location/location.interface";
+import { CompanyState } from "../enum/company.state.enum";
+import { OrganisationDto } from "../dto/organisation.dto";
+import { PasswordHashService } from "../util/passwordHash.service";
+import { FilterEntry } from "../dto/filter.entry";
 
 @Injectable()
 export class UserService {
@@ -64,7 +68,8 @@ export class UserService {
     private countryService: CountryService,
     private fileHandler: FileHandlerInterface,
     private asyncOperationsInterface: AsyncOperationsInterface,
-    private locationService: LocationInterface
+    private locationService: LocationInterface,
+    private passwordHashService: PasswordHashService
   ) {}
 
   private async generateApiKey(email) {
@@ -95,6 +100,7 @@ export class UserService {
         "companyId",
         "companyRole",
         "name",
+        "isPending"
       ],
       where: {
         email: username,
@@ -205,6 +211,10 @@ export class UserService {
       )
       .addSelect(["User.password"])
       .getOne();
+    
+    passwordResetDto.oldPassword = this.passwordHashService.getPasswordHash(passwordResetDto.oldPassword);
+    passwordResetDto.newPassword = this.passwordHashService.getPasswordHash(passwordResetDto.newPassword);
+    
     if (!user || user.password != passwordResetDto.oldPassword) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -338,6 +348,108 @@ export class UserService {
     );
   }
 
+  async approveUser(
+    company: Company
+  ) {
+    this.logger.verbose("User approve request received for company", company.companyId);
+
+    const generatedPassword = this.helperService.generateRandomPassword();
+    const hostAddress = this.configService.get("host");
+    let users;
+    try{
+      users = await this.getPendingOrganisationAdminUsers(company.companyId);
+  
+      for (const user of users) {
+        const result = await this.userRepo
+        .update(
+          {
+            id: user.user_id,
+          },
+          {
+            isPending: false,
+            password: this.passwordHashService.getPasswordHash(generatedPassword),
+          }
+        ).catch((err: any) => {
+          this.logger.error(err);
+          return err;
+        });
+        if (result.affected > 0) {
+          const templateData = {
+            name: user.user_name,
+            countryName: this.configService.get("systemCountryName"),
+            systemName: this.configService.get("systemName"),
+            tempPassword: generatedPassword,
+            home: hostAddress,
+            email: user.user_email,
+            address: this.configService.get("email.adresss"),
+            liveChat: this.configService.get("liveChat"),
+            helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
+          };
+          const action: AsyncAction = {
+            actionType: AsyncActionType.Email,
+            actionProps: {
+              emailType: EmailTemplates.USER_CREATE.id,
+              sender: user.user_email,
+              subject: this.helperService.getEmailTemplateMessage(
+                EmailTemplates.USER_CREATE["subject"],
+                templateData,
+                true
+              ),
+              emailBody: this.helperService.getEmailTemplateMessage(
+                EmailTemplates.USER_CREATE["html"],
+                templateData,
+                false
+              ),
+            },
+          };
+          await this.asyncOperationsInterface.AddAction(action);
+
+          const userDto = new UserDto();
+          userDto.email = user.user_email;
+          userDto.role = user.user_role;
+          userDto.name = user.user_name;
+
+          const organisationDto = new OrganisationDto();
+          organisationDto.taxId = company.taxId;
+          organisationDto.paymentId = company.paymentId;
+          organisationDto.name = company.name;
+          organisationDto.email = company.email;
+          organisationDto.phoneNo = company.phoneNo;
+          organisationDto.website = company.website;
+          organisationDto.address = company.address;
+          organisationDto.logo = company.logo;
+          organisationDto.companyRole = company.companyRole;
+          organisationDto.regions = company.regions;
+
+          userDto.company = organisationDto;
+
+          if (company && user.user_role !== Role.Root && company.companyRole !== CompanyRole.API) {
+            const registryCompanyCreateAction: AsyncAction = {
+              actionType: AsyncActionType.RegistryCompanyCreate,
+              actionProps: userDto,
+            };
+            await this.asyncOperationsInterface.AddAction(
+              registryCompanyCreateAction
+            );
+          }
+        }
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "user.approvalFailed",
+            []
+          ),
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+
+      }
+      return users;
+    } catch (err) {
+      this.logger.error(err);
+      return err;
+    }
+
+  }
+
   async createUserWithPassword(
     name: string,
     companyRole: CompanyRole,
@@ -398,9 +510,11 @@ export class UserService {
   async create(
     userDto: UserDto,
     companyId: number,
-    companyRole: CompanyRole
+    companyRole: CompanyRole,
+    isRegistration?: boolean
   ): Promise<User | DataResponseMessageDto | undefined> {
     this.logger.verbose(`User create received  ${userDto.email} ${companyId}`);
+    const isRegistrationValue = isRegistration || false; // Use false as the default value
     userDto.email = userDto.email?.toLowerCase();
     const createdUserDto = {...userDto};
     if(userDto.company){
@@ -434,7 +548,7 @@ export class UserService {
       }
     }
     if (company) {
-      if (companyRole != CompanyRole.GOVERNMENT && companyRole != CompanyRole.API && companyRole !== CompanyRole.MINISTRY) {
+      if (companyRole != CompanyRole.GOVERNMENT && companyRole != CompanyRole.API && companyRole !== CompanyRole.MINISTRY && !isRegistrationValue) {
         throw new HttpException(
           this.helperService.formatReqMessagesString("user.userUnAUth", []),
           HttpStatus.FORBIDDEN
@@ -528,7 +642,9 @@ export class UserService {
       u.country = this.configService.get("systemCountry");
     }
 
-    u.password = this.helperService.generateRandomPassword();
+    let generatedPassword = this.helperService.generateRandomPassword();
+    u.password = this.passwordHashService.getPasswordHash(generatedPassword);
+
     if (userDto.role == Role.Admin && u.companyRole == CompanyRole.API) {
       u.apiKey = await this.generateApiKey(userDto.email);
     }
@@ -564,10 +680,11 @@ export class UserService {
         company["website"] = "";
       }
 
-      if (company.email) {
+      if (company.email && !isRegistrationValue) {
         const templateData = {
           organisationName: company.name,
           countryName: this.configService.get("systemCountryName"),
+          systemName: this.configService.get("systemName"),
           organisationRole:
             company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
               ? "Programme Developer"
@@ -605,47 +722,92 @@ export class UserService {
       }
     }
 
-    const templateData = {
-      name: u.name,
-      countryName: this.configService.get("systemCountryName"),
-      tempPassword: u.password,
-      home: hostAddress,
-      email: u.email,
-      address: this.configService.get("email.adresss"),
-      liveChat: this.configService.get("liveChat"),
-      helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
-    };
+    if (isRegistrationValue) {
+      company.state = CompanyState.PENDING;
+      u.isPending = true;
 
-    const action: AsyncAction = {
-      actionType: AsyncActionType.Email,
-      actionProps: {
-        emailType: EmailTemplates.USER_CREATE.id,
-        sender: u.email,
-        subject: this.helperService.getEmailTemplateMessage(
-          EmailTemplates.USER_CREATE["subject"],
-          templateData,
-          true
-        ),
-        emailBody: this.helperService.getEmailTemplateMessage(
-          EmailTemplates.USER_CREATE["html"],
-          templateData,
-          false
-        ),
-      },
-    };
-    await this.asyncOperationsInterface.AddAction(action);
+      const hostAddress = this.configService.get("host");
+      const users = await this.getGovAdminUsers();
+
+      users.forEach(async (user: any) => {
+        const templateData = {
+          name: user.user_name,
+          countryName: this.configService.get("systemCountryName"),
+          home: hostAddress,
+          email: user.email,
+          organisationName: company.name,
+          systemName: this.configService.get("systemName"),
+          organisationRole: company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
+              ? "Programme Developer"
+              : company.companyRole,
+          organisationPageLink:
+            hostAddress +
+            `/companyManagement/viewAll`,
+        };
+        const action: AsyncAction = {
+          actionType: AsyncActionType.Email,
+          actionProps: {
+            emailType: EmailTemplates.ORGANISATION_REGISTRATION.id,
+            sender: user.user_email,
+            subject: this.helperService.getEmailTemplateMessage(
+              EmailTemplates.ORGANISATION_REGISTRATION["subject"],
+              templateData,
+              true
+            ),
+            emailBody: this.helperService.getEmailTemplateMessage(
+              EmailTemplates.ORGANISATION_REGISTRATION["html"],
+              templateData,
+              false
+            ),
+          },
+        };
+        await this.asyncOperationsInterface.AddAction(action);
+      });
+
+    } else {
+      const templateData = {
+        name: u.name,
+        countryName: this.configService.get("systemCountryName"),
+        systemName: this.configService.get("systemName"),
+        tempPassword: generatedPassword,
+        home: hostAddress,
+        email: u.email,
+        address: this.configService.get("email.adresss"),
+        liveChat: this.configService.get("liveChat"),
+        helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
+      };
+  
+      const action: AsyncAction = {
+        actionType: AsyncActionType.Email,
+        actionProps: {
+          emailType: EmailTemplates.USER_CREATE.id,
+          sender: u.email,
+          subject: this.helperService.getEmailTemplateMessage(
+            EmailTemplates.USER_CREATE["subject"],
+            templateData,
+            true
+          ),
+          emailBody: this.helperService.getEmailTemplateMessage(
+            EmailTemplates.USER_CREATE["html"],
+            templateData,
+            false
+          ),
+        },
+      };
+      await this.asyncOperationsInterface.AddAction(action);
+
+      if (company && companyRole !== CompanyRole.API && userFields.role !== Role.Root && company.companyRole !== CompanyRole.API) {
+        const registryCompanyCreateAction: AsyncAction = {
+          actionType: AsyncActionType.RegistryCompanyCreate,
+          actionProps: createdUserDto,
+        };
+        await this.asyncOperationsInterface.AddAction(
+          registryCompanyCreateAction
+        );
+      }
+    }
 
     u.createdTime = new Date().getTime();
-
-    if (company && companyRole !== CompanyRole.API && userFields.role !== Role.Root && company.companyRole !== CompanyRole.API) {
-      const registryCompanyCreateAction: AsyncAction = {
-        actionType: AsyncActionType.RegistryCompanyCreate,
-        actionProps: createdUserDto,
-      };
-      await this.asyncOperationsInterface.AddAction(
-        registryCompanyCreateAction
-      );
-    }
 
     const usr = await this.entityManger
       .transaction(async (em) => {
@@ -714,6 +876,25 @@ export class UserService {
   }
 
   async query(query: QueryDto, abilityCondition: string): Promise<any> {
+    
+    if (query.filterAnd) {
+      if (!query.filterAnd.some(filter => filter.key === "isPending")) {
+        query.filterAnd.push({
+          key: "isPending",
+          operation: "=",
+          value: false,
+        });
+      }
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: "isPending",
+        operation: "=",
+        value: false,
+      });
+      query.filterAnd = filterAnd;
+    }
+    
     const resp = await this.userRepo
       .createQueryBuilder("user")
       .where(
@@ -823,6 +1004,21 @@ export class UserService {
     //return result.map((item) => {return item.user_email});
   }
 
+  async getGovAdminUsers() {
+    const result = await this.userRepo
+      .createQueryBuilder("user")
+      .where("user.role in (:admin)", {
+        admin: Role.Admin,
+      })
+      .andWhere("user.companyRole= :companyRole", {
+        companyRole: CompanyRole.GOVERNMENT,
+      })
+      .select(["user.name", "user.email"])
+      .getRawMany();
+
+    return result;
+  }
+
   async getOrganisationAdminAndManagerUsers(organisationId) {
     const result = await this.userRepo
       .createQueryBuilder("user")
@@ -832,6 +1028,19 @@ export class UserService {
       })
       .andWhere("user.companyId= :companyId", { companyId: organisationId })
       .select(["user.name", "user.email"])
+      .getRawMany();
+
+    return result;
+  }
+
+  async getPendingOrganisationAdminUsers(organisationId) {
+    const result = await this.userRepo
+      .createQueryBuilder("user")
+      .where("user.role= :admin", {
+        admin: Role.Admin
+      })
+      .andWhere("user.companyId= :companyId", { companyId: organisationId })
+      .andWhere("user.isPending= true")
       .getRawMany();
 
     return result;

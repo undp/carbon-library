@@ -22,13 +22,14 @@ import { ObjectionLetterGen } from "./objection.letter.gen";
 import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { Region } from "../entities/region.entity";
 import { AuthorizationLetterGen } from "./authorisation.letter.gen";
-import { AnnualReportGen } from "./annual.report.gen";
 import { Programme } from "../entities/programme.entity";
 import { ProgrammeTransfer } from "../entities/programme.transfer";
 import { Company } from "../entities/company.entity";
 import { LetterOfIntentRequestGen } from "./letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "./letter.of.authorisation.request.gen";
+import { PasswordHashService } from "./passwordHash.service";
+import { LetterSustainableDevSupportLetterGen } from "./letter.sustainable.dev.support";
 
 @Module({
   imports: [
@@ -78,8 +79,9 @@ import { LetterOfAuthorisationRequestGen } from "./letter.of.authorisation.reque
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
     LetterOfIntentResponseGen,
-    AnnualReportGen,
     LetterOfAuthorisationRequestGen,
+    PasswordHashService,
+    LetterSustainableDevSupportLetterGen
   ],
   exports: [
     CounterService,
@@ -91,8 +93,9 @@ import { LetterOfAuthorisationRequestGen } from "./letter.of.authorisation.reque
     AuthorizationLetterGen,
     LetterOfIntentRequestGen,
     LetterOfIntentResponseGen,
-    AnnualReportGen,
     LetterOfAuthorisationRequestGen,
+    PasswordHashService,
+    LetterSustainableDevSupportLetterGen
   ],
 })
 export class UtilModule {}

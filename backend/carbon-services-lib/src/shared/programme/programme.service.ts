@@ -69,6 +69,7 @@ import { DocumentStatus } from "../enum/document.status";
 import { ObjectionLetterGen } from "../util/objection.letter.gen";
 import { ProgrammeDocumentViewEntity } from "../entities/document.view.entity";
 import { SectoralScope } from "@undp/serial-number-gen";
+import { SectoralScope as SectoralScopeDef} from "../enum/sectoral.scope.enum";
 import { Sector } from "../enum/sector.enum";
 import { sectoralScopesMapped } from "../sectoralSecor.mapped";
 import { NDCStatus } from "../enum/ndc.status";
@@ -88,6 +89,7 @@ import { ProgrammeDocumentRegistryDto } from "../dto/programme.document.registry
 import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
+import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -136,7 +138,8 @@ export class ProgrammeService {
     private ndcActionViewRepo: Repository<NDCActionViewEntity>,
     private letterOfIntentRequestGen: LetterOfIntentRequestGen,
     private letterOfIntentResponseGen: LetterOfIntentResponseGen,
-    private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen
+    private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen,
+    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen
   ) {}
 
   private fileExtensionMap = new Map([
@@ -909,6 +912,14 @@ export class ProgrammeService {
       documentCreatedUser = await this.userService.findById(Number(d.remark));
       if(documentCreatedUser){
         cid = (documentCreatedUser.companyRole === CompanyRole.CERTIFIER ? Number(documentCreatedUser.companyId): undefined);
+        if(cid){
+          const company = await this.companyRepo.findOne({
+            where: { companyId: documentCreatedUser.companyId }
+          });
+          if(company){
+            documentCreatedUser.companyName = company.name;
+          }
+        }
       }
     }
 
@@ -941,11 +952,11 @@ export class ProgrammeService {
       
     });
 
-    if (resp && d.type === DocType.DESIGN_DOCUMENT) {
+    if (resp && d.type === DocType.DESIGN_DOCUMENT && documentAction.status === DocumentStatus.ACCEPTED) {
       await this.sendLetterOfIntentResponse(pr);
     }
 
-    if (resp && d.type === DocType.METHODOLOGY_DOCUMENT) {
+    if (resp && d.type === DocType.METHODOLOGY_DOCUMENT && documentAction.status === DocumentStatus.ACCEPTED) {
       await this.sendRequestForLetterOfAuthorisation(pr);
     }
 
@@ -971,15 +982,12 @@ export class ProgrammeService {
     let sectorialMinistries: string[] = [];
 
     if (programme.sectoralScope) {
-      for (const sectoralScopeId of programme.sectoralScope) {
-        const ministry = await this.companyService.getSectoralScopeMinistry(sectoralScopeId);
-        ministry.forEach((company) => {
-          if (!sectorialMinistries.includes(company?.name)) {
-            sectorialMinistries.push(company.name);
-          }
-        })
-
-      }
+      const ministry = await this.companyService.getSectoralScopeMinistry(programme.sectoralScope);
+      ministry.forEach((company) => {
+        if (!sectorialMinistries.includes(company?.name)) {
+          sectorialMinistries.push(company.name);
+        }
+      })
     }
 
     let sectoralMinistryNames: string;
@@ -1037,8 +1045,8 @@ export class ProgrammeService {
     const hostAddress = this.configService.get("host");
     let companies: string[] = [];
     let companyEmails: string[] = [];
-    const programmeSectoralScopeKey = Object.keys(SectoralScope).find(
-      (key) => SectoralScope[key] === programme.sectoralScope
+    const programmeSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+      (key) => SectoralScopeDef[key] === programme.sectoralScope
     );
 
     for (const companyId of programme.companyId) {
@@ -1211,11 +1219,11 @@ export class ProgrammeService {
     if (user.companyRole === CompanyRole.GOVERNMENT ||
       (user.companyRole === CompanyRole.MINISTRY &&
         permissionForMinistryLevel)) {
-      if (resp && dr.type === DocType.DESIGN_DOCUMENT) {
+      if (resp && dr.type === DocType.DESIGN_DOCUMENT && dr.status === DocumentStatus.ACCEPTED) {
         await this.sendLetterOfIntentResponse(programme);
       }
 
-      if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT) {
+      if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT && dr.status === DocumentStatus.ACCEPTED) {
         await this.sendRequestForLetterOfAuthorisation(programme);
       }
     }
@@ -1271,6 +1279,11 @@ export class ProgrammeService {
       await this.documentRepo.save(dr);
 
       await this.asyncOperationsInterface.AddAction({
+        actionType: action,
+        actionProps: req,
+      });
+
+      await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.DocumentUpload,
         actionProps: {
           type: this.helperService.enumToString(DocType, dr.type),
@@ -1278,6 +1291,8 @@ export class ProgrammeService {
           externalId: dr.externalId
         },
       });
+      
+      return 
     }
 
     await this.asyncOperationsInterface.AddAction({
@@ -1289,7 +1304,7 @@ export class ProgrammeService {
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
     this.logger.verbose("ProgrammeDTO received", JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
-    this.logger.verbose("Programme create", JSON.stringify(programme));
+    this.logger.verbose("Programme  create", JSON.stringify(programme));
 
     
     if (
@@ -1358,6 +1373,16 @@ export class ProgrammeService {
       );
     }
 
+    const prg = await this.findByEnvironmentalAssessmentRegistrationNo(programmeDto.environmentalAssessmentRegistrationNo);
+    if (prg && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.programmeExistsWithAssessmentRegId",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
     if(user.companyRole === CompanyRole.MINISTRY) {
       const permission = await this.findPermissionForMinistryUser(user, programme.sectoralScope);
@@ -1526,6 +1551,23 @@ export class ProgrammeService {
         );
       }
 
+      let environmentalImpactAssessmentDoc;
+      if(programmeDto.environmentalImpactAssessment){
+        programmeDto.environmentalImpactAssessment = await this.uploadDocument(
+          DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
+          programme.programmeId,
+          programmeDto.environmentalImpactAssessment
+        );
+
+        environmentalImpactAssessmentDoc = new ProgrammeDocument();
+        environmentalImpactAssessmentDoc.programmeId = programme.programmeId;
+        environmentalImpactAssessmentDoc.externalId = programme.externalId;
+        environmentalImpactAssessmentDoc.status = DocumentStatus.PENDING;
+        environmentalImpactAssessmentDoc.type = DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT;
+        environmentalImpactAssessmentDoc.txTime = new Date().getTime();
+        environmentalImpactAssessmentDoc.url = programmeDto.environmentalImpactAssessment;
+      }
+
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.ProgrammeCreate,
         actionProps: programmeDto,
@@ -1577,6 +1619,18 @@ export class ProgrammeService {
             actionId: monitoringReport.actionId
           },ndcAc, monitoringReport.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
         }
+
+        if(environmentalImpactAssessmentDoc){
+          this.logger.log(`Approving environmentalImpactAssessment report since the user is ${user.companyRole}`)
+          environmentalImpactAssessmentDoc.status = DocumentStatus.ACCEPTED;
+
+          await this.queueDocument(AsyncActionType.DocumentUpload, {
+            type: this.helperService.enumToString(DocType, environmentalImpactAssessmentDoc.type),
+            data: environmentalImpactAssessmentDoc.url,
+            externalId: environmentalImpactAssessmentDoc.externalId,
+            actionId: environmentalImpactAssessmentDoc.actionId
+          },undefined, environmentalImpactAssessmentDoc.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
+        }
       }
       
       savedProgramme = await this.entityManager
@@ -1589,6 +1643,9 @@ export class ProgrammeService {
           }
           if (dr) {
             await em.save<ProgrammeDocument>(dr);
+          }
+          if(environmentalImpactAssessmentDoc) {
+            await em.save<ProgrammeDocument>(environmentalImpactAssessmentDoc);
           }
           if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
           return await em.save<Programme>(programme);
@@ -1635,6 +1692,31 @@ export class ProgrammeService {
         }
       );
 
+      const orgNames = await this.companyService.query({
+        size: 10,
+        page: 1,
+        filterAnd: [{
+          key: 'companyId',
+          operation: 'IN',
+          value: programme.companyId
+        }],
+        filterOr: undefined,
+        sort: undefined,
+        filterBy: undefined
+      }, undefined, CompanyRole.GOVERNMENT);
+
+      const programmeSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+        (key) => SectoralScopeDef[key] === programme.sectoralScope
+      );
+
+      const letterSustainableDevSupport = await this.letterSustainableDevSupportLetterGen.generateLetter(
+        programme.programmeId,
+        programme.title,
+        orgNames.data.map(e => ({name:e['name'],address:e['address']})),
+        programmeSectoralScopeKey,
+        programme.sector
+      );
+
       programme.companyId.forEach(async (companyId) => {
         await this.emailHelperService.sendEmailToOrganisationAdmins(
           companyId,
@@ -1645,10 +1727,16 @@ export class ProgrammeService {
             hostAddress +
             `/programmeManagement/view?id=${programme.programmeId}`,
           },undefined,undefined,undefined,
-          {
-            filename: 'Request For Letter Of Intent.pdf',
-            path: letterOfIntentRequestLetterUrl
-          }
+          [
+            {
+              filename: 'Request For Letter Of Intent.pdf',
+              path: letterOfIntentRequestLetterUrl
+            },
+            {
+              filename: 'Letter Of Sustainable Dev Support.pdf',
+              path: letterSustainableDevSupport
+            }
+          ]
         );
       });
 
@@ -1724,7 +1812,7 @@ export class ProgrammeService {
         const filetype = this.getFileExtension(document);
         const response: any = await this.fileHandler.uploadFile(
           `documents/FEASIBILITY_REPORT${"_" + ndcAction.id}.${filetype}`,
-          document
+          document.split(',')[1]
         );
         (ndcActionDto.coBenefitsProperties as any).assessmentDetails.document =
           response;
@@ -1739,7 +1827,7 @@ export class ProgrammeService {
 
     if (ndcAction.action == NDCActionType.Enablement && ndcAction.enablementProperties.report) {
       const filetype = this.getFileExtension(ndcAction.enablementProperties.report);
-      const response: any = await this.fileHandler.uploadFile( `documents/ENABLEMENT_REPORT${ "_" + ndcAction.id}.${filetype}`, ndcAction.enablementProperties.report);
+      const response: any = await this.fileHandler.uploadFile( `documents/ENABLEMENT_REPORT${ "_" + ndcAction.id}.${filetype}`, ndcAction.enablementProperties.report.split(',')[1]);
       ndcAction.enablementProperties.report = response
     }
 
@@ -3896,92 +3984,29 @@ export class ProgrammeService {
         where: { companyId: In(updated.certifierId) },
       });
     }
-
-    const orgNames = await this.companyService.queryNames({
-      size: 10,
-      page: 1,
-      filterAnd: [{
-        key: 'companyId',
-        operation: 'IN',
-        value: program.companyId
-      }],
-      filterOr: undefined,
-      sort: undefined,
-      filterBy: undefined
-    }, undefined);
-
-    const documents = await this.documentRepo.find({
-      where: [
-        { programmeId: program.programmeId, status: DocumentStatus.ACCEPTED, type: DocType.DESIGN_DOCUMENT },
-        { programmeId: program.programmeId, status: DocumentStatus.ACCEPTED, type: DocType.METHODOLOGY_DOCUMENT },
-      ]
-    });
-
-    let designDoc, designDocUrl, methodologyDoc, methodologyDocUrl;
-
-    if (documents && documents.length > 0) {
-      designDoc = documents.find(d => d.type === DocType.DESIGN_DOCUMENT);
-      if (designDoc) {
-        designDocUrl = designDoc.url;
-      }
-      methodologyDoc = documents.find(d => d.type === DocType.METHODOLOGY_DOCUMENT);
-      if (methodologyDoc) {
-        methodologyDocUrl = methodologyDoc.url;
-      }
+    
+    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
+      const hostAddress = this.configService.get("host");
+      let authDate = new Date(updated.txTime);
+      let date = authDate.getDate().toString().padStart(2, "0");
+      let month = authDate.toLocaleString("default", { month: "long" });
+      let year = authDate.getFullYear();
+      let formattedDate = `${date} ${month} ${year}`;
+  
+      updated.company.forEach(async (company) => {
+        await this.emailHelperService.sendEmailToOrganisationAdmins(
+          company.companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: updated.title,
+            authorisedDate: formattedDate,
+            serialNumber: updated.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+          }
+        );
+      });
     }
-
-    const authLetterUrl = await this.authLetterGen.generateLetter(
-      program.programmeId,
-      program.title,
-      (user as any).companyName,
-      orgNames.data.map(e => e['name']),
-      designDocUrl,
-      methodologyDocUrl
-    );
-
-    const dr = new ProgrammeDocument();
-    dr.programmeId = program.programmeId;
-    dr.externalId = program.externalId;
-    dr.status = DocumentStatus.ACCEPTED;
-    dr.type = DocType.AUTHORISATION_LETTER;
-    dr.txTime = new Date().getTime();
-    dr.url = authLetterUrl;
-    await this.documentRepo.save(dr);
-
-    await this.asyncOperationsInterface.AddAction({
-      actionType: AsyncActionType.DocumentUpload,
-      actionProps: {
-        type: this.helperService.enumToString(DocType, dr.type),
-        data: dr.url,
-        externalId: dr.externalId
-      },
-    });
-
-    const hostAddress = this.configService.get("host");
-    let authDate = new Date(updated.txTime);
-    let date = authDate.getDate().toString().padStart(2, "0");
-    let month = authDate.toLocaleString("default", { month: "long" });
-    let year = authDate.getFullYear();
-    let formattedDate = `${date} ${month} ${year}`;
-
-
-    updated.company.forEach(async (company) => {
-      await this.emailHelperService.sendEmailToOrganisationAdmins(
-        company.companyId,
-        EmailTemplates.PROGRAMME_AUTHORISATION,
-        {
-          programmeName: updated.title,
-          authorisedDate: formattedDate,
-          serialNumber: updated.serialNo,
-          programmePageLink:
-            hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
-        }, undefined, undefined, undefined,
-        {
-          filename: 'Authorisation Letter.pdf',
-          path: authLetterUrl
-        }
-      );
-    });
 
     return new DataResponseDto(HttpStatus.OK, updated);
   }
@@ -4117,6 +4142,14 @@ export class ProgrammeService {
     return await this.programmeRepo.findOne({
       where: {
         externalId: externalId,
+      },
+    });
+  }
+
+  async findByEnvironmentalAssessmentRegistrationNo(registrationNo: string): Promise<Programme | undefined> {
+    return await this.programmeRepo.findOne({
+      where: {
+        environmentalAssessmentRegistrationNo: registrationNo,
       },
     });
   }

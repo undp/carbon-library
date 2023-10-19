@@ -122,4 +122,14 @@ export class ProgrammeDto {
     @IsOptional()
     @IsNotEmpty()
     designDocument?: string;
+
+    @ApiPropertyOptional()
+    @IsString()
+    @IsOptional()
+    environmentalImpactAssessment?: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    environmentalAssessmentRegistrationNo: string;
 }

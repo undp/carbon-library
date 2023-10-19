@@ -13,6 +13,7 @@ import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { LocationModule } from '../location/location.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,7 +32,7 @@ import { LocationModule } from '../location/location.module';
     UtilModule,
     FileHandlerModule,
     AsyncOperationsModule,
-    LocationModule
+    LocationModule,
   ],
   providers: [UserService, Logger],
   exports: [UserService]

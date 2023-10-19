@@ -4,5 +4,6 @@ export enum CompanyManagementColumns {
     taxId = 'taxId',
     companyRole = 'companyRole',
     programmeCount = 'programmeCount',
-    creditBalance = 'creditBalance'
+    creditBalance = 'creditBalance',
+    companyState = "status",
 }

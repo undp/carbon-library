@@ -44,7 +44,7 @@ export class LetterOfAuthorisationRequestGen {
             align: "left",
         });
 
-        doc.font("fonts/Inter-Bold.ttf").text(`\n\nRequest for Letter of Authorisation Request ${programmeName}`);
+        doc.font("fonts/Inter-Bold.ttf").text(`\n\nRequest for Letter of Authorisation ${programmeName}`);
 
 
         doc.font("fonts/Inter-Regular.ttf");
@@ -57,11 +57,11 @@ export class LetterOfAuthorisationRequestGen {
             align: "left",
         });
 
-        doc.text(`\n\n${orgName} requests a letter of authorisation to cover ${programmeName} to ensure the further development of the activity`, {
+        doc.text(`\n\n${orgName} requests a letter of authorisation to cover ${programmeName} to ensure the further development of the activity.`, {
             align: "left",
         });
 
-        doc.text(`\n\nPlease do not hesitate to request more information. We hope to receive your assistance in further developing the mitigation activity`, {
+        doc.text(`\n\nPlease do not hesitate to request more information. We hope to receive your assistance in further developing the mitigation activity.`, {
             align: "left",
         });
 

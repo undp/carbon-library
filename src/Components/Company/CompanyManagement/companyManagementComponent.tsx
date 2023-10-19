@@ -42,6 +42,8 @@ import { Company } from "../../../Definitions/Entities/company";
 import { CompanyManagementColumns } from "../../../Definitions/Enums/company.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { CompanyState } from "../../../Definitions";
+import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
 
 const { Search } = Input;
 
@@ -121,6 +123,17 @@ export const CompanyManagementComponent = (props: any) => {
         ) : (
           <div>{item}</div>
         )}
+      </div>
+    );
+  };
+
+  const getCompanyStateComponent = (item: string) => {
+    return (
+      <div style={{ display: "flex", alignItems: "left" }}>
+        <OrganisationStatus
+          t={t}
+          organisationStatus={parseInt(item)}
+        ></OrganisationStatus>
       </div>
     );
   };
@@ -210,6 +223,16 @@ export const CompanyManagementComponent = (props: any) => {
       align: "left" as const,
       render: (item: any) => {
         return item !== null ? addCommSep(item) : "-";
+      },
+    },
+    {
+      title: t("company:companyState"),
+      dataIndex: "state",
+      key: CompanyManagementColumns.companyState,
+      sorter: true,
+      align: "center" as const,
+      render: (item: any) => {
+        return getCompanyStateComponent(item);
       },
     },
   ].filter((column) => visibleColumns.includes(column.key));

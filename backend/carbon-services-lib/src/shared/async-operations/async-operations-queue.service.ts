@@ -25,7 +25,7 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
   public async AddAction(action: AsyncAction): Promise<boolean> {
     // var params = {};
 
-    if ([AsyncActionType.AuthProgramme, AsyncActionType.DocumentUpload, AsyncActionType.IssueCredit, AsyncActionType.RegistryCompanyCreate, AsyncActionType.RejectProgramme,AsyncActionType.AddMitigation,AsyncActionType.ProgrammeAccept,AsyncActionType.ProgrammeCreate,AsyncActionType.OwnershipUpdate].includes(action.actionType) && !this.configService.get("registry.syncEnable")) {
+    if ([AsyncActionType.DocumentUpload, AsyncActionType.IssueCredit, AsyncActionType.RegistryCompanyCreate, AsyncActionType.RejectProgramme,AsyncActionType.AddMitigation,AsyncActionType.ProgrammeAccept,AsyncActionType.ProgrammeCreate,AsyncActionType.OwnershipUpdate].includes(action.actionType) && !this.configService.get("registry.syncEnable")) {
       this.logger.log(`Dropping sync event ${action.actionType} due to sync disabled`)
       return false;
     }
@@ -62,7 +62,7 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
 
     try {
       await this.sqs.send(params);
-      this.logger.log("Succefully added to the queue", action.actionType);
+      this.logger.log("Successfully added to the queue", action.actionType);
     } catch (error) {
       this.logger.error("Failed when adding to queue", action.actionType);
       this.logger.error("Error",error)

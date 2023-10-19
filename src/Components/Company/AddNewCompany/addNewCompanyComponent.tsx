@@ -40,6 +40,8 @@ export const AddNewCompanyComponent = (props: any) => {
     useUserContext,
     useLocation,
     regionField,
+    isGuest,
+    onNavigateToHome,
   } = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -167,21 +169,36 @@ export const AddNewCompanyComponent = (props: any) => {
       );
       const logoUrls = logoBase64.split(",");
       requestData.company.logo = logoUrls[1];
-      const response = await post("national/user/add", requestData);
-      if (response.status === 200 || response.status === 201) {
-        if (isUpdate) {
-          setUserInfo({
-            companyLogo: response.data.logo,
-          } as UserProps);
+
+      if (isGuest) {
+        const response = await post("national/user/register", requestData);
+        if (response.status === 200 || response.status === 201) {
+          message.open({
+            type: "success",
+            content: t("companyRegisteredSuccess"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
+          onNavigateToHome();
+          setLoading(false);
         }
-        message.open({
-          type: "success",
-          content: t("companyAddedSuccess"),
-          duration: 3,
-          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-        });
-        onNavigateToCompanyManagement();
-        setLoading(false);
+      } else {
+        const response = await post("national/user/add", requestData);
+        if (response.status === 200 || response.status === 201) {
+          if (isUpdate) {
+            setUserInfo({
+              companyLogo: response.data.logo,
+            } as UserProps);
+          }
+          message.open({
+            type: "success",
+            content: t("companyAddedSuccess"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
+          onNavigateToCompanyManagement();
+          setLoading(false);
+        }
       }
     } catch (error: any) {
       message.open({
@@ -558,6 +575,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       size="large"
                       disabled={isUpdate}
                       onChange={onChangeCompanyRole}
+                      style={isGuest && { justifyContent: "start" }}
                     >
                       {isUpdate ? (
                         <div
@@ -613,8 +631,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               CompanyRole.MINISTRY
                                 ? {
                                     width: "45%",
+                                    marginLeft: isGuest ?  "30px" : 0,
                                   }
-                                : {}
+                                : {marginLeft: isGuest ? "30px" : 0,}
                             }
                           >
                             <Tooltip
@@ -630,8 +649,8 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          {userInfoState?.companyRole !==
-                            CompanyRole.MINISTRY && (
+                          {(userInfoState?.companyRole !==
+                            CompanyRole.MINISTRY) && !isGuest && (
                             <div className="minister-radio-container">
                               <Tooltip
                                 placement="top"

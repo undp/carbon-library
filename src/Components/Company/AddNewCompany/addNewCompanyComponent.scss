@@ -220,7 +220,7 @@
     .main {
       font-size: 1.25rem;
       font-weight: 500;
-      color: $title-main;
+      color: $primary-color;
     }
 
     .sub {
@@ -264,4 +264,8 @@
 .ant-upload-list-picture-card .ant-upload-list-item-error {
   height: auto;
   max-height: 200px;
+}
+
+.hide {
+  display: none !important;
 }

@@ -4,9 +4,37 @@ export const EmailTemplates = {
     subject: "Welcome!",
     html: `
         Welcome {{organisationName}},<br><br>
-        Your Organisation has been registered with the {{countryName}} Carbon Registry as a {{organisationRole}} Organisation. <br><br>
-        Explore the Registry here {{home}}. <br><br>
+        Your Organisation has been registered with the {{countryName}} {{systemName}} as a {{organisationRole}} Organisation. <br><br>
+        Explore the System <a href="{{home}}">here</a>. <br><br>
 
+        Sincerely,<br>
+        The {{countryName}} Carbon Credit Registry Team
+        `,
+  },
+  ORGANISATION_REGISTRATION: {
+    id: "ORGANISATION_REGISTRATION",
+    subject: "Organisation Registration Request",
+    html: `
+        Hi {{name}},<br><br>
+
+        New Organisation {{organisationName}} has requested to register with the {{countryName}} {{systemName}} as a {{organisationRole}} Organisation. <br><br> 
+        Click <a href="{{organisationPageLink}}">here</a> for more details of the Organisation.
+
+        <br><br>
+        Sincerely,<br>
+        The {{countryName}} Carbon Credit Registry Team
+        `,
+  },
+  ORGANISATION_REGISTRATION_REJECTED: {
+    id: "ORGANISATION_REGISTRATION_REJECTED",
+    subject: "Organisation Registration Request Rejected",
+    html: `
+        Hi {{name}},<br><br>
+
+        Registration request made by your Organisation to register with the {{countryName}} {{systemName}} as a {{organisationRole}} Organisation has been rejected due to the following reason/s:<br>
+        {{remarks}}
+
+        <br><br>
         Sincerely,<br>
         The {{countryName}} Carbon Credit Registry Team
         `,
@@ -17,15 +45,15 @@ export const EmailTemplates = {
     html: `
         Welcome {{name}}, <br><br>
 
-        Your account has been created for the {{countryName}} Carbon Credit
-        Registry. You can access your account using the temporary Homepage: {{home}} <br><br>
+        Your account has been created for the {{countryName}} {{systemName}}. 
+        You can access your account using the temporary Homepage: <a href="{{home}}">{{home}}</a> <br><br>
 
         User: {{email}} <br>
         Password (temporary): {{tempPassword}} <br><br>
 
         If you have any questions, feel free to email our customer success
         team <a href="mailto:help@carbreg.org?subject=I Need Help With The {{countryName}} Carbon Credit Registry">customer success team</a>
-        (We’re lightning quick at replying.) We also offer live chat {{liveChat}}.
+        (We’re lightning quick at replying.) We also offer live chat <a href="{{liveChat}}">{{liveChat}}</a>.
         <br><br>
 
         Sincerely, <br>
@@ -355,7 +383,7 @@ export const EmailTemplates = {
         Click <a href="{{programmePageLink}}">here</a> to access all the programmes that require authorisation. <br><br>
         
         Sincerely, <br>
-        The {{countryName}} Transparency System Team
+        The {{countryName}} Carbon Credit Registry Team
         `,
   },
   PROGRAMME_CERTIFICATION: {

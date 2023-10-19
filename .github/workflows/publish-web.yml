@@ -1,11 +1,11 @@
 name: Publish to NPM UI
 on:
   push:
-    branches:
-      - main
     paths:
       - src/**
       - package.json
+concurrency:
+  group: ${{ github.ref }}
 
 jobs:
   deploy_front_end:
@@ -18,11 +18,20 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn install --frozen-lockfile
-      - run: |
+      - if: github.ref == 'refs/heads/main'
+        run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
-          git pull origin HEAD
           yarn version --patch
+          git push --follow-tags
+        env:
+          CI_COMMIT_MESSAGE: Continuous Integration Version Update
+          CI_COMMIT_AUTHOR: Continuous Integration
+      - if: github.ref != 'refs/heads/main'
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "palinda@xeptagon.com"
+          yarn version --prerelease --preid ${{ github.head_ref || github.ref_name }} 
           git push --follow-tags
         env:
           CI_COMMIT_MESSAGE: Continuous Integration Version Update
@@ -31,7 +40,8 @@ jobs:
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - uses: actions/github-script@v6
+      - if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |

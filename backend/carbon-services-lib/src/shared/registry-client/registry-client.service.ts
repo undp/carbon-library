@@ -19,6 +19,8 @@ import { ProgrammeDto } from "../dto/programme.dto";
 import { NDCActionType } from "../enum/ndc.action.enum";
 import { NDCAction } from "../entities/ndc.action.entity";
 import { NDCActionDto } from "../dto/ndc.action.dto";
+import { EmailHelperService } from "../email-helper/email-helper.service";
+import { EmailTemplates } from "../email-helper/email.template";
 
 @Injectable()
 export class RegistryClientService {
@@ -29,6 +31,7 @@ export class RegistryClientService {
     private programmeService: ProgrammeService,
     @InjectRepository(ProgrammeDocument)
     private documentRepo: Repository<ProgrammeDocument>,
+    private emailHelperService: EmailHelperService,
 ) {}
 
   private async sendHttp(endpoint: string, data: any) {
@@ -143,6 +146,32 @@ export class RegistryClientService {
       dr.txTime = new Date().getTime();
       dr.url = authLetterUrl;
       await this.documentRepo.save(dr);
+
+      const hostAddress = this.configService.get("host");
+      let authDate = new Date(dr.txTime);
+      let date = authDate.getDate().toString().padStart(2, "0");
+      let month = authDate.toLocaleString("default", { month: "long" });
+      let year = authDate.getFullYear();
+      let formattedDate = `${date} ${month} ${year}`;
+
+
+      programme.companyId.forEach(async (companyId) => {
+        await this.emailHelperService.sendEmailToOrganisationAdmins(
+          companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: programme.title,
+            authorisedDate: formattedDate,
+            serialNumber: actionProps.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view?id=${actionProps.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'AUTHORISATION_LETTER.pdf',
+            path: authLetterUrl
+          }
+        );
+      });
   
       return
     }
@@ -203,7 +232,8 @@ export class RegistryClientService {
         "proponentTaxVatId": programme.proponentTaxVatId,
         "proponentPercentage": programme.proponentPercentage,
         "programmeProperties": props,
-        "creditEst": programme.creditEst
+        "creditEst": programme.creditEst,
+        "environmentalAssessmentRegistrationNo": programme.environmentalAssessmentRegistrationNo
       }
 
     if (programme.ndcAction && (programme.ndcAction.action === NDCActionType.Mitigation || programme.ndcAction.action === NDCActionType.CrossCutting) && programme.ndcAction.typeOfMitigation) {

@@ -1,5 +1,7 @@
+import { DocType } from "../Definitions";
+
 const allowedFileTypes = [
-    "application/pdf", 
+    "application/pdf",
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "application/vnd.ms-powerpoint",
@@ -11,6 +13,17 @@ const allowedFileTypes = [
     "image/jpeg"
 ];
 
-export const isValidateFileType = (fileType: string): boolean => {
-    return allowedFileTypes.includes(fileType);
+const environmentalImpactAssessmentAllowedTypes = [
+    "application/pdf",
+    "application/msword",
+    "image/png",
+    "image/jpeg"
+]
+
+export const isValidateFileType = (fileType: string, docType?: string): boolean => {
+    if (docType === DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT) {
+        return environmentalImpactAssessmentAllowedTypes.includes(fileType)
+    } else {
+        return allowedFileTypes.includes(fileType);
+    }
 }

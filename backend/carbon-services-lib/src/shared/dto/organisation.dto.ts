@@ -16,6 +16,7 @@ import { Role } from "../casl/role.enum";
 import { CompanyRole } from "../enum/company.role.enum";
 import { IsValidCountry } from "../util/validcountry.decorator";
 import { SectoralScope } from "@undp/serial-number-gen";
+import { CompanyState } from "../enum/company.state.enum";
 
 export class OrganisationDto {
   companyId: number;
@@ -27,6 +28,14 @@ export class OrganisationDto {
   @IsString()
   @ApiProperty()
   taxId: string;
+
+  @ValidateIf(
+    (c) => ![CompanyRole.GOVERNMENT, CompanyRole.API, CompanyRole.MINISTRY].includes(c.companyRole)
+  )
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  paymentId: string;
 
   @IsNotEmpty()
   @IsString()
@@ -116,5 +125,12 @@ export class OrganisationDto {
 
   createdTime: number;
 
-  geographicalLocationCordintes?: any
+  geographicalLocationCordintes?: any;
+
+  @IsOptional()
+  @IsEnum(CompanyState, {
+    message:
+      "Invalid state. Supported following roles:" + Object.values(CompanyState),
+  })
+  state: CompanyState;
 }
