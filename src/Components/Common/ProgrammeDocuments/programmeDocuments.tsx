@@ -241,7 +241,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
       getProgrammeById();
       setLoading(false);
     }
-  };
+  }; 
 
   const handleOk = () => {
     docAction(rejectDocData?.id, DocumentStatus.REJECTED);
