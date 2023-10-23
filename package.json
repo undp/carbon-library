@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-library",
-  "version": "1.0.41-CARBON-329.1",
+  "version": "1.0.41-CARBON-329.2",
   "description": "Shared Library of tools for Carbon Credits applications ecosystem for ExO and and HQ/GEF",
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "rollup -c --bundleConfigAsCjs",
     "prepare": "npm run build"
   },
-  "keywords": [], 
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
