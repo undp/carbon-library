@@ -46,7 +46,6 @@ type CompanyInfo = {
   name: string;
   credit: number;
 };
-
 type PopupInfo = {
   title: string;
   icon: any;
@@ -122,6 +121,14 @@ export const CreditTransferComponent = (props: any) => {
   };
   const [formModal] = Form.useForm();
   const { Search } = Input;
+
+  const ministryLevelPermission = (sectoralScope: any) => {
+    return (
+      userInfoState?.companyRole === CompanyRole.MINISTRY &&
+      userInfoState?.userRole !== Role.ViewOnly &&
+      ministrySectoralScope.includes(sectoralScope)
+    );
+  };
 
   const onCheckAllChange = (e: any) => {
     const nw = e.target.checked ? statusOptions.map((el) => el.value) : [];
@@ -417,7 +424,8 @@ export const CreditTransferComponent = (props: any) => {
           )}
         />
       ) : record.isRetirement &&
-        userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
+        (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+          ministryLevelPermission(record.programmeSectoralScope)) ? (
         <List
           className="action-menu"
           size="small"

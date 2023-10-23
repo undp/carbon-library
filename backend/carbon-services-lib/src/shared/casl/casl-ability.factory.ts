@@ -134,9 +134,11 @@ export class CaslAbilityFactory {
           can(Action.Manage, DocumentAction);
           can(Action.Manage, Investment);
           can(Action.Manage, ProgrammeTransferRequest);
+          can(Action.Manage, ProgrammeTransfer);
         } else {
           can(Action.Read, Investment);
           can(Action.Read, Programme);
+          can(Action.Read, ProgrammeTransfer);
         }
       }
       
