@@ -1523,12 +1523,21 @@ export class ProgrammeLedgerService {
         if (!programme.mitigationActions) {
           programme.mitigationActions = [];
         }
-
-        programme.mitigationActions.push({...mitigation,
-        properties:{
-          issuedCredits:0,
-          availableCredits:mitigation.userEstimatedCredits
-        }});
+        
+        if(mitigation.properties){
+          mitigation.properties={
+            ...mitigation.properties,
+            issuedCredits:0,
+            availableCredits:mitigation.userEstimatedCredits
+          }
+        }
+        else{
+          mitigation.properties={
+            issuedCredits:0,
+            availableCredits:mitigation.userEstimatedCredits
+          }
+        }
+        programme.mitigationActions.push(mitigation);
         updateMap[this.ledger.tableName] = {
           txRef: programme.txRef,
           txTime: programme.txTime,
