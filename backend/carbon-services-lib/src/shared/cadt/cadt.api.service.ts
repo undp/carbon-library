@@ -40,7 +40,7 @@ export class CadtApiService {
   }
 
   public async createProgramme(programme: Programme) {
-    return await this.sendHttpPost('v1/projects', {
+    const p = await this.sendHttpPost('v1/projects', {
         "projectId": programme.programmeId,
         "originProjectId": programme.programmeId,
         "registryOfOrigin": `${this.configService.get('systemCountryName')} Standard Carbon Registry`,
@@ -56,6 +56,8 @@ export class CadtApiService {
         "unitMetric": "tCO2e",
         "methodology": "CDM - AM0001"
     })
+    await await this.sendHttpPost('v1/staging/commit', undefined);
+    return p;
   }
 
   public async issueCredit(programmeId: string, cadtId: string, amount: number) {
