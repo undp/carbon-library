@@ -813,8 +813,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           placement="top"
                           trigger="hover"
                           title={
-                            userInfoState?.userRole === Role.ViewOnly ||
-                            userInfoState?.companyRole === CompanyRole.CERTIFIER
+                            userInfoState?.userRole === Role.ViewOnly
                               ? t("programme:notAuthToUploadDoc")
                               : !uploadDocUserPermission(
                                   userInfoState,
@@ -874,8 +873,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       placement="top"
                       trigger="hover"
                       title={
-                        userInfoState?.userRole === Role.ViewOnly ||
-                        userInfoState?.companyRole === CompanyRole.CERTIFIER
+                        userInfoState?.userRole === Role.ViewOnly
                           ? t("programme:notAuthToUploadDoc")
                           : !uploadDocUserPermission(
                               userInfoState,
