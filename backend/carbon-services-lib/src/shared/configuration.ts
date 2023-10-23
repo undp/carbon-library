@@ -81,6 +81,10 @@ export default () => ({
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
+  cadTrust: {
+    enable: false,
+    endpoint: "http://44.212.139.61:31310/"
+  },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
   systemName: process.env.SYSTEM_NAME || "SystemX",
   environmentalManagementActHyperlink: process.env.ENVIRONMENTAL_MANAGEMENT_ACT_HYPERLINK  || "",
