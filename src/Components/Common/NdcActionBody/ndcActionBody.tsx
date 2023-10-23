@@ -19,6 +19,7 @@ import {
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
+import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
 
 export interface NdcActionBodyProps {
   data?: any;
@@ -31,8 +32,6 @@ export interface NdcActionBodyProps {
   useConnection: any;
   translator: any;
   useUserContext: any;
-  linkDocVisible: any;
-  uploadDocUserPermission: any;
 }
 
 export const NdcActionBody: FC<NdcActionBodyProps> = (
@@ -48,8 +47,6 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
     useConnection,
     translator,
     useUserContext,
-    linkDocVisible,
-    uploadDocUserPermission,
   } = props;
   const t = translator.t;
   const { userInfoState } = useUserContext();

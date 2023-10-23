@@ -19,6 +19,7 @@ import {
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
+import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
 
 export interface ProgrammeDocumentsProps {
   data: any;
@@ -29,12 +30,11 @@ export interface ProgrammeDocumentsProps {
   getDocumentDetails: any;
   getProgrammeById: any;
   ministryLevelPermission?: boolean;
-  linkDocVisible: any;
-  uploadDocUserPermission: any;
   useConnection: any;
   useUserContext: any;
   translator: any;
   methodologyDocumentUpdated: any;
+  programmeStatus?: any;
 }
 
 export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
@@ -49,12 +49,11 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     getDocumentDetails,
     getProgrammeById,
     ministryLevelPermission,
-    linkDocVisible,
-    uploadDocUserPermission,
     useConnection,
     useUserContext,
     translator,
     methodologyDocumentUpdated,
+    programmeStatus
   } = props;
 
   const t = translator.t;
@@ -365,7 +364,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                                 userInfoState,
                                 DocType.DESIGN_DOCUMENT,
                                 programmeOwnerId,
-                                ministryLevelPermission
+                                ministryLevelPermission,
+                                programmeStatus
                               ) && t("programme:orgNotAuth")
                         }
                         overlayClassName="custom-tooltip"
@@ -377,7 +377,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               userInfoState,
                               DocType.DESIGN_DOCUMENT,
                               programmeOwnerId,
-                              ministryLevelPermission
+                              ministryLevelPermission,
+                              programmeStatus
                             )
                               ? { color: "#3F3A47", cursor: "pointer" }
                               : { color: "#cacaca", cursor: "default" }
@@ -387,7 +388,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               userInfoState,
                               DocType.DESIGN_DOCUMENT,
                               programmeOwnerId,
-                              ministryLevelPermission
+                              ministryLevelPermission,
+                              programmeStatus
                             ) && handleDesignDocFileUpload()
                           }
                         />
@@ -423,7 +425,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                             userInfoState,
                             DocType.DESIGN_DOCUMENT,
                             programmeOwnerId,
-                            ministryLevelPermission
+                            ministryLevelPermission,
+                            programmeStatus
                           ) && t("programme:orgNotAuth")
                     }
                     overlayClassName="custom-tooltip"
@@ -435,7 +438,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           userInfoState,
                           DocType.DESIGN_DOCUMENT,
                           programmeOwnerId,
-                          ministryLevelPermission
+                          ministryLevelPermission,
+                          programmeStatus
                         )
                           ? { color: "#3F3A47", cursor: "pointer" }
                           : { color: "#cacaca", cursor: "default" }
@@ -445,7 +449,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           userInfoState,
                           DocType.DESIGN_DOCUMENT,
                           programmeOwnerId,
-                          ministryLevelPermission
+                          ministryLevelPermission,
+                          programmeStatus
                         ) && handleDesignDocFileUpload()
                       }
                     />
@@ -591,7 +596,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                                 userInfoState,
                                 DocType.METHODOLOGY_DOCUMENT,
                                 programmeOwnerId,
-                                ministryLevelPermission
+                                ministryLevelPermission,
+                                programmeStatus
                               ) && t("programme:orgNotAuth")
                         }
                         overlayClassName="custom-tooltip"
@@ -604,7 +610,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               userInfoState,
                               DocType.METHODOLOGY_DOCUMENT,
                               programmeOwnerId,
-                              ministryLevelPermission
+                              ministryLevelPermission,
+                              programmeStatus
                             )
                               ? { color: "#3F3A47", cursor: "pointer" }
                               : { color: "#cacaca" }
@@ -615,7 +622,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               userInfoState,
                               DocType.METHODOLOGY_DOCUMENT,
                               programmeOwnerId,
-                              ministryLevelPermission
+                              ministryLevelPermission,
+                              programmeStatus
                             ) &&
                             handleMethodologyFileUpload()
                           }
@@ -652,7 +660,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                             userInfoState,
                             DocType.METHODOLOGY_DOCUMENT,
                             programmeOwnerId,
-                            ministryLevelPermission
+                            ministryLevelPermission,
+                            programmeStatus
                           )
                         ? designDocStatus !== DocumentStatus.ACCEPTED &&
                           t("programme:designDocNotApproved")
@@ -668,7 +677,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           userInfoState,
                           DocType.METHODOLOGY_DOCUMENT,
                           programmeOwnerId,
-                          ministryLevelPermission
+                          ministryLevelPermission,
+                          programmeStatus
                         )
                           ? { color: "#3F3A47", cursor: "pointer" }
                           : { color: "#cacaca", cursor: "default" }
@@ -679,7 +689,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           userInfoState,
                           DocType.METHODOLOGY_DOCUMENT,
                           programmeOwnerId,
-                          ministryLevelPermission
+                          ministryLevelPermission,
+                          programmeStatus
                         ) &&
                         handleMethodologyFileUpload()
                       }
@@ -819,14 +830,14 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           placement="top"
                           trigger="hover"
                           title={
-                            userInfoState?.userRole === Role.ViewOnly ||
-                            userInfoState?.companyRole === CompanyRole.CERTIFIER
+                            userInfoState?.userRole === Role.ViewOnly
                               ? t("programme:notAuthToUploadDoc")
                               : !uploadDocUserPermission(
                                   userInfoState,
                                   DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
                                   programmeOwnerId,
-                                  ministryLevelPermission
+                                  ministryLevelPermission,
+                                  programmeStatus
                                 ) && t("programme:orgNotAuth")
                           }
                           overlayClassName="custom-tooltip"
@@ -838,7 +849,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                                 userInfoState,
                                 DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
                                 programmeOwnerId,
-                                ministryLevelPermission
+                                ministryLevelPermission,
+                                programmeStatus
                               )
                                 ? { color: "#3F3A47", cursor: "pointer" }
                                 : { color: "#cacaca", cursor: "default" }
@@ -848,7 +860,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                                 userInfoState,
                                 DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
                                 programmeOwnerId,
-                                ministryLevelPermission
+                                ministryLevelPermission,
+                                programmeStatus
                               ) && handleImpactAssessmentFileUpload()
                             }
                           />
@@ -877,14 +890,14 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       placement="top"
                       trigger="hover"
                       title={
-                        userInfoState?.userRole === Role.ViewOnly ||
-                        userInfoState?.companyRole === CompanyRole.CERTIFIER
+                        userInfoState?.userRole === Role.ViewOnly
                           ? t("programme:notAuthToUploadDoc")
                           : !uploadDocUserPermission(
                               userInfoState,
                               DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
                               programmeOwnerId,
-                              ministryLevelPermission
+                              ministryLevelPermission,
+                              programmeStatus
                             ) && t("programme:orgNotAuth")
                       }
                       overlayClassName="custom-tooltip"
@@ -896,7 +909,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                             userInfoState,
                             DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
                             programmeOwnerId,
-                            ministryLevelPermission
+                            ministryLevelPermission,
+                            programmeStatus
                           )
                             ? { color: "#3F3A47", cursor: "pointer" }
                             : { color: "#cacaca", cursor: "default" }
@@ -906,7 +920,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                             userInfoState,
                             DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT,
                             programmeOwnerId,
-                            ministryLevelPermission
+                            ministryLevelPermission,
+                            programmeStatus
                           ) && handleImpactAssessmentFileUpload()
                         }
                       />
