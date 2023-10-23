@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-services-lib",
-  "version": "0.0.239-CARBON-329.0",
+  "version": "0.0.239-CARBON-329.1",
   "description": "Backend library",
   "author": "",
   "private": false,
@@ -10,7 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch", 
+    "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
