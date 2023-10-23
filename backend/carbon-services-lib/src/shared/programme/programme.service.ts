@@ -2056,7 +2056,7 @@ export class ProgrammeService {
         HttpStatus.FORBIDDEN
       );
     }
-    if (pTransfer.isRetirement && pTransfer.toCompanyId != approver.companyId) {
+    if (pTransfer.isRetirement && pTransfer.toCompanyId != approver.companyId && approver.companyRole !== CompanyRole.MINISTRY) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.invalidApproverForRetirementReq",
@@ -2064,6 +2064,33 @@ export class ProgrammeService {
         ),
         HttpStatus.FORBIDDEN
       );
+    }
+
+    if (approver.companyRole === CompanyRole.MINISTRY) {
+      const programme = await this.programmeLedger.getProgrammeById(
+        pTransfer.programmeId
+      );
+  
+      if (!programme) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.programmeNotExist",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const permission = await this.findPermissionForMinistryUser(
+        approver,
+        programme.sectoralScope
+      );
+      if (!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
     }
 
     const result = await this.programmeTransferRepo
@@ -2328,7 +2355,7 @@ export class ProgrammeService {
         HttpStatus.FORBIDDEN
       );
     }
-    if (transfer.isRetirement && transfer.toCompanyId != approver.companyId) {
+    if (transfer.isRetirement && transfer.toCompanyId != approver.companyId && approver.companyRole !== CompanyRole.MINISTRY) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.invalidApproverForRetirementReq",
@@ -2336,6 +2363,33 @@ export class ProgrammeService {
         ),
         HttpStatus.FORBIDDEN
       );
+    }
+
+    if (approver.companyRole === CompanyRole.MINISTRY) {
+      const programme = await this.programmeLedger.getProgrammeById(
+        transfer.programmeId
+      );
+  
+      if (!programme) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.programmeNotExist",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const permission = await this.findPermissionForMinistryUser(
+        approver,
+        programme.sectoralScope
+      );
+      if (!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
     }
 
     const receiver = await this.companyService.findByCompanyId(
@@ -2644,6 +2698,13 @@ export class ProgrammeService {
       );
     }
 
+    if(transfer.initiatorCompanyId !== requester.companyId){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
     const result = await this.programmeTransferRepo
       .update(
         {
@@ -2805,6 +2866,19 @@ export class ProgrammeService {
       );
     }
     this.logger.verbose(`Transfer programme ${JSON.stringify(programme)}`);
+
+    if (requester.companyRole === CompanyRole.MINISTRY) {
+      const permission = await this.findPermissionForMinistryUser(
+        requester,
+        programme.sectoralScope
+      );
+      if (!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
 
     if (programme.currentStage != ProgrammeStage.AUTHORISED) {
       throw new HttpException(
@@ -3356,6 +3430,19 @@ export class ProgrammeService {
       );
     }
     this.logger.verbose(`Transfer programme ${JSON.stringify(programme)}`);
+
+    if (requester.companyRole === CompanyRole.MINISTRY) {
+      const permission = await this.findPermissionForMinistryUser(
+        requester,
+        programme.sectoralScope
+      );
+      if (!permission) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("user.userUnAUth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
 
     if (programme.currentStage != ProgrammeStage.AUTHORISED) {
       throw new HttpException(
@@ -4174,6 +4261,20 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
+
+      if (programme && user.companyRole === CompanyRole.MINISTRY) {
+        const permission = await this.findPermissionForMinistryUser(
+          user,
+          programme.sectoralScope
+        );
+        if (!permission) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString("user.userUnAUth", []),
+            HttpStatus.FORBIDDEN
+          );
+        }
+      }
+
       const updated = await this.programmeLedger.updateProgrammeStatus(
         req.programmeId,
         ProgrammeStage.REJECTED,
@@ -4220,6 +4321,19 @@ export class ProgrammeService {
           ),
           HttpStatus.BAD_REQUEST
         );
+      }
+
+      if (user.companyRole === CompanyRole.MINISTRY) {
+        const permission = await this.findPermissionForMinistryUser(
+          user,
+          programme.sectoralScope
+        );
+        if (!permission) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString("user.userUnAUth", []),
+            HttpStatus.FORBIDDEN
+          );
+        }
       }
 
       const resp = await this.programmeRepo.update(
