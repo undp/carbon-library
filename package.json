@@ -8,7 +8,7 @@
     "build": "rollup -c --bundleConfigAsCjs",
     "prepare": "npm run build"
   },
-  "keywords": [],
+  "keywords": [], 
   "author": "",
   "license": "ISC",
   "dependencies": {
