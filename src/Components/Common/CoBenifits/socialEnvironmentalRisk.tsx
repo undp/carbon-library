@@ -27,9 +27,9 @@ const SocialEnvironmentalRisk = (props: any) => {
   const checkHeaderAvailability = () => {
     SocialEnvironmentalDetails.forEach((section: any) => {
       section.isTitleVisible = false;
-      section.forEach((subSection: any) => {
+      section.subItems.forEach((subSection: any) => {
         subSection.isTitleVisible = false;
-        subSection.forEach((element: any) => {
+        subSection.subItems.forEach((element: any) => {
           if (SocialEnvironmentalRiskData.hasOwnProperty(element?.name)) {
             subSection.isTitleVisible = true;
           }
