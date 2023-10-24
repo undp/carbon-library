@@ -24,7 +24,7 @@ export enum TypeOfMitigation {
     TRANSPORT = 'Transport',
     WIND = 'Wind'
 }
-
+//sub types of mitigation
 export enum SubTypeOfMitigation {
   IRRIGATION = "Irrigation",
   ENERGY_EFFICIENCY ="EnergyEfficiency",
