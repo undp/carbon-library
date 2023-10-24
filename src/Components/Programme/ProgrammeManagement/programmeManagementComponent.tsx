@@ -561,7 +561,12 @@ export const ProgrammeManagementComponent = (props: any) => {
               </div>
               <div className="download-data-btn">
                 <a onClick={downloadProgrammeData}>
-                  <DownloadOutlined />
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
                 </a>
               </div>
             </div>
