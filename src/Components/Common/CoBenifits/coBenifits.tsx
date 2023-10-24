@@ -9,7 +9,7 @@ import Environmental from "./environmental";
 import Economic from "./economic";
 import Social from "./social";
 import { RadioButtonStatus } from "../../../Definitions";
-import SocialEnvironmentalRisk from "./socialEnvironmentalRisk"
+import SocialEnvironmentalRisk from "./socialEnvironmentalRisk";
 
 export interface CoBenefitProps {
   onClickedBackBtn?: any;
@@ -40,7 +40,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
   const [coBenefitDetails, setCoBenefitDetails] = useState<any>();
   const [isSocialFormValid, setIsSocialFormValid] = useState<any>(true);
   const [isAssessmentFormValid, setIsAssessmentFormValid] = useState<any>(true);
-  translator.setDefaultNamespace('coBenifits');
+  translator.setDefaultNamespace("coBenifits");
   const t = translator.t;
 
   const onSdgGoalsFormSubmit = (sdgGoalsDetails: any) => {
@@ -92,6 +92,13 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       socialValueDetails: socialValueDetails,
     }));
     setIsSocialFormValid(isFormValid);
+  };
+
+  const onSocialEnvironmentalFormSubmit = (socialEnvironmentDetails: any) => {
+    setCoBenefitDetails((pre: any) => ({
+      ...pre,
+      socialEnvironmentDetails: socialEnvironmentDetails,
+    }));
   };
 
   const tabItems = [
@@ -212,10 +219,11 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       key: "8",
       children: (
         <SocialEnvironmentalRisk
+          onFormSubmit={onSocialEnvironmentalFormSubmit}
           translator={translator}
         />
       ),
-    }
+    },
   ];
 
   const onCoBenefitSubmit = () => {
@@ -417,4 +425,3 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     </div>
   );
 };
-

@@ -3,12 +3,16 @@ import React, { useEffect, useState } from "react";
 import { RadioButtonStatus } from "../../../Definitions";
 
 const SocialEnvironmentalRisk = (props: any) => {
-  const { translator } = props;
+  const { onFormSubmit, translator } = props;
   translator.setDefaultNamespace("socialEnvironmentalRisk");
   const t = translator.t;
   const [form] = Form.useForm();
   const [socialEnvironmentalFormDetails, setSocialEnvironmentalFormDetails] =
     useState();
+
+  useEffect(() => {
+    onFormSubmit(socialEnvironmentalFormDetails);
+  }, [socialEnvironmentalFormDetails]);
 
   const SocialEnvironmentalDetails: any[] = [
     {
@@ -378,7 +382,7 @@ const SocialEnvironmentalRisk = (props: any) => {
             <>
               {section.subHeader && (
                 <div style={{ marginBottom: "15px" }}>
-                  <label className="co-sub-title-text">
+                  <label className="co-sub-header-text">
                     {section.subHeader}
                   </label>
                 </div>
