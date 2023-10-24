@@ -27,12 +27,11 @@ import {
 } from "../../../Definitions";
 import { InfoView } from "../../Common/InfoView/info.view";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
+import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
 
 export const NdcActionViewComponent = (props: any) => {
   const {
     useUserContext,
-    linkDocVisible,
-    uploadDocUserPermission,
     useConnection,
     useLocation,
     onNavigateToNdcManagementView,

@@ -5,5 +5,5 @@ export enum CompanyManagementColumns {
     companyRole = 'companyRole',
     programmeCount = 'programmeCount',
     creditBalance = 'creditBalance',
-    companyState = "state",
+    companyState = "status",
 }
