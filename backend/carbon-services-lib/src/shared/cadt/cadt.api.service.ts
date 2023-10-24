@@ -38,6 +38,20 @@ export class CadtApiService {
         throw ex;
       });
   }
+ 
+  private async sendHttpPut(endpoint: string, data: any) {
+    if (!this.configService.get("cadTrust.syncEnable")) {
+      this.logger.debug("Does not execute since CAD-Trust is disable in the system");
+      return;
+    }
+
+    return await axios
+      .put(this.configService.get("cadTrust.endpoint") + endpoint, data)
+      .catch((ex) => {
+        console.log("Exception", ex.response?.data?.statusCode);
+        throw ex;
+      });
+  }
 
   public async createProgramme(programme: Programme) {
     const p = await this.sendHttpPost('v1/projects', {
@@ -46,11 +60,11 @@ export class CadtApiService {
         "registryOfOrigin": `${this.configService.get('systemCountryName')} Standard Carbon Registry`,
         "projectName": programme.title,
         "projectLink": "https://test.carbreg.org/programmeManagement/view/" + programme.programmeId,
-        "projectDeveloper": programme.companyId,
+        "projectDeveloper": String(programme.companyId),
         "sector": programme.sector,
         "projectType": programme.sector,
         "coveredByNDC": "Inside NDC",
-        "projectStatus": "Pending",
+        "projectStatus": "Registered",
         "projectStatusDate": "2022-03-12",
         "ndcInformation": "Estimated to contribute 56 tons of carbon capture towards US NDC goals.",
         "unitMetric": "tCO2e",
@@ -59,8 +73,28 @@ export class CadtApiService {
     await await this.sendHttpPost('v1/staging/commit', undefined);
     return p;
   }
+  
+  // public async findcadtrusprojectbyId(programmeId:string){
+  //   const 
+  // }
+
+  public async authProgramme(programmeId: string, cadtId: string, amount: number) {
+    const auth = await this.sendHttpPut('v1/projects', {
+      "warehouseProjectId": String(cadtId),
+      "projectId": programmeId,
+      "estimations": amount
+    })
+    await await this.sendHttpPost('v1/staging/commit', undefined);
+    return auth;
+  }
 
   public async issueCredit(programmeId: string, cadtId: string, amount: number) {
-
+    const credit = await this.sendHttpPut('v1/projects', {
+      "warehouseProjectId": String(cadtId),
+      "projectId": programmeId,
+      "issuances": amount
+    })
+    await await this.sendHttpPost('v1/staging/commit', undefined);
+    return credit;
   }
 }

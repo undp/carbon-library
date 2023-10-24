@@ -82,8 +82,8 @@ export default () => ({
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
   cadTrust: {
-    enable: false,
-    endpoint: "http://44.212.139.61:31310/"
+    enable: process.env.CADTRUST_ENABLE || false,
+    endpoint: process.env.CADTRUST_ENDPOINT || "http://44.212.139.61:31310/"
   },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
   systemName: process.env.SYSTEM_NAME || "SystemX",
