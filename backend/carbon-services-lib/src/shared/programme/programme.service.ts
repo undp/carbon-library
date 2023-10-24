@@ -2092,11 +2092,24 @@ export class ProgrammeService {
       dto.action = ndcAction.action;
       dto.methodology = ndcAction.methodology;
       dto.typeOfMitigation = ndcAction.typeOfMitigation;
+      dto.subTypeOfMitigation = ndcAction.subTypeOfMitigation;
       dto.agricultureLandArea = ndcAction.agricultureProperties?.landArea;
       dto.agricultureLandAreaUnit = ndcAction.agricultureProperties?.landAreaUnit;
       dto.solarEnergyGeneration = ndcAction.solarProperties?.energyGeneration;
       dto.solarEnergyGenerationUnit = ndcAction.solarProperties?.energyGenerationUnit;
       dto.solarConsumerGroup = ndcAction.solarProperties?.consumerGroup;
+
+      dto.creditCalculationTypeOfMitigation = ndcAction.creditCalculationProperties?.typeOfMitigation;
+      dto.creditCalculationSubTypeOfMitigation = ndcAction.creditCalculationProperties?.subTypeOfMitigation;
+      dto.creditCalculationEnergyGeneration = ndcAction.creditCalculationProperties?.energyGeneration;
+      dto.creditCalculationEnergyGenerationUnit = ndcAction.creditCalculationProperties?.energyGenerationUnit;
+      dto.creditCalculationConsumerGroup = ndcAction.creditCalculationProperties?.consumerGroup;
+      dto.creditCalculationLandArea = ndcAction.creditCalculationProperties?.landArea;
+      dto.creditCalculationLandAreaUnit = ndcAction.creditCalculationProperties?.landAreaUnit;
+      dto.creditCalculationWeight = ndcAction.creditCalculationProperties?.weight;
+      dto.creditCalculationNumberOfDays = ndcAction.creditCalculationProperties?.numberOfDays;
+      dto.creditCalculationNumberOfPeopleInHousehold = ndcAction.creditCalculationProperties?.numberOfPeopleInHousehold;
+
       dto.adaptationImplementingAgency = ndcAction.adaptationProperties?.implementingAgency;
       dto.adaptationNationalPlanObjectives = ndcAction.adaptationProperties?.nationalPlanObjectives;
       dto.adaptationNationalPlanCoverage = ndcAction.adaptationProperties?.nationalPlanCoverage;

@@ -7,11 +7,24 @@ export class DataExportNdcActionDto extends DataExportDto {
     action;
     methodology;
     typeOfMitigation;
+    subTypeOfMitigation;
     agricultureLandArea;
     agricultureLandAreaUnit;
     solarEnergyGeneration;
     solarEnergyGenerationUnit;
     solarConsumerGroup;
+
+    creditCalculationTypeOfMitigation;
+    creditCalculationSubTypeOfMitigation;
+    creditCalculationEnergyGeneration;
+    creditCalculationEnergyGenerationUnit;
+    creditCalculationConsumerGroup;
+    creditCalculationLandArea;
+    creditCalculationLandAreaUnit;
+    creditCalculationWeight;
+    creditCalculationNumberOfDays;
+    creditCalculationNumberOfPeopleInHousehold;
+    
     adaptationImplementingAgency;
     adaptationNationalPlanObjectives;
     adaptationNationalPlanCoverage;
