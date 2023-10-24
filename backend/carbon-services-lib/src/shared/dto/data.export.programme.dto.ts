@@ -1,0 +1,52 @@
+import { DataExportDto } from "./data.export.dto";
+
+export class DataExportProgrammeDto extends DataExportDto{
+    programmeId;
+    serialNo;
+    title;
+    externalId;
+    sectoralScope;
+    sector;
+    countryCodeA2;
+    currentStage;
+    startTime;
+    endTime;
+    creditEst;
+    emissionReductionExpected;
+    emissionReductionAchieved;
+    creditChange;
+    creditIssued;
+    creditBalance;
+    creditRetired;
+    creditFrozen;
+    creditTransferred;
+    constantVersion;
+    proponentTaxVatId;
+    companyId;
+    proponentPercentage;
+    creditOwnerPercentage;
+    certifierId;
+    revokedCertifierId;
+    creditUnit;
+    ndcScope;
+    creditYear;
+    includedInNdc;
+    greenHouseGasses;
+    carbonPriceUSDPerTon;
+    geographicalLocation;
+    estimatedProgrammeCostUSD;
+    txTime;
+    createdTime;
+    authTime;
+    creditUpdateTime;
+    statusUpdateTime;
+    certifiedTime;
+    txRef;
+    txType;
+    geographicalLocationCordintes;
+    environmentalAssessmentRegistrationNo;
+    createdAt;
+    updatedAt;
+    certifier;
+
+}

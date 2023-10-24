@@ -52,6 +52,9 @@ import { LocationInterface } from "../location/location.interface";
 import { CompanyState } from "../enum/company.state.enum";
 import { OrganisationDto } from "../dto/organisation.dto";
 import { PasswordHashService } from "../util/passwordHash.service";
+import { DataExportService } from "../util/data.export.service";
+import { DataExportQueryDto } from "../dto/data.export.query.dto";
+import { DataExportUserDto } from "../dto/data.export.user.dto";
 
 @Injectable()
 export class UserService {
@@ -68,7 +71,8 @@ export class UserService {
     private fileHandler: FileHandlerInterface,
     private asyncOperationsInterface: AsyncOperationsInterface,
     private locationService: LocationInterface,
-    private passwordHashService: PasswordHashService
+    private passwordHashService: PasswordHashService,
+    private dataExportService: DataExportService,
   ) {}
 
   private async generateApiKey(email) {
@@ -902,6 +906,72 @@ export class UserService {
       resp.length > 0 ? resp[0] : undefined,
       resp.length > 1 ? resp[1] : undefined
     );
+  }
+
+  async download(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+    ) {
+
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+
+    const resp = await this.userRepo
+      .createQueryBuilder("user")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            '"user"',
+            abilityCondition
+          ),
+          '"user"'
+        )
+      )
+      .orderBy(
+        queryDto?.sort?.key ? `"user"."${queryDto?.sort?.key}"` : `"user"."id"`,
+        queryDto?.sort?.order ? queryDto?.sort?.order : "DESC"
+      )
+      .getMany();
+      
+      const prepData = this.prepareUserDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "userExport." + key,
+            []
+          )
+        )
+      }
+      
+    const path = await this.dataExportService.generateCsv(prepData, headers);
+    return path;
+  }
+
+  private prepareUserDataForExport(users: any) {
+    const exportData: DataExportUserDto[] = [];
+
+    for (const user of users) {
+      const dto = new DataExportUserDto();
+      dto.id = user.id;
+      dto.email = user.email;
+      dto.role = user.role;
+      dto.name = user.name;
+      dto.country = user.country;
+      dto.phoneNo = user.phoneNo;
+      dto.companyId = user.companyId;
+      dto.companyRole = user.companyRole;
+      dto.createdTime = this.helperService.formatTimestamp(user.createdTime);
+      dto.isPending = user.isPending;
+      exportData.push(dto);
+    }
+
+    return exportData;
   }
 
   async delete(userId: number, ability: string): Promise<BasicResponseDto> {

@@ -10,6 +10,7 @@ import {
   SolarCreationRequest,
 } from "@undp/carbon-credit-calculator";
 import { QueryDto } from "../dto/query.dto";
+import { DataExportQueryDto } from "../dto/data.export.query.dto";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, In, QueryFailedError, Repository } from "typeorm";
 import { PrimaryGeneratedColumnType } from "typeorm/driver/types/ColumnTypes";
@@ -90,6 +91,10 @@ import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
+import { DataExportService } from "../util/data.export.service";
+import { DataExportProgrammeDto } from "../dto/data.export.programme.dto";
+import { DataExportNdcActionDto } from "../dto/data.export.ndc.action.dto";
+import { DataExportInvestmentDto } from "../dto/data.export.investment.dto";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -139,7 +144,8 @@ export class ProgrammeService {
     private letterOfIntentRequestGen: LetterOfIntentRequestGen,
     private letterOfIntentResponseGen: LetterOfIntentResponseGen,
     private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen,
-    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen
+    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen,
+    private dataExportService: DataExportService,
   ) {}
 
   private fileExtensionMap = new Map([
@@ -1942,6 +1948,139 @@ export class ProgrammeService {
     );
   }
 
+  async downloadNdcActions(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+    ) {
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+    queryDto.filterBy = queryData.filterBy;
+
+    let queryBuilder = await this.ndcActionViewRepo
+      .createQueryBuilder("ndcaction")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "ndcaction",
+            abilityCondition
+          ),
+          "ndcaction"
+        )
+      );
+
+    if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.leftJoinAndMapOne(
+      "ndcaction.programmeDetails",
+      Programme,
+      "programme",
+      "programme.programmeId = ndcaction.programmeId"
+      )
+      .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
+        allowedScopes: queryDto.filterBy.value
+      });
+    }
+
+    const resp = await  queryBuilder.orderBy(
+      queryDto?.sort?.key &&
+          `"ndcaction".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
+          queryDto?.sort?.order,
+          queryDto?.sort?.nullFirst !== undefined
+          ? queryDto?.sort?.nullFirst === true
+            ? "NULLS FIRST"
+            : "NULLS LAST"
+          : undefined
+      )
+      .getMany();
+
+      const prepData = this.prepareUserDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "ndcActionExport." + key,
+            []
+          )
+        )
+      }
+
+    const path = await this.dataExportService.generateCsv(prepData, headers);
+    return path;
+  }
+
+  private prepareUserDataForExport(ndcActions: any) {
+    const exportData: DataExportNdcActionDto[] = [];
+
+    for (const ndcAction of ndcActions) {
+      const dto = new DataExportNdcActionDto();
+      dto.id = ndcAction.id;
+      dto.programmeId = ndcAction.programmeId;
+      dto.programmeName = ndcAction.programmeName;
+      dto.action = ndcAction.action;
+      dto.methodology = ndcAction.methodology;
+      dto.typeOfMitigation = ndcAction.typeOfMitigation;
+      dto.agricultureLandArea = ndcAction.agricultureProperties?.landArea;
+      dto.agricultureLandAreaUnit = ndcAction.agricultureProperties?.landAreaUnit;
+      dto.solarEnergyGeneration = ndcAction.solarProperties?.energyGeneration;
+      dto.solarEnergyGenerationUnit = ndcAction.solarProperties?.energyGenerationUnit;
+      dto.solarConsumerGroup = ndcAction.solarProperties?.consumerGroup;
+      dto.adaptationImplementingAgency = ndcAction.adaptationProperties?.implementingAgency;
+      dto.adaptationNationalPlanObjectives = ndcAction.adaptationProperties?.nationalPlanObjectives;
+      dto.adaptationNationalPlanCoverage = ndcAction.adaptationProperties?.nationalPlanCoverage;
+      dto.adaptationGhgEmissionsAvoidedCO2 = ndcAction.adaptationProperties?.ghgEmissionsAvoided.CO2;
+      dto.adaptationGhgEmissionsAvoidedCH4 = ndcAction.adaptationProperties?.ghgEmissionsAvoided.CH4;
+      dto.adaptationGhgEmissionsAvoidedN2O = ndcAction.adaptationProperties?.ghgEmissionsAvoided.N2O;
+      dto.adaptationGhgEmissionsAvoidedHFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided.HFCs;
+      dto.adaptationGhgEmissionsAvoidedPFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided.PFCs;
+      dto.adaptationGhgEmissionsAvoidedSF6 = ndcAction.adaptationProperties?.ghgEmissionsAvoided.SF6;
+      dto.adaptationGhgEmissionsReducedCO2 = ndcAction.adaptationProperties?.ghgEmissionsReduced.CO2;
+      dto.adaptationGhgEmissionsReducedCH4 = ndcAction.adaptationProperties?.ghgEmissionsReduced.CH4;
+      dto.adaptationGhgEmissionsReducedN2O = ndcAction.adaptationProperties?.ghgEmissionsReduced.N2O;
+      dto.adaptationGhgEmissionsReducedHFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced.HFCs;
+      dto.adaptationGhgEmissionsReducedPFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced.PFCs;
+      dto.adaptationGhgEmissionsReducedSF6 = ndcAction.adaptationProperties?.ghgEmissionsReduced.SF6;
+      dto.adaptationIncludedInNAP = ndcAction.adaptationProperties?.includedInNAP;
+      dto.ndcFinancingUserEstimatedCredits = ndcAction.ndcFinancing?.userEstimatedCredits;
+      dto.ndcFinancingSystemEstimatedCredits = ndcAction.ndcFinancing?.systemEstimatedCredits;
+      dto.coBenefitsProperties = this.flattenObject(ndcAction.coBenefitsProperties);
+      dto.enablementTitle = ndcAction.enablementProperties?.title;
+      dto.enablementType = ndcAction.enablementProperties?.type;
+      dto.enablementReport = ndcAction.enablementProperties?.report;
+      dto.txTime = this.helperService.formatTimestamp(ndcAction.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(ndcAction.createdTime);
+      dto.constantVersion = ndcAction.constantVersion;
+      dto.sector = ndcAction.sector;
+      dto.status = ndcAction.status;
+      dto.companyId = ndcAction.companyId;
+      dto.emissionReductionExpected = ndcAction.emissionReductionExpected;
+      dto.emissionReductionAchieved = ndcAction.emissionReductionAchieved;
+      exportData.push(dto);
+    }
+
+    return exportData;
+  }
+
+  private flattenObject(ob) {
+    let result = {};
+  
+    for (const key in ob) {
+      if ((typeof ob[key]) === 'object' && !Array.isArray(ob[key])) {
+        const temp = this.flattenObject(ob[key]);
+        for (const subKey in temp) {
+          result[key + '.' + subKey] = temp[subKey];
+        }
+      } else {
+        result[key] = ob[key];
+      }
+    }
+  
+    return result;
+  }
+
   async queryDocuments(
     query: QueryDto,
     abilityCondition: string
@@ -3007,6 +3146,121 @@ export class ProgrammeService {
   //   const resp = await this.programmeLedger.addMitigation(mitigation.externalId, mitigation.mitigation);
   //   return new DataResponseDto(HttpStatus.OK, resp);
   // }
+
+  async downloadProgrammes(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+    ) {
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+
+    let resp = await this.programmeViewRepo
+      .createQueryBuilder("programme")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "programme",
+            abilityCondition
+          ),
+          "programme"
+        )
+      )
+      .orderBy(
+        queryDto?.sort?.key &&
+          `"programme".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
+          queryDto?.sort?.order,
+          queryDto?.sort?.nullFirst !== undefined
+          ? queryDto?.sort?.nullFirst === true
+            ? "NULLS FIRST"
+            : "NULLS LAST"
+          : undefined
+      )
+      .getMany();
+
+      const prepData = this.prepareProgrammeDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "programmeExport." + key,
+            []
+          )
+        )
+      }
+
+    const path = await this.dataExportService.generateCsv(prepData, headers);
+    return path;
+  }
+
+  private prepareProgrammeDataForExport(programmes: any) {
+    const exportData: DataExportProgrammeDto[] = [];
+    
+
+    for (const programme of programmes) {
+
+      const startTimestamp = programme.startTime * 1000;
+      const endTimestamp = programme.endTime * 1000;
+
+      const dto = new DataExportProgrammeDto();
+      dto.programmeId = programme.programmeId;
+      dto.serialNo = programme.serialNo;
+      dto.title = programme.title;
+      dto.externalId = programme.externalId;
+      dto.sectoralScope = programme.sectoralScope;
+      dto.sector = programme.sector;
+      dto.countryCodeA2 = programme.countryCodeA2;
+      dto.currentStage = programme.currentStage;
+      dto.startTime = this.helperService.formatTimestamp(startTimestamp);
+      dto.endTime = this.helperService.formatTimestamp(endTimestamp);
+      dto.creditEst = programme.creditEst;
+      dto.emissionReductionExpected = programme.emissionReductionExpected;
+      dto.emissionReductionAchieved = programme.emissionReductionAchieved;
+      dto.creditChange = programme.creditChange;
+      dto.creditIssued = programme.creditIssued;
+      dto.creditBalance = programme.creditBalance;
+      dto.creditRetired = programme.creditRetired;
+      dto.creditFrozen = programme.creditFrozen;
+      dto.creditTransferred = programme.creditTransferred;
+      dto.constantVersion = programme.constantVersion;
+      dto.proponentTaxVatId = programme.proponentTaxVatId;
+      dto.companyId = programme.companyId;
+      dto.proponentPercentage = programme.proponentPercentage;
+      dto.creditOwnerPercentage = programme.creditOwnerPercentage;
+      dto.certifierId = programme.certifierId;
+      dto.revokedCertifierId = programme.revokedCertifierId;
+      dto.creditUnit = programme.creditUnit;
+      dto.ndcScope = programme.programmeProperties?.ndcScope;
+      dto.creditYear = programme.programmeProperties?.creditYear;
+      dto.includedInNdc = programme.programmeProperties?.includedInNdc;
+      dto.greenHouseGasses = programme.programmeProperties?.greenHouseGasses;
+      dto.carbonPriceUSDPerTon = programme.programmeProperties?.carbonPriceUSDPerTon;
+      dto.geographicalLocation = programme.programmeProperties?.geographicalLocation;
+      dto.estimatedProgrammeCostUSD = programme.programmeProperties?.estimatedProgrammeCostUSD;
+      dto.txTime = this.helperService.formatTimestamp(programme.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(programme.createdTime);
+      dto.authTime = this.helperService.formatTimestamp(programme.authTime);
+      dto.creditUpdateTime = this.helperService.formatTimestamp(programme.creditUpdateTime);
+      dto.statusUpdateTime = this.helperService.formatTimestamp(programme.statusUpdateTime);
+      dto.certifiedTime = this.helperService.formatTimestamp(programme.certifiedTime);
+      dto.txRef = programme.txRef;
+      dto.txType = programme.txType;
+      dto.geographicalLocationCordintes = programme.geographicalLocationCordintes;
+      dto.environmentalAssessmentRegistrationNo = programme.environmentalAssessmentRegistrationNo;
+      dto.createdAt = this.helperService.formatTimestamp(programme.createdAt);
+      dto.updatedAt = this.helperService.formatTimestamp(programme.updatedAt);
+      dto.certifier = programme.certifier;
+
+      exportData.push(dto);
+    }
+
+    return exportData;
+
+  }
 
   async query(
     query: QueryDto,
@@ -4245,6 +4499,117 @@ export class ProgrammeService {
       resp.length > 1 ? resp[1] : undefined
     );
   }
+
+  async downloadInvestments(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+    ) {
+
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+
+    let queryBuilder = await this.investmentViewRepo
+      .createQueryBuilder("investment")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "investment",
+            abilityCondition
+          )
+        )
+      )
+
+      if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+        queryBuilder = queryBuilder.leftJoinAndMapOne(
+        "investment.programmeDetails",
+        Programme,
+        "programme",
+        "programme.programmeId = investment.programmeId"
+        )
+        .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
+          allowedScopes: queryDto.filterBy.value
+        });
+      }
+
+      const resp = await  queryBuilder.orderBy(
+        queryDto?.sort?.key &&
+          this.helperService.generateSortCol(queryDto?.sort?.key),
+          queryDto?.sort?.order,
+          queryDto?.sort?.nullFirst !== undefined
+          ? queryDto?.sort?.nullFirst === true
+            ? "NULLS FIRST"
+            : "NULLS LAST"
+          : undefined
+      )
+      .getMany();
+
+      const prepData = this.prepareInvestmentDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "investmentExport." + key,
+            []
+          )
+        )
+      }
+      
+    const path = await this.dataExportService.generateCsv(prepData, headers);
+    return path;
+  }
+
+  private prepareInvestmentDataForExport(investments: any) {
+    const exportData: DataExportInvestmentDto[] = [];
+    
+
+    for (const investment of investments) {
+
+      // const startTimestamp = programme.startTime * 1000;
+      // const endTimestamp = programme.endTime * 1000;
+
+      const dto = new DataExportInvestmentDto();
+      dto.requestId = investment.requestId;
+      dto.programmeId = investment.programmeId;
+      dto.programmeTitle = investment.programmeTitle;
+      dto.programmeSector = investment.programmeSector;
+      dto.amount = investment.amount;
+      dto.instrument = investment.instrument;
+      dto.interestRate = investment.interestRate;
+      dto.resultMetric = investment.resultMetric;
+      dto.paymentPerMetric = investment.paymentPerMetric;
+      dto.comments = investment.comments;
+      dto.type = investment.type;
+      dto.level = investment.level;
+      dto.stream = investment.stream;
+      dto.esgClassification = investment.esgClassification;
+      dto.status = investment.status;
+      dto.fromCompanyId = investment.fromCompanyId;
+      dto.percentage = investment.percentage;
+      dto.shareFromOwner = investment.shareFromOwner;
+      dto.txTime = this.helperService.formatTimestamp(investment.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(investment.createdTime);
+      dto.txRef = investment.txRef;
+      dto.sender = investment.sender[0]?.companyId;
+      dto.requester = investment.requester[0]?.companyId;
+      dto.receiver = investment.receiver[0]?.companyId;
+      dto.proponentTaxVatId = investment.proponentTaxVatId;
+      dto.proponentPercentage = investment.proponentPercentage;
+      dto.companyId = investment.companyId;
+      dto.creditOwnerPercentage = investment.creditOwnerPercentage;
+      dto.toGeo = "[ " + investment.toGeo +" ]";
+      dto.fromGeo = "[ " + investment.fromGeo +" ]";
+      exportData.push(dto);
+    }
+
+    return exportData;
+
+  }
+
   async investmentCancel(req: InvestmentCancel, requester: User) {
     this.logger.log(
       `Investment cancel by ${requester.companyId}-${

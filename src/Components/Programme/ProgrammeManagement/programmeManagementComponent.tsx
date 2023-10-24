@@ -28,7 +28,7 @@ import {
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { ProgrammeManagementColumns } from "../../../Definitions/Enums/programme.management.columns.enum";
 import { Action } from "../../../Definitions/Enums/action.enum";
-import { PlusOutlined } from "@ant-design/icons";
+import { DownloadOutlined, PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import {
   ProgrammeEntity,
@@ -66,6 +66,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     useState<boolean>(false);
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
+  const [dataQuery, setDataQuery] = useState<any>();
 
   const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStageR;
 
@@ -346,6 +347,11 @@ export const ProgrammeManagementComponent = (props: any) => {
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
       setLoading(false);
+      setDataQuery({
+        filterAnd: filter,
+        filterOr: filterOr?.length > 0 ? filterOr : undefined,
+        sort: sort,
+      })
     } catch (error: any) {
       console.log("Error in getting programme", error);
       message.open({
@@ -384,6 +390,32 @@ export const ProgrammeManagementComponent = (props: any) => {
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);
+      setLoading(false);
+    }
+  };
+
+  const downloadProgrammeData = async () => {
+    setLoading(true);
+
+    try {
+      const response: any = await post("national/programme/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in downloading programme data", error);
       setLoading(false);
     }
   };
@@ -526,6 +558,11 @@ export const ProgrammeManagementComponent = (props: any) => {
                   onSearch={setSearch}
                   style={{ width: 265 }}
                 />
+              </div>
+              <div className="download-data-btn">
+                <a onClick={downloadProgrammeData}>
+                  <DownloadOutlined />
+                </a>
               </div>
             </div>
           </Col>

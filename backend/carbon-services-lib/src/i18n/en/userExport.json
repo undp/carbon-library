@@ -1,0 +1,12 @@
+{
+    "id": "User Id",
+    "email": "Email",
+    "role": "Role",
+    "name": "Name",
+    "country": "Country",
+    "phoneNo": "Phone Number",
+    "companyId": "Company Id",
+    "companyRole": "Company Role",
+    "createdTime": "Created At",
+    "isPending": "Pending Approval"
+}

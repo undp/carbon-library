@@ -40,6 +40,9 @@ import {
 } from "../async-operations/async-operations.interface";
 import { AsyncActionType } from "../enum/async.action.type.enum";
 import { LocationInterface } from "../location/location.interface";
+import { DataExportQueryDto } from "../dto/data.export.query.dto";
+import { DataExportService } from "../util/data.export.service";
+import { DataExportCompanyDto } from "../dto/data.export.company.dto";
 
 @Injectable()
 export class CompanyService {
@@ -58,7 +61,8 @@ export class CompanyService {
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private asyncOperationsInterface: AsyncOperationsInterface,
-    private locationService: LocationInterface
+    private locationService: LocationInterface,
+    private dataExportService: DataExportService
   ) {}
 
   async suspend(
@@ -481,6 +485,108 @@ export class CompanyService {
       resp.length > 0 ? resp[0] : undefined,
       resp.length > 1 ? resp[1] : undefined
     );
+  }
+
+  async download(
+    queryData: DataExportQueryDto,
+    abilityCondition: string,
+    companyRole: string
+    ) {
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+
+    let filterWithCompanyStatesIn: number[];
+
+    if (companyRole === CompanyRole.GOVERNMENT) {
+      filterWithCompanyStatesIn = [0, 1, 2, 3]
+    } else {
+      filterWithCompanyStatesIn = [0, 1]
+    }
+
+    if (queryDto.filterAnd) {
+      queryDto.filterAnd.push({
+        key: "state",
+        operation: "in",
+        value: filterWithCompanyStatesIn,
+      });
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: "state",
+        operation: "in",
+        value: filterWithCompanyStatesIn,
+      });
+      queryDto.filterAnd = filterAnd;
+    }
+
+    const resp = await this.companyRepo
+      .createQueryBuilder()
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQL(abilityCondition)
+        )
+      )
+      .orderBy(
+        queryDto?.sort?.key && `"${queryDto?.sort?.key}"`,
+        queryDto?.sort?.order,
+        queryDto?.sort?.nullFirst !== undefined
+          ? queryDto?.sort?.nullFirst === true
+            ? "NULLS FIRST"
+            : "NULLS LAST"
+          : undefined
+      )
+      .getMany();
+
+      const prepData = this.prepareCompanyDataForExport(resp)
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "companyExport." + key,
+            []
+          )
+        )
+      }
+    const path = await this.dataExportService.generateCsv(prepData, headers);
+    return path;
+  }
+
+  private prepareCompanyDataForExport(companies: any) {
+    const exportData: DataExportCompanyDto[] = [];
+  
+    for (const company of companies) {
+      const dto = new DataExportCompanyDto();
+  
+      dto.companyId = company.companyId;
+      dto.taxId = company.taxId;
+      dto.paymentId = company.paymentId;
+      dto.name = company.name;
+      dto.email = company.email;
+      dto.phoneNo = company.phoneNo;
+      dto.website = company.website;
+      dto.address = company.address;
+      dto.country = company.country;
+      dto.companyRole = company.companyRole;
+      dto.state = company.state;
+      dto.creditBalance = company.creditBalance;
+      dto.secondaryAccountBalance = company.secondaryAccountBalance;
+      dto.programmeCount = company.programmeCount;
+      dto.lastUpdateVersion = company.lastUpdateVersion;
+      dto.creditTxTime = this.helperService.formatTimestamp(company.creditTxTime);
+      dto.remarks = company.remarks;
+      dto.createdTime = this.helperService.formatTimestamp(company.createdTime);
+      dto.geographicalLocationCordintes = company.geographicalLocationCordintes;
+      dto.regions = company.regions;
+      dto.nameOfMinister = company.nameOfMinister;
+      dto.sectoralScope = company.sectoralScope;
+      exportData.push(dto);
+    }
+  
+    return exportData;
   }
 
   async queryNames(query: QueryDto, abilityCondition: string): Promise<any> {

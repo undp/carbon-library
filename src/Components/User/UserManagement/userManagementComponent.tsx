@@ -2,6 +2,7 @@ import {
   AuditOutlined,
   BankOutlined,
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   EllipsisOutlined,
   ExperimentOutlined,
@@ -98,6 +99,7 @@ export const UserManagementComponent = (props: any) => {
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [openDeleteConfirmationModal, setOpenDeleteConfirmationModal] =
     useState(false);
+  const [dataQuery, setDataQuery] = useState<any>();
   const ability = useAbilityContext();
 
   document.addEventListener("mousedown", (event: any) => {
@@ -528,6 +530,11 @@ export const UserManagementComponent = (props: any) => {
         setTableData(availableUsers);
         setTotalUser(response?.response?.data?.total);
       }
+      setDataQuery({
+        filterAnd: filterAnd(),
+        filterOr: filterOr(),
+        sort: sort(),
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);
@@ -537,6 +544,32 @@ export const UserManagementComponent = (props: any) => {
         duration: 3,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
+      setLoading(false);
+    }
+  };
+
+  const downloadUserData = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/user/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+      });
+
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in downloading user data", error);
       setLoading(false);
     }
   };
@@ -727,6 +760,16 @@ export const UserManagementComponent = (props: any) => {
                     />
                   </a>
                 </Dropdown>
+              </div>
+              <div className="download-data-btn">
+                <a onClick={downloadUserData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
               </div>
             </div>
           </Col>
