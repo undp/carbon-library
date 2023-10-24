@@ -100,19 +100,19 @@ export class CadtApiService {
       projectDeveloper: companies?.map((c) => c.name)?.join(', '),
       sector: programme.sector,
       projectType:
-        programme.mitigationActions.length > 0
+        programme.mitigationActions?.length > 0
           ? programme.mitigationActions[0].typeOfMitigation
           : 'No NDC Action',
       coveredByNDC: 'Inside NDC',
       projectStatus: this.getMapToCADTStatus(programme.currentStage),
       projectStatusDate: this.getProjectDate(programme.startTime),
       ndcInformation:
-        programme.mitigationActions.length > 0
+        programme.mitigationActions?.length > 0
           ? programme.mitigationActions[0].actionId
           : 'No NDC Action',
       unitMetric: 'tCO2e',
       methodology:
-        programme.mitigationActions.length > 0
+        programme.mitigationActions?.length > 0
           ? programme.mitigationActions[0].properties.methodology
           : 'No NDC Action',
     });
