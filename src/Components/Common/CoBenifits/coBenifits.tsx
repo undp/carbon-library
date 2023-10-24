@@ -220,6 +220,11 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       children: (
         <SocialEnvironmentalRisk
           onFormSubmit={onSocialEnvironmentalFormSubmit}
+          SocialEnvironmentalRiskData={
+            (viewOnly && coBenifitsViewDetails?.socialEnvironmentDetails) ||
+            (!viewOnly && coBenefitsDetails?.socialEnvironmentDetails)
+          }
+          viewOnly={viewOnly || false}
           translator={translator}
         />
       ),
