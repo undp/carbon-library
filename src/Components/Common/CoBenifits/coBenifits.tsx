@@ -9,6 +9,7 @@ import Environmental from "./environmental";
 import Economic from "./economic";
 import Social from "./social";
 import { RadioButtonStatus } from "../../../Definitions";
+import SocialEnvironmentalRisk from "./socialEnvironmentalRisk"
 
 export interface CoBenefitProps {
   onClickedBackBtn?: any;
@@ -206,6 +207,15 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
         />
       ),
     },
+    {
+      label: t("coBenifits:socialEnvironmentalRisk"),
+      key: "8",
+      children: (
+        <SocialEnvironmentalRisk
+          translator={translator}
+        />
+      ),
+    }
   ];
 
   const onCoBenefitSubmit = () => {
