@@ -24,7 +24,6 @@ import {
   mitigationTypeList,
 } from "../../../Definitions";
 import { InfoView } from "../../Common/InfoView/info.view";
-import moment from "moment";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
 import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
 
@@ -86,10 +85,6 @@ export const NdcActionViewComponent = (props: any) => {
   };
 
   const getProjectReportActions = (reportData: any) => {
-    const versionfull =
-      (reportData?.url).split("_")[(reportData?.url).split("_").length - 1];
-    const version = versionfull ? versionfull.split(".")[0] : "1";
-    const Docversion = version.startsWith("V") ? version : "V1";
     return (
       <Row>
         <div className="icon">
@@ -121,14 +116,6 @@ export const NdcActionViewComponent = (props: any) => {
             </a>
           )}
         </div>
-        {reportData?.url !== "" && (
-          <div className="time">
-            {moment(parseInt(reportData?.txTime)).format(
-              "DD MMMM YYYY @ HH:mm"
-            )}
-            {" ~ " + Docversion}
-          </div>
-        )}
       </Row>
     );
   };
