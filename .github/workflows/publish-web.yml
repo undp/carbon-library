@@ -4,6 +4,8 @@ on:
     paths:
       - src/**
       - package.json
+concurrency:
+  group: ${{ github.ref }}
 
 jobs:
   deploy_front_end:

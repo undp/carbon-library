@@ -232,7 +232,7 @@ export const CompanyManagementComponent = (props: any) => {
       dataIndex: "state",
       key: CompanyManagementColumns.companyState,
       sorter: true,
-      align: "left" as const,
+      align: "center" as const,
       render: (item: any) => {
         return getCompanyStateComponent(item);
       },
