@@ -95,6 +95,7 @@ import { DataExportService } from "../util/data.export.service";
 import { DataExportProgrammeDto } from "../dto/data.export.programme.dto";
 import { DataExportNdcActionDto } from "../dto/data.export.ndc.action.dto";
 import { DataExportInvestmentDto } from "../dto/data.export.investment.dto";
+import { DataExportTransferDto } from "../dto/data.export.transfer.dto";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -1996,7 +1997,7 @@ export class ProgrammeService {
       )
       .getMany();
 
-      const prepData = this.prepareUserDataForExport(resp)
+      const prepData = this.prepareNdcActionDataForExport(resp)
 
       let headers: string[] = [];
       const titleKeys = Object.keys(prepData[0]);
@@ -2013,7 +2014,7 @@ export class ProgrammeService {
     return path;
   }
 
-  private prepareUserDataForExport(ndcActions: any) {
+  private prepareNdcActionDataForExport(ndcActions: any) {
     const exportData: DataExportNdcActionDto[] = [];
 
     for (const ndcAction of ndcActions) {
@@ -2047,7 +2048,164 @@ export class ProgrammeService {
       dto.adaptationIncludedInNAP = ndcAction.adaptationProperties?.includedInNAP;
       dto.ndcFinancingUserEstimatedCredits = ndcAction.ndcFinancing?.userEstimatedCredits;
       dto.ndcFinancingSystemEstimatedCredits = ndcAction.ndcFinancing?.systemEstimatedCredits;
-      dto.coBenefitsProperties = this.flattenObject(ndcAction.coBenefitsProperties);
+
+      dto.coBenefitsPropertiesSdgGoals = ndcAction.coBenefitsProperties?.sdgGoals;
+      //coBenefitsProperties:safeGuards
+      dto.coBenefitsPropertiesSafeguardsIsRespectHumanRights = ndcAction.coBenefitsProperties?.safeguardDetails?.isRespectHumanRights;
+      dto.coBenefitsPropertiesSafeguardsIsProjectDiscriminate = ndcAction.coBenefitsProperties?.safeguardDetails?.isProjectdiscriminate;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ1;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ2;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ3 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ3;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ4 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ4;
+      dto.coBenefitsPropertiesSafeguardsCommunityHealthQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.communityHealthQ1;
+      dto.coBenefitsPropertiesSafeguardsHistoricHeritageQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.historicHeritageQ1;
+      dto.coBenefitsPropertiesSafeguardsForcedEvictionQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.forcedEvictionQ1;
+      dto.coBenefitsPropertiesSafeguardsLandTenureQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.landTenureQ1;
+      dto.coBenefitsPropertiesSafeguardsLandTenureQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.landTenureQ2;
+      dto.coBenefitsPropertiesSafeguardsIndigenousPeopleQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.indegenousPeopleQ1;
+      dto.coBenefitsPropertiesSafeguardsCorruptionQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.corruptionQ1;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ1;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ2;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ3 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ3;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ4 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ4;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ1;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ2;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ3 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ3;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ4 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ4;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ5 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ5;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ6 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ6;
+      dto.coBenefitsPropertiesSafeguardsEconomicConsequencesQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.economicConsequencesQ1;
+      dto.coBenefitsPropertiesSafeguardsEmissionsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.emissionsQ1;
+      dto.coBenefitsPropertiesSafeguardsEnergySupplyQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.energySupplyQ1;
+      dto.coBenefitsPropertiesSafeguardsWaterPatternQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.waterPatternQ1;
+      dto.coBenefitsPropertiesSafeguardsErosionQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.erosoinQ1;
+      dto.coBenefitsPropertiesSafeguardsErosionQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.erosoinQ2;
+      dto.coBenefitsPropertiesSafeguardsLandscapeQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.landscapeQ1;
+      dto.coBenefitsPropertiesSafeguardsNaturalDisasterQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.naturalDisasterQ1;
+      dto.coBenefitsPropertiesSafeguardsGeneticQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.geneticQ1;
+      dto.coBenefitsPropertiesSafeguardsPollutantsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.pollutantsQ1;
+      dto.coBenefitsPropertiesSafeguardsHazardousWasteQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.hazardousWasteQ1;
+      dto.coBenefitsPropertiesSafeguardsPesticidesQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.pesticidesQ1;
+      dto.coBenefitsPropertiesSafeguardsHarvestForestsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.harvestForestsQ1;
+      dto.coBenefitsPropertiesSafeguardsFoodQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.foodQ1;
+      dto.coBenefitsPropertiesSafeguardsAnimalHusbandryQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.animalHusbandryQ1;
+      dto.coBenefitsPropertiesSafeguardsCriticalHabitatsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.criticalHabitatsQ1;
+      dto.coBenefitsPropertiesSafeguardsEndangeredSpeciesQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.endangeredSpeciesQ1;
+      dto.coBenefitsPropertiesSafeguardsEndangeredSpeciesQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.endangeredSpeciesQ2;
+
+      // coBenefitsProperties:AssessmentDetails
+      dto.coBenefitsPropertiesAssessmentDetailsEmail = ndcAction.coBenefitsProperties?.assessmentDetails?.email;
+      dto.coBenefitsPropertiesAssessmentDetailsTitle = ndcAction.coBenefitsProperties?.assessmentDetails?.title;
+      dto.coBenefitsPropertiesAssessmentDetailsFunder = ndcAction.coBenefitsProperties?.assessmentDetails?.funder;
+      dto.coBenefitsPropertiesAssessmentDetailsLastName = ndcAction.coBenefitsProperties?.assessmentDetails?.lastName;
+      dto.coBenefitsPropertiesAssessmentDetailsFirstName = ndcAction.coBenefitsProperties?.assessmentDetails?.firstName;
+      dto.coBenefitsPropertiesAssessmentDetailsStudyName = ndcAction.coBenefitsProperties?.assessmentDetails?.studyName;
+      dto.coBenefitsPropertiesAssessmentDetailsTelephone = ndcAction.coBenefitsProperties?.assessmentDetails?.telephone;
+      dto.coBenefitsPropertiesAssessmentDetailsOrganisation = ndcAction.coBenefitsProperties?.assessmentDetails?.organisation;
+      dto.coBenefitsPropertiesAssessmentDetailsAffiliationCdm = ndcAction.coBenefitsProperties?.assessmentDetails?.affiliationCDM;
+      dto.coBenefitsPropertiesAssessmentDetailsVerifyingDetails = ndcAction.coBenefitsProperties?.assessmentDetails?.verifyingDetails;
+      dto.coBenefitsPropertiesAssessmentDetailsVerifyingOrgName = ndcAction.coBenefitsProperties?.assessmentDetails?.verifyingOrgName;
+      dto.coBenefitsPropertiesAssessmentDetailsIsThePersonListed = ndcAction.coBenefitsProperties?.assessmentDetails?.isThePersonListed;
+      dto.coBenefitsPropertiesAssessmentDetailsIsWillingToVerified = ndcAction.coBenefitsProperties?.assessmentDetails?.IsWillingToVerified;
+      dto.coBenefitsPropertiesAssessmentDetailsIsThirdPartyVerified = ndcAction.coBenefitsProperties?.assessmentDetails?.IsThirdPartyVerified;
+      // coBenefitsProperties:Economic
+      dto.coBenefitsPropertiesEconomicGrowthQ1 = ndcAction.coBenefitsProperties?.economic?.growthQ1;
+      dto.coBenefitsPropertiesEconomicGrowthQ2 = ndcAction.coBenefitsProperties?.economic?.growthQ2;
+      dto.coBenefitsPropertiesEconomicGrowthQ3 = ndcAction.coBenefitsProperties?.economic?.growthQ3;
+      dto.coBenefitsPropertiesEconomicGrowthQ4 = ndcAction.coBenefitsProperties?.economic?.growthQ4;
+      dto.coBenefitsPropertiesEconomicGrowthQ5 = ndcAction.coBenefitsProperties?.economic?.growthQ5;
+      dto.coBenefitsPropertiesEconomicGrowthQ6 = ndcAction.coBenefitsProperties?.economic?.growthQ6;
+      dto.coBenefitsPropertiesEconomicGrowthQ7 = ndcAction.coBenefitsProperties?.economic?.growthQ7;
+      dto.coBenefitsPropertiesEconomicGrowthQ8 = ndcAction.coBenefitsProperties?.economic?.growthQ8;
+      dto.coBenefitsPropertiesEconomicEnergyQ1 = ndcAction.coBenefitsProperties?.economic?.energyQ1;
+      dto.coBenefitsPropertiesEconomicEnergyQ2 = ndcAction.coBenefitsProperties?.economic?.energyQ2;
+      dto.coBenefitsPropertiesEconomicEnergyQ3 = ndcAction.coBenefitsProperties?.economic?.energyQ3;
+      dto.coBenefitsPropertiesEconomicEnergyQ4 = ndcAction.coBenefitsProperties?.economic?.energyQ4;
+      dto.coBenefitsPropertiesEconomicEnergyQ5 = ndcAction.coBenefitsProperties?.economic?.energyQ5;
+      dto.coBenefitsPropertiesEconomicTechTransferQ1 = ndcAction.coBenefitsProperties?.economic?.techTransferQ1;
+      dto.coBenefitsPropertiesEconomicTechTransferQ2 = ndcAction.coBenefitsProperties?.economic?.techTransferQ2;
+      dto.coBenefitsPropertiesEconomicTechTransferQ3 = ndcAction.coBenefitsProperties?.economic?.techTransferQ3;
+      dto.coBenefitsPropertiesEconomicTechTransferQ4 = ndcAction.coBenefitsProperties?.economic?.techTransferQ4;
+      dto.coBenefitsPropertiesEconomicTechTransferQ5 = ndcAction.coBenefitsProperties?.economic?.techTransferQ5;
+      dto.coBenefitsPropertiesEconomicTechTransferQ6 = ndcAction.coBenefitsProperties?.economic?.techTransferQ6;
+      dto.coBenefitsPropertiesEconomicBalanceOfPaymentsQ1 = ndcAction.coBenefitsProperties?.economic?.balanceOfPaymentsQ1;
+      dto.coBenefitsPropertiesEconomicBalanceOfPaymentsQ2 = ndcAction.coBenefitsProperties?.economic?.balanceOfPaymentsQ2;
+      dto.coBenefitsPropertiesEconomicBalanceOfPaymentsQ3 = ndcAction.coBenefitsProperties?.economic?.balanceOfPaymentsQ3;
+      dto.coBenefitsPropertiesEconomicFurtherInfoQ1 = ndcAction.coBenefitsProperties?.economic?.furtherInfoQ1;
+      // coBenefitsProperties:GenderParity
+      dto.coBenefitsPropertiesGenderParityDiscriminationAgainstGirls = ndcAction.coBenefitsProperties?.genderParity?.discriminationAgainstGirls;
+      dto.coBenefitsPropertiesGenderParityViolationAgainstGirls = ndcAction.coBenefitsProperties?.genderParity?.violationAgainstGirls;
+      dto.coBenefitsPropertiesGenderParityHarmfulPracticesAgainstGirls = ndcAction.coBenefitsProperties?.genderParity?.harmfulPracticesAgainstGirls;
+      dto.coBenefitsPropertiesGenderParityEqualRightsToGirls = ndcAction.coBenefitsProperties?.genderParity?.equalRightsToGirls;
+      dto.coBenefitsPropertiesGenderParityEqualRightsToHealthToGirls = ndcAction.coBenefitsProperties?.genderParity?.equalRightsToHealthToGirls;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenEmployed = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenEmpoyed;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenTrained = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenTrained;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenSelectedForDecisionMaking = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenSelectedForDecisionMaking;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenProvidedAccessForTech = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenProvidedAccessForTech;
+      // coBenefitsProperties:Environmental
+      dto.coBenefitsPropertiesEnvironmentalAirQ1 = ndcAction.coBenefitsProperties?.environmental?.airQ1;
+      dto.coBenefitsPropertiesEnvironmentalAirQ2 = ndcAction.coBenefitsProperties?.environmental?.airQ2;
+      dto.coBenefitsPropertiesEnvironmentalAirQ3 = ndcAction.coBenefitsProperties?.environmental?.airQ3;
+      dto.coBenefitsPropertiesEnvironmentalAirQ4 = ndcAction.coBenefitsProperties?.environmental?.airQ4;
+      dto.coBenefitsPropertiesEnvironmentalAirQ5 = ndcAction.coBenefitsProperties?.environmental?.airQ5;
+      dto.coBenefitsPropertiesEnvironmentalAirQ6 = ndcAction.coBenefitsProperties?.environmental?.airQ6;
+      dto.coBenefitsPropertiesEnvironmentalAirQ7 = ndcAction.coBenefitsProperties?.environmental?.airQ7;
+      dto.coBenefitsPropertiesEnvironmentalAirQ8 = ndcAction.coBenefitsProperties?.environmental?.airQ8;
+      dto.coBenefitsPropertiesEnvironmentalAirQ9 = ndcAction.coBenefitsProperties?.environmental?.airQ9;
+      dto.coBenefitsPropertiesEnvironmentalLandQ1 = ndcAction.coBenefitsProperties?.environmental?.landQ1;
+      dto.coBenefitsPropertiesEnvironmentalLandQ2 = ndcAction.coBenefitsProperties?.environmental?.landQ2;
+      dto.coBenefitsPropertiesEnvironmentalLandQ3 = ndcAction.coBenefitsProperties?.environmental?.landQ3;
+      dto.coBenefitsPropertiesEnvironmentalLandQ4 = ndcAction.coBenefitsProperties?.environmental?.landQ4;
+      dto.coBenefitsPropertiesEnvironmentalLandQ5 = ndcAction.coBenefitsProperties?.environmental?.landQ5;
+      dto.coBenefitsPropertiesEnvironmentalLandQ6 = ndcAction.coBenefitsProperties?.environmental?.landQ6;
+      dto.coBenefitsPropertiesEnvironmentalLandQ7 = ndcAction.coBenefitsProperties?.environmental?.landQ7;
+      dto.coBenefitsPropertiesEnvironmentalLandQ8 = ndcAction.coBenefitsProperties?.environmental?.landQ8;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ1 = ndcAction.coBenefitsProperties?.environmental?.waterQ1;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ2 = ndcAction.coBenefitsProperties?.environmental?.waterQ2;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ3 = ndcAction.coBenefitsProperties?.environmental?.waterQ3;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ4 = ndcAction.coBenefitsProperties?.environmental?.waterQ4;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ5 = ndcAction.coBenefitsProperties?.environmental?.waterQ5;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ6 = ndcAction.coBenefitsProperties?.environmental?.waterQ6;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ7 = ndcAction.coBenefitsProperties?.environmental?.waterQ7;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ1 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ1;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ2 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ2;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ3 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ3;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ4 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ4;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ5 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ5;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ6 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ6;
+      // coBenefitsProperties:SocialValue
+      dto.coBenefitsPropertiesSocialValueJobRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ5 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ5
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ6 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ6
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ7 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ7
+      dto.coBenefitsPropertiesSocialValueHealthRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ5 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ5
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ6 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ6
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ7 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ7
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ8 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ8
+      dto.coBenefitsPropertiesSocialValueEducationRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ5 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ5
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ6 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ6
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ7 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ7
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ8 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ8
+
       dto.enablementTitle = ndcAction.enablementProperties?.title;
       dto.enablementType = ndcAction.enablementProperties?.type;
       dto.enablementReport = ndcAction.enablementProperties?.report;
@@ -2413,6 +2571,110 @@ export class ProgrammeService {
       resp.length > 0 ? resp[0] : undefined,
       resp.length > 1 ? resp[1] : undefined
     );
+  }
+
+  async downloadTransfers(
+    queryData: DataExportQueryDto,
+    abilityCondition: string,
+    user: User
+  ) {
+
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+
+    let queryBuilder = await this.programmeTransferViewRepo
+      .createQueryBuilder("programme_transfer")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "programme_transfer",
+            abilityCondition
+          )
+        )
+      );
+
+    if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.andWhere("programme_transfer.programmeSectoralScope IN (:...allowedScopes)", {
+        allowedScopes: queryDto.filterBy.value
+      });
+    }
+
+    const resp = await queryBuilder.orderBy(
+      queryDto?.sort?.key &&
+      this.helperService.generateSortCol(queryDto?.sort?.key),
+      queryDto?.sort?.order,
+      queryDto?.sort?.nullFirst !== undefined
+        ? queryDto?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
+      .getMany();
+      console.log('========================downloadTransfers resp', resp);
+    const prepData = this.prepareTransferDataForExport(resp);
+    //console.log('========================DataExportService-prepdata', data);
+    let headers: string[] = [];
+    const titleKeys = Object.keys(prepData[0]);
+    for (const key of titleKeys) {
+      headers.push(
+        this.helperService.formatReqMessagesString(
+          "transferExport." + key,
+          []
+        )
+      )
+    }
+
+    const path = await this.dataExportService.generateCsv(prepData, headers);
+    return path;
+  }
+
+  private prepareTransferDataForExport(transfers: any) {
+    const exportData: DataExportTransferDto[] = [];
+
+
+    for (const transfer of transfers) {
+      const dto = new DataExportTransferDto();
+      dto.requestId = transfer.requestId;
+      dto.programmeId = transfer.programmeId;
+      dto.initiator = transfer.initiator;
+      dto.initiatorCompanyId = transfer.initiatorCompanyId;
+      dto.toCompanyId = transfer.toCompanyId;
+      dto.toAccount = transfer.toAccount;
+      dto.retirementType = transfer.retirementType;
+      dto.fromCompanyId = transfer.fromCompanyId;
+      dto.creditAmount = transfer.creditAmount;
+      dto.comment = transfer.comment;
+      dto.txRef = transfer.txRef;
+      dto.txTime = this.helperService.formatTimestamp(transfer.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(transfer.createdTime);
+      dto.authTime = transfer.authTime;
+      dto.status = transfer.status;
+      dto.isRetirement = transfer.isRetirement;
+      dto.creditBalance = transfer.creditBalance;
+      dto.programmeTitle = transfer.programmeTitle;
+      dto.programmeCertifierId = transfer.programmeCertifierId;
+      dto.serialNo = transfer.serialNo;
+      dto.programmeSector = transfer.programmeSector;
+      dto.programmeSectoralScope = transfer.programmeSectoralScope;
+      dto.certifier = (transfer.certifier && Array.isArray(transfer.certifier) && transfer.certifier.length > 0)
+        ? transfer.certifier.map((certifier) => certifier ? certifier.companyId : null)
+        : [];
+      dto.sender = transfer.sender[0].companyId;
+      dto.requester = transfer.requester[0].companyId;
+      dto.receiver = transfer.receiver[0].companyId;
+      dto.proponentTaxVatId = transfer.proponentTaxVatId;
+      dto.proponentPercentage = transfer.proponentPercentage;
+      dto.companyId = transfer.companyId;
+      dto.creditOwnerPercentage = transfer.creditOwnerPercentage;
+
+      exportData.push(dto);
+    }
+
+    return exportData;
+
   }
 
   async transferApprove(req: ProgrammeTransferApprove, approver: User) {
@@ -4683,10 +4945,6 @@ export class ProgrammeService {
     
 
     for (const investment of investments) {
-
-      // const startTimestamp = programme.startTime * 1000;
-      // const endTimestamp = programme.endTime * 1000;
-
       const dto = new DataExportInvestmentDto();
       dto.requestId = investment.requestId;
       dto.programmeId = investment.programmeId;
