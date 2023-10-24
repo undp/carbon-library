@@ -77,7 +77,7 @@ export class CadtApiService {
   }
 
   private getProjectDate(startDate: number) {
-    const d = new Date(startDate);
+    const d = new Date(startDate*1000);
     return `${d.getFullYear}-${d.getMonth() + 1}-${d.getDate()}`;
   }
 
