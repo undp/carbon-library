@@ -10,38 +10,7 @@ const SocialEnvironmentalRisk = (props: any) => {
   const [form] = Form.useForm();
   const [socialEnvironmentalFormDetails, setSocialEnvironmentalFormDetails] =
     useState();
-
-  useEffect(() => {
-    onFormSubmit(socialEnvironmentalFormDetails);
-  }, [socialEnvironmentalFormDetails]);
-
-  useEffect(() => {
-    if (SocialEnvironmentalRiskData && !viewOnly) {
-      setSocialEnvironmentalFormDetails(SocialEnvironmentalRiskData);
-      form.setFieldsValue(SocialEnvironmentalRiskData);
-    } else if (SocialEnvironmentalRiskData && viewOnly) {
-      checkHeaderAvailability();
-    }
-  }, [SocialEnvironmentalRiskData]);
-
-  const checkHeaderAvailability = () => {
-    SocialEnvironmentalDetails.forEach((section: any) => {
-      section.isTitleVisible = false;
-      section.subItems.forEach((subSection: any) => {
-        subSection.isTitleVisible = false;
-        subSection.subItems.forEach((element: any) => {
-          if (SocialEnvironmentalRiskData.hasOwnProperty(element?.name)) {
-            subSection.isTitleVisible = true;
-          }
-        });
-        if (subSection.isTitleVisible) {
-          section.isTitleVisible = true;
-        }
-      });
-    });
-  };
-
-  const SocialEnvironmentalDetails: any[] = [
+  const [socialEnvironmentalDetails, setSocialEnvironmentalDetails] = useState([
     {
       title: t("humanRightsSubHeader"),
       isTitleVisible: true,
@@ -404,7 +373,38 @@ const SocialEnvironmentalRisk = (props: any) => {
         },
       ],
     },
-  ];
+  ]);
+
+  useEffect(() => {
+    onFormSubmit(socialEnvironmentalFormDetails);
+  }, [socialEnvironmentalFormDetails]);
+
+  useEffect(() => {
+    if (SocialEnvironmentalRiskData && !viewOnly) {
+      setSocialEnvironmentalFormDetails(SocialEnvironmentalRiskData);
+      form.setFieldsValue(SocialEnvironmentalRiskData);
+    } else if (SocialEnvironmentalRiskData && viewOnly) {
+      checkHeaderAvailability();
+    }
+  }, [SocialEnvironmentalRiskData]);
+
+  const checkHeaderAvailability = () => {
+    socialEnvironmentalDetails.forEach((section: any) => {
+      section.isTitleVisible = false;
+      section.subItems.forEach((subSection: any) => {
+        subSection.isTitleVisible = false;
+        subSection.subItems.forEach((element: any) => {
+          if (SocialEnvironmentalRiskData.hasOwnProperty(element?.name)) {
+            subSection.isTitleVisible = true;
+          }
+        });
+        if (subSection.isTitleVisible) {
+          section.isTitleVisible = true;
+        }
+      });
+    });
+    setSocialEnvironmentalDetails(socialEnvironmentalDetails);
+  };
 
   const SocialEnvironmentalDetailsChanged = async (changedValues: any) => {
     setSocialEnvironmentalFormDetails((pre: any) => ({
@@ -430,7 +430,7 @@ const SocialEnvironmentalRisk = (props: any) => {
           onValuesChange={SocialEnvironmentalDetailsChanged}
         >
           {!viewOnly &&
-            SocialEnvironmentalDetails.map((section: any) => {
+            socialEnvironmentalDetails.map((section: any) => {
               return (
                 <>
                   <div style={{ marginBottom: "15px" }}>
@@ -482,7 +482,7 @@ const SocialEnvironmentalRisk = (props: any) => {
             })}
           {viewOnly &&
             SocialEnvironmentalRiskData &&
-            SocialEnvironmentalDetails.map((section: any) => {
+            socialEnvironmentalDetails.map((section: any) => {
               return (
                 <>
                   {section.isTitleVisible && (
@@ -504,19 +504,29 @@ const SocialEnvironmentalRisk = (props: any) => {
                         )}
                         {subSection.subItems.map((element: any) => {
                           return (
-                            <Form.Item
-                              className="mg-left-2"
-                              label={element.label}
-                              name={element.name}
-                            >
-                              <Radio.Group size="middle">
-                                <div className="radio-container">
-                                  <Radio.Button className="radio">
-                                    {SocialEnvironmentalRiskData[element.name]}
-                                  </Radio.Button>
-                                </div>
-                              </Radio.Group>
-                            </Form.Item>
+                            <>
+                              {SocialEnvironmentalRiskData.hasOwnProperty(
+                                element?.name
+                              ) && (
+                                <Form.Item
+                                  className="mg-left-2"
+                                  label={element.label}
+                                  name={element.name}
+                                >
+                                  <Radio.Group size="middle">
+                                    <div className="radio-container">
+                                      <Radio.Button className="radio">
+                                        {
+                                          SocialEnvironmentalRiskData[
+                                            element.name
+                                          ]
+                                        }
+                                      </Radio.Button>
+                                    </div>
+                                  </Radio.Group>
+                                </Form.Item>
+                              )}
+                            </>
                           );
                         })}
                       </>
