@@ -12,6 +12,7 @@ import { NdcAction } from "../../../Definitions/Definitions/ndcAction.definition
 import {
   DocType,
   DocumentStatus,
+  MitigationSubTypes,
   MitigationTypes,
   NdcActionStatus,
   NdcActionTypes,
@@ -22,6 +23,7 @@ import {
   addSpaces,
   getNdcStatusTagType,
   mitigationTypeList,
+  mitigationSubTypeList,
 } from "../../../Definitions";
 import { InfoView } from "../../Common/InfoView/info.view";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
@@ -275,8 +277,14 @@ export const NdcActionViewComponent = (props: any) => {
         mitigationDetails[t("ndcAction:viewMitigationType")] = type.label;
       }
     });
+    mitigationSubTypeList?.map((type: any) => {
+      if (ndcActionDetails?.subTypeOfMitigation === type.value) {
+        mitigationDetails[t("ndcAction:viewMitigationSubType")] = type.label;
+      }
+    });
     if (
       ndcActionDetails?.typeOfMitigation === MitigationTypes.AGRICULTURE &&
+      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.RICE_CROPS &&
       ndcActionDetails?.agricultureProperties
     ) {
       mitigationDetails[t("ndcAction:viewMitigationLandArea")] =
@@ -284,7 +292,16 @@ export const NdcActionViewComponent = (props: any) => {
         ndcActionDetails?.agricultureProperties?.landAreaUnit;
     }
     if (
+      ndcActionDetails?.typeOfMitigation === MitigationTypes.AGRICULTURE &&
+      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR &&
+      ndcActionDetails?.creditCalculationProperties
+    ) {
+      mitigationDetails[t("ndcAction:viewMitigationWeight")] =
+        addCommSep(ndcActionDetails?.creditCalculationProperties?.weight) + 't'
+    }
+    if (
       ndcActionDetails?.typeOfMitigation === MitigationTypes.SOLAR &&
+      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV &&
       ndcActionDetails?.solarProperties
     ) {
       mitigationDetails[t("ndcAction:viewMitigationEnergyGeneration")] =
@@ -293,6 +310,28 @@ export const NdcActionViewComponent = (props: any) => {
       mitigationDetails[t("ndcAction:viewMitigationConsumerGroup")] =
         ndcActionDetails?.solarProperties?.consumerGroup;
     }
+    if (
+      ndcActionDetails?.typeOfMitigation === MitigationTypes.SOLAR &&
+      (ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID || 
+      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID) &&
+      ndcActionDetails?.creditCalculationProperties
+    ) {
+      mitigationDetails[t("ndcAction:viewMitigationEnergyGeneration")] =
+        addCommSep(ndcActionDetails?.creditCalculationProperties?.energyGeneration) +
+        ndcActionDetails?.creditCalculationProperties?.energyGenerationUnit;
+    }
+
+    if (
+      ndcActionDetails?.typeOfMitigation === MitigationTypes.EE_HOUSEHOLDS &&
+      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA &&
+      ndcActionDetails?.creditCalculationProperties
+    ) {
+      mitigationDetails[t("ndcAction:viewMitigationNoOfDays")] =
+        ndcActionDetails?.creditCalculationProperties?.numberOfDays;
+        mitigationDetails[t("ndcAction:viewMitigationNoOfPeople")] =
+        ndcActionDetails?.creditCalculationProperties?.numberOfPeopleInHousehold;
+    }
+
     if (ndcActionDetails?.ndcFinancing) {
       mitigationDetails[t("ndcAction:viewMitigationUserEstimatedCredits")] =
         addCommSep(ndcActionDetails.ndcFinancing.userEstimatedCredits);
