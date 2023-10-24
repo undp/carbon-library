@@ -43,7 +43,7 @@ export class CadtApiService {
     return await axios
       .post(this.configService.get('cadTrust.endpoint') + endpoint, data)
       .catch((ex) => {
-        console.log('Exception', ex.response?.data?.statusCode);
+        console.log('Exception', ex);
         throw ex;
       });
   }
