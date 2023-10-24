@@ -84,7 +84,7 @@ describe('CadtApiService', () => {
       creditTransferred: [],
       constantVersion: '',
       proponentTaxVatId: [],
-      companyId: [],
+      companyId: [1],
       proponentPercentage: [],
       creditOwnerPercentage: [],
       certifierId: [],

@@ -43,7 +43,7 @@ export class CadtApiService {
     return await axios
       .post(this.configService.get('cadTrust.endpoint') + endpoint, data)
       .catch((ex) => {
-        console.log('Exception', ex);
+        console.log('Exception', ex?.response?.data?.errors);
         throw ex;
       });
   }
@@ -86,6 +86,10 @@ export class CadtApiService {
       companyIds: programme.companyId,
     });
 
+    const pd = companies?.map((c) => c.name)?.join(', ')
+
+    console.log('Comp', companies, pd)
+
     const p = await this.sendHttpPost('v1/projects', {
       projectId: programme.programmeId,
       originProjectId: programme.programmeId,
@@ -97,7 +101,7 @@ export class CadtApiService {
         this.configService.get('host') +
         '/programmeManagement/view/' +
         programme.programmeId,
-      projectDeveloper: companies?.map((c) => c.name)?.join(', '),
+      projectDeveloper: pd,
       sector: programme.sector,
       projectType:
         programme.mitigationActions?.length > 0
@@ -117,10 +121,9 @@ export class CadtApiService {
           : 'No NDC Action',
     });
 
-    this.logger.log(`CADTrust programme create response ${JSON.stringify(p)}`)
+    console.log('CADtrust response', p)
     const cresp = await this.sendHttpPost('v1/staging/commit', undefined);
-
-    this.logger.log(`CADTrust programme create commit response ${JSON.stringify(cresp)}`)
+    console.log('CADtrust commit response', cresp)
     //TODO: Make this reliable
     const response = await this.programmeRepo
     .update(
