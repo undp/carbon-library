@@ -90,7 +90,6 @@ import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
-import { CadtApiService } from "../cadt/cadt.api.service";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -112,7 +111,6 @@ export class ProgrammeService {
     private emailHelperService: EmailHelperService,
     private readonly countryService: CountryService,
     private letterGen: ObjectionLetterGen,
-    private cadtService: CadtApiService,
     @InjectRepository(Programme) private programmeRepo: Repository<Programme>,
     @InjectRepository(ProgrammeQueryEntity)
     private programmeViewRepo: Repository<ProgrammeQueryEntity>,
@@ -1669,13 +1667,10 @@ export class ProgrammeService {
         this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED) && !pr){
       // console.log("111111111111111111111111111111111111111111111111111")
       savedProgramme = await this.programmeLedger.createProgramme(programme);
-      try{
-        const resp = await this.cadtService.createProgramme(programme)
-        console.log("Successfully added Programme in CAD-Trust",resp)
-      }
-      catch(error){
-        console.error("Unable to add Programme in CAD-Trust",error)
-      }
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTProgrammeCreate,
+        actionProps: programme,
+      });
     }
 
     if (savedProgramme || pr) {

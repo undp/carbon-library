@@ -50,7 +50,6 @@ import { CadtModule } from '../cadt/cadt.module';
     LocationModule,
     AsyncOperationsModule,
     FileHandlerModule,
-    CadtModule,
   ],
   providers: [Logger, ProgrammeService],
   exports: [ProgrammeService],

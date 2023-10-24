@@ -8,5 +8,6 @@ export enum AsyncActionType {
   ProgrammeCreate,
   ProgrammeAccept,
   AddMitigation,
-  OwnershipUpdate
+  OwnershipUpdate,
+  CADTProgrammeCreate,
 }
