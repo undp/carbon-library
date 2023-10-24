@@ -117,8 +117,10 @@ export class CadtApiService {
           : 'No NDC Action',
     });
 
-    await await this.sendHttpPost('v1/staging/commit', undefined);
+    this.logger.log(`CADTrust programme create response ${JSON.stringify(p)}`)
+    const cresp = await this.sendHttpPost('v1/staging/commit', undefined);
 
+    this.logger.log(`CADTrust programme create commit response ${JSON.stringify(cresp)}`)
     //TODO: Make this reliable
     const response = await this.programmeRepo
     .update(
@@ -126,11 +128,11 @@ export class CadtApiService {
         programmeId: programme.programmeId,
         },
         {
-            cadtId: p.data.uuid
+            cadtId: p?.data?.uuid
         }
     )
     .catch((err: any) => {
-        this.logger.error(`CADT id update failed on programme ${programme.programmeId} CADTId: ${p.data.uuid}`);
+        this.logger.error(`CADT id update failed on programme ${programme.programmeId} CADTId: ${p?.data?.uuid}`);
         return err;
     });
     
