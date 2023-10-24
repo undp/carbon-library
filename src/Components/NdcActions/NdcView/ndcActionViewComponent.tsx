@@ -5,7 +5,7 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   FileAddOutlined,
-  LinkOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import * as Icon from "react-bootstrap-icons";
 import { NdcAction } from "../../../Definitions/Definitions/ndcAction.definitions";
@@ -109,7 +109,7 @@ export const NdcActionViewComponent = (props: any) => {
               rel="noopener noreferrer"
               download
             >
-              <LinkOutlined
+              <BookOutlined
                 className="common-progress-icon margin-right-1"
                 style={{ color: "#3F3A47" }}
               />

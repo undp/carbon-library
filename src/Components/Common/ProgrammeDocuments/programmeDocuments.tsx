@@ -7,7 +7,7 @@ import {
   ExclamationCircleOutlined,
   FileAddOutlined,
   LikeOutlined,
-  LinkOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import { RcFile } from "antd/lib/upload";
 import moment from "moment";
@@ -74,7 +74,9 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
   const [designDocStatus, setDesignDocStatus] = useState<any>("");
   const [methodDocStatus, setMethodDocStatus] = useState<any>("");
   const [designDocId, setDesignDocId] = useState<any>("");
+  const [designDocversion, setDesignDocversion] = useState<any>("");
   const [methDocId, setMethDocId] = useState<any>("");
+  const [methDocversion, setMethDocversion] = useState<any>("");
   const [docData, setDocData] = useState<any[]>([]);
   const [openRejectDocConfirmationModal, setOpenRejectDocConfirmationModal] =
     useState(false);
@@ -84,6 +86,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
   const [impactAssessmentDate,setImpactAssessmentDate] = useState<any>("");
   const [impactAssessmentStatus,setImpactAssessmentStatus] = useState<any>("");
   const [impactAssessmentId,setImpactAssessmentId] = useState<any>("");
+  const [impactAssessmentversion,setImpactAssessmentversion] = useState<any>("");
   const maximumImageSize = process.env.REACT_APP_MAXIMUM_FILE_SIZE
     ? parseInt(process.env.REACT_APP_MAXIMUM_FILE_SIZE)
     : 5000000;
@@ -112,12 +115,18 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           setDesignDocDate(item?.txTime);
           setDesignDocStatus(item?.status);
           setDesignDocId(item?.id);
+          const versionfull = (item?.url).split("_")[(item?.url).split('_').length-1]
+          const version = versionfull? versionfull.split('.')[0]: "1"
+          setDesignDocversion(version.startsWith("V")? version:"V1");
         }
         if (item?.url?.includes("METHODOLOGY")) {
           setMethodologyDocUrl(item?.url);
           setMethodologyDate(item?.txTime);
           setMethodDocStatus(item?.status);
           setMethDocId(item?.id);
+          const versionfull = (item?.url).split("_")[(item?.url).split('_').length-1]
+          const version = versionfull? versionfull.split('.')[0]: "1"
+          setMethDocversion(version.startsWith("V")? version:"V1");
         }
         if (item?.url?.includes("OBJECTION")) {
           setNoObjectionDocUrl(item?.url);
@@ -132,6 +141,9 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
           setImpactAssessmentDate(item?.txTime);
           setImpactAssessmentStatus(item?.status);
           setImpactAssessmentId(item?.id);
+          const versionfull = (item?.url).split("_")[(item?.url).split("_").length-1]
+          const version = versionfull? versionfull.split('.')[0]: "1"
+          setImpactAssessmentversion(version.startsWith("V")? version:"V1")
         }
       });
     }
@@ -228,7 +240,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
       getProgrammeById();
       setLoading(false);
     }
-  };
+  }; 
 
   const handleOk = () => {
     docAction(rejectDocData?.id, DocumentStatus.REJECTED);
@@ -318,6 +330,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   {moment(parseInt(designDocDate)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ "+designDocversion}
                 </div>
               )}
             </Col>
@@ -331,7 +344,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       rel="noopener noreferrer"
                       download
                     >
-                      <LinkOutlined
+                      <BookOutlined
                         className="common-progress-icon margin-right-1"
                         style={{ color: "#3F3A47" }}
                       />
@@ -467,6 +480,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   {moment(parseInt(noObjectionDate)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ V1"}
                 </div>
               </Col>
               <Col span={6} className="field-value">
@@ -477,7 +491,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     rel="noopener noreferrer"
                     download
                   >
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon"
                       style={{ color: "#3F3A47" }}
                     />
@@ -549,6 +563,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   {moment(parseInt(methodologyDate)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ "+methDocversion}
                 </div>
               )}
             </Col>
@@ -562,7 +577,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       rel="noopener noreferrer"
                       download
                     >
-                      <LinkOutlined
+                      <BookOutlined
                         className="common-progress-icon margin-right-1"
                         style={{ color: "#3F3A47" }}
                       />
@@ -710,6 +725,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   {moment(parseInt(authorisationDocDate)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ V1"}
                 </div>
               </Col>
               <Col span={6} className="field-value">
@@ -720,7 +736,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     rel="noopener noreferrer"
                     download
                   >
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon"
                       style={{ color: "#3F3A47" }}
                     />
@@ -787,6 +803,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                   {moment(parseInt(impactAssessmentDate)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ "+impactAssessmentversion}
                 </div>
               )}
               </Col>
@@ -800,7 +817,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                         rel="noopener noreferrer"
                         download
                       >
-                        <LinkOutlined
+                        <BookOutlined
                           className="common-progress-icon margin-right-1"
                           style={{ color: "#3F3A47" }}
                         />
