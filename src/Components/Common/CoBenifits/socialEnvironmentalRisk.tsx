@@ -449,7 +449,7 @@ const SocialEnvironmentalRisk = (props: any) => {
                         {subSection.subItems.map((element: any) => {
                           return (
                             <Form.Item
-                              className="mg-left-2"
+                              className="mg-left-2 form-item"
                               label={element.label}
                               name={element.name}
                             >
@@ -509,7 +509,7 @@ const SocialEnvironmentalRisk = (props: any) => {
                                 element?.name
                               ) && (
                                 <Form.Item
-                                  className="mg-left-2"
+                                  className="mg-left-2 form-item"
                                   label={element.label}
                                   name={element.name}
                                 >
