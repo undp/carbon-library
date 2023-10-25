@@ -569,7 +569,13 @@ export const UserManagementComponent = (props: any) => {
       }
       setLoading(false);
     } catch (error: any) {
-      console.log("Error in downloading user data", error);
+      console.log("Error in exporting users", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };

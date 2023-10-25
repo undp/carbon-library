@@ -234,7 +234,13 @@ export const InvestmentManagementComponent = (props: any) => {
       }
       setLoading(false);
     } catch (error: any) {
-      console.log("Error in downloading investment data", error);
+      console.log("Error in exporting investments", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };

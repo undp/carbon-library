@@ -365,7 +365,13 @@ export const CompanyManagementComponent = (props: any) => {
       }
       setLoading(false);
     } catch (error: any) {
-      console.log("Error in downloading company data", error);
+      console.log("Error in exporting organisations", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };
