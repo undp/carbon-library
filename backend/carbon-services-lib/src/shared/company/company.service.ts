@@ -492,7 +492,7 @@ export class CompanyService {
     queryData: DataExportQueryDto,
     abilityCondition: string,
     companyRole: string
-    ) {
+  ) {
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
     queryDto.filterOr = queryData.filterOr;
@@ -541,6 +541,8 @@ export class CompanyService {
       )
       .getMany();
 
+    if (resp.length > 0) {
+
       const prepData = this.prepareCompanyDataForExport(resp)
       let headers: string[] = [];
       const titleKeys = Object.keys(prepData[0]);
@@ -552,8 +554,18 @@ export class CompanyService {
           )
         )
       }
-    const path = await this.dataExportService.generateCsv(prepData, headers);
-    return path;
+      const path = await this.dataExportService.generateCsv(prepData, headers);
+      return path;
+    }
+
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "companyExport.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
   }
 
   private prepareCompanyDataForExport(companies: any) {

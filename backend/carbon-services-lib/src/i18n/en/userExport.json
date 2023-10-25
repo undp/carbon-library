@@ -8,5 +8,6 @@
     "companyId": "Company Id",
     "companyRole": "Company Role",
     "createdTime": "Created At",
-    "isPending": "Pending Approval"
+    "isPending": "Pending Approval",
+    "nothingToExport": "Data not found for export"
 }

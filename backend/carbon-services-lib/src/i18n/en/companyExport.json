@@ -20,5 +20,6 @@
     "geographicalLocationCordintes": "Geographical Location Coordinates",
     "regions": "Regions",
     "nameOfMinister": "Name Of Minister",
-    "sectoralScope": "Sectoral Scope"
+    "sectoralScope": "Sectoral Scope",
+    "nothingToExport": "Data not found for export"
 }

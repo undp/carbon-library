@@ -934,7 +934,7 @@ export class UserService {
   async download(
     queryData: DataExportQueryDto,
     abilityCondition: string
-    ) {
+  ) {
 
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
@@ -958,7 +958,8 @@ export class UserService {
         queryDto?.sort?.order ? queryDto?.sort?.order : "DESC"
       )
       .getMany();
-      
+
+    if (resp.length > 0) {
       const prepData = this.prepareUserDataForExport(resp)
 
       let headers: string[] = [];
@@ -971,9 +972,17 @@ export class UserService {
           )
         )
       }
-      
-    const path = await this.dataExportService.generateCsv(prepData, headers);
-    return path;
+
+      const path = await this.dataExportService.generateCsv(prepData, headers);
+      return path;
+    }
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "userExport.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
   }
 
   private prepareUserDataForExport(users: any) {

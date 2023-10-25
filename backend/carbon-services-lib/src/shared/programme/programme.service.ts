@@ -2020,7 +2020,7 @@ export class ProgrammeService {
   async downloadNdcActions(
     queryData: DataExportQueryDto,
     abilityCondition: string
-    ) {
+  ) {
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
     queryDto.filterOr = queryData.filterOr;
@@ -2042,28 +2042,29 @@ export class ProgrammeService {
 
     if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
       queryBuilder = queryBuilder.leftJoinAndMapOne(
-      "ndcaction.programmeDetails",
-      Programme,
-      "programme",
-      "programme.programmeId = ndcaction.programmeId"
+        "ndcaction.programmeDetails",
+        Programme,
+        "programme",
+        "programme.programmeId = ndcaction.programmeId"
       )
-      .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
-        allowedScopes: queryDto.filterBy.value
-      });
+        .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
+          allowedScopes: queryDto.filterBy.value
+        });
     }
 
-    const resp = await  queryBuilder.orderBy(
+    const resp = await queryBuilder.orderBy(
       queryDto?.sort?.key &&
-          `"ndcaction".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
-          queryDto?.sort?.order,
-          queryDto?.sort?.nullFirst !== undefined
-          ? queryDto?.sort?.nullFirst === true
-            ? "NULLS FIRST"
-            : "NULLS LAST"
-          : undefined
-      )
+      `"ndcaction".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
+      queryDto?.sort?.order,
+      queryDto?.sort?.nullFirst !== undefined
+        ? queryDto?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
       .getMany();
 
+    if (resp.length > 0) {
       const prepData = this.prepareNdcActionDataForExport(resp)
 
       let headers: string[] = [];
@@ -2077,8 +2078,16 @@ export class ProgrammeService {
         )
       }
 
-    const path = await this.dataExportService.generateCsv(prepData, headers);
-    return path;
+      const path = await this.dataExportService.generateCsv(prepData, headers);
+      return path;
+    }
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
   }
 
   private prepareNdcActionDataForExport(ndcActions: any) {
@@ -2693,22 +2702,32 @@ export class ProgrammeService {
         : undefined
     )
       .getMany();
-      console.log('========================downloadTransfers resp', resp);
-    const prepData = this.prepareTransferDataForExport(resp);
-    //console.log('========================DataExportService-prepdata', data);
-    let headers: string[] = [];
-    const titleKeys = Object.keys(prepData[0]);
-    for (const key of titleKeys) {
-      headers.push(
-        this.helperService.formatReqMessagesString(
-          "transferExport." + key,
-          []
+
+    if (resp.length > 0) {
+      const prepData = this.prepareTransferDataForExport(resp);
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "transferExport." + key,
+            []
+          )
         )
-      )
+      }
+
+      const path = await this.dataExportService.generateCsv(prepData, headers);
+      return path;
     }
 
-    const path = await this.dataExportService.generateCsv(prepData, headers);
-    return path;
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
   }
 
   private prepareTransferDataForExport(transfers: any) {
@@ -3567,7 +3586,7 @@ export class ProgrammeService {
   async downloadProgrammes(
     queryData: DataExportQueryDto,
     abilityCondition: string
-    ) {
+  ) {
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
     queryDto.filterOr = queryData.filterOr;
@@ -3587,9 +3606,9 @@ export class ProgrammeService {
       )
       .orderBy(
         queryDto?.sort?.key &&
-          `"programme".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
-          queryDto?.sort?.order,
-          queryDto?.sort?.nullFirst !== undefined
+        `"programme".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
+        queryDto?.sort?.order,
+        queryDto?.sort?.nullFirst !== undefined
           ? queryDto?.sort?.nullFirst === true
             ? "NULLS FIRST"
             : "NULLS LAST"
@@ -3597,6 +3616,7 @@ export class ProgrammeService {
       )
       .getMany();
 
+    if (resp.length > 0) {
       const prepData = this.prepareProgrammeDataForExport(resp)
 
       let headers: string[] = [];
@@ -3610,8 +3630,17 @@ export class ProgrammeService {
         )
       }
 
-    const path = await this.dataExportService.generateCsv(prepData, headers);
-    return path;
+      const path = await this.dataExportService.generateCsv(prepData, headers);
+      return path;
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
   }
 
   private prepareProgrammeDataForExport(programmes: any) {
@@ -4960,7 +4989,7 @@ export class ProgrammeService {
   async downloadInvestments(
     queryData: DataExportQueryDto,
     abilityCondition: string
-    ) {
+  ) {
 
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
@@ -4979,30 +5008,31 @@ export class ProgrammeService {
         )
       )
 
-      if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
-        queryBuilder = queryBuilder.leftJoinAndMapOne(
+    if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.leftJoinAndMapOne(
         "investment.programmeDetails",
         Programme,
         "programme",
         "programme.programmeId = investment.programmeId"
-        )
+      )
         .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
           allowedScopes: queryDto.filterBy.value
         });
-      }
+    }
 
-      const resp = await  queryBuilder.orderBy(
-        queryDto?.sort?.key &&
-          this.helperService.generateSortCol(queryDto?.sort?.key),
-          queryDto?.sort?.order,
-          queryDto?.sort?.nullFirst !== undefined
-          ? queryDto?.sort?.nullFirst === true
-            ? "NULLS FIRST"
-            : "NULLS LAST"
-          : undefined
-      )
+    const resp = await queryBuilder.orderBy(
+      queryDto?.sort?.key &&
+      this.helperService.generateSortCol(queryDto?.sort?.key),
+      queryDto?.sort?.order,
+      queryDto?.sort?.nullFirst !== undefined
+        ? queryDto?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
       .getMany();
 
+    if (resp.length > 0) {
       const prepData = this.prepareInvestmentDataForExport(resp)
 
       let headers: string[] = [];
@@ -5015,9 +5045,19 @@ export class ProgrammeService {
           )
         )
       }
-      
-    const path = await this.dataExportService.generateCsv(prepData, headers);
-    return path;
+
+      const path = await this.dataExportService.generateCsv(prepData, headers);
+      return path;
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
+
   }
 
   private prepareInvestmentDataForExport(investments: any) {
