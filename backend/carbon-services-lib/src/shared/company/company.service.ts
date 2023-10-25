@@ -704,10 +704,7 @@ export class CompanyService {
 
   async increaseProgrammeCount(companyId: any) {
     const companyDetails = await this.findByCompanyId(companyId);
-    const programmeCount =
-      companyDetails.companyRole === CompanyRole.GOVERNMENT
-        ? null
-        : Number(companyDetails.programmeCount) + 1;
+    const programmeCount = Number(companyDetails.programmeCount) + 1;
 
     const response = await this.companyRepo
       .update(
