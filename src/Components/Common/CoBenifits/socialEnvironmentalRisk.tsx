@@ -513,7 +513,7 @@ const SocialEnvironmentalRisk = (props: any) => {
                                   label={element.label}
                                   name={element.name}
                                 >
-                                  <Radio.Group size="middle">
+                                  <Radio.Group size="middle" disabled>
                                     <div className="radio-container">
                                       <Radio.Button className="radio">
                                         {
