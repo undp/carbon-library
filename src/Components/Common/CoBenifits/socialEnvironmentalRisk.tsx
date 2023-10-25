@@ -508,23 +508,25 @@ const SocialEnvironmentalRisk = (props: any) => {
                               {SocialEnvironmentalRiskData.hasOwnProperty(
                                 element?.name
                               ) && (
-                                <Form.Item
-                                  className="mg-left-2 form-item"
-                                  label={element.label}
-                                  name={element.name}
-                                >
-                                  <Radio.Group size="middle" disabled>
-                                    <div className="radio-container">
-                                      <Radio.Button className="radio">
-                                        {
-                                          SocialEnvironmentalRiskData[
-                                            element.name
-                                          ]
-                                        }
-                                      </Radio.Button>
-                                    </div>
-                                  </Radio.Group>
-                                </Form.Item>
+                                <div className="view-section">
+                                  <Form.Item
+                                    className="mg-left-2 form-item"
+                                    label={element.label}
+                                    name={element.name}
+                                  >
+                                    <Radio.Group size="middle" disabled>
+                                      <div className="radio-container">
+                                        <Radio.Button className="radio">
+                                          {
+                                            SocialEnvironmentalRiskData[
+                                              element.name
+                                            ]
+                                          }
+                                        </Radio.Button>
+                                      </div>
+                                    </Radio.Group>
+                                  </Form.Item>
+                                </div>
                               )}
                             </>
                           );
