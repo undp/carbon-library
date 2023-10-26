@@ -3748,6 +3748,16 @@ export class ProgrammeService {
       issueCReq
     );
 
+    if (program.cadtId) {
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTCreditIssue,
+        actionProps: {
+          program: program,
+          amount: req.issueAmount,
+        },
+      });
+    }
+
     const hostAddress = this.configService.get("host");
     updated.companyId.forEach(async (companyId) => {
       await this.emailHelperService.sendEmailToOrganisationAdmins(

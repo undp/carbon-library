@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { NDCAction } from '../entities/ndc.action.entity';
 import { TypeOfMitigation } from '../enum/typeofmitigation.enum';
 import { TxType } from '../enum/txtype.enum';
+import { Sector } from '../enum/sector.enum';
 
 @Injectable()
 export class CadtApiService {
@@ -65,14 +66,23 @@ export class CadtApiService {
     }
   }
 
-  private getUnitType(typeOfMitigation: TypeOfMitigation) {
-    switch(typeOfMitigation) {
-        case TypeOfMitigation.FORESTRY:
+  private getUnitType(sector: Sector) {
+    switch(sector) {
+        case Sector.Forestry:
             return "Removal Nature";
         default:
             return "Reduction Technical";
     }
   }
+
+  // private getUnitType(typeOfMitigation: TypeOfMitigation) {
+  //   switch(typeOfMitigation) {
+  //       case TypeOfMitigation.FORESTRY:
+  //           return "Removal Nature";
+  //       default:
+  //           return "Reduction Technical";
+  //   }
+  // }
 
   private getUnitStatus(txType: TxType) {
     switch(txType) {
@@ -176,7 +186,7 @@ export class CadtApiService {
 
   public async issueCredit(
     programme: Programme,
-    ndcAction: NDCAction,
+    // ndcAction: NDCAction,
     amount: number
   ) {
 
@@ -195,7 +205,7 @@ export class CadtApiService {
         "unitBlockEnd": blockStart + amount - 1,
         "unitCount": amount,
         "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
-        "unitType": this.getUnitType(ndcAction.typeOfMitigation),
+        "unitType": this.getUnitType(programme.sector),
         "unitStatus": this.getUnitStatus(TxType.ISSUE),
         "unitRegistryLink": this.configService.get('host') + "/creditTransfers/viewAll",
         "correspondingAdjustmentDeclaration": "Unknown",
@@ -205,7 +215,7 @@ export class CadtApiService {
             "startDate": this.getProjectDate(programme.startTime * 1000),
              "endDate": this.getProjectDate(programme.endTime * 1000),
              "verificationApproach": "Pending",
-             "verificationReportDate": this.getProjectDate(ndcAction.txTime), //TODO
+             "verificationReportDate": this.getProjectDate(new Date().getTime()), //TODO
              "verificationBody": gov.name // TODO
         }
     });
