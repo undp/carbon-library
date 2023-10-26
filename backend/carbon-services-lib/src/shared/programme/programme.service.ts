@@ -827,6 +827,16 @@ export class ProgrammeService {
       } 
       if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+        if (program.cadtId) {
+          await this.asyncOperationsInterface.AddAction({
+            actionType: AsyncActionType.CADTProgrammeStatusChange,
+            actionProps: {
+              cadtId: program.cadtId,
+              programmeId: program.programmeId,
+              status: ProgrammeStage.APPROVED
+            },
+          });
+        }
       }
     }
     console.log('NDC COmmit', ndc)
@@ -4060,6 +4070,17 @@ export class ProgrammeService {
       );
     }
 
+    if (program.cadtId) {
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTProgrammeStatusChange,
+        actionProps: {
+          cadtId: program.cadtId,
+          programmeId: program.programmeId,
+          status: ProgrammeStage.AUTHORISED
+        },
+      });
+    }
+
     const authRe: AsyncAction = {
       actionType: AsyncActionType.AuthProgramme,
       actionProps: {
@@ -4154,6 +4175,17 @@ export class ProgrammeService {
           ),
           HttpStatus.BAD_REQUEST
         );
+      }
+
+      if (programme.cadtId) {
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTProgrammeStatusChange,
+          actionProps: {
+            cadtId: programme.cadtId,
+            programmeId: programme.programmeId,
+            status: ProgrammeStage.REJECTED
+          },
+        });
       }
   
       const authRe: AsyncAction = {

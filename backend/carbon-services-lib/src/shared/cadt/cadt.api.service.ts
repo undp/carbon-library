@@ -21,7 +21,7 @@ export class CadtApiService {
 
   private async send(endpoint, fn, data?: any) {
     if (!this.configService.get('cadTrust.enable')) {
-      this.logger.debug(
+      this.logger.log(
         'Does not execute since CAD-Trust is disable in the system',
       );
       return;
@@ -152,7 +152,11 @@ export class CadtApiService {
     return p;
   }
 
-  public async programmeStatusChange(cadtId: string, status: ProgrammeStage) {
+  public async programmeStatusChange(cadtId: string, status: ProgrammeStage, programmeId: string) {
+    if (!cadtId) {
+        this.logger.log(`Programme does not have cad trust id. Dropping record ${programmeId} ${status}`)
+        return;
+    }
     const auth = await this.sendHttpPut('v1/projects', {
       warehouseProjectId: String(cadtId),
       projectStatus: this.getMapToCADTStatus(status)
@@ -175,6 +179,12 @@ export class CadtApiService {
     ndcAction: NDCAction,
     amount: number
   ) {
+
+    if (!programme.cadtId) {
+        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
+        return;
+    }
+
     const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued) -  (Number(programme.creditIssued) > 0 ? 1 : 0);
     const credit = await this.sendHttpPut('v1/units', {
