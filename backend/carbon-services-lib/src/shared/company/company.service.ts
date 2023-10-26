@@ -44,7 +44,7 @@ import { LocationInterface } from "../location/location.interface";
 @Injectable()
 export class CompanyService {
   constructor(
-    @InjectRepository(Company) private companyRepo: Repository<Company>,
+  @InjectRepository(Company) private companyRepo: Repository<Company>,
     private logger: Logger,
     private configService: ConfigService,
     private helperService: HelperService,
