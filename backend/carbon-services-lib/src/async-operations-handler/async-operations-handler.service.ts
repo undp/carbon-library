@@ -42,8 +42,8 @@ export class AsyncOperationsHandlerService {
 
         case AsyncActionType.CADTProgrammeCreate.toString():
           return this.cadtService.createProgramme(dataObject)
-        case AsyncActionType.CADTProgrammeStatusChange.toString():
-          return this.cadtService.programmeStatusChange(dataObject.cadtId, dataObject.status, dataObject.programmeId);
+        case AsyncActionType.CADTUpdateProgramme.toString():
+          return this.cadtService.updateProgramme(dataObject.programme);
         case AsyncActionType.CADTCreditIssue.toString():
           return this.cadtService.issueCredit(dataObject.programme, dataObject.amount);
         

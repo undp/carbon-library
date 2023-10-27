@@ -10,7 +10,7 @@ export enum AsyncActionType {
   AddMitigation,
   OwnershipUpdate,
   CADTProgrammeCreate,
-  CADTProgrammeStatusChange,
+  CADTUpdateProgramme,
   CADTCreditIssue,
   CADTCertify,
   CADTTransferCredit,

@@ -829,11 +829,9 @@ export class ProgrammeService {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
           await this.asyncOperationsInterface.AddAction({
-            actionType: AsyncActionType.CADTProgrammeStatusChange,
+            actionType: AsyncActionType.CADTUpdateProgramme,
             actionProps: {
-              cadtId: program.cadtId,
-              programmeId: program.programmeId,
-              status: ProgrammeStage.APPROVED
+              programme: program
             },
           });
         }
@@ -3752,7 +3750,7 @@ export class ProgrammeService {
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTCreditIssue,
         actionProps: {
-          program: program,
+          programme: program,
           amount: req.issueAmount,
         },
       });
@@ -4082,11 +4080,9 @@ export class ProgrammeService {
 
     if (program.cadtId) {
       await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTProgrammeStatusChange,
+        actionType: AsyncActionType.CADTUpdateProgramme,
         actionProps: {
-          cadtId: program.cadtId,
-          programmeId: program.programmeId,
-          status: ProgrammeStage.AUTHORISED
+          programme: program
         },
       });
     }
@@ -4189,11 +4185,9 @@ export class ProgrammeService {
 
       if (programme.cadtId) {
         await this.asyncOperationsInterface.AddAction({
-          actionType: AsyncActionType.CADTProgrammeStatusChange,
+          actionType: AsyncActionType.CADTUpdateProgramme,
           actionProps: {
-            cadtId: programme.cadtId,
-            programmeId: programme.programmeId,
-            status: ProgrammeStage.REJECTED
+            programme: programme
           },
         });
       }

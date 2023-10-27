@@ -34,6 +34,7 @@ export class CadtApiService {
       data,
     ).catch((ex) => {
       console.log('Exception', ex);
+      console.log('CADT errors', ex.response?.data?.errors)
       throw ex;
     });
     console.log('CADT response', resp);
@@ -69,10 +70,9 @@ export class CadtApiService {
   private getUnitType(sector: Sector) {
     switch(sector) {
         case Sector.Forestry:
-            return "Removal Nature";
-        default:
-            return "Reduction Technical";
+            return "Removal - nature";
     }
+    return "Reduction - technical";
   }
 
   // private getUnitType(typeOfMitigation: TypeOfMitigation) {
@@ -86,6 +86,7 @@ export class CadtApiService {
 
   private getUnitStatus(txType: TxType) {
     switch(txType) {
+        case TxType.ISSUE:
         case TxType.APPROVE:
             return "Held";
         case TxType.RETIRE:
@@ -99,9 +100,10 @@ export class CadtApiService {
 
   private getProjectDate(date: number) {
     const d = new Date(date);
-    return `${d.getFullYear}-${d.getMonth() + 1}-${d.getDate()}`;
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   }
 
+  
   public async createProgramme(programme: Programme) {
     const companies = await this.companyService.findByCompanyIds({
       companyIds: programme.companyId,
@@ -136,9 +138,11 @@ export class CadtApiService {
         programme.mitigationActions?.length > 0
           ? programme.mitigationActions[0].properties.methodology
           : 'Pending',
-      estimations: {
+      estimations: [{
         unitCount: programme.creditEst,
-      }
+        creditingPeriodStart: this.getProjectDate(programme.startTime * 1000),
+        creditingPeriodEnd: this.getProjectDate(programme.endTime * 1000),
+      }]
     });
 
     const cresp = await this.sendHttpPost('v1/staging/commit', undefined);
@@ -162,14 +166,44 @@ export class CadtApiService {
     return p;
   }
 
-  public async programmeStatusChange(cadtId: string, status: ProgrammeStage, programmeId: string) {
-    if (!cadtId) {
-        this.logger.log(`Programme does not have cad trust id. Dropping record ${programmeId} ${status}`)
+  public async updateProgramme(programme: Programme) {
+    if (!programme.cadtId) {
+        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId} ${programme.currentStage}`)
         return;
     }
+
+    const companies = await this.companyService.findByCompanyIds({
+      companyIds: programme.companyId,
+    });
+
+    const pd = companies?.map((c) => c.name)?.join(', ');
+
     const auth = await this.sendHttpPut('v1/projects', {
-      warehouseProjectId: String(cadtId),
-      projectStatus: this.getMapToCADTStatus(status)
+      warehouseProjectId: String(programme.cadtId),
+      projectId: programme.programmeId,
+      originProjectId: programme.programmeId,
+      registryOfOrigin: `${this.configService.get(
+        'systemCountryName',
+      )} Standard Carbon Registry`,
+      projectName: programme.title,
+      projectLink:
+        this.configService.get('host') +
+        '/programmeManagement/view/' +
+        programme.programmeId,
+      projectDeveloper: pd,
+      sector: programme.sector,
+      projectType:
+        programme.mitigationActions?.length > 0
+          ? programme.mitigationActions[0].typeOfMitigation
+          : 'Pending',
+      coveredByNDC: 'Inside NDC',
+      projectStatus: this.getMapToCADTStatus(programme.currentStage),
+      projectStatusDate: this.getProjectDate(programme.startTime * 1000),
+      unitMetric: 'tCO2e',
+      methodology:
+        programme.mitigationActions?.length > 0
+          ? programme.mitigationActions[0].properties.methodology
+          : 'Pending',
     });
     
     await await this.sendHttpPost('v1/staging/commit', undefined);
@@ -181,7 +215,7 @@ export class CadtApiService {
   }
 
   private getYearFromSerialNumber(serialNo: string) {
-    return Number(serialNo.split('-')[4]);
+    return parseInt(serialNo.split('-')[4]);
   }
 
   public async issueCredit(
@@ -197,12 +231,12 @@ export class CadtApiService {
 
     const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued) -  (Number(programme.creditIssued) > 0 ? 1 : 0);
-    const credit = await this.sendHttpPut('v1/units', {
+    const credit = await this.sendHttpPost('v1/units', {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
         "unitOwner": programme.companyId.join(', '),
         "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
-        "unitBlockStart": blockStart,
-        "unitBlockEnd": blockStart + amount - 1,
+        "unitBlockStart": String(blockStart),
+        "unitBlockEnd": String(blockStart + amount - 1),
         "unitCount": amount,
         "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
         "unitType": this.getUnitType(programme.sector),

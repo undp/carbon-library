@@ -22,6 +22,7 @@ import { EmailHelperModule } from '../email-helper/email-helper.module';
 import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { LocationModule } from '../location/location.module';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
+import { GHGs } from '../enum/ghgs.enum';
 
 describe('CadtApiService', () => {
   let service: CadtApiService;
@@ -60,50 +61,109 @@ describe('CadtApiService', () => {
     service = module.get<CadtApiService>(CadtApiService);
   });
 
-  it('should be defined', async () => {
-    expect(service).toBeDefined();
-    await service.createProgramme({
-      programmeId: '123',
-      serialNo: '1223',
-      title: 'Testing',
-      externalId: '',
-      sectoralScope: SectoralScope.EnergyIndustry,
-      sector: Sector.Energy,
-      countryCodeA2: 'NG',
-      currentStage: ProgrammeStage.AWAITING_AUTHORIZATION,
-      startTime: new Date().getTime(),
-      endTime: new Date().getTime() + 20000000,
-      creditEst: 100,
-      emissionReductionExpected: 0,
-      emissionReductionAchieved: 0,
-      creditChange: 0,
-      creditIssued: 0,
-      creditBalance: 0,
-      creditRetired: [],
-      creditFrozen: [],
-      creditTransferred: [],
-      constantVersion: '',
-      proponentTaxVatId: [],
-      companyId: [1],
-      proponentPercentage: [],
-      creditOwnerPercentage: [],
-      certifierId: [],
-      revokedCertifierId: [],
-      creditUnit: '',
-      programmeProperties: undefined,
-      txTime: 0,
-      createdTime: 0,
-      authTime: 0,
-      creditUpdateTime: 0,
-      statusUpdateTime: 0,
-      certifiedTime: 0,
-      txRef: '',
-      txType: TxType.CREATE,
-      geographicalLocationCordintes: undefined,
-      cadtId: '',
-      environmentalAssessmentRegistrationNo: '',
-      createdAt: undefined,
-      updatedAt: undefined
+  let program = {
+        programmeId: '123',
+        serialNo: '	NG-ITMO-15-25511-2023-0-59385508-59388007',
+        title: 'Testing',
+        externalId: '',
+        sectoralScope: SectoralScope.EnergyIndustry,
+        sector: Sector.Energy,
+        countryCodeA2: 'NG',
+        currentStage: ProgrammeStage.AWAITING_AUTHORIZATION,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime() + 20000000,
+        creditEst: 100,
+        emissionReductionExpected: 0,
+        emissionReductionAchieved: 0,
+        creditChange: 0,
+        creditIssued: 0,
+        creditBalance: 0,
+        creditRetired: [],
+        creditFrozen: [],
+        creditTransferred: [],
+        constantVersion: '',
+        proponentTaxVatId: [],
+        companyId: [1],
+        proponentPercentage: [],
+        creditOwnerPercentage: [],
+        certifierId: [],
+        revokedCertifierId: [],
+        creditUnit: '',
+        programmeProperties: {
+          geographicalLocation: ["Abia"],
+          greenHouseGasses: [GHGs.CO2]
+        },
+        txTime: 0,
+        createdTime: 0,
+        authTime: 0,
+        creditUpdateTime: 0,
+        statusUpdateTime: 0,
+        certifiedTime: 0,
+        txRef: '',
+        txType: TxType.CREATE,
+        geographicalLocationCordintes: undefined,
+        cadtId: '',
+        environmentalAssessmentRegistrationNo: '',
+        createdAt: undefined,
+        updatedAt: undefined
+      };
+
+    it('should be issue credit', async () => {
+      program.currentStage = ProgrammeStage.AUTHORISED;
+      program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
+      await service.issueCredit(program, 20)
     })
-  });
+
+  // it('should be update status', async () => {
+  //   program.currentStage = ProgrammeStage.AUTHORISED;
+  //   program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
+  //   await service.updateProgramme(program)
+  // })
+
+  // it('should be create project', async () => {
+  //   expect(service).toBeDefined();
+  //   await service.createProgramme({
+  //     programmeId: '123',
+  //     serialNo: '1223',
+  //     title: 'Testing',
+  //     externalId: '',
+  //     sectoralScope: SectoralScope.EnergyIndustry,
+  //     sector: Sector.Energy,
+  //     countryCodeA2: 'NG',
+  //     currentStage: ProgrammeStage.AWAITING_AUTHORIZATION,
+  //     startTime: new Date().getTime(),
+  //     endTime: new Date().getTime() + 20000000,
+  //     creditEst: 100,
+  //     emissionReductionExpected: 0,
+  //     emissionReductionAchieved: 0,
+  //     creditChange: 0,
+  //     creditIssued: 0,
+  //     creditBalance: 0,
+  //     creditRetired: [],
+  //     creditFrozen: [],
+  //     creditTransferred: [],
+  //     constantVersion: '',
+  //     proponentTaxVatId: [],
+  //     companyId: [1],
+  //     proponentPercentage: [],
+  //     creditOwnerPercentage: [],
+  //     certifierId: [],
+  //     revokedCertifierId: [],
+  //     creditUnit: '',
+  //     programmeProperties: undefined,
+  //     txTime: 0,
+  //     createdTime: 0,
+  //     authTime: 0,
+  //     creditUpdateTime: 0,
+  //     statusUpdateTime: 0,
+  //     certifiedTime: 0,
+  //     txRef: '',
+  //     txType: TxType.CREATE,
+  //     geographicalLocationCordintes: undefined,
+  //     cadtId: '',
+  //     environmentalAssessmentRegistrationNo: '',
+  //     createdAt: undefined,
+  //     updatedAt: undefined
+  //   })
+  // });
 });
