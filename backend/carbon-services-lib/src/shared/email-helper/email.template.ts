@@ -487,7 +487,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        {{credits}} credits of the programme {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}.<br><br>
+        {{credits}} credits of the programme {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}{}.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the retirement. <br><br>
 
         Sincerely, <br>
@@ -500,7 +500,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        {{organisationName}} has requested an international transfer retirement of {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}}. <br><br>
+        {{organisationName}} has requested an international transfer retirement of {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}}. <br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>
@@ -513,7 +513,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled.<br><br>
+        Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>
@@ -525,7 +525,7 @@ export const EmailTemplates = {
     subject: "International Transfer Retire Request Cancelled by the System",
     html: `
       Hi {{name}},<br><br>
-      Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been cancelled by the system due to insufficient credits available. <br><br>
+      Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been cancelled by the system due to insufficient credits available. <br><br>
       Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
       Sincerely,  <br>
@@ -537,7 +537,7 @@ export const EmailTemplates = {
     subject: "International Transfer Retire Request Cancelled by the System",
     html: `
       Hi {{name}},<br><br>
-      Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled by the system due to insufficient credits available. <br><br>
+      Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled by the system due to insufficient credits available. <br><br>
       Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
       Sincerely,  <br>
@@ -550,7 +550,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been recognised.<br><br>
+        Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been recognised.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>
@@ -563,7 +563,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has not been recognised.<br><br>
+        Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has not been recognised.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>

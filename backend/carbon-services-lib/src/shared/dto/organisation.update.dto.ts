@@ -4,11 +4,15 @@ import {
   IsArray,
   IsEmail,
   IsEnum,
+  IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
+  Max,
   MaxLength,
+  Min,
   ValidateIf,
 } from "class-validator";
 import { CompanyRole } from "../enum/company.role.enum";
@@ -85,4 +89,15 @@ export class OrganisationUpdateDto {
   regions: string[];
 
   geographicalLocationCordintes?: any
+
+  @ValidateIf(
+    (c) => CompanyRole.GOVERNMENT==c.companyRole
+  )
+  @IsNotEmpty()
+  @IsNumber()
+  @IsInt()
+  @Min(1)
+  @Max(99)
+  @ApiProperty()
+  omgePercentage: number;
 }
