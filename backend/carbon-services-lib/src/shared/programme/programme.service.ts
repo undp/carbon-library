@@ -3747,7 +3747,9 @@ export class ProgrammeService {
       issueCReq
     );
 
-    if (program.cadtId) {
+    const sqlProgram = await this.findById(program.programmeId);
+    if (sqlProgram.cadtId) {
+      program.cadtId = sqlProgram.cadtId;
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTCreditIssue,
         actionProps: {
