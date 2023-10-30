@@ -101,4 +101,5 @@ const ndcDetailManagementComponent = (props: any) => {
   );
 };
 
+
 export default ndcDetailManagementComponent;
