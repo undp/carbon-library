@@ -4079,7 +4079,9 @@ export class ProgrammeService {
       );
     }
 
-    if (program.cadtId) {
+    const sqlProgram = await this.findById(program.programmeId);
+    if (sqlProgram.cadtId) {
+      updated.cadtId = sqlProgram.cadtId;
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTUpdateProgramme,
         actionProps: {
