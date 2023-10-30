@@ -828,6 +828,7 @@ export class ProgrammeService {
       if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
+          program.currentStage = ProgrammeStage.APPROVED;
           await this.asyncOperationsInterface.AddAction({
             actionType: AsyncActionType.CADTUpdateProgramme,
             actionProps: {
@@ -4082,7 +4083,7 @@ export class ProgrammeService {
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTUpdateProgramme,
         actionProps: {
-          programme: program
+          programme: updated
         },
       });
     }
@@ -4184,6 +4185,7 @@ export class ProgrammeService {
       }
 
       if (programme.cadtId) {
+        programme.currentStage = ProgrammeStage.REJECTED;
         await this.asyncOperationsInterface.AddAction({
           actionType: AsyncActionType.CADTUpdateProgramme,
           actionProps: {
