@@ -4298,7 +4298,7 @@ export class ProgrammeService {
     }
 
     if (
-      investment.fromCompanyId != requester.companyId
+      investment.initiatorCompanyId != requester.companyId
     ) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
