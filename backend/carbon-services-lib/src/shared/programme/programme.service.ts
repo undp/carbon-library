@@ -1884,6 +1884,16 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, saved);
   }
 
+  async queryNdcDetails(
+    query: QueryDto,
+    abilityCondition: string
+  ): Promise<DataListResponseDto> {
+    return new DataListResponseDto(
+      undefined,
+      undefined
+    );
+  }
+
   async queryNdcActions(
     query: QueryDto,
     abilityCondition: string
