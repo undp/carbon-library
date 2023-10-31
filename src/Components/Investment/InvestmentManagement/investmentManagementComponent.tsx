@@ -15,6 +15,7 @@ import {
   Typography,
   Form,
   Tooltip,
+  Button,
 } from "antd";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DateTime } from "luxon";
@@ -45,6 +46,7 @@ import { RoleIcon } from "../../Common/RoleIcon/role.icon";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { Role } from "../../../Definitions/Enums/role.enum";
+import { PlusOutlined } from "@ant-design/icons";
 
 type PopupInfo = {
   title: string;
