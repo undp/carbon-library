@@ -14,7 +14,7 @@ import {
 import type { MenuProps } from "antd";
 import "./dashboard.scss";
 import {
-  LinkOutlined,
+  BookOutlined,
   DownloadOutlined,
   CaretDownOutlined,
 } from "@ant-design/icons";
@@ -2350,7 +2350,7 @@ ${total}
             {selectedurl.trim().length === 0 && (
               <Button className="annual-report-downloadbutton">
                 <Space>
-                  <LinkOutlined
+                  <BookOutlined
                     className="common-progress-icon"
                     style={{ color: "#3F3A47" }}
                   />
@@ -2366,7 +2366,7 @@ ${total}
               >
                 <Button className="annual-report-downloadbutton">
                   <Space>
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon"
                       style={{ color: "#3F3A47" }}
                     />

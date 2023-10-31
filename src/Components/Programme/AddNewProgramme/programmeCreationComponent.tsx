@@ -314,12 +314,12 @@ export const ProgrammeCreationComponent = (props: any) => {
       );
     }
     let environmentalImpactAssessmentData = "";
-    if(values?.environmentalImpactAssessment?.length > 0) {
+    if (values?.environmentalImpactAssessment?.length > 0) {
       environmentalImpactAssessmentData = await getBase64(
         values?.environmentalImpactAssessment[0]?.originFileObj as RcFile
       );
     }
-    
+
     const propTaxIds =
       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
       userInfoState?.companyRole !== CompanyRole.MINISTRY
@@ -367,13 +367,15 @@ export const ProgrammeCreationComponent = (props: any) => {
           ...(includedInNDC !== undefined &&
             includedInNDC !== null && { includedInNdc: includedInNDC }),
         },
-        environmentalAssessmentRegistrationNo: values?.environmentalAssessmentRegistrationNo
+        environmentalAssessmentRegistrationNo:
+          values?.environmentalAssessmentRegistrationNo,
       };
       if (logoBase64?.length > 0) {
         programmeDetails.designDocument = logoBase64;
       }
-      if(environmentalImpactAssessmentData?.length > 0) {
-        programmeDetails.environmentalImpactAssessment = environmentalImpactAssessmentData;
+      if (environmentalImpactAssessmentData?.length > 0) {
+        programmeDetails.environmentalImpactAssessment =
+          environmentalImpactAssessmentData;
       }
       setLoading(false);
       console.log(programmeDetails);
@@ -762,63 +764,90 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   </Select.Option>
                                 </Select>
                               </Form.Item>
-                              <Form.Item
-                                label={t("addProgramme:designDoc")}
-                                name="designDocument"
-                                valuePropName="fileList"
-                                getValueFromEvent={normFile}
-                                required={true}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: `${t(
-                                      "addProgramme:designDoc"
-                                    )} ${t("addProgramme:isRequired")}`,
-                                  },
-                                  {
-                                    validator: async (rule, file) => {
-                                      if (file?.length > 0) {
-                                        if (!isValidateFileType(file[0]?.type)) {
-                                          throw new Error(
-                                            `${t(
-                                              "addProgramme:invalidFileFormat"
-                                            )}`
-                                          );
-                                        } else if (
-                                          file[0]?.size > maximumImageSize
-                                        ) {
-                                          // default size format of files would be in bytes -> 1MB = 1000000bytes
-                                          throw new Error(
-                                            `${t("common:maxSizeVal")}`
-                                          );
-                                        }
-                                      }
+                              <div className="add-Document">
+                                <Form.Item
+                                  label={t("addProgramme:designDoc")}
+                                  name="designDocument"
+                                  valuePropName="fileList"
+                                  getValueFromEvent={normFile}
+                                  required={true}
+                                  labelCol={{ span: 30 }}
+                                
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: `${t(
+                                        "addProgramme:designDoc"
+                                      )} ${t("addProgramme:isRequired")}`,
                                     },
-                                  },
-                                ]}
-                              >
-                                <Upload
-                                  accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
-                                  beforeUpload={(file: any) => {
-                                    return false;
-                                  }}
-                                  className="design-upload-section"
-                                  name="design"
-                                  action="/upload.do"
-                                  listType="picture"
-                                  multiple={false}
-                                  // defaultFileList={fileList}
-                                  maxCount={1}
+                                    {
+                                      validator: async (rule, file) => {
+                                        if (file?.length > 0) {
+                                          if (
+                                            !isValidateFileType(file[0]?.type)
+                                          ) {
+                                            throw new Error(
+                                              `${t(
+                                                "addProgramme:invalidFileFormat"
+                                              )}`
+                                            );
+                                          } else if (
+                                            file[0]?.size > maximumImageSize
+                                          ) {
+                                            // default size format of files would be in bytes ->  1MB = 1000000bytes
+                                            throw new Error(
+                                              `${t("common:maxSizeVal")}`
+                                            );
+                                          }
+                                        }
+                                      },
+                                    },
+                                  ]}
                                 >
-                                  <Button
-                                    className="upload-doc"
-                                    size="large"
-                                    icon={<UploadOutlined />}
+                                  <Upload
+                                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
+                                    beforeUpload={(file: any) => {
+                                      return false;
+                                    }}
+                                    className="design-upload-section"
+                                    name="design"
+                                    action="/upload.do"
+                                    listType="picture"
+                                    multiple={false}
+                                    // defaultFileList={fileList}
+                                    maxCount={1}
                                   >
-                                    Upload
-                                  </Button>
-                                </Upload>
-                              </Form.Item>
+                                    <Button
+                                      className="upload-doc"
+                                      size="large"
+                                      icon={<UploadOutlined />}
+                                    >
+                                      Upload
+                                    </Button>
+                                  </Upload>
+                                </Form.Item>
+                                <div className="addDoc-info">
+                                  <Tooltip
+                                    arrowPointAtCenter
+                                    placement="topLeft"
+                                    trigger="hover"
+                                    title={
+                                      <a
+                                        style = {{color:"#fff"}}
+                                        href={
+                                          "https://app-eff78ffabc4efb.app.unfccc.org/tools/cdm/testprodspt3/UNFCCC_CDM/Pages/PDDnew.aspx?t=pdd"
+                                        }
+                                        target="_blank"
+                                      >
+                                        {t("addProgramme:designDocTooltip")}
+                                      </a>
+                                    }
+                                    overlayClassName="custom-tooltip"
+                                  >
+                                    <InfoCircle color="#000000" size={12} />
+                                  </Tooltip>
+                                </div>
+                              </div>
                               <Form.Item
                                 label={t(
                                   "addProgramme:buyerCountryEligibility"
@@ -1012,13 +1041,18 @@ export const ProgrammeCreationComponent = (props: any) => {
                                 }}
                               </Form.List>
                               <Form.Item
-                                label={t("addProgramme:environmentalAssessmentRegistrationNo")}
+                                label={t(
+                                  "addProgramme:environmentalAssessmentRegistrationNo"
+                                )}
                                 name="environmentalAssessmentRegistrationNo"
-                                initialValue={state?.record?.environmentalAssessmentRegistrationNo}
+                                initialValue={
+                                  state?.record
+                                    ?.environmentalAssessmentRegistrationNo
+                                }
                                 rules={[
                                   {
                                     required: true,
-                                    message: "", 
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
@@ -1029,9 +1063,9 @@ export const ProgrammeCreationComponent = (props: any) => {
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t("addProgramme:environmentalAssessmentRegistrationNo")} ${t(
-                                            "isRequired"
-                                          )}`
+                                          `${t(
+                                            "addProgramme:environmentalAssessmentRegistrationNo"
+                                          )} ${t("isRequired")}`
                                         );
                                       }
                                     },
@@ -1041,7 +1075,9 @@ export const ProgrammeCreationComponent = (props: any) => {
                                 <Input size="large" />
                               </Form.Item>
                               <Form.Item
-                                label={t("addProgramme:environmentalImpactAssessment")}
+                                label={t(
+                                  "addProgramme:environmentalImpactAssessment"
+                                )}
                                 name="environmentalImpactAssessment"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
@@ -1050,7 +1086,12 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   {
                                     validator: async (rule, file) => {
                                       if (file?.length > 0) {
-                                        if (!isValidateFileType(file[0]?.type, DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT)) {
+                                        if (
+                                          !isValidateFileType(
+                                            file[0]?.type,
+                                            DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT
+                                          )
+                                        ) {
                                           throw new Error(
                                             `${t(
                                               "addProgramme:invalidFileFormat"
