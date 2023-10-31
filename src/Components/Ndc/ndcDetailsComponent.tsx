@@ -27,7 +27,7 @@ type NdcDetail = {
   kpi: number;
 };
 
-const NdcDetailsComponent = (props: any) => {
+export const NdcDetailsComponent = (props: any) => {
   const { t, useConnection } = props;
   const { RangePicker } = DatePicker;
   const [ndcDetailsData, setNdcDetailsData] = useState<NdcDetail[]>([]);
@@ -264,5 +264,3 @@ const NdcDetailsComponent = (props: any) => {
     </div>
   );
 };
-
-export default NdcDetailsComponent;
