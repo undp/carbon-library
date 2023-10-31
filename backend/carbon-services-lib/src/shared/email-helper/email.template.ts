@@ -487,7 +487,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        {{credits}} credits of the programme {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}{}.<br><br>
+        {{credits}} credits of the programme {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the retirement. <br><br>
 
         Sincerely, <br>
