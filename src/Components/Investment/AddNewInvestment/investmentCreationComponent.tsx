@@ -115,14 +115,16 @@ export const InvestmentCreationComponent = (props: any) => {
       onNavigateToProgrammeManagementView();
       return;
     }
-    setData(state?.record);
+    if (state?.record) {
+      setData(state?.record);
+    }
   }, []);
 
   useEffect(() => {
-    state?.id !== "ow" && getOrganisationsDetails();
+    getOrganisationsDetails();
   }, [data]);
 
-  if (!data || !state) {
+  if (!data || !state?.ownership) {
     return <Loading />;
   }
 
@@ -682,7 +684,7 @@ export const InvestmentCreationComponent = (props: any) => {
                 description: current === 1 && (
                   <div>
                     <div className="programme-sought-form-container ownership-container">
-                      {state?.id !== "ow" &&
+                      {state?.ownership !== true &&
                         <div className="programme-sought-form">
                           <Form
                             labelCol={{ span: 20 }}

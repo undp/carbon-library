@@ -87,14 +87,6 @@ export const SupportCreationComponent = (props: any) => {
           value: userInfoState?.companyId,
         });
       }
-      for (const c of data!.companyId) {
-        filterAnd.push({
-          key: "companyId",
-          operation: "!=",
-          value: c,
-        });
-      }
-
       const response = await post("national/organisation/queryNames", {
         page: 1,
         size: 100,
@@ -112,7 +104,7 @@ export const SupportCreationComponent = (props: any) => {
 
   useEffect(() => {
     getOrganisationsDetails();
-  }, [data]);
+  }, []);
 
   // const companyName: any = {};
   // for (const company of data!?.company) {
