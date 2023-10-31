@@ -235,7 +235,7 @@ export const InvestmentCreationComponent = (props: any) => {
                         onFinish={nextOne}
                       >
                         <Row className="row" gutter={[16, 16]}>
-                          <Col xl={8} md={12}>
+                          <Col xl={12} md={24}>
                             <Form.Item
                               label={t("programme:typeCreation")}
                               wrapperCol={{ span: 24 }}
@@ -243,7 +243,7 @@ export const InvestmentCreationComponent = (props: any) => {
                               name="typeCreation"
                               rules={[
                                 {
-                                  required: false,
+                                  required: true,
                                 },
                               ]}
                             >
