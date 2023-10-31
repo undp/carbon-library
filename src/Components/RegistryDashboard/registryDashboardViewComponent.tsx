@@ -18,6 +18,7 @@ import {
   DownloadOutlined,
   CaretDownOutlined,
 } from "@ant-design/icons";
+import ApexCharts from 'react-apexcharts';
 import moment from "moment";
 import {
   ClockHistory,
@@ -860,7 +861,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateTotalCreditsCertifiedEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -941,7 +942,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateTotalCreditsCertifiedEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -1169,7 +1170,7 @@ export const RegistryDashboardComponent = (props: any) => {
       if (
         response?.data?.stats?.PENDING_TRANSFER_INIT?.all?.txTime &&
         String(response?.data?.stats?.PENDING_TRANSFER_INIT?.all?.txTime) !==
-          "0"
+        "0"
       ) {
         setLastUpdatePendingTransferSentEpoch(
           parseInt(response?.data?.stats?.PENDING_TRANSFER_INIT?.all?.txTime)
@@ -1362,7 +1363,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.AUTH_CERTIFIED_BY_ME_BY_STATE?.last &&
           String(response?.data?.stats?.AUTH_CERTIFIED_BY_ME_BY_STATE?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateProgrammesCreditsStatsEpoch(
             parseInt(response?.data?.stats?.AUTH_CERTIFIED_BY_ME_BY_STATE?.last)
@@ -1455,7 +1456,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateCertifiedCreditsStatsEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -1524,7 +1525,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateCertifiedCreditsStatsEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -1878,13 +1879,10 @@ export const RegistryDashboardComponent = (props: any) => {
     const largeArc = end - start > 0.5 ? 1 : 0;
 
     // draw an SVG path
-    return `<path d="M ${r + r0 * x0} ${r + r0 * y0} L ${r + r * x0} ${
-      r + r * y0
-    } A ${r} ${r} 0 ${largeArc} 1 ${r + r * x1} ${r + r * y1} L ${
-      r + r0 * x1
-    } ${r + r0 * y1} A ${r0} ${r0} 0 ${largeArc} 0 ${r + r0 * x0} ${
-      r + r0 * y0
-    }" fill="${color}" />`;
+    return `<path d="M ${r + r0 * x0} ${r + r0 * y0} L ${r + r * x0} ${r + r * y0
+      } A ${r} ${r} 0 ${largeArc} 1 ${r + r * x1} ${r + r * y1} L ${r + r0 * x1
+      } ${r + r0 * y1} A ${r0} ${r0} 0 ${largeArc} 0 ${r + r0 * x0} ${r + r0 * y0
+      }" fill="${color}" />`;
   };
 
   // code for creating an SVG donut chart from feature properties
@@ -1987,12 +1985,12 @@ ${total}
             row.count < 2
               ? `#4da6ff`
               : row.count < 10
-              ? "#0080ff"
-              : row.count < 50
-              ? "#0059b3"
-              : row.count < 100
-              ? "#003366"
-              : "#000d1a";
+                ? "#0080ff"
+                : row.count < 50
+                  ? "#0059b3"
+                  : row.count < 100
+                    ? "#003366"
+                    : "#000d1a";
 
           matchExpression.push(row.country, color);
           txLocationMap[row.country] = row.count;
@@ -2083,9 +2081,8 @@ ${total}
       return;
     }
 
-    return `${feature.properties?.name_en} : ${
-      txLocationMapData[feature.properties?.iso_3166_1]
-    }`;
+    return `${feature.properties?.name_en} : ${txLocationMapData[feature.properties?.iso_3166_1]
+      }`;
   };
 
   // Use the same approach as above to indicate that the symbols are clickable
@@ -2097,7 +2094,7 @@ ${total}
     });
     map.getCanvas().style.cursor =
       features.length > 0 &&
-      txLocationMapData[features[0].properties?.iso_3166_1]
+        txLocationMapData[features[0].properties?.iso_3166_1]
         ? "pointer"
         : "";
   };
@@ -2149,7 +2146,7 @@ ${total}
         //   setSelectedurl(item?.url)
         // })
         // setFileList(responses.data[0] ?? [])
-       
+
         const initlist = [];
         for (let i = 0; i < data.length; i++) {
           const newreports = {
@@ -2218,24 +2215,24 @@ ${total}
                   ? pendingProjectsWithoutTimeRange
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? transferRequestReceived
-                  : programmesUnCertifed
+                    ? transferRequestReceived
+                    : programmesUnCertifed
               }
               title={t(
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "programmesPending"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "trasnferReqReceived"
-                  : "programmesUnCertified"
+                    ? "trasnferReqReceived"
+                    : "programmesUnCertified"
               )}
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdateProgrammesStats
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? lastUpdatePendingTransferReceived
-                  : lastUpdateProgrammesCertifiable
+                    ? lastUpdatePendingTransferReceived
+                    : lastUpdateProgrammesCertifiable
               }
               icon={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
@@ -2258,24 +2255,24 @@ ${total}
                   ? transferRequestSent
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? transferRequestSent
-                  : programmesCertifed
+                    ? transferRequestSent
+                    : programmesCertifed
               }
               title={t(
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "trasnferReqInit"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "trasnferReqInit"
-                  : "programmesCertified"
+                    ? "trasnferReqInit"
+                    : "programmesCertified"
               )}
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdatePendingTransferSent
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? lastUpdatePendingTransferSent
-                  : lastUpdateProgrammesCertified
+                    ? lastUpdatePendingTransferSent
+                    : lastUpdateProgrammesCertified
               }
               icon={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
@@ -2298,24 +2295,24 @@ ${total}
                   ? creditBalanceWithoutTimeRange
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? creditBalanceWithoutTimeRange
-                  : creditCertiedBalanceWithoutTimeRange
+                    ? creditBalanceWithoutTimeRange
+                    : creditCertiedBalanceWithoutTimeRange
               }
               title={t(
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "creditBal"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "creditBal"
-                  : "creditCertified"
+                    ? "creditBal"
+                    : "creditCertified"
               )}
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdateCreditBalance
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? lastUpdateCreditBalance
-                  : lastUpdateProgrammesCertified
+                    ? lastUpdateCreditBalance
+                    : lastUpdateProgrammesCertified
               }
               icon={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
@@ -2419,10 +2416,10 @@ ${total}
                   ? "tTProgrammesGoverment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTProgrammesProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTProgrammesCertifierMine"
-                  : "tTProgrammesCertifierOverall"
+                    ? "tTProgrammesProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTProgrammesCertifierMine"
+                      : "tTProgrammesCertifierOverall"
               )}
             />
           </Col>
@@ -2439,10 +2436,10 @@ ${total}
                   ? "tTCreditsGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTCreditsCertifierMine"
-                  : "tTCreditsCertifierOverall"
+                    ? "tTCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTCreditsCertifierMine"
+                      : "tTCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2460,10 +2457,10 @@ ${total}
                   ? "tTCertifiedCreditsGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTCertifiedCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTCertifiedCreditsCertifierMine"
-                  : "tTCertifiedCreditsCertifierOverall"
+                    ? "tTCertifiedCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTCertifiedCreditsCertifierMine"
+                      : "tTCertifiedCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2485,10 +2482,10 @@ ${total}
                   ? "tTTotalProgrammesGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalProgrammesProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalProgrammesCertifierMine"
-                  : "tTTotalProgrammesCertifierOverall"
+                    ? "tTTotalProgrammesProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalProgrammesCertifierMine"
+                      : "tTTotalProgrammesCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2506,10 +2503,10 @@ ${total}
                   ? "tTTotalProgrammesSectorGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalProgrammesSecProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalProgrammesSecCertifierMine"
-                  : "tTTotalProgrammesSecCertifierOverall"
+                    ? "tTTotalProgrammesSecProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalProgrammesSecCertifierMine"
+                      : "tTTotalProgrammesSecCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2531,10 +2528,10 @@ ${total}
                   ? "tTTotalCreditsGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalCreditsCertifierMine"
-                  : "tTTotalCreditsCertifierOverall"
+                    ? "tTTotalCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalCreditsCertifierMine"
+                      : "tTTotalCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2552,10 +2549,10 @@ ${total}
                   ? "tTTotalCreditsCertifiedGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalCertifiedCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalCertifiedCreditsCertifierMine"
-                  : "tTTotalCertifiedCreditsCertifierOverall"
+                    ? "tTTotalCertifiedCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalCertifiedCreditsCertifierMine"
+                      : "tTTotalCertifiedCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2582,10 +2579,10 @@ ${total}
                             ? "tTProgrammeLocationsGovernment"
                             : userInfoState?.companyRole ===
                               CompanyRole.PROGRAMME_DEVELOPER
-                            ? "tTProgrammeLocationsProgrammeDev"
-                            : categoryType === "mine"
-                            ? "tTProgrammeLocationsCertifierMine"
-                            : "tTProgrammeLocationsCertifierOverall"
+                              ? "tTProgrammeLocationsProgrammeDev"
+                              : categoryType === "mine"
+                                ? "tTProgrammeLocationsCertifierMine"
+                                : "tTProgrammeLocationsCertifierOverall"
                         )}
                       >
                         <InfoCircle color="#000000" size={17} />
@@ -2619,12 +2616,12 @@ ${total}
                         userInfoState?.companyRole === CompanyRole.CERTIFIER &&
                         categoryType === "mine"
                       ) && (
-                        <>
-                          <LegendItem text="Rejected" color="#FF8183" />
-                          <LegendItem text="Pending" color="#CDCDCD" />
-                          <LegendItem text="New" color="#B7A4FE" />
-                        </>
-                      )}
+                          <>
+                            <LegendItem text="Rejected" color="#FF8183" />
+                            <LegendItem text="Pending" color="#CDCDCD" />
+                            <LegendItem text="New" color="#B7A4FE" />
+                          </>
+                        )}
                     </div>
                     <div className="updated-on margin-top-1">
                       <div className="updated-moment-container">
@@ -2652,10 +2649,10 @@ ${total}
                           ? "tTTransferLocationsGovernment"
                           : userInfoState?.companyRole ===
                             CompanyRole.PROGRAMME_DEVELOPER
-                          ? "tTTrasnferLocationsProgrammeDev"
-                          : categoryType === "mine"
-                          ? "tTTrasnferLocationsCertifierMine"
-                          : "tTTrasnferLocationsCertifierOverall"
+                            ? "tTTrasnferLocationsProgrammeDev"
+                            : categoryType === "mine"
+                              ? "tTTrasnferLocationsCertifierMine"
+                              : "tTTrasnferLocationsCertifierOverall"
                       )}
                     >
                       <InfoCircle color="#000000" size={17} />

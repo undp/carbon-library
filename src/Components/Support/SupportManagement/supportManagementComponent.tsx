@@ -19,7 +19,7 @@ import {
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
-import "../investmentComponent.scss";
+import "../supportComponent.scss";
 import "../../../Styles/common.table.scss";
 import * as Icon from "react-bootstrap-icons";
 import {

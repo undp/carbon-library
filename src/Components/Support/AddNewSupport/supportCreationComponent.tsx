@@ -13,7 +13,7 @@ import {
   Steps,
   message,
 } from "antd";
-import "../investmentComponent.scss";
+import "../supportComponent.scss";
 import {
   ProgrammeT,
   addSpaces,
