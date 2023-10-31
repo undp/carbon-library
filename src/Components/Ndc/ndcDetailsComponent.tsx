@@ -12,10 +12,7 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  EditableRow,
-  EditableCell,
-} from "../Common/AntComponents/antTableComponents";
+import { EditableRow, EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 
 type Period = {
@@ -130,9 +127,6 @@ export const NdcDetailsComponent = (props: any) => {
 
   const onCancelPeriod = () => {};
 
-  const inRange = (num: number, min: number, max: number) =>
-    num >= min && num <= max;
-
   const onAddNewPeriod = () => {
     if (selectedPeriod && selectedPeriod.current) {
       const newPeriodItem = {
@@ -144,9 +138,7 @@ export const NdcDetailsComponent = (props: any) => {
       };
 
       const existingIndex = periodItemsRef.current.findIndex(
-        (item: any) =>
-          inRange(newPeriodItem.start, item.start, item.end) ||
-          inRange(newPeriodItem.end, item.start, item.end)
+        (item: any) => item.start === newPeriodItem.start || item.end === newPeriodItem.end
       );
 
       if (existingIndex === -1) {
@@ -181,10 +173,10 @@ export const NdcDetailsComponent = (props: any) => {
   function addNewPeriodContent() {
     return (
       <div>
-        <Row justify="center">
+        <Row>
           <RangePicker onChange={onDateRangeChanged} picker="year" />
         </Row>
-        <Row className="mg-top-1" justify="center">
+        <Row className="mg-top-1">
           <div className="steps-actions">
             <Button
               type="primary"
@@ -254,9 +246,10 @@ export const NdcDetailsComponent = (props: any) => {
       </div>
       <div>
         <Tabs
-          centered={true}
+          centered={false}
           defaultActiveKey="1"
           items={periodItems}
+          activeKey={selectedTab}
           onChange={onTabChange}
         />
       </div>
