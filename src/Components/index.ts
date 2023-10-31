@@ -8,6 +8,8 @@ export * from "./User/UserProfile/userProfileComponent";
 export * from "./User/UserManagement/userManagementComponent";
 export * from "./Investment/AddNewInvestment/investmentCreationComponent";
 export * from "./Investment/InvestmentManagement/investmentManagementComponent";
+export * from "./Support/AddNewSupport/supportCreationComponent";
+export * from "./Support/SupportManagement/supportManagementComponent";
 export * from "./NdcActions/NdcActionManagement/ndcActionManagementComponent";
 export * from "./NdcActions/AddNdcAction/addNdcActionComponent";
 export * from "./NdcActions/NdcView/ndcActionViewComponent";

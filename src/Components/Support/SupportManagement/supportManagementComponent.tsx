@@ -55,15 +55,13 @@ type PopupInfo = {
   remarkRequired: boolean;
 };
 
-export const InvestmentManagementComponent = (props: any) => {
+export const SupportManagementComponent = (props: any) => {
   const {
     translator,
     useConnection,
     onNavigateToProgrammeView,
     useUserContext,
     useSettingsContext,
-    onClickAddOwnership,
-    enableAddOwnership
   } = props;
 
   const t = translator.t;
@@ -689,28 +687,15 @@ export const InvestmentManagementComponent = (props: any) => {
 
   return (
     <div className="investment-management content-container">
-      <div className="investment-title-bar">
-        <div className="title-bar">
-          <div className="body-title">{t("programme:investmentTitle")}</div>
-          <div className="body-sub-title">
-            {t("programme:investmentDesc")}
-          </div>
-        </div>
-        <div className="actions">
-          {enableAddOwnership && (
-            <div className="action-bar">
-              <Button
-                type="primary"
-                size="large"
-                block
-                icon={<PlusOutlined />}
-                onClick={onClickAddOwnership}
-              >
-                {t("programme:addOwnership")}
-              </Button>
+      <div className="title-bar">
+        <Row justify="space-between" align="middle">
+          <Col span={20}>
+            <div className="body-title">{t("programme:investmentTitle")}</div>
+            <div className="body-sub-title">
+              {t("programme:investmentDesc")}
             </div>
-          )}
-        </div>
+          </Col>
+        </Row>
       </div>
       <div className="content-card">
         <Row>
