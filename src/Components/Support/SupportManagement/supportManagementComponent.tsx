@@ -441,23 +441,6 @@ export const SupportManagementComponent = (props: any) => {
       },
     },
     {
-      title: t("programme:programmeName"),
-      dataIndex: "programmeTitle",
-      key: "programmeTitle",
-      sorter: true,
-      align: "left" as const,
-      render: (item: any) => {
-        return <span className="clickable">{item}</span>;
-      },
-      onCell: (record: any, rowIndex: any) => {
-        return {
-          onClick: (ev: any) => {
-            onNavigateToProgrammeView(record.programmeId);
-          },
-        };
-      },
-    },
-    {
       title: t("programme:type"),
       key: "type",
       sorter: true,
@@ -570,36 +553,6 @@ export const SupportManagementComponent = (props: any) => {
           <div style={{ display: "flex", alignItems: "center" }}>
             {itemObj.receiver &&
               itemObj.receiver.map((v: any, i: any) => {
-                return (
-                  <Tooltip
-                    title={v.name}
-                    color={TooltipColor}
-                    key={TooltipColor}
-                  >
-                    <div>
-                      <ProfileIcon
-                        icon={v.logo}
-                        bg={getCompanyBgColor(v.companyRole)}
-                        name={v.name}
-                      />
-                    </div>
-                  </Tooltip>
-                );
-              })}
-          </div>
-        );
-      },
-    },
-    {
-      title: t("programme:owner"),
-      key: "fromCompanyId",
-      sorter: true,
-      align: "left" as const,
-      render: (item: any, itemObj: any) => {
-        return (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {itemObj.sender &&
-              itemObj.sender.map((v: any, i: any) => {
                 return (
                   <Tooltip
                     title={v.name}
