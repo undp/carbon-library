@@ -114,10 +114,6 @@ export const SupportCreationComponent = (props: any) => {
     getOrganisationsDetails();
   }, [data]);
 
-  if (!data) {
-    return <Loading />;
-  }
-
   const companyName: any = {};
   for (const company of data!.company) {
     companyName[company.companyId] = company;

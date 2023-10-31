@@ -122,7 +122,7 @@ export const InvestmentCreationComponent = (props: any) => {
     getOrganisationsDetails();
   }, [data]);
 
-  if (!data) {
+  if (!data || !state) {
     return <Loading />;
   }
 
@@ -234,11 +234,11 @@ export const InvestmentCreationComponent = (props: any) => {
                         form={formOne}
                         onFinish={nextOne}
                       >
-                        <Row className="row" gutter={[16, 16]}>
-                          <Col xl={12} md={24}>
+                        <Row className="row" gutter={[4, 4]}>
+                          <Col xl={8} md={12}>
                             <Form.Item
                               label={t("programme:typeCreation")}
-                              wrapperCol={{ span: 24 }}
+                              wrapperCol={{ span: 13 }}
                               className="role-group"
                               name="typeCreation"
                               rules={[
