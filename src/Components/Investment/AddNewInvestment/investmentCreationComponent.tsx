@@ -119,7 +119,7 @@ export const InvestmentCreationComponent = (props: any) => {
   }, []);
 
   useEffect(() => {
-    getOrganisationsDetails();
+    state?.id !== "ow" && getOrganisationsDetails();
   }, [data]);
 
   if (!data || !state) {
