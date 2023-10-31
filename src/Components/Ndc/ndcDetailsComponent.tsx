@@ -9,10 +9,11 @@ import {
   Tabs,
   TabsProps,
   message,
-} from 'antd';
-import moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
-import { EditableRow, EditableCell } from '../Common/AntComponents/antTableComponents';
+} from "antd";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import { EditableRow, EditableCell } from "./antTableComponents";
+import "./ndcDetailsComponent.scss";
 
 type Period = {
   start: number;
@@ -32,8 +33,9 @@ export const NdcDetailsComponent = (props: any) => {
   const { RangePicker } = DatePicker;
   const [ndcDetailsData, setNdcDetailsData] = useState<NdcDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const periodItemsRef = useRef([] as any[]);
   const [periodItems, setPeriodItems] = useState([] as any[]);
-  const [selectedTab, setSelectedTab] = useState('add_new');
+  const [selectedTab, setSelectedTab] = useState("add_new");
   const selectedPeriod = useRef({} as Period);
 
   const handleSave = (row: any) => {
@@ -49,45 +51,17 @@ export const NdcDetailsComponent = (props: any) => {
 
   const defaultColumns: any = [
     {
-      title: t('ndc:ndcColumnsStartDate'),
-      dataIndex: 'startDate',
-      key: 'startDate',
-      align: 'left' as const,
-      editable: true,
-      render: (record: any) => {
-        return (
-          <div>
-            <p>{moment(record.startDate).format('DD-MM-YYYY')}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: t('ndc:ndcColumnsEndDate'),
-      dataIndex: 'endDate',
-      key: 'endDate',
-      align: 'left' as const,
-      editable: true,
-      render: (record: any) => {
-        return (
-          <div>
-            <p>{moment(record.endDate).format('DD-MM-YYYY')}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: t('ndc:ndcColumnsNationalPlanObj'),
-      dataIndex: 'nationalPlanObj',
-      key: 'nationalPlanObj',
-      align: 'left' as const,
+      title: t("ndc:ndcColumnsNationalPlanObj"),
+      dataIndex: "nationalPlanObj",
+      key: "nationalPlanObj",
+      align: "left" as const,
       editable: true,
     },
     {
-      title: t('ndc:ndcColumnsKpi'),
-      dataIndex: 'kpi',
-      key: 'kpi',
-      align: 'left' as const,
+      title: t("ndc:ndcColumnsKpi"),
+      dataIndex: "kpi",
+      key: "kpi",
+      align: "left" as const,
       editable: true,
     },
   ];
@@ -110,9 +84,9 @@ export const NdcDetailsComponent = (props: any) => {
 
   function onAddNewNdcDetail() {
     const newData = {
-      startDate: new Date('2014-12-24 23:12:00'),
-      endDate: new Date('2014-12-24 23:12:00'),
-      nationalPlanObj: 'sample text2',
+      startDate: new Date("2014-12-24 23:12:00"),
+      endDate: new Date("2014-12-24 23:12:00"),
+      nationalPlanObj: "sample text2",
       kpi: 34,
     };
 
@@ -160,7 +134,22 @@ export const NdcDetailsComponent = (props: any) => {
         label: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
         children: ndcDetailsTableContent(),
       };
-      setPeriodItems((items: any) => [...items, newPeriodItem]);
+
+      const existingIndex = periodItemsRef.current.findIndex(
+        (item: any) => item.key === newPeriodItem.key
+      );
+
+      if (existingIndex === -1) {
+        setPeriodItems((items: any) => [...items, newPeriodItem]);
+        periodItemsRef.current = [...periodItemsRef.current, newPeriodItem];
+      } else {
+        message.open({
+          type: "error",
+          content: t("ndc:rangeAlreadyExists"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+      }
     }
   };
 
@@ -178,13 +167,22 @@ export const NdcDetailsComponent = (props: any) => {
         <Row>
           <RangePicker onChange={onDateRangeChanged} picker="year" />
         </Row>
-        <Row>
+        <Row className="mg-top-1">
           <div className="steps-actions">
-            <Button type="primary" onClick={onAddNewPeriod} htmlType="submit" loading={loading}>
-              {t('ndc:submit')}
+            <Button
+              type="primary"
+              onClick={onAddNewPeriod}
+              htmlType="submit"
+              loading={loading}
+            >
+              {t("ndc:submit")}
             </Button>
-            <Button className="back-btn" onClick={onCancelPeriod} loading={loading}>
-              {t('ndc:back')}
+            <Button
+              className="back-btn"
+              onClick={onCancelPeriod}
+              loading={loading}
+            >
+              {t("ndc:back")}
             </Button>
           </div>
         </Row>
@@ -199,30 +197,31 @@ export const NdcDetailsComponent = (props: any) => {
   useEffect(() => {
     const defaultNdcDetails = [
       {
-        startDate: new Date('2022-03-25'),
-        endDate: new Date('2023-03-25'),
-        nationalPlanObj: 'sample text1',
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "sample text1",
         kpi: 23,
       },
       {
-        startDate: new Date('2023-03-25'),
-        endDate: new Date('2024-03-25'),
-        nationalPlanObj: 'sample text2',
+        startDate: new Date("2023-03-25"),
+        endDate: new Date("2024-03-25"),
+        nationalPlanObj: "sample text2",
         kpi: 34,
       },
       {
-        startDate: new Date('2024-03-25'),
-        endDate: new Date('2025-03-25'),
-        nationalPlanObj: 'sample text3',
+        startDate: new Date("2024-03-25"),
+        endDate: new Date("2025-03-25"),
+        nationalPlanObj: "sample text3",
         kpi: 25,
       },
     ];
     const addNewItem = {
-      key: 'add_new',
-      label: 'Add New',
+      key: "add_new",
+      label: "Add New",
       children: addNewPeriodContent(),
     };
     setPeriodItems([addNewItem]);
+    periodItemsRef.current = [addNewItem];
     setNdcDetailsData(defaultNdcDetails);
   }, []);
 
@@ -231,32 +230,41 @@ export const NdcDetailsComponent = (props: any) => {
       <div className="title-bar">
         <Row justify="space-between" align="middle">
           <Col span={20}>
-            <div className="body-title">{t('ndc:NdcTitle')}</div>
-            <div className="body-sub-title">{t('ndc:NdcSubTitle')}</div>
+            <div className="body-title">{t("ndc:ndcTitle")}</div>
+            <div className="body-sub-title">{t("ndc:ndcSubTitle")}</div>
           </Col>
         </Row>
       </div>
       <div>
-        <Tabs defaultActiveKey="1" items={periodItems} onChange={onTabChange} />
+        <Tabs
+          centered={true}
+          defaultActiveKey="1"
+          items={periodItems}
+          onChange={onTabChange}
+        />
       </div>
-      {selectedTab !== 'add_new' && (
+      {selectedTab !== "add_new" && (
         <div>
           <div>
-            <Button
-              onClick={onAddNewNdcDetail}
-              type="primary"
-              style={{
-                marginBottom: 16,
-              }}
-            >
-              Add a row
-            </Button>
             <Table
               components={components}
-              rowClassName={() => 'editable-row'}
+              rowClassName={() => "editable-row"}
               bordered
               dataSource={ndcDetailsData}
               columns={columns}
+              footer={() => (
+                <Row justify={"center"}>
+                  <Button
+                    onClick={onAddNewNdcDetail}
+                    type="primary"
+                    style={{
+                      marginBottom: 16,
+                    }}
+                  >
+                    {t("ndc:addNdcAction")}
+                  </Button>
+                </Row>
+              )}
             />
           </div>
         </div>
