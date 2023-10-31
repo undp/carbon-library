@@ -163,6 +163,13 @@ export const NdcDetailsComponent = (props: any) => {
     }
   };
 
+
+  useEffect(() => {
+    if (periodItems && periodItems.length > 1) {
+      setSelectedTab(periodItems[periodItems.length - 1].key)
+    }
+  }, [periodItems]);
+
   const onDateRangeChanged = (range: any) => {
     const period = {
       start: Number(moment(range[0]).year()),
@@ -174,10 +181,10 @@ export const NdcDetailsComponent = (props: any) => {
   function addNewPeriodContent() {
     return (
       <div>
-        <Row>
+        <Row justify="center">
           <RangePicker onChange={onDateRangeChanged} picker="year" />
         </Row>
-        <Row className="mg-top-1">
+        <Row className="mg-top-1" justify="center">
           <div className="steps-actions">
             <Button
               type="primary"
@@ -266,9 +273,10 @@ export const NdcDetailsComponent = (props: any) => {
                 <Row justify={"center"}>
                   <Button
                     onClick={onAddNewNdcDetail}
-                    type="primary"
+                    type="default"
                     style={{
                       marginBottom: 16,
+                      width: '100%'
                     }}
                   >
                     {t("ndc:addNdcAction")}
