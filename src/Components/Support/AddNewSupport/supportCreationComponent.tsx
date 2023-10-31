@@ -234,39 +234,6 @@ export const SupportCreationComponent = (props: any) => {
                         form={formOne}
                         onFinish={nextOne}
                       >
-                        <Row className="row" gutter={[4, 4]}>
-                          <Col xl={8} md={12}>
-                            <Form.Item
-                              label={t("programme:type")}
-                              wrapperCol={{ span: 13 }}
-                              className="role-group"
-                              name="type"
-                              rules={[
-                                {
-                                  required: false,
-                                },
-                              ]}
-                            >
-                              <Radio.Group size="large">
-                                {Object.values(InvestmentCreationType).map(
-                                  (k, index) => (
-                                    <div className="condition-radio-container">
-                                      <Radio.Button
-                                        className="condition-radio"
-                                        value={k}
-                                        onClick={(e: any) =>
-                                          deselectOnClick(e, "type")
-                                        }
-                                      >
-                                        {t("programme:" + k)}
-                                      </Radio.Button>
-                                    </div>
-                                  )
-                                )}
-                              </Radio.Group>
-                            </Form.Item>
-                          </Col>
-                        </Row>
                         <Row className="row" gutter={[16, 16]}>
                           <Col xl={12} md={24}>
                             <div className="details-part-one">
