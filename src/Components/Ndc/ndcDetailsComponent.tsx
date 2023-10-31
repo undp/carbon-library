@@ -12,7 +12,7 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { EditableRow, EditableCell } from "./antTableComponents";
+import { EditableRow, EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 
 type Period = {
