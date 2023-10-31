@@ -87,7 +87,7 @@ export const InvestmentCreationComponent = (props: any) => {
           value: userInfoState?.companyId,
         });
       }
-      for (const c of data!.companyId) {
+      for (const c of data!?.companyId) {
         filterAnd.push({
           key: "companyId",
           operation: "!=",
@@ -115,7 +115,7 @@ export const InvestmentCreationComponent = (props: any) => {
       onNavigateToProgrammeManagementView();
       return;
     }
-    setData(state.record);
+    setData(state?.record);
   }, []);
 
   useEffect(() => {
@@ -127,8 +127,8 @@ export const InvestmentCreationComponent = (props: any) => {
   }
 
   const companyName: any = {};
-  for (const company of data!.company) {
-    companyName[company.companyId] = company;
+  for (const company of data!?.company) {
+    companyName[company?.companyId] = company;
   }
   if (!data!.proponentPercentage) {
     data.proponentPercentage = [100];
@@ -682,143 +682,144 @@ export const InvestmentCreationComponent = (props: any) => {
                 description: current === 1 && (
                   <div>
                     <div className="programme-sought-form-container ownership-container">
-                      <div className="programme-sought-form">
-                        <Form
-                          labelCol={{ span: 20 }}
-                          wrapperCol={{ span: 24 }}
-                          form={formTwo}
-                          name="investment-sought"
-                          className="investment-sought-form"
-                          layout="vertical"
-                          requiredMark={true}
-                          onChange={onPercentageChange}
-                          onFinish={submitInvestment}
-                        >
-                          {data?.companyId.map((companyId, index) => {
-                            return (
-                              <Row className="row" gutter={[16, 16]}>
-                                <Col xl={8} md={15}>
-                                  <div className="label">
-                                    {companyName[companyId].name}
-                                    <span className="required-mark">*</span>
-                                  </div>
-                                </Col>
-                                <Col xl={8} md={9}>
-                                  <Form.Item
-                                    className="inline"
-                                    name={["percentage", index]}
-                                    initialValue={0}
-                                    rules={[
-                                      {
-                                        pattern: new RegExp(
-                                          /^[+]?([.]\d+|\d+[.]?\d*)$/g
-                                        ),
-                                        message:
-                                          "Percentage Should be a positive number",
-                                      },
-                                      {
-                                        required: true,
-                                        message: "Required field",
-                                      },
-                                      ({ getFieldValue }) => ({
-                                        validator(rule, v) {
-                                          if (
-                                            getFieldValue([
-                                              "percentage",
-                                              index,
-                                            ]) &&
-                                            parseFloat(
+                      {state?.id !== "ow" &&
+                        <div className="programme-sought-form">
+                          <Form
+                            labelCol={{ span: 20 }}
+                            wrapperCol={{ span: 24 }}
+                            form={formTwo}
+                            name="investment-sought"
+                            className="investment-sought-form"
+                            layout="vertical"
+                            requiredMark={true}
+                            onChange={onPercentageChange}
+                            onFinish={submitInvestment}
+                          >
+                            {data?.companyId.map((companyId, index) => {
+                              return (
+                                <Row className="row" gutter={[16, 16]}>
+                                  <Col xl={8} md={15}>
+                                    <div className="label">
+                                      {companyName[companyId].name}
+                                      <span className="required-mark">*</span>
+                                    </div>
+                                  </Col>
+                                  <Col xl={8} md={9}>
+                                    <Form.Item
+                                      className="inline"
+                                      name={["percentage", index]}
+                                      initialValue={0}
+                                      rules={[
+                                        {
+                                          pattern: new RegExp(
+                                            /^[+]?([.]\d+|\d+[.]?\d*)$/g
+                                          ),
+                                          message:
+                                            "Percentage Should be a positive number",
+                                        },
+                                        {
+                                          required: true,
+                                          message: "Required field",
+                                        },
+                                        ({ getFieldValue }) => ({
+                                          validator(rule, v) {
+                                            if (
                                               getFieldValue([
                                                 "percentage",
                                                 index,
-                                              ])
-                                            ) > data!.proponentPercentage[index]
-                                          ) {
-                                            // eslint-disable-next-line prefer-promise-reject-errors
-                                            return Promise.reject(
-                                              "Amount > Available"
-                                            );
+                                              ]) &&
+                                              parseFloat(
+                                                getFieldValue([
+                                                  "percentage",
+                                                  index,
+                                                ])
+                                              ) > data!.proponentPercentage[index]
+                                            ) {
+                                              // eslint-disable-next-line prefer-promise-reject-errors
+                                              return Promise.reject(
+                                                "Amount > Available"
+                                              );
+                                            }
+                                            return Promise.resolve();
+                                          },
+                                        }),
+                                      ]}
+                                    >
+                                      <InputNumber
+                                        placeholder=""
+                                        controls={false}
+                                        // disabled={userInfoState?.companyId === Number(companyId)}
+                                        onKeyPress={(event) => {
+                                          if (!/[0-9\.]/.test(event.key)) {
+                                            event.preventDefault();
                                           }
-                                          return Promise.resolve();
-                                        },
-                                      }),
-                                    ]}
-                                  >
-                                    <InputNumber
-                                      placeholder=""
-                                      controls={false}
-                                      // disabled={userInfoState?.companyId === Number(companyId)}
-                                      onKeyPress={(event) => {
-                                        if (!/[0-9\.]/.test(event.key)) {
-                                          event.preventDefault();
-                                        }
-                                      }}
-                                    />
-                                  </Form.Item>
-                                  <div className="inline separator">{"/"}</div>
+                                        }}
+                                      />
+                                    </Form.Item>
+                                    <div className="inline separator">{"/"}</div>
 
-                                  <Form.Item className="inline">
-                                    <InputNumber
-                                      placeholder={String(
-                                        data?.proponentPercentage[index]
-                                      )}
-                                      disabled
-                                    />
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                            );
-                          })}
-                          <Row className="row" gutter={[16, 16]}>
-                            <Col xl={8} md={15}>
-                              <div className="label">
-                                {t("programme:total")}
+                                    <Form.Item className="inline">
+                                      <InputNumber
+                                        placeholder={String(
+                                          data?.proponentPercentage[index]
+                                        )}
+                                        disabled
+                                      />
+                                    </Form.Item>
+                                  </Col>
+                                </Row>
+                              );
+                            })}
+                            <Row className="row" gutter={[16, 16]}>
+                              <Col xl={8} md={15}>
+                                <div className="label">
+                                  {t("programme:total")}
+                                </div>
+                              </Col>
+                              <Col xl={8} md={9}>
+                                <Form.Item className="inline" name={["total"]}>
+                                  <InputNumber
+                                    placeholder={currentPercTotal + ""}
+                                    controls={false}
+                                    disabled={true}
+                                    onKeyPress={(event) => {
+                                      if (!/[0-9\.]/.test(event.key)) {
+                                        event.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                </Form.Item>
+                                <div className="inline separator">{"/"}</div>
+
+                                <Form.Item className="inline">
+                                  <InputNumber
+                                    disabled={true}
+                                    placeholder={"100"}
+                                  />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                            <Form.Item>
+                              <div className="steps-actions">
+                                <Button
+                                  type="primary"
+                                  htmlType="submit"
+                                  loading={loading}
+                                  onSubmit={submitInvestment}
+                                >
+                                  {t("programme:submit")}
+                                </Button>
+                                <Button
+                                  className="back-btn"
+                                  onClick={() => prevOne()}
+                                  loading={loading}
+                                >
+                                  {t("programme:back")}
+                                </Button>
                               </div>
-                            </Col>
-                            <Col xl={8} md={9}>
-                              <Form.Item className="inline" name={["total"]}>
-                                <InputNumber
-                                  placeholder={currentPercTotal + ""}
-                                  controls={false}
-                                  disabled={true}
-                                  onKeyPress={(event) => {
-                                    if (!/[0-9\.]/.test(event.key)) {
-                                      event.preventDefault();
-                                    }
-                                  }}
-                                />
-                              </Form.Item>
-                              <div className="inline separator">{"/"}</div>
-
-                              <Form.Item className="inline">
-                                <InputNumber
-                                  disabled={true}
-                                  placeholder={"100"}
-                                />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                          <Form.Item>
-                            <div className="steps-actions">
-                              <Button
-                                type="primary"
-                                htmlType="submit"
-                                loading={loading}
-                                onSubmit={submitInvestment}
-                              >
-                                {t("programme:submit")}
-                              </Button>
-                              <Button
-                                className="back-btn"
-                                onClick={() => prevOne()}
-                                loading={loading}
-                              >
-                                {t("programme:back")}
-                              </Button>
-                            </div>
-                          </Form.Item>
-                        </Form>
-                      </div>
+                            </Form.Item>
+                          </Form>
+                        </div>}
                     </div>
                   </div>
                 ),

@@ -114,13 +114,13 @@ export const SupportCreationComponent = (props: any) => {
     getOrganisationsDetails();
   }, [data]);
 
-  const companyName: any = {};
-  for (const company of data!?.company) {
-    companyName[company.companyId] = company;
-  }
-  if (!data!.proponentPercentage) {
-    data.proponentPercentage = [100];
-  }
+  // const companyName: any = {};
+  // for (const company of data!?.company) {
+  //   companyName[company.companyId] = company;
+  // }
+  // if (!data!.proponentPercentage) {
+  //   data.proponentPercentage = [100];
+  // }
 
   const nextOne = (val: any) => {
     setCurrent(current + 1);
@@ -637,7 +637,7 @@ export const SupportCreationComponent = (props: any) => {
                 description: current === 1 && (
                   <div>
                     <div className="programme-sought-form-container ownership-container">
-                      <div className="programme-sought-form">
+                      {/* <div className="programme-sought-form">
                         <Form
                           labelCol={{ span: 20 }}
                           wrapperCol={{ span: 24 }}
@@ -773,7 +773,7 @@ export const SupportCreationComponent = (props: any) => {
                             </div>
                           </Form.Item>
                         </Form>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ),
