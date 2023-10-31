@@ -115,7 +115,7 @@ export const SupportCreationComponent = (props: any) => {
   }, [data]);
 
   const companyName: any = {};
-  for (const company of data!.company) {
+  for (const company of data!?.company) {
     companyName[company.companyId] = company;
   }
   if (!data!.proponentPercentage) {
@@ -649,7 +649,7 @@ export const SupportCreationComponent = (props: any) => {
                           onChange={onPercentageChange}
                           onFinish={() => { }}
                         >
-                          {data?.companyId.map((companyId, index) => {
+                          {data?.companyId?.map((companyId, index) => {
                             return (
                               <Row className="row" gutter={[16, 16]}>
                                 <Col xl={8} md={15}>
