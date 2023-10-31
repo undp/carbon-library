@@ -132,11 +132,13 @@ export const NdcDetailsComponent = (props: any) => {
       const newPeriodItem = {
         key: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
         label: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
+        start: selectedPeriod.current.start,
+        end: selectedPeriod.current.end,
         children: ndcDetailsTableContent(),
       };
 
       const existingIndex = periodItemsRef.current.findIndex(
-        (item: any) => item.key === newPeriodItem.key
+        (item: any) => item.start === newPeriodItem.start || item.end === newPeriodItem.end
       );
 
       if (existingIndex === -1) {
