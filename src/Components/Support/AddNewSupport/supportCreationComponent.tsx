@@ -111,14 +111,6 @@ export const SupportCreationComponent = (props: any) => {
   };
 
   useEffect(() => {
-    if (!state) {
-      onNavigateToProgrammeManagementView();
-      return;
-    }
-    setData(state.record);
-  }, []);
-
-  useEffect(() => {
     getOrganisationsDetails();
   }, [data]);
 
