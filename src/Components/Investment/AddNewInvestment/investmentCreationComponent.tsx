@@ -234,20 +234,20 @@ export const InvestmentCreationComponent = (props: any) => {
                         form={formOne}
                         onFinish={nextOne}
                       >
-                        <Row className="row" gutter={[4, 4]}>
+                        <Row className="row" gutter={[16, 16]}>
                           <Col xl={8} md={12}>
                             <Form.Item
-                              label={t("programme:type")}
-                              wrapperCol={{ span: 13 }}
+                              label={t("programme:typeCreation")}
+                              wrapperCol={{ span: 24 }}
                               className="role-group"
-                              name="type"
+                              name="typeCreation"
                               rules={[
                                 {
                                   required: false,
                                 },
                               ]}
                             >
-                              <Radio.Group size="large">
+                              <Radio.Group size="large" defaultValue="New">
                                 {Object.values(InvestmentCreationType).map(
                                   (k, index) => (
                                     <div className="condition-radio-container">
