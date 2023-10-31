@@ -12,7 +12,10 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { EditableRow, EditableCell } from "../Common/AntComponents/antTableComponents";
+import {
+  EditableRow,
+  EditableCell,
+} from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 
 type Period = {
@@ -127,6 +130,9 @@ export const NdcDetailsComponent = (props: any) => {
 
   const onCancelPeriod = () => {};
 
+  const inRange = (num: number, min: number, max: number) =>
+    num >= min && num <= max;
+
   const onAddNewPeriod = () => {
     if (selectedPeriod && selectedPeriod.current) {
       const newPeriodItem = {
@@ -138,7 +144,9 @@ export const NdcDetailsComponent = (props: any) => {
       };
 
       const existingIndex = periodItemsRef.current.findIndex(
-        (item: any) => item.start === newPeriodItem.start || item.end === newPeriodItem.end
+        (item: any) =>
+          inRange(newPeriodItem.start, item.start, item.end) ||
+          inRange(newPeriodItem.end, item.start, item.end)
       );
 
       if (existingIndex === -1) {
