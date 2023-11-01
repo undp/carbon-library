@@ -112,7 +112,6 @@ export const InvestmentCreationComponent = (props: any) => {
   };
 
   useEffect(() => {
-    console.log("state ---------------- > ", state)
     if (!state) {
       onNavigateToProgrammeManagementView();
       return;
@@ -260,15 +259,17 @@ export const InvestmentCreationComponent = (props: any) => {
                                 },
                               ]}
                             >
-                              <Radio.Group size="large" value={typeCreation}>
+                              <Radio.Group size="large" value={"New"}>
                                 {Object.values(InvestmentCreationType).map(
                                   (k, index) => (
                                     <div className="condition-radio-container">
                                       <Radio.Button
                                         className="condition-radio"
                                         value={k}
-                                        onClick={(e: any) =>
+                                        onClick={(e: any) => {
+                                          console.log(e)
                                           deselectOnClick(e, "type")
+                                        }
                                         }
                                       >
                                         {t("programme:" + k)}
