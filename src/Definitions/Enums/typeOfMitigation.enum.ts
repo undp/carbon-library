@@ -4,6 +4,7 @@ export enum TypeOfMitigation {
   EE_HOUSEHOLDS = "EEHouseholds",
 }
 
+// sub types of mitigation
 export enum SubTypeOfMitigation {
   SOIL_ENRICHMENT_BIOCHAR = "SoilEnrichmentBiochar",
   RICE_CROPS = "RiceCrops",
