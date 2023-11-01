@@ -139,7 +139,7 @@ export const NdcDetailsComponent = (props: any) => {
       endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
       nationalPlanObj: t("ndc:enterNewPlanTxt"),
       kpi: 0,
-      ministry: "Enter The Ministry"
+      ministry: "Please add the Ministry name"
     };
 
     setNdcDetailsData([...ndcDetailsData, newData]);
