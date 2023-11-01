@@ -12,8 +12,12 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { EditableRow, EditableCell } from "../Common/AntComponents/antTableComponents";
+import {
+  EditableRow,
+  EditableCell,
+} from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
+import { CompanyRole, Role } from "../../Definitions";
 
 type Period = {
   start: number;
@@ -29,7 +33,7 @@ type NdcDetail = {
 };
 
 export const NdcDetailsComponent = (props: any) => {
-  const { t, useConnection } = props;
+  const { t, useConnection, useUserContext } = props;
   const { RangePicker } = DatePicker;
   const [ndcDetailsData, setNdcDetailsData] = useState<NdcDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,6 +41,27 @@ export const NdcDetailsComponent = (props: any) => {
   const [periodItems, setPeriodItems] = useState([] as any[]);
   const [selectedTab, setSelectedTab] = useState("add_new");
   const selectedPeriod = useRef({} as Period);
+  const addedNdcDetailId = useRef(0);
+
+  const { userInfoState } = useUserContext();
+
+  const isAddRangeVisible = () => {
+    return (
+      (userInfoState?.companyRole === CompanyRole.MINISTRY ||
+        userInfoState?.companyRole === CompanyRole.GOVERNMENT) &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
+  };
+
+  const isAddNdcActionVisible = () => {
+    return (
+      userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
+  };
+
+  const inRange = (num: number, min: number, max: number) =>
+    num >= min && num <= max;
 
   const handleSave = (row: any) => {
     const newData = [...ndcDetailsData];
@@ -47,6 +72,22 @@ export const NdcDetailsComponent = (props: any) => {
       ...row,
     });
     setNdcDetailsData(newData);
+  };
+
+  const getNdcDetailsForPeriod = () => {
+    const range = selectedTab.split("-");
+    if (range.length > 1) {
+      const filteredData = ndcDetailsData.filter((item: NdcDetail) => {
+        return inRange(
+          Number(moment(item.startDate).year()),
+          Number(range[0]),
+          Number(range[1])
+        );
+      });
+      return filteredData;
+    } else {
+      return [];
+    }
   };
 
   const defaultColumns: any = [
@@ -83,11 +124,14 @@ export const NdcDetailsComponent = (props: any) => {
   });
 
   function onAddNewNdcDetail() {
+    const range = selectedTab.split("-");
+    addedNdcDetailId.current = addedNdcDetailId.current + 1;
     const newData = {
-      startDate: new Date("2014-12-24 23:12:00"),
-      endDate: new Date("2014-12-24 23:12:00"),
-      nationalPlanObj: "sample text2",
-      kpi: 34,
+      key: addedNdcDetailId.current,
+      startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
+      endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
+      nationalPlanObj: t("ndc:enterNewPlanTxt"),
+      kpi: 0,
     };
 
     setNdcDetailsData([...ndcDetailsData, newData]);
@@ -138,7 +182,9 @@ export const NdcDetailsComponent = (props: any) => {
       };
 
       const existingIndex = periodItemsRef.current.findIndex(
-        (item: any) => item.start === newPeriodItem.start || item.end === newPeriodItem.end
+        (item: any) =>
+          inRange(newPeriodItem.start, item.start, item.end) ||
+          inRange(newPeriodItem.end, item.start, item.end)
       );
 
       if (existingIndex === -1) {
@@ -155,10 +201,9 @@ export const NdcDetailsComponent = (props: any) => {
     }
   };
 
-
   useEffect(() => {
     if (periodItems && periodItems.length > 1) {
-      setSelectedTab(periodItems[periodItems.length - 1].key)
+      setSelectedTab(periodItems[periodItems.length - 1].key);
     }
   }, [periodItems]);
 
@@ -206,31 +251,74 @@ export const NdcDetailsComponent = (props: any) => {
   useEffect(() => {
     const defaultNdcDetails = [
       {
-        startDate: new Date("2022-03-25"),
-        endDate: new Date("2023-03-25"),
-        nationalPlanObj: "sample text1",
-        kpi: 23,
-      },
-      {
-        startDate: new Date("2023-03-25"),
-        endDate: new Date("2024-03-25"),
-        nationalPlanObj: "sample text2",
-        kpi: 34,
-      },
-      {
-        startDate: new Date("2024-03-25"),
-        endDate: new Date("2025-03-25"),
-        nationalPlanObj: "sample text3",
+        key:1,
+        startDate: new Date("2019-03-25"),
+        endDate: new Date("2020-03-25"),
+        nationalPlanObj: "Enhance value addition in key growth opportunities",
         kpi: 25,
       },
+      {
+        key:2,
+        startDate: new Date("2019-03-25"),
+        endDate: new Date("2019-08-25"),
+        nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
+        kpi: 10500,
+      },
+      {
+        key:3,
+        startDate: new Date("2021-03-25"),
+        endDate: new Date("2022-03-25"),
+        nationalPlanObj:
+          "Consolidate and increase the stock and quality of productive infrastructure by 50%",
+        kpi: 48,
+      },
+      {
+        key:4,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2022-05-25"),
+        nationalPlanObj:
+          "Enhance the productivity and social wellbeing of the population",
+        kpi: 20,
+      },
+      {
+        key:5,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj:
+          "Strengthen the role of the state in guiding and facilitating development",
+        kpi: 10,
+      },
     ];
-    const addNewItem = {
-      key: "add_new",
-      label: "Add New",
-      children: addNewPeriodContent(),
-    };
-    setPeriodItems([addNewItem]);
-    periodItemsRef.current = [addNewItem];
+    const initialPeriods = [
+      {
+        key: `2019-2020`,
+        label: `2019-2020`,
+        start: 2019,
+        end: 2020,
+        children: ndcDetailsTableContent(),
+      },
+      {
+        key: `2021-2023`,
+        label: `2021-2023`,
+        start: 2021,
+        end: 2021,
+        children: ndcDetailsTableContent(),
+      },
+    ];
+
+    if (isAddRangeVisible()) {
+      initialPeriods.unshift({
+        key: "add_new",
+        label: "Add New",
+        start: 0,
+        end: 0,
+        children: addNewPeriodContent(),
+      });
+    }
+
+    addedNdcDetailId.current = 5;
+    setPeriodItems(initialPeriods);
+    periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
   }, []);
 
@@ -260,22 +348,24 @@ export const NdcDetailsComponent = (props: any) => {
               components={components}
               rowClassName={() => "editable-row"}
               bordered
-              dataSource={ndcDetailsData}
+              dataSource={getNdcDetailsForPeriod()}
               columns={columns}
-              footer={() => (
-                <Row justify={"center"}>
-                  <Button
-                    onClick={onAddNewNdcDetail}
-                    type="default"
-                    style={{
-                      marginBottom: 16,
-                      width: '100%'
-                    }}
-                  >
-                    {t("ndc:addNdcAction")}
-                  </Button>
-                </Row>
-              )}
+              footer={() =>
+                isAddNdcActionVisible() && (
+                  <Row justify={"center"}>
+                    <Button
+                      onClick={onAddNewNdcDetail}
+                      type="default"
+                      style={{
+                        marginBottom: 16,
+                        width: "100%",
+                      }}
+                    >
+                      {t("ndc:addNdcAction")}
+                    </Button>
+                  </Row>
+                )
+              }
             />
           </div>
         </div>
