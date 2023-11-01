@@ -1864,7 +1864,7 @@ export class ProgrammeService {
       );
       }
 
-      if(!mitigationSubTypesListMapped[ndcAction.typeOfMitigation].includes(ndcAction.subTypeOfMitigation)) {
+      if(ndcAction.subTypeOfMitigation && !mitigationSubTypesListMapped[ndcAction.typeOfMitigation].includes(ndcAction.subTypeOfMitigation)) {
         throw new HttpException(
             this.helperService.formatReqMessagesString(
               "programme.wrongSubMitigationMapping",
