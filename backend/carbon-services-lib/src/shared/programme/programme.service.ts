@@ -3845,6 +3845,15 @@ export class ProgrammeService {
       });
     }
 
+    req.issueAmount.map(action=>{
+      updated.mitigationActions.map(actionData=>{
+        if(actionData.actionId===action.actionId){
+          actionData.issuedCredits+=action.issueCredit
+          actionData.availableCredits-=action.issueCredit
+        }
+      })
+    })
+
     return new DataResponseDto(HttpStatus.OK, updated);
   }
 
