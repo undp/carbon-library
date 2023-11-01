@@ -13,6 +13,7 @@ import {
   Steps,
   message,
 } from "antd";
+import type { RadioChangeEvent } from 'antd';
 import "../investmentComponent.scss";
 import {
   ProgrammeT,
@@ -211,6 +212,11 @@ export const InvestmentCreationComponent = (props: any) => {
     }
   };
 
+  const onChangeTypeCreation = (e: RadioChangeEvent) => {
+    console.log('radio checked', e.target.value);
+    setTypeCreation(e.target.value);
+  };
+
   return (
     <div className="add-programme-main-container">
       <div className="title-container">
@@ -259,18 +265,14 @@ export const InvestmentCreationComponent = (props: any) => {
                                 },
                               ]}
                             >
-                              <Radio.Group size="large" value={"New"}>
+                              <Radio.Group size="large" defaultValue={typeCreation}>
                                 {Object.values(InvestmentCreationType).map(
                                   (k, index) => (
                                     <div className="condition-radio-container">
                                       <Radio.Button
                                         className="condition-radio"
                                         value={k}
-                                        onClick={(e: any) => {
-                                          console.log(e)
-                                          deselectOnClick(e, "type")
-                                        }
-                                        }
+                                        onChange={onChangeTypeCreation}
                                       >
                                         {t("programme:" + k)}
                                       </Radio.Button>
