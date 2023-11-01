@@ -123,11 +123,12 @@ export const NdcDetailsComponent = (props: any) => {
   });
 
   function onAddNewNdcDetail() {
+    const range = selectedTab.split("-");
     const newData = {
-      startDate: new Date("2014-12-24 23:12:00"),
-      endDate: new Date("2014-12-24 23:12:00"),
-      nationalPlanObj: "sample text2",
-      kpi: 34,
+      startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
+      endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
+      nationalPlanObj: t("ndc:enterNewPlanTxt"),
+      kpi: 0,
     };
 
     setNdcDetailsData([...ndcDetailsData, newData]);
