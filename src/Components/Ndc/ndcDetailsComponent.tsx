@@ -41,6 +41,9 @@ export const NdcDetailsComponent = (props: any) => {
   const [selectedTab, setSelectedTab] = useState("add_new");
   const selectedPeriod = useRef({} as Period);
 
+  const inRange = (num: number, min: number, max: number) =>
+    num >= min && num <= max;
+
   const handleSave = (row: any) => {
     const newData = [...ndcDetailsData];
     const index = newData.findIndex((item) => row.key === item.key);
@@ -53,8 +56,20 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const getNdcDetailsForPeriod = () => {
-    return ndcDetailsData;
-  }
+    const range = selectedTab.split("-");
+    if (range.length > 1) {
+      const filteredData = ndcDetailsData.filter((item: NdcDetail) => {
+        return inRange(
+          Number(moment(item.startDate).year()),
+          Number(range[0]),
+          Number(range[1])
+        );
+      });
+      return filteredData;
+    } else {
+      return [];
+    }
+  };
 
   const defaultColumns: any = [
     {
@@ -133,9 +148,6 @@ export const NdcDetailsComponent = (props: any) => {
   }
 
   const onCancelPeriod = () => {};
-
-  const inRange = (num: number, min: number, max: number) =>
-    num >= min && num <= max;
 
   const onAddNewPeriod = () => {
     if (selectedPeriod && selectedPeriod.current) {
@@ -231,19 +243,22 @@ export const NdcDetailsComponent = (props: any) => {
       {
         startDate: new Date("2021-03-25"),
         endDate: new Date("2022-03-25"),
-        nationalPlanObj: "Consolidate and increase the stock and quality of productive infrastructure by 50%",
+        nationalPlanObj:
+          "Consolidate and increase the stock and quality of productive infrastructure by 50%",
         kpi: 48,
       },
       {
         startDate: new Date("2022-03-25"),
         endDate: new Date("2022-05-25"),
-        nationalPlanObj: "Enhance the productivity and social wellbeing of the population",
+        nationalPlanObj:
+          "Enhance the productivity and social wellbeing of the population",
         kpi: 20,
       },
       {
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Strengthen the role of the state in guiding and facilitating development",
+        nationalPlanObj:
+          "Strengthen the role of the state in guiding and facilitating development",
         kpi: 10,
       },
     ];
@@ -266,8 +281,8 @@ export const NdcDetailsComponent = (props: any) => {
         start: 2020,
         end: 2023,
         children: ndcDetailsTableContent(),
-      }
-    ]
+      },
+    ];
     const addNewItem = {
       key: "add_new",
       label: "Add New",
