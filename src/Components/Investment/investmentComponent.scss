@@ -1,7 +1,10 @@
 @import '../../Styles/variables.scss';
 
 .steps-actions {
-  text-align: right;
+  display: flex;
+  flex-direction: row-reverse;
+  margin-right: 1rem;
+  justify-content: flex-start;
 }
 
 .investment-title-bar {
