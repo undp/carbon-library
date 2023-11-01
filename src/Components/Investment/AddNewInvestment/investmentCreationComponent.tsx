@@ -46,6 +46,7 @@ export const InvestmentCreationComponent = (props: any) => {
   const [formTwo] = Form.useForm();
   const { post } = useConnection();
   const [loading, setLoading] = useState<boolean>(false);
+  const [typeCreation, setTypeCreation] = useState<any>("New");
   const [loadingList, setLoadingList] = useState<boolean>(false);
   const [current, setCurrent] = useState<number>(0);
   const [currentPercTotal, setCurrentPercTotal] = useState<number>(0);
@@ -137,11 +138,13 @@ export const InvestmentCreationComponent = (props: any) => {
   }
 
   const companyName: any = {};
-  for (const company of data!?.company) {
-    companyName[company?.companyId] = company;
-  }
-  if (!data!.proponentPercentage) {
-    data.proponentPercentage = [100];
+  if (data && Object.keys(data)[0] !== "ownership") {
+    for (const company of data!?.company) {
+      companyName[company?.companyId] = company;
+    }
+    if (!data!.proponentPercentage) {
+      data.proponentPercentage = [100];
+    }
   }
 
   const nextOne = (val: any) => {
@@ -257,7 +260,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                 },
                               ]}
                             >
-                              <Radio.Group size="large" defaultValue="New">
+                              <Radio.Group size="large" value={typeCreation}>
                                 {Object.values(InvestmentCreationType).map(
                                   (k, index) => (
                                     <div className="condition-radio-container">
