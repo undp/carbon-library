@@ -661,6 +661,11 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                               )}`
                             );
                           }
+                          if (value < 0) {
+                            throw new Error(
+                              `${t("ndcAction:allowOnlyNumericValueAndDecimal")}`
+                            );
+                          }
                         },
                       },
                     ]}
@@ -668,7 +673,12 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                   >
                     <InputNumber
                       style={{ width: 442, paddingRight: 12 }}
-                      onChange={calculateMethodologyEstimatedCredits}
+                      onChange={(value) => {
+                        const numericValue = Number(value); // Convert value to a number
+                        if (!isNaN(numericValue) && numericValue >= 0) {
+                          calculateMethodologyEstimatedCredits();
+                        }
+                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -746,13 +756,23 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                             )}`
                           );
                         }
+                        if (value < 0) {
+                          throw new Error(
+                            `${t("ndcAction:allowOnlyNumericValueAndDecimal")}`
+                          );
+                        }
                       },
                     },
                   ]}
                 >
                   <InputNumber
                     style={{ width: 442, paddingRight: 12 }}
-                    onChange={calculateMethodologyEstimatedCredits}
+                    onChange={(value) => {
+                      const numericValue = Number(value); // Convert value to a number
+                      if (!isNaN(numericValue) && numericValue >= 0) {
+                        calculateMethodologyEstimatedCredits();
+                      }
+                    }}
                   />
                 </Form.Item>
               </Col>
@@ -808,13 +828,25 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                             )}`
                           );
                         }
+                        if (
+                          value < 1
+                        ) {
+                          throw new Error(
+                            `${t("ndcAction:allowOnlyNumericValueAndDecimal")}`
+                          );
+                        }
                       },
                     },
                   ]}
                 >
                   <InputNumber
                     style={{ width: 442, paddingRight: 12 }}
-                    onChange={calculateMethodologyEstimatedCredits}
+                    onChange={(value) => {
+                      const numericValue = Number(value); // Convert value to a number
+                      if (!isNaN(numericValue) && numericValue >= 0) {
+                        calculateMethodologyEstimatedCredits();
+                      }
+                    }}
                   />
                 </Form.Item>
               </Col>
@@ -849,6 +881,11 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                               )}`
                             );
                           }
+                          if (value < 0) {
+                            throw new Error(
+                              `${t("ndcAction:allowOnlyNumericValue")}`
+                            );
+                          }
                         },
                       },
                     ]}
@@ -856,7 +893,12 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                   >
                     <InputNumber
                       style={{ width: 442, paddingRight: 12 }}
-                      onChange={calculateMethodologyEstimatedCredits}
+                      onChange={(value) => {
+                        const numericValue = Number(value); // Convert value to a number
+                        if (!isNaN(numericValue) && numericValue >= 0) {
+                          calculateMethodologyEstimatedCredits();
+                        }
+                      }}
                     />
                   </Form.Item>
                 </Col>
@@ -882,6 +924,11 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                               )}`
                             );
                           }
+                          if (value < 0) {
+                            throw new Error(
+                              `${t("ndcAction:allowOnlyNumericValue")}`
+                            );
+                          }
                         },
                       },
                     ]}
@@ -889,7 +936,12 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                   >
                     <InputNumber
                       style={{ width: 442, paddingRight: 12 }}
-                      onChange={calculateMethodologyEstimatedCredits}
+                      onChange={(value) => {
+                        const numericValue = Number(value); // Convert value to a number
+                        if (!isNaN(numericValue) && numericValue >= 0) {
+                          calculateMethodologyEstimatedCredits();
+                        }
+                      }}
                     />
                   </Form.Item>
                 </Col>

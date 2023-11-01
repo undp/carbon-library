@@ -11,6 +11,7 @@ import { NDCReports } from "./ndc.reports";
 import { CoBenefitsProperties } from "./co.benefits";
 import { EnablementProperties } from "./enablement.properties";
 import { CreditCalculationProperties } from "./credit.calculation.properties";
+import { CreditCalculationPropertyValidator, IsChildClassValid } from "../validation/credit.calculation.property.validator";
 
 export class NDCActionDto {
 
@@ -43,7 +44,7 @@ export class NDCActionDto {
 
   @ApiProperty({ enum: SubTypeOfMitigation })
   @ValidateIf(o => ((o.action === NDCActionType.Mitigation || o.action === NDCActionType.CrossCutting) && (
-    o.typeOfMitigation !== TypeOfMitigation.CCS || o.typeOfMitigation !== TypeOfMitigation.MARINE
+    o.typeOfMitigation !== TypeOfMitigation.CCS && o.typeOfMitigation !== TypeOfMitigation.MARINE
   )))
   @IsEnum(SubTypeOfMitigation, {
       message: 'Invalid sub mitigation type. Supported following values:' + Object.values(SubTypeOfMitigation)
@@ -77,6 +78,7 @@ export class NDCActionDto {
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => CreditCalculationProperties)
+  @IsChildClassValid()
   creditCalculationProperties?: CreditCalculationProperties;
 
 

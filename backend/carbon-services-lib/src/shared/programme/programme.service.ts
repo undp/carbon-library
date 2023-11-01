@@ -26,7 +26,7 @@ import { ConstantUpdateDto } from "../dto/constants.update.dto";
 import { ProgrammeApprove } from "../dto/programme.approve";
 import { BasicResponseDto } from "../dto/basic.response.dto";
 import { ConfigService } from "@nestjs/config";
-import { SubTypeOfMitigation, TypeOfMitigation, sectorMitigationTypesListMapped } from "../enum/typeofmitigation.enum";
+import { SubTypeOfMitigation, TypeOfMitigation, mitigationSubTypesListMapped, sectorMitigationTypesListMapped } from "../enum/typeofmitigation.enum";
 import { ProgrammeTransferRequest } from "../dto/programme.transfer.request";
 import { User } from "../entities/user.entity";
 import { ProgrammeTransfer } from "../entities/programme.transfer";
@@ -1858,6 +1858,16 @@ export class ProgrammeService {
         throw new HttpException(
             this.helperService.formatReqMessagesString(
               "programme.wrongMItigationSectorMapping",
+              []
+              ),
+              HttpStatus.BAD_REQUEST
+      );
+      }
+
+      if(!mitigationSubTypesListMapped[ndcAction.typeOfMitigation].includes(ndcAction.subTypeOfMitigation)) {
+        throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "programme.wrongSubMitigationMapping",
               []
               ),
               HttpStatus.BAD_REQUEST
