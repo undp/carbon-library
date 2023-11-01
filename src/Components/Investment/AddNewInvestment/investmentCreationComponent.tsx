@@ -124,10 +124,13 @@ export const InvestmentCreationComponent = (props: any) => {
   }, []);
 
   useEffect(() => {
-    getOrganisationsDetails();
+    const keys = Object.keys(data)
+    if (keys.length > 0) {
+      getOrganisationsDetails();
+    }
   }, [data]);
 
-  if (!data || !state?.ownership) {
+  if (!data) {
     return <Loading />;
   }
 
@@ -687,7 +690,7 @@ export const InvestmentCreationComponent = (props: any) => {
                 description: current === 1 && (
                   <div>
                     <div className="programme-sought-form-container ownership-container">
-                      {state?.ownership !== true &&
+                      {Object.keys(data).length > 0 &&
                         <div className="programme-sought-form">
                           <Form
                             labelCol={{ span: 20 }}
