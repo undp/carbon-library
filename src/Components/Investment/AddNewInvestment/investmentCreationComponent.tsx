@@ -111,12 +111,15 @@ export const InvestmentCreationComponent = (props: any) => {
   };
 
   useEffect(() => {
+    console.log("state ---------------- > ", state)
     if (!state) {
       onNavigateToProgrammeManagementView();
       return;
     }
     if (state?.record) {
       setData(state?.record);
+    } else {
+      setData({})
     }
   }, []);
 
