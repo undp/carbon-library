@@ -36,6 +36,11 @@ export enum InvestmentType {
   PRIVATE = "Private",
 }
 
+export enum InvestmentCreationType {
+  EXISTING = "Existing",
+  NEW = "New",
+}
+
 export enum InvestmentStream {
   CLIMATE_FINANCE = "ClimateFinance",
   CARBON_MARKET = "CarbonMarket",
