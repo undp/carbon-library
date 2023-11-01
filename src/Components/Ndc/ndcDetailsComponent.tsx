@@ -17,6 +17,7 @@ import {
   EditableCell,
 } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
+import { CompanyRole, Role } from "../../Definitions";
 
 type Period = {
   start: number;
@@ -32,7 +33,7 @@ type NdcDetail = {
 };
 
 export const NdcDetailsComponent = (props: any) => {
-  const { t, useConnection } = props;
+  const { t, useConnection, useUserContext } = props;
   const { RangePicker } = DatePicker;
   const [ndcDetailsData, setNdcDetailsData] = useState<NdcDetail[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,6 +41,23 @@ export const NdcDetailsComponent = (props: any) => {
   const [periodItems, setPeriodItems] = useState([] as any[]);
   const [selectedTab, setSelectedTab] = useState("add_new");
   const selectedPeriod = useRef({} as Period);
+
+  const { userInfoState } = useUserContext();
+
+  const isAddRangeVisible = () => {
+    return (
+      (userInfoState?.companyRole === CompanyRole.MINISTRY ||
+        userInfoState?.companyRole === CompanyRole.GOVERNMENT) &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
+  };
+
+  const isAddNdcActionVisible = () => {
+    return (
+      userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
+  };
 
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
@@ -235,8 +253,8 @@ export const NdcDetailsComponent = (props: any) => {
         kpi: 25,
       },
       {
-        startDate: new Date("2018-03-25"),
-        endDate: new Date("2019-03-25"),
+        startDate: new Date("2019-03-25"),
+        endDate: new Date("2019-08-25"),
         nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
         kpi: 10500,
       },
@@ -264,11 +282,6 @@ export const NdcDetailsComponent = (props: any) => {
     ];
     const initialPeriods = [
       {
-        key: "add_new",
-        label: "Add New",
-        children: addNewPeriodContent(),
-      },
-      {
         key: `2019-2020`,
         label: `2019-2020`,
         start: 2019,
@@ -276,18 +289,24 @@ export const NdcDetailsComponent = (props: any) => {
         children: ndcDetailsTableContent(),
       },
       {
-        key: `2020-2023`,
-        label: `2020-2023`,
-        start: 2020,
-        end: 2023,
+        key: `2021-2023`,
+        label: `2021-2023`,
+        start: 2021,
+        end: 2021,
         children: ndcDetailsTableContent(),
       },
     ];
-    const addNewItem = {
-      key: "add_new",
-      label: "Add New",
-      children: addNewPeriodContent(),
-    };
+
+    if (isAddRangeVisible()) {
+      initialPeriods.unshift({
+        key: "add_new",
+        label: "Add New",
+        start: 0,
+        end: 0,
+        children: addNewPeriodContent(),
+      });
+    }
+
     setPeriodItems(initialPeriods);
     periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
@@ -321,20 +340,22 @@ export const NdcDetailsComponent = (props: any) => {
               bordered
               dataSource={getNdcDetailsForPeriod()}
               columns={columns}
-              footer={() => (
-                <Row justify={"center"}>
-                  <Button
-                    onClick={onAddNewNdcDetail}
-                    type="default"
-                    style={{
-                      marginBottom: 16,
-                      width: "100%",
-                    }}
-                  >
-                    {t("ndc:addNdcAction")}
-                  </Button>
-                </Row>
-              )}
+              footer={() =>
+                isAddNdcActionVisible() && (
+                  <Row justify={"center"}>
+                    <Button
+                      onClick={onAddNewNdcDetail}
+                      type="default"
+                      style={{
+                        marginBottom: 16,
+                        width: "100%",
+                      }}
+                    >
+                      {t("ndc:addNdcAction")}
+                    </Button>
+                  </Row>
+                )
+              }
             />
           </div>
         </div>
