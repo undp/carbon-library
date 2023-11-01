@@ -261,7 +261,7 @@ export const InvestmentCreationComponent = (props: any) => {
                               name="typeCreation"
                               rules={[
                                 {
-                                  required: true,
+                                  required: false,
                                 },
                               ]}
                             >
