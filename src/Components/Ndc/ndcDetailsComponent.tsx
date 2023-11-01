@@ -272,7 +272,7 @@ export const NdcDetailsComponent = (props: any) => {
         endDate: new Date("2019-08-25"),
         nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
         kpi: 10500,
-        ministry: "Ministry of Defence (MoD)"
+        ministry: "Ministry of Tourism (MoT)"
       },
       {
         key: 3,
@@ -299,7 +299,7 @@ export const NdcDetailsComponent = (props: any) => {
         nationalPlanObj:
           "Strengthen the role of the state in guiding and facilitating development",
         kpi: 10,
-        ministry: "Ministry of Defence (MoD)"
+        ministry: "Ministry of Tourism (MoT)"
       },
     ];
     const initialPeriods = [
