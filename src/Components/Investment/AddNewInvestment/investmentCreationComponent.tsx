@@ -119,14 +119,16 @@ export const InvestmentCreationComponent = (props: any) => {
     if (state?.record) {
       setData(state?.record);
     } else {
-      setData({})
+      setData({ ownership: true })
     }
   }, []);
 
   useEffect(() => {
-    const keys = Object.keys(data)
-    if (keys.length > 0) {
-      getOrganisationsDetails();
+    if (data) {
+      const keys = Object.keys(data)
+      if (keys[0] !== "ownership") {
+        getOrganisationsDetails();
+      }
     }
   }, [data]);
 
