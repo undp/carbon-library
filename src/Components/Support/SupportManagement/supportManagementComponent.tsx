@@ -661,7 +661,7 @@ export const SupportManagementComponent = (props: any) => {
                 icon={<PlusOutlined />}
                 onClick={onClickAddSupport}
               >
-                {t("programme:addOwnership")}
+                {t("programme:addSupportBtnText")}
               </Button>
             </div>
           )}
