@@ -202,7 +202,7 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   useEffect(() => {
-    if (periodItems && periodItems.length > 1) {
+    if (periodItems && periodItems.length > 3) {
       setSelectedTab(periodItems[periodItems.length - 1].key);
     }
   }, [periodItems]);
@@ -222,7 +222,7 @@ export const NdcDetailsComponent = (props: any) => {
           <RangePicker onChange={onDateRangeChanged} picker="year" />
         </Row>
         <Row className="mg-top-1">
-          <div className="steps-actions">
+          <div className="ndc-steps-actions">
             <Button
               type="primary"
               onClick={onAddNewPeriod}
@@ -251,21 +251,21 @@ export const NdcDetailsComponent = (props: any) => {
   useEffect(() => {
     const defaultNdcDetails = [
       {
-        key:1,
+        key: 1,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2020-03-25"),
         nationalPlanObj: "Enhance value addition in key growth opportunities",
         kpi: 25,
       },
       {
-        key:2,
+        key: 2,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2019-08-25"),
         nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
         kpi: 10500,
       },
       {
-        key:3,
+        key: 3,
         startDate: new Date("2021-03-25"),
         endDate: new Date("2022-03-25"),
         nationalPlanObj:
@@ -273,7 +273,7 @@ export const NdcDetailsComponent = (props: any) => {
         kpi: 48,
       },
       {
-        key:4,
+        key: 4,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2022-05-25"),
         nationalPlanObj:
@@ -281,7 +281,7 @@ export const NdcDetailsComponent = (props: any) => {
         kpi: 20,
       },
       {
-        key:5,
+        key: 5,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
         nationalPlanObj:
