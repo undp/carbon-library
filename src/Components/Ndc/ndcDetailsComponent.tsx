@@ -202,7 +202,7 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   useEffect(() => {
-    if (periodItems && periodItems.length > 2) {
+    if (periodItems && periodItems.length > 3) {
       setSelectedTab(periodItems[periodItems.length - 1].key);
     }
   }, [periodItems]);
