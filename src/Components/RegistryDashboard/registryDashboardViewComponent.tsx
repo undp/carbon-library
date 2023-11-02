@@ -18,7 +18,6 @@ import {
   DownloadOutlined,
   CaretDownOutlined,
 } from "@ant-design/icons";
-import ApexCharts from 'react-apexcharts';
 import moment from "moment";
 import {
   ClockHistory,
