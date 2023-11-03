@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Empty, Form, Radio } from "antd";
+import { Col, Empty, Form, Radio, Row } from "antd";
 import { FormElementType, RadioButtonStatus2 } from "../../../Definitions";
 
 const Safeguards = (props: any) => {
@@ -444,6 +444,18 @@ const Safeguards = (props: any) => {
       )}
       {((viewOnly && safeGuardViewData) || !viewOnly) && (
         <div className="safeguard-tab-item">
+          <div className="undpSesp-section-wrapper">
+            <Row justify="center" align="middle" style={{ width: '100%' }}>
+              <Col span={24} className="unfcccSdTool-section-title">
+                <span>
+                {t("undpSespTitle")}
+                </span>
+              </Col>
+              <Col span={24}>
+                <div className="undpSesp-section-divider" />
+              </Col>
+            </Row>
+          </div>
           <Form
             onValuesChange={onSafeguardValuesChanged}
             name="safeguardDetails"
