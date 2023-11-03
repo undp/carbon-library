@@ -276,9 +276,6 @@ const Economic = (props: any) => {
         onFieldsChange={onFieldsChange}
         onValuesChange={onEconomicValuesChanged}
       >
-        {economicDetails?.length === 0 && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
         <div className={economicViewData ? "section view-section" : "section"}>
           <div className="unfccSdTool-section-wrapper">
             <Row justify="center" align="middle" style={{ width: '100%' }}>
@@ -292,6 +289,9 @@ const Economic = (props: any) => {
               </Col>
             </Row>
           </div>
+          {economicDetails?.length === 0 && (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
           {economicDetails?.map((environmentalDetail: any) => (
             <>
               <div className="title">{environmentalDetail?.section}</div>

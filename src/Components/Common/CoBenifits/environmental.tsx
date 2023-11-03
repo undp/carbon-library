@@ -311,9 +311,6 @@ const Environmental = (props: any) => {
         onFieldsChange={onFieldsChange}
         onValuesChange={onEnvironmentalValuesChanged}
       >
-        {environmentalDetails?.length === 0 && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
         <div
           className={environmentalViewData ? "section view-section" : "section"}
         >
@@ -337,6 +334,9 @@ const Environmental = (props: any) => {
               </Col>
             </Row>
           </div>
+          {environmentalDetails?.length === 0 && (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
           {environmentalDetails?.map((environmentalDetail: any) => (
             <>
               <div className="title">{environmentalDetail?.section}</div>

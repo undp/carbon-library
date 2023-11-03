@@ -360,7 +360,7 @@ const Social = (props: any) => {
                           name={element.name}
                         >
                           <Radio.Group size="middle" disabled>
-                            <div className="radio-container">
+                            <div className="radio-container-view">
                               <Radio.Button className="radio">
                                 {socialViewData[element.name]}
                               </Radio.Button>

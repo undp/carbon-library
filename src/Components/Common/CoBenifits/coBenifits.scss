@@ -525,6 +525,23 @@
           }
         }
 
+        .radio-container-view {
+          margin-right: 2rem;
+          width: 35%;
+          max-width: 90px;
+          text-align: center;
+          .ant-radio-button-wrapper-checked:not(
+              .ant-radio-button-wrapper-disabled
+            ) {
+            color: $dark-text-color !important;
+            border-color: $primary-purple !important;
+            box-shadow: none;
+          }
+          .ant-radio-button-wrapper {
+            border: 1px solid $common-form-input-border;
+          }
+        }
+
         .radio-container-view-child {
           margin-right: 2rem;
           width: 28%;
