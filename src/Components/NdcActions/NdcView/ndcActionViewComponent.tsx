@@ -25,7 +25,11 @@ import {
 } from "../../../Definitions";
 import { InfoView } from "../../Common/InfoView/info.view";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
-import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
+import {
+  linkDocVisible,
+  uploadDocUserPermission,
+} from "../../../Utils/documentsPermission";
+import moment from "moment";
 
 export const NdcActionViewComponent = (props: any) => {
   const {
@@ -84,7 +88,7 @@ export const NdcActionViewComponent = (props: any) => {
     }
   };
 
-  const getProjectReportActions = (reportData: any) => {
+  const getProjectReportActions = (reportData: any, reportVersion: any) => {
     return (
       <Row>
         <div className="icon">
@@ -116,6 +120,14 @@ export const NdcActionViewComponent = (props: any) => {
             </a>
           )}
         </div>
+        {reportData?.txTime && (
+          <div className="time">
+            {moment(parseInt(reportData?.txTime)).format(
+              "DD MMMM YYYY @ HH:mm"
+            )}
+            {" ~ " + reportVersion}
+          </div>
+        )}
       </Row>
     );
   };
@@ -185,11 +197,21 @@ export const NdcActionViewComponent = (props: any) => {
             if (item?.status === DocumentStatus.ACCEPTED) {
               setMonitoringReportAccepted(true);
             }
+            const versionfull =
+              (item?.url).split("_")[(item?.url).split("_").length - 1];
+            const version = versionfull ? versionfull.split(".")[0] : "1";
+            const moniteringVersion = version.startsWith("V") ? version : "V1";
             reportDetails[t("ndcAction:viewMoniteringReport")] =
-              getProjectReportActions(item);
+              getProjectReportActions(item, moniteringVersion);
           } else if (item?.url?.includes("VERIFICATION_REPORT")) {
+            const versionfull =
+              (item?.url).split("_")[(item?.url).split("_").length - 1];
+            const version = versionfull ? versionfull.split(".")[0] : "1";
+            const verificationVersion = version.startsWith("V")
+              ? version
+              : "V1";
             reportDetails[t("ndcAction:viewVerificationReport")] =
-              getProjectReportActions(item);
+              getProjectReportActions(item, verificationVersion);
           }
         });
       }
