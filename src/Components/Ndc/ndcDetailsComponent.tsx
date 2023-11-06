@@ -44,6 +44,7 @@ export const NdcDetailsComponent = (props: any) => {
   const selectedPeriod = useRef({} as Period);
   const addedNdcDetailId = useRef(0);
   const selectedNdcDetail = useRef({} as NdcDetail);
+  const [tableKey, setTableKey] = useState(0);
 
   const { userInfoState } = useUserContext();
 
@@ -189,6 +190,7 @@ export const NdcDetailsComponent = (props: any) => {
 
     ndcDetailsData[ndcDetailItemIndex] = ndcDetail;
     setNdcDetailsData(ndcDetailsData);
+    setTableKey((key) => key + 1);
   }
 
   const components = {
@@ -446,6 +448,7 @@ export const NdcDetailsComponent = (props: any) => {
         <div>
           <div>
             <Table
+              key={tableKey}
               components={components}
               rowClassName={() => "editable-row"}
               bordered
