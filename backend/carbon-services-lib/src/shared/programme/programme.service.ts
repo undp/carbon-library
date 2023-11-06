@@ -1105,9 +1105,9 @@ export class ProgrammeService {
 
     const sqlProgram = await this.findById(resp.programmeId);
 
-    console.log('Add document on registry', sqlProgram)
+    console.log('Add document on registry', sqlProgram, resp, documentDto)
 
-    if (sqlProgram.cadtId) {
+    if (sqlProgram.cadtId && documentDto.type == DocType.METHODOLOGY_DOCUMENT) {
       resp.cadtId = sqlProgram.cadtId;
 
       console.log('Add action', resp)
