@@ -23,7 +23,6 @@ import { ProgrammeDocumentViewEntity } from '../entities/document.view.entity';
 import { NDCAction } from '../entities/ndc.action.entity';
 import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
-
 @Module({
   imports: [
     ProgrammeLedgerModule,
