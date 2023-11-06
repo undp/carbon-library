@@ -1102,6 +1102,18 @@ export class ProgrammeService {
 
     const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
     const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
+
+    const sqlProgram = await this.findById(resp.programmeId);
+    if (sqlProgram.cadtId) {
+      resp.cadtId = sqlProgram.cadtId;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: resp
+        },
+      });
+    }
+    
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
@@ -3088,13 +3100,6 @@ export class ProgrammeService {
     this.logger.log('Add accept triggered')
     const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
     const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.type, accept.creditEst, certifierId);
-
-    await this.asyncOperationsInterface.AddAction({
-      actionType: AsyncActionType.CADTUpdateProgramme,
-      actionProps: {
-        programme: resp
-      },
-    });
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
