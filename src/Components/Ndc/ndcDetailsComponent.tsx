@@ -64,7 +64,10 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const isAddSubNdcActionVisible = () => {
-    return true;
+    return (
+      userInfoState?.companyRole === CompanyRole.MINISTRY &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
   };
 
   const inRange = (num: number, min: number, max: number) =>
@@ -456,8 +459,8 @@ export const NdcDetailsComponent = (props: any) => {
               columns={columns}
               expandable={{
                 expandedRowRender: (record) => getSubNdcActionContent(record),
-                indentSize:0,
-                defaultExpandedRowKeys:[selectedNdcDetail.current.key]
+                indentSize: 0,
+                defaultExpandedRowKeys: [selectedNdcDetail.current.key],
               }}
               footer={() =>
                 isAddNdcActionVisible() && (
