@@ -35,8 +35,8 @@ export interface NdcActionBodyProps {
   useConnection: any;
   translator: any;
   useUserContext: any;
-  onFinish: any;
-  programme: any;
+  onFinish?: any;
+  programme?: any;
 }
 
 export const NdcActionBody: FC<NdcActionBodyProps> = (
