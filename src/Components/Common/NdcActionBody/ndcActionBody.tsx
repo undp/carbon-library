@@ -209,24 +209,31 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
           ],
         });
         let programmeData = programmeRes.data[0];
+
         if (programmeData.mitigationActions) {
+          const docRepoRes: any = await post("national/programme/queryDocs", {
+            page: 1,
+            size: 100,
+            filterAnd: [
+              {
+                key: "id",
+                operation: "=",
+                value: id,
+              },
+            ],
+          });
+          const docUrl = docRepoRes.data[0].url;
+
           let modified = false;
           programmeData.mitigationActions.map((action: any) => {
             if (action.actionId == actionId) {
               modified = true;
-              let docAdded = false;
-              for (var document of action.projectMaterial) {
-                if (document.includes("VERIFICATION_REPORT")) {
-                  docAdded = true;
-                  break;
-                }
-              }
-              if (!docAdded) {
-                action.projectMaterial.push("VERIFICATION_REPORT");
+              if (!action.projectMaterial.includes(docUrl)) {
+                action.projectMaterial.push(docUrl);
               }
             }
           });
-          onFinish(programmeData);
+          if (modified) onFinish(programmeData);
         }
       }
     } catch (error: any) {
