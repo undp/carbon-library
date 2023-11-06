@@ -1220,6 +1220,10 @@ export class ProgrammeService {
       if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT && dr.status === DocumentStatus.ACCEPTED) {
         await this.sendRequestForLetterOfAuthorisation(programme);
       }
+      if (resp && dr.type === DocType.VERIFICATION_REPORT && dr.status === DocumentStatus.ACCEPTED) {
+        const programmeData = await this.findById(programme.programmeId);
+        return new DataResponseDto(HttpStatus.OK, {...resp,programme:programmeData});
+      }
     }
 
     return new DataResponseDto(HttpStatus.OK, resp);
