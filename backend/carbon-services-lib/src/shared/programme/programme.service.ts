@@ -1105,12 +1105,12 @@ export class ProgrammeService {
 
     const sqlProgram = await this.findById(resp.programmeId);
 
-    console.log('Add document on registry', resp.programmeId, sqlProgram)
+    console.log('Add document on registry', sqlProgram)
 
     if (sqlProgram.cadtId) {
       resp.cadtId = sqlProgram.cadtId;
 
-      console.log('Add action', resp.cadtId)
+      console.log('Add action', resp)
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTUpdateProgramme,
         actionProps: {
