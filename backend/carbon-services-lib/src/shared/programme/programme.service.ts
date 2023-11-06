@@ -3088,6 +3088,13 @@ export class ProgrammeService {
     this.logger.log('Add accept triggered')
     const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
     const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.type, accept.creditEst, certifierId);
+
+    await this.asyncOperationsInterface.AddAction({
+      actionType: AsyncActionType.CADTUpdateProgramme,
+      actionProps: {
+        programme: resp
+      },
+    });
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
