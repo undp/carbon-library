@@ -456,6 +456,8 @@ export const NdcDetailsComponent = (props: any) => {
               columns={columns}
               expandable={{
                 expandedRowRender: (record) => getSubNdcActionContent(record),
+                indentSize:0,
+                defaultExpandedRowKeys:[selectedNdcDetail.current.key]
               }}
               footer={() =>
                 isAddNdcActionVisible() && (
