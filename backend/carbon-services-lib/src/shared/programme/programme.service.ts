@@ -1101,13 +1101,13 @@ export class ProgrammeService {
     this.logger.log('Add Registry Document triggered')
 
     const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
-    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
 
-    const sqlProgram = await this.findById(resp.programmeId);
+    const sqlProgram = await this.findByExternalId(documentDto.externalId);
+    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
 
     console.log('Add document on registry', sqlProgram, resp, documentDto)
 
-    if (sqlProgram.cadtId && documentDto.type == DocType.METHODOLOGY_DOCUMENT) {
+    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
       resp.cadtId = sqlProgram.cadtId;
 
       console.log('Add action', resp)
@@ -3102,9 +3102,25 @@ export class ProgrammeService {
   }
 
   async programmeAccept(accept: ProgrammeAcceptedDto): Promise<DataResponseDto | undefined> {
-    this.logger.log('Add accept triggered')
+    this.logger.log('Add accept triggered', accept.type)
     const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
+
+    const sqlProgram = await this.findByExternalId(accept.externalId);
     const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.type, accept.creditEst, certifierId);
+    
+    console.log('Add accept on registry', sqlProgram, resp, accept)
+
+    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
+      resp.cadtId = sqlProgram.cadtId;
+
+      console.log('Add action', resp)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: resp
+        },
+      });
+    }
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
