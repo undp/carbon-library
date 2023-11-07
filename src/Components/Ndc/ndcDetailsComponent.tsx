@@ -388,6 +388,24 @@ export const NdcDetailsComponent = (props: any) => {
         ],
       },
       {
+        key: 12,
+        startDate: new Date("2019-03-25"),
+        endDate: new Date("2019-08-25"),
+        nationalPlanObj: "Other",
+        kpi: 10500,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 8,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
         key: 3,
         startDate: new Date("2021-03-25"),
         endDate: new Date("2022-03-25"),
@@ -431,6 +449,24 @@ export const NdcDetailsComponent = (props: any) => {
         endDate: new Date("2023-03-25"),
         nationalPlanObj:
           "Strengthen the role of the state in guiding and facilitating development",
+        kpi: 10,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 11,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 13,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Other",
         kpi: 10,
         ministry: "Ministry of Environment",
         subNdcDetails: [
