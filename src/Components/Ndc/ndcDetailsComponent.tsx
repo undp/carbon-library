@@ -316,22 +316,22 @@ export const NdcDetailsComponent = (props: any) => {
         columns={columns}
         showHeader={false}
         pagination={false}
-        footer={() =>
-          isAddSubNdcActionVisible() && (
-            <Row justify={"center"}>
-              <Button
-                onClick={onAddNewSubNdcDetail}
-                type="default"
-                style={{
-                  marginBottom: 16,
-                  width: "100%",
-                }}
-              >
-                {t("ndc:addSubNdcAction")}
-              </Button>
-            </Row>
-          )
-        }
+        // footer={() =>
+        //   isAddSubNdcActionVisible() && (
+        //     <Row justify={"center"}>
+        //       <Button
+        //         onClick={onAddNewSubNdcDetail}
+        //         type="default"
+        //         style={{
+        //           marginBottom: 16,
+        //           width: "100%",
+        //         }}
+        //       >
+        //         {t("ndc:addSubNdcAction")}
+        //       </Button>
+        //     </Row>
+        //   )
+        // }
       />
     );
   }
