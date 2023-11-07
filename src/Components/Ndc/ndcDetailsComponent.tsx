@@ -33,6 +33,11 @@ type NdcDetail = {
   subNdcDetails?: [];
 };
 
+enum NdcActionType {
+  main,
+  sub,
+}
+
 export const NdcDetailsComponent = (props: any) => {
   const { t, useConnection, useUserContext } = props;
   const { RangePicker } = DatePicker;
@@ -74,14 +79,43 @@ export const NdcDetailsComponent = (props: any) => {
     num >= min && num <= max;
 
   const handleSave = (row: any) => {
-    const newData = [...ndcDetailsData];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setNdcDetailsData(newData);
+    if (row.type === NdcActionType.main) {
+      const newData = [...ndcDetailsData];
+      const index = newData.findIndex((item) => row.key === item.key);
+      const item = newData[index];
+      newData.splice(index, 1, {
+        ...item,
+        ...row,
+      });
+      setNdcDetailsData(newData);
+    } else {
+      const newData = [...ndcDetailsData];
+      const parentIndex = newData.findIndex(
+        (item) => row.ndcActionId === item.key
+      );
+      const parentItem = newData[parentIndex];
+      if (parentItem) {
+        if (parentItem.subNdcDetails) {
+          const itemIndex = parentItem.subNdcDetails.findIndex(
+            (item: any) => row.key === item.key
+          );
+          if (itemIndex === -1) {
+            parentItem.subNdcDetails.push(row);
+          } else {
+            parentItem.subNdcDetails.splice(itemIndex, 1, {
+              ...row,
+            });
+          }
+        } else {
+          parentItem.subNdcDetails = [row];
+        }
+      }
+      newData.splice(parentIndex, 1, {
+        ...parentItem,
+      });
+      setNdcDetailsData(newData);
+      setTableKey((key) => key + 1);
+    }
   };
 
   const getNdcDetailsForPeriod = () => {
@@ -155,14 +189,27 @@ export const NdcDetailsComponent = (props: any) => {
 
   function onAddNewNdcDetail() {
     const range = selectedTab.split("-");
-    addedNdcDetailId.current = addedNdcDetailId.current + 1;
+    const ndcActionId = ++addedNdcDetailId.current;
     const newData = {
-      key: addedNdcDetailId.current,
+      key: ndcActionId,
+      type: NdcActionType.main,
       startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
       endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
       nationalPlanObj: t("ndc:enterNewPlanTxt"),
       kpi: 0,
       ministry: "Please add the Ministry name",
+      subNdcDetails: [
+        {
+          key: ++addedNdcDetailId.current,
+          ndcActionId: ndcActionId,
+          type: NdcActionType.sub,
+          startDate: new Date("2019-03-25"),
+          endDate: new Date("2020-03-25"),
+          nationalPlanObj: "",
+          kpi: "",
+          ministry: "",
+        },
+      ],
     };
 
     setNdcDetailsData([...ndcDetailsData, newData]);
@@ -344,6 +391,7 @@ export const NdcDetailsComponent = (props: any) => {
     const defaultNdcDetails = [
       {
         key: 1,
+        type: NdcActionType.main,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2020-03-25"),
         nationalPlanObj: "Enhance value addition in key growth opportunities",
@@ -352,6 +400,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 6,
+            ndcActionId: 1,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj:
@@ -361,6 +411,8 @@ export const NdcDetailsComponent = (props: any) => {
           },
           {
             key: 7,
+            ndcActionId: 1,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
@@ -371,6 +423,7 @@ export const NdcDetailsComponent = (props: any) => {
       },
       {
         key: 2,
+        type: NdcActionType.main,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2019-08-25"),
         nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
@@ -379,6 +432,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 8,
+            ndcActionId: 2,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
@@ -389,6 +444,7 @@ export const NdcDetailsComponent = (props: any) => {
       },
       {
         key: 12,
+        type: NdcActionType.main,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2019-08-25"),
         nationalPlanObj: "Other",
@@ -397,6 +453,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 8,
+            ndcActionId: 12,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
@@ -407,6 +465,7 @@ export const NdcDetailsComponent = (props: any) => {
       },
       {
         key: 3,
+        type: NdcActionType.main,
         startDate: new Date("2021-03-25"),
         endDate: new Date("2022-03-25"),
         nationalPlanObj:
@@ -416,6 +475,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 9,
+            ndcActionId: 3,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
@@ -426,6 +487,7 @@ export const NdcDetailsComponent = (props: any) => {
       },
       {
         key: 4,
+        type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2022-05-25"),
         nationalPlanObj:
@@ -435,6 +497,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 10,
+            ndcActionId: 4,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
@@ -445,6 +509,7 @@ export const NdcDetailsComponent = (props: any) => {
       },
       {
         key: 5,
+        type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
         nationalPlanObj:
@@ -454,6 +519,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 11,
+            ndcActionId: 5,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
@@ -464,6 +531,7 @@ export const NdcDetailsComponent = (props: any) => {
       },
       {
         key: 13,
+        type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
         nationalPlanObj: "Other",
@@ -472,6 +540,8 @@ export const NdcDetailsComponent = (props: any) => {
         subNdcDetails: [
           {
             key: 11,
+            ndcActionId: 13,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj: "",
