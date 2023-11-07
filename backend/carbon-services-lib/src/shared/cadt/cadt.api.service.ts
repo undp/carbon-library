@@ -230,7 +230,7 @@ export class CadtApiService {
     }
 
     const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
-    const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued) -  (Number(programme.creditIssued) > 0 ? 1 : 0);
+    const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
     const credit = await this.sendHttpPost('v1/units', {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
         "unitOwner": programme.companyId.join(', '),

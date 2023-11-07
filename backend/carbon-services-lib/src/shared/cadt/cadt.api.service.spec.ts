@@ -76,7 +76,7 @@ describe('CadtApiService', () => {
         emissionReductionExpected: 0,
         emissionReductionAchieved: 0,
         creditChange: 0,
-        creditIssued: 0,
+        creditIssued: 20,
         creditBalance: 0,
         creditRetired: [],
         creditFrozen: [],
@@ -110,9 +110,16 @@ describe('CadtApiService', () => {
 
     it('should be issue credit', async () => {
       program.currentStage = ProgrammeStage.AUTHORISED;
-      program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
-      await service.issueCredit(program, 20)
+      program.cadtId = 'edb62b6e-260a-423b-a464-8d3192bff99a';
+      await service.issueCredit(program, 50)
     })
+
+
+  // it('create programme', async () => {
+  //   // program.currentStage = ProgrammeStage.AUTHORISED;
+  //   // program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
+  //   await service.createProgramme(program)
+  // })
 
   // it('should be update status', async () => {
   //   program.currentStage = ProgrammeStage.AUTHORISED;
