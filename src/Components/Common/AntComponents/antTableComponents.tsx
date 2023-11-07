@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Form, Input, Table, InputRef } from 'antd';
-import type { FormInstance } from 'antd/es/form';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Form, Input, Table, InputRef } from "antd";
+import type { FormInstance } from "antd/es/form";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -15,7 +15,10 @@ interface EditableRowProps {
   index: number;
 }
 
-export const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
+export const EditableRow: React.FC<EditableRowProps> = ({
+  index,
+  ...props
+}) => {
   const [form] = Form.useForm();
   return (
     <Form form={form} component={false}>
@@ -66,7 +69,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       toggleEdit();
       handleSave({ ...record, ...values });
     } catch (errInfo) {
-      console.log('Save failed:', errInfo);
+      console.log("Save failed:", errInfo);
     }
   };
 
@@ -87,7 +90,11 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         <Input ref={inputRef} onPressEnter={save} onBlur={save} />
       </Form.Item>
     ) : (
-      <div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={toggleEdit}>
+      <div
+        className="editable-cell-value-wrap"
+        style={{ paddingRight: 24, minWidth: "100px", minHeight: "20px" }}
+        onClick={toggleEdit}
+      >
         {children}
       </div>
     );
@@ -105,4 +112,4 @@ interface DataType {
   address: string;
 }
 
-type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
+type ColumnTypes = Exclude<EditableTableProps["columns"], undefined>;
