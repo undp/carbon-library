@@ -118,6 +118,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "nationalPlanObj",
       align: "left" as const,
       editable: true,
+      width: 800,
     },
     {
       title: t("ndc:ndcColumnsKpi"),
@@ -125,6 +126,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "kpi",
       align: "left" as const,
       editable: true,
+      width: 100,
     },
     {
       title: "Ministry",
@@ -346,7 +348,7 @@ export const NdcDetailsComponent = (props: any) => {
         endDate: new Date("2020-03-25"),
         nationalPlanObj: "Enhance value addition in key growth opportunities",
         kpi: 25,
-        ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+        ministry: "Ministry of Environment",
         subNdcDetails: [
           {
             key: 6,
@@ -357,6 +359,14 @@ export const NdcDetailsComponent = (props: any) => {
             kpi: 25,
             ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
           },
+          {
+            key: 7,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
         ],
       },
       {
@@ -365,7 +375,17 @@ export const NdcDetailsComponent = (props: any) => {
         endDate: new Date("2019-08-25"),
         nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
         kpi: 10500,
-        ministry: "Ministry of Tourism (MoT)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 8,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
       {
         key: 3,
@@ -374,7 +394,17 @@ export const NdcDetailsComponent = (props: any) => {
         nationalPlanObj:
           "Consolidate and increase the stock and quality of productive infrastructure by 50%",
         kpi: 48,
-        ministry: "Ministry of Education, Arts and Culture (MoE)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 9,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
       {
         key: 4,
@@ -383,7 +413,17 @@ export const NdcDetailsComponent = (props: any) => {
         nationalPlanObj:
           "Enhance the productivity and social wellbeing of the population",
         kpi: 20,
-        ministry: "Ministry of Environment, Forestry and Tourism (MEFT)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 10,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
       {
         key: 5,
@@ -392,7 +432,17 @@ export const NdcDetailsComponent = (props: any) => {
         nationalPlanObj:
           "Strengthen the role of the state in guiding and facilitating development",
         kpi: 10,
-        ministry: "Ministry of Tourism (MoT)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 11,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
     ];
     const initialPeriods = [
