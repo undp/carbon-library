@@ -274,12 +274,14 @@ export const NdcDetailsComponent = (props: any) => {
             </Tooltip>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => onEditRow(record)}
-          >
-            <EditOutlined />
-          </Typography.Link>
+          <Tooltip title="Edit">
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => onEditRow(record)}
+            >
+              <EditOutlined />
+            </Typography.Link>
+          </Tooltip>
         );
       },
     },
