@@ -31,7 +31,8 @@ export class AsyncOperationsDatabaseHandlerService
     }
     let retryCount = 0;
     const retryLimit = 10;
-    const intervalId = setInterval(async () => {
+    const intervalId = await setInterval(async () => {
+      const intervalStart= Date.now()
       const notExecutedActions = await this.asyncActionRepo
         .createQueryBuilder("asyncAction")
         .where("asyncAction.actionId > :lastExecuted", {
@@ -48,6 +49,7 @@ export class AsyncOperationsDatabaseHandlerService
 
       try {
         for (const action of notExecutedActions) {
+          console.log("time spent",(Date.now()-intervalStart))
           console.log('Action start', action.actionType, action.actionId)
           await this.asyncOperationsHandlerService.handler(
             action.actionType,
@@ -71,6 +73,7 @@ export class AsyncOperationsDatabaseHandlerService
           retryCount+=1
         }
       }
+      console.log("interval time",(Date.now()-intervalStart))
     }, 5000);
   }
 }
