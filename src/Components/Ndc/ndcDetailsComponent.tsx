@@ -11,6 +11,7 @@ import {
   Table,
   Tabs,
   TabsProps,
+  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -19,6 +20,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role } from "../../Definitions";
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 
 type NdcPeriod = {
   start: number;
@@ -193,7 +199,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "nationalPlanObj",
       align: "left" as const,
       editable: true,
-      width: 800,
+      width: "50%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -201,7 +207,12 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.nationalPlanObj}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Please add the National Plan Objective"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -212,7 +223,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "kpi",
       align: "left" as const,
       editable: true,
-      width: 100,
+      width: "10%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -220,7 +231,12 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpi}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Enter Kpi"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -231,6 +247,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "ministry",
       align: "left" as const,
       editable: true,
+      width: "30%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -238,35 +255,50 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.ministry}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Please add the Ministry name"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
           )}
         </>
       ),
     },
     {
-      title: "operation",
+      title: "Action",
       dataIndex: "operation",
+      width: "10%",
       render: (_: any, record: NdcDetail) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Typography.Link
-              onClick={() => onHandleSave(record)}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={onEditCancel}>
-              <a>Cancel</a>
-            </Popconfirm>
+            <Tooltip title="Save">
+              <Typography.Link
+                onClick={() => onHandleSave(record)}
+                style={{ marginRight: 20 }}
+              >
+                <SaveOutlined />
+              </Typography.Link>
+            </Tooltip>
+            <Tooltip title="Cancel">
+              <Typography.Link
+                onClick={onEditCancel}
+                style={{ marginRight: 8 }}
+              >
+                <ExclamationCircleOutlined />
+              </Typography.Link>
+            </Tooltip>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => onEditRow(record)}
-          >
-            Edit
-          </Typography.Link>
+          <Tooltip title="Edit">
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => onEditRow(record)}
+            >
+              <EditOutlined />
+            </Typography.Link>
+          </Tooltip>
         );
       },
     },
@@ -296,9 +328,9 @@ export const NdcDetailsComponent = (props: any) => {
       type: NdcActionType.main,
       startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
       endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-      nationalPlanObj: t("ndc:enterNewPlanTxt"),
-      kpi: 0,
-      ministry: "Please add the Ministry name",
+      nationalPlanObj: "",
+      kpi: "",
+      ministry: "",
       subNdcDetails: [
         {
           key: ++addedNdcDetailId.current,
@@ -418,6 +450,7 @@ export const NdcDetailsComponent = (props: any) => {
 
   const onTabChange = (key: string) => {
     setSelectedTab(key);
+    setEditingKey("");
   };
 
   useEffect(() => {
@@ -567,13 +600,85 @@ export const NdcDetailsComponent = (props: any) => {
         type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Other",
-        kpi: 10,
+        nationalPlanObj: "Convert to solar energy",
+        kpi: 50000,
         ministry: "Ministry of Environment",
         subNdcDetails: [
           {
             key: 11,
             ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Convert to solar energy",
+            kpi: "3000",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 14,
+            ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 15,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Strengthen the private sector to create jobs",
+        kpi: 10000,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 16,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "7200",
+            ministry: "Ministry of Tourism (MoT)",
+          },
+          {
+            key: 17,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 18,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Other",
+        kpi: '',
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 19,
+            ndcActionId: 18,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 20,
+            ndcActionId: 18,
             type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
