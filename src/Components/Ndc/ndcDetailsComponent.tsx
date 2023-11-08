@@ -199,7 +199,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "nationalPlanObj",
       align: "left" as const,
       editable: true,
-      width: 800,
+      width: "50%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -207,7 +207,12 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.nationalPlanObj}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Please add the National Plan Objective"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -218,7 +223,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "kpi",
       align: "left" as const,
       editable: true,
-      width: 100,
+      width: "10%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -226,7 +231,12 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpi}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Enter Kpi"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -237,6 +247,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "ministry",
       align: "left" as const,
       editable: true,
+      width: "30%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -244,7 +255,12 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.ministry}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Please add the Ministry name"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -252,6 +268,7 @@ export const NdcDetailsComponent = (props: any) => {
     {
       title: "Action",
       dataIndex: "operation",
+      width: "10%",
       render: (_: any, record: NdcDetail) => {
         const editable = isEditing(record);
         return editable ? (
@@ -311,9 +328,9 @@ export const NdcDetailsComponent = (props: any) => {
       type: NdcActionType.main,
       startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
       endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-      nationalPlanObj: t("ndc:enterNewPlanTxt"),
-      kpi: 0,
-      ministry: "Please add the Ministry name",
+      nationalPlanObj: "",
+      kpi: "",
+      ministry: "",
       subNdcDetails: [
         {
           key: ++addedNdcDetailId.current,
