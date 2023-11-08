@@ -29,7 +29,7 @@ export class EmailService {
 
   async sendEmail(emailDataObj: any): Promise<any> {
     if (emailDataObj?.sender && !this.emailDisabled && !(emailDataObj.sender.split('@')[1]=='undp.org') && !(emailDataObj.sender.split('@')[1]=='carbon.com')) {
-      return new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
         this.transporter.sendMail(
           {
             from: this.sourceEmail,
