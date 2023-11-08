@@ -584,13 +584,85 @@ export const NdcDetailsComponent = (props: any) => {
         type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Other",
-        kpi: 10,
+        nationalPlanObj: "Convert to solar energy",
+        kpi: 50000,
         ministry: "Ministry of Environment",
         subNdcDetails: [
           {
             key: 11,
             ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Convert to solar energy",
+            kpi: "3000",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 14,
+            ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 15,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Strengthen the private sector to create jobs",
+        kpi: 10000,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 16,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "7200",
+            ministry: "Ministry of Tourism (MoT)",
+          },
+          {
+            key: 17,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 18,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Other",
+        kpi: '',
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 19,
+            ndcActionId: 18,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 20,
+            ndcActionId: 18,
             type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
@@ -628,7 +700,7 @@ export const NdcDetailsComponent = (props: any) => {
       });
     }
 
-    addedNdcDetailId.current = 5;
+    addedNdcDetailId.current = 20;
     setPeriodItems(initialPeriods);
     periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
