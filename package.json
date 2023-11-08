@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-library",
-  "version": "1.0.160-gayanath8-patch-1.0",
+  "version": "1.0.160",
   "description": "Shared Library of tools for Carbon Credits applications ecosystem for ExO and and HQ/GEF",
   "type": "module",
   "scripts": {

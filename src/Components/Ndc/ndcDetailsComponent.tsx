@@ -716,7 +716,7 @@ export const NdcDetailsComponent = (props: any) => {
       });
     }
 
-    addedNdcDetailId.current = 5;
+    addedNdcDetailId.current = 20;
     setPeriodItems(initialPeriods);
     periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
