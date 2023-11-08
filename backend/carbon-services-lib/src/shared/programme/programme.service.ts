@@ -4177,18 +4177,18 @@ export class ProgrammeService {
         );
       }
 
-      if (user.companyRole === CompanyRole.MINISTRY) {
-        const permission = await this.findPermissionForMinistryUser(
-          user,
-          programme.sectoralScope
-        );
-        if (!permission) {
-          throw new HttpException(
-            this.helperService.formatReqMessagesString("user.userUnAUth", []),
-            HttpStatus.FORBIDDEN
-          );
-        }
-      }
+      // if (user.companyRole === CompanyRole.MINISTRY) {
+      //   const permission = await this.findPermissionForMinistryUser(
+      //     user,
+      //     programme.sectoralScope
+      //   );
+      //   if (!permission) {
+      //     throw new HttpException(
+      //       this.helperService.formatReqMessagesString("user.userUnAUth", []),
+      //       HttpStatus.FORBIDDEN
+      //     );
+      //   }
+      // }
 
       const resp = await this.programmeRepo.update(
         {
