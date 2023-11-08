@@ -31,8 +31,49 @@ export class AsyncOperationsDatabaseHandlerService
     }
     let retryCount = 0;
     const retryLimit = 10;
-    const intervalId = await setInterval(async () => {
-      const intervalStart= Date.now()
+    // const intervalId = await setInterval(async () => {
+    //   const notExecutedActions = await this.asyncActionRepo
+    //     .createQueryBuilder("asyncAction")
+    //     .where("asyncAction.actionId > :lastExecuted", {
+    //       lastExecuted: lastSeq,
+    //     })
+    //     .orderBy(
+    //       '"actionId"',
+    //       'ASC',
+    //     )
+    //     .select(['"actionId"', '"actionType"', '"actionProps"'])
+    //     .getRawMany();
+
+    //   if(notExecutedActions.length === 0)return;
+
+    //   try {
+    //     for (const action of notExecutedActions) {
+    //       console.log('Action start', action.actionType, action.actionId)
+    //       await this.asyncOperationsHandlerService.handler(
+    //         action.actionType,
+    //         JSON.parse(action.actionProps)
+    //       );
+    //       lastSeq = action.actionId ;
+    //       await this.counterRepo.save({
+    //         id: CounterType.ASYNC_OPERATIONS,
+    //         counter: lastSeq,
+    //       });
+    //       retryCount=0
+    //     }
+        
+    //   } catch (exception) {
+    //     this.logger.log("database asyncHandler failed", exception);
+    //     if(retryCount>retryLimit){
+    //       this.logger.log("database asyncHandler terminated")
+    //       clearInterval(intervalId)
+    //     }
+    //     else {
+    //       retryCount+=1
+    //     }
+    //   }
+    // }, 5000);
+    async function doActions(){
+      console.log('lastSeq',lastSeq,'retryCount',retryCount)
       const notExecutedActions = await this.asyncActionRepo
         .createQueryBuilder("asyncAction")
         .where("asyncAction.actionId > :lastExecuted", {
@@ -44,36 +85,36 @@ export class AsyncOperationsDatabaseHandlerService
         )
         .select(['"actionId"', '"actionType"', '"actionProps"'])
         .getRawMany();
-
-      if(notExecutedActions.length === 0)return;
-
-      try {
-        for (const action of notExecutedActions) {
-          console.log("time spent",(Date.now()-intervalStart))
-          console.log('Action start', action.actionType, action.actionId)
-          await this.asyncOperationsHandlerService.handler(
-            action.actionType,
-            JSON.parse(action.actionProps)
-          );
-          lastSeq = action.actionId ;
-          await this.counterRepo.save({
-            id: CounterType.ASYNC_OPERATIONS,
-            counter: lastSeq,
-          });
-          retryCount=0
-        }
-        
-      } catch (exception) {
-        this.logger.log("database asyncHandler failed", exception);
-        if(retryCount>retryLimit){
-          this.logger.log("database asyncHandler terminated")
-          clearInterval(intervalId)
-        }
-        else {
-          retryCount+=1
+      if(notExecutedActions.length !== 0){
+        try {
+          for (const action of notExecutedActions) {
+            console.log('Action start', action.actionType, action.actionId)
+            await this.asyncOperationsHandlerService.handler(
+              action.actionType,
+              JSON.parse(action.actionProps)
+            );
+            lastSeq = action.actionId ;//ref
+            await this.counterRepo.save({
+              id: CounterType.ASYNC_OPERATIONS,
+              counter: lastSeq,
+            });
+            retryCount=0//ref
+          }
+        } catch (exception) {
+          this.logger.log("database asyncHandler failed", exception);
+          if(retryCount>retryLimit){
+            this.logger.log("database asyncHandler terminated")
+            return
+          }
+          else {
+            retryCount+=1//ref
+            doActions()
+          }
         }
       }
-      console.log("interval time",(Date.now()-intervalStart))
-    }, 5000);
+      setTimeout(doActions, 5000)
+    }
+
+    await doActions()
   }
 }
