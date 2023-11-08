@@ -11,7 +11,6 @@ import {
   Table,
   Tabs,
   TabsProps,
-  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -20,11 +19,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role } from "../../Definitions";
-import {
-  EditOutlined,
-  ExclamationCircleOutlined,
-  SaveOutlined,
-} from "@ant-design/icons";
 
 type NdcPeriod = {
   start: number;
@@ -266,39 +260,30 @@ export const NdcDetailsComponent = (props: any) => {
       ),
     },
     {
-      title: "Action",
+      title: "operation",
       dataIndex: "operation",
       width: "10%",
       render: (_: any, record: NdcDetail) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Tooltip title="Save">
-              <Typography.Link
-                onClick={() => onHandleSave(record)}
-                style={{ marginRight: 20 }}
-              >
-                <SaveOutlined />
-              </Typography.Link>
-            </Tooltip>
-            <Tooltip title="Cancel">
-              <Typography.Link
-                onClick={onEditCancel}
-                style={{ marginRight: 8 }}
-              >
-                <ExclamationCircleOutlined />
-              </Typography.Link>
-            </Tooltip>
+            <Typography.Link
+              onClick={() => onHandleSave(record)}
+              style={{ marginRight: 8 }}
+            >
+              Save
+            </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={onEditCancel}>
+              <a>Cancel</a>
+            </Popconfirm>
           </span>
         ) : (
-          <Tooltip title="Edit">
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => onEditRow(record)}
-            >
-              <EditOutlined />
-            </Typography.Link>
-          </Tooltip>
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => onEditRow(record)}
+          >
+            Edit
+          </Typography.Link>
         );
       },
     },
@@ -450,7 +435,6 @@ export const NdcDetailsComponent = (props: any) => {
 
   const onTabChange = (key: string) => {
     setSelectedTab(key);
-    setEditingKey("");
   };
 
   useEffect(() => {
