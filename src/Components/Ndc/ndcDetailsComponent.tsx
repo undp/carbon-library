@@ -264,44 +264,44 @@ export const NdcDetailsComponent = (props: any) => {
           )}
         </>
       ),
-    },
-    {
-      title: "Action",
-      dataIndex: "operation",
-      width: "10%",
-      render: (_: any, record: NdcDetail) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Tooltip title="Save">
-              <Typography.Link
-                onClick={() => onHandleSave(record)}
-                style={{ marginRight: 20 }}
-              >
-                <SaveOutlined />
-              </Typography.Link>
-            </Tooltip>
-            <Tooltip title="Cancel">
-              <Typography.Link
-                onClick={onEditCancel}
-                style={{ marginRight: 8 }}
-              >
-                <ExclamationCircleOutlined />
-              </Typography.Link>
-            </Tooltip>
-          </span>
-        ) : (
-          <Tooltip title="Edit">
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => onEditRow(record)}
-            >
-              <EditOutlined />
-            </Typography.Link>
-          </Tooltip>
-        );
-      },
-    },
+    }
+    // {
+    //   title: "Action",
+    //   dataIndex: "operation",
+    //   width: "10%",
+    //   render: (_: any, record: NdcDetail) => {
+    //     const editable = isEditing(record);
+    //     return editable ? (
+    //       <span>
+    //         <Tooltip title="Save">
+    //           <Typography.Link
+    //             onClick={() => onHandleSave(record)}
+    //             style={{ marginRight: 20 }}
+    //           >
+    //             <SaveOutlined />
+    //           </Typography.Link>
+    //         </Tooltip>
+    //         <Tooltip title="Cancel">
+    //           <Typography.Link
+    //             onClick={onEditCancel}
+    //             style={{ marginRight: 8 }}
+    //           >
+    //             <ExclamationCircleOutlined />
+    //           </Typography.Link>
+    //         </Tooltip>
+    //       </span>
+    //     ) : (
+    //       <Tooltip title="Edit">
+    //         <Typography.Link
+    //           disabled={editingKey !== ""}
+    //           onClick={() => onEditRow(record)}
+    //         >
+    //           <EditOutlined />
+    //         </Typography.Link>
+    //       </Tooltip>
+    //     );
+    //   },
+    // },
   ];
 
   const columns = defaultColumns.map((col: any) => {
