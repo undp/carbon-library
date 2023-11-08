@@ -11,6 +11,7 @@ import {
   Table,
   Tabs,
   TabsProps,
+  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -19,6 +20,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role } from "../../Definitions";
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 
 type NdcPeriod = {
   start: number;
@@ -244,28 +250,35 @@ export const NdcDetailsComponent = (props: any) => {
       ),
     },
     {
-      title: "operation",
+      title: "Action",
       dataIndex: "operation",
       render: (_: any, record: NdcDetail) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Typography.Link
-              onClick={() => onHandleSave(record)}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={onEditCancel}>
-              <a>Cancel</a>
-            </Popconfirm>
+            <Tooltip title="Save">
+              <Typography.Link
+                onClick={() => onHandleSave(record)}
+                style={{ marginRight: 20 }}
+              >
+                <SaveOutlined />
+              </Typography.Link>
+            </Tooltip>
+            <Tooltip title="Cancel">
+              <Typography.Link
+                onClick={onEditCancel}
+                style={{ marginRight: 8 }}
+              >
+                <ExclamationCircleOutlined />
+              </Typography.Link>
+            </Tooltip>
           </span>
         ) : (
           <Typography.Link
             disabled={editingKey !== ""}
             onClick={() => onEditRow(record)}
           >
-            Edit
+            <EditOutlined />
           </Typography.Link>
         );
       },
@@ -418,6 +431,7 @@ export const NdcDetailsComponent = (props: any) => {
 
   const onTabChange = (key: string) => {
     setSelectedTab(key);
+    setEditingKey("");
   };
 
   useEffect(() => {
