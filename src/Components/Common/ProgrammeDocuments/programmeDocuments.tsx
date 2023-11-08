@@ -380,8 +380,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               ministryLevelPermission,
                               programmeStatus
                             )
-                              ? { color: "#3F3A47", cursor: "pointer" }
-                              : { color: "#cacaca", cursor: "default" }
+                              ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                              : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                           }
                           onClick={() =>
                             uploadDocUserPermission(
@@ -441,8 +441,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           ministryLevelPermission,
                           programmeStatus
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() =>
                         uploadDocUserPermission(
@@ -613,8 +613,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               ministryLevelPermission,
                               programmeStatus
                             )
-                              ? { color: "#3F3A47", cursor: "pointer" }
-                              : { color: "#cacaca" }
+                              ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                              : { color: "#cacaca", margin: "0px 0px 2.5px 0px"  }
                           }
                           onClick={() =>
                             designDocStatus === DocumentStatus.ACCEPTED &&
@@ -680,8 +680,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           ministryLevelPermission,
                           programmeStatus
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() =>
                         designDocStatus === DocumentStatus.ACCEPTED &&
@@ -852,8 +852,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                                 ministryLevelPermission,
                                 programmeStatus
                               )
-                                ? { color: "#3F3A47", cursor: "pointer" }
-                                : { color: "#cacaca", cursor: "default" }
+                                ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                                : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                             }
                             onClick={() =>
                               uploadDocUserPermission(
@@ -912,8 +912,8 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                             ministryLevelPermission,
                             programmeStatus
                           )
-                            ? { color: "#3F3A47", cursor: "pointer" }
-                            : { color: "#cacaca", cursor: "default" }
+                            ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
+                            : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px" }
                         }
                         onClick={() =>
                           uploadDocUserPermission(
