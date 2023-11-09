@@ -5,6 +5,7 @@ import {
   Empty,
   PaginationProps,
   Row,
+  Space,
   Table,
   Tabs,
   TabsProps,
@@ -32,6 +33,11 @@ type NdcDetail = {
   kpi: number;
   subNdcDetails?: [];
 };
+
+enum NdcActionType {
+  main,
+  sub,
+}
 
 export const NdcDetailsComponent = (props: any) => {
   const { t, useConnection, useUserContext } = props;
@@ -74,14 +80,43 @@ export const NdcDetailsComponent = (props: any) => {
     num >= min && num <= max;
 
   const handleSave = (row: any) => {
-    const newData = [...ndcDetailsData];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setNdcDetailsData(newData);
+    if (row.type === NdcActionType.main) {
+      const newData = [...ndcDetailsData];
+      const index = newData.findIndex((item) => row.key === item.key);
+      const item = newData[index];
+      newData.splice(index, 1, {
+        ...item,
+        ...row,
+      });
+      setNdcDetailsData(newData);
+    } else {
+      const newData = [...ndcDetailsData];
+      const parentIndex = newData.findIndex(
+        (item) => row.ndcActionId === item.key
+      );
+      const parentItem = newData[parentIndex];
+      if (parentItem) {
+        if (parentItem.subNdcDetails) {
+          const itemIndex = parentItem.subNdcDetails.findIndex(
+            (item: any) => row.key === item.key
+          );
+          if (itemIndex === -1) {
+            parentItem.subNdcDetails.push(row);
+          } else {
+            parentItem.subNdcDetails.splice(itemIndex, 1, {
+              ...row,
+            });
+          }
+        } else {
+          parentItem.subNdcDetails = [row];
+        }
+      }
+      newData.splice(parentIndex, 1, {
+        ...parentItem,
+      });
+      setNdcDetailsData(newData);
+      setTableKey((key) => key + 1);
+    }
   };
 
   const getNdcDetailsForPeriod = () => {
@@ -118,6 +153,23 @@ export const NdcDetailsComponent = (props: any) => {
       key: "nationalPlanObj",
       align: "left" as const,
       editable: true,
+      width: "50%",
+      render: (_: any, record: any) => (
+        <>
+          {record.nationalPlanObj ? (
+            <Space size="middle">
+              <span>{record.nationalPlanObj}</span>
+            </Space>
+          ) : (
+            <input
+              placeholder="Please add the National Plan Objective"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
+          )}
+        </>
+      ),
     },
     {
       title: t("ndc:ndcColumnsKpi"),
@@ -125,6 +177,23 @@ export const NdcDetailsComponent = (props: any) => {
       key: "kpi",
       align: "left" as const,
       editable: true,
+      width: "10%",
+      render: (_: any, record: any) => (
+        <>
+          {record.nationalPlanObj ? (
+            <Space size="middle">
+              <span>{record.kpi}</span>
+            </Space>
+          ) : (
+            <input
+              placeholder="Enter Kpi"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
+          )}
+        </>
+      ),
     },
     {
       title: "Ministry",
@@ -132,6 +201,23 @@ export const NdcDetailsComponent = (props: any) => {
       key: "ministry",
       align: "left" as const,
       editable: true,
+      width: "40%",
+      render: (_: any, record: any) => (
+        <>
+          {record.nationalPlanObj ? (
+            <Space size="middle">
+              <span>{record.ministry}</span>
+            </Space>
+          ) : (
+            <input
+              placeholder="Please add the Ministry name"
+              className="ant-input"
+              disabled
+              type="text"
+            ></input>
+          )}
+        </>
+      ),
     },
   ];
 
@@ -153,14 +239,27 @@ export const NdcDetailsComponent = (props: any) => {
 
   function onAddNewNdcDetail() {
     const range = selectedTab.split("-");
-    addedNdcDetailId.current = addedNdcDetailId.current + 1;
+    const ndcActionId = ++addedNdcDetailId.current;
     const newData = {
-      key: addedNdcDetailId.current,
+      key: ndcActionId,
+      type: NdcActionType.main,
       startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
       endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-      nationalPlanObj: t("ndc:enterNewPlanTxt"),
-      kpi: 0,
-      ministry: "Please add the Ministry name",
+      nationalPlanObj: "",
+      kpi: "",
+      ministry: "",
+      subNdcDetails: [
+        {
+          key: ++addedNdcDetailId.current,
+          ndcActionId: ndcActionId,
+          type: NdcActionType.sub,
+          startDate: new Date("2019-03-25"),
+          endDate: new Date("2020-03-25"),
+          nationalPlanObj: "",
+          kpi: "",
+          ministry: "",
+        },
+      ],
     };
 
     setNdcDetailsData([...ndcDetailsData, newData]);
@@ -314,22 +413,22 @@ export const NdcDetailsComponent = (props: any) => {
         columns={columns}
         showHeader={false}
         pagination={false}
-        footer={() =>
-          isAddSubNdcActionVisible() && (
-            <Row justify={"center"}>
-              <Button
-                onClick={onAddNewSubNdcDetail}
-                type="default"
-                style={{
-                  marginBottom: 16,
-                  width: "100%",
-                }}
-              >
-                {t("ndc:addSubNdcAction")}
-              </Button>
-            </Row>
-          )
-        }
+        // footer={() =>
+        //   isAddSubNdcActionVisible() && (
+        //     <Row justify={"center"}>
+        //       <Button
+        //         onClick={onAddNewSubNdcDetail}
+        //         type="default"
+        //         style={{
+        //           marginBottom: 16,
+        //           width: "100%",
+        //         }}
+        //       >
+        //         {t("ndc:addSubNdcAction")}
+        //       </Button>
+        //     </Row>
+        //   )
+        // }
       />
     );
   }
@@ -342,14 +441,17 @@ export const NdcDetailsComponent = (props: any) => {
     const defaultNdcDetails = [
       {
         key: 1,
+        type: NdcActionType.main,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2020-03-25"),
         nationalPlanObj: "Enhance value addition in key growth opportunities",
         kpi: 25,
-        ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+        ministry: "Ministry of Environment",
         subNdcDetails: [
           {
             key: 6,
+            ndcActionId: 1,
+            type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
             nationalPlanObj:
@@ -357,42 +459,218 @@ export const NdcDetailsComponent = (props: any) => {
             kpi: 25,
             ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
           },
+          {
+            key: 7,
+            ndcActionId: 1,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
         ],
       },
       {
         key: 2,
+        type: NdcActionType.main,
         startDate: new Date("2019-03-25"),
         endDate: new Date("2019-08-25"),
         nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
         kpi: 10500,
-        ministry: "Ministry of Tourism (MoT)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 8,
+            ndcActionId: 2,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 12,
+        type: NdcActionType.main,
+        startDate: new Date("2019-03-25"),
+        endDate: new Date("2019-08-25"),
+        nationalPlanObj: "Other",
+        kpi: 10500,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 8,
+            ndcActionId: 12,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
       {
         key: 3,
+        type: NdcActionType.main,
         startDate: new Date("2021-03-25"),
         endDate: new Date("2022-03-25"),
         nationalPlanObj:
           "Consolidate and increase the stock and quality of productive infrastructure by 50%",
         kpi: 48,
-        ministry: "Ministry of Education, Arts and Culture (MoE)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 9,
+            ndcActionId: 3,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
       {
         key: 4,
+        type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2022-05-25"),
         nationalPlanObj:
           "Enhance the productivity and social wellbeing of the population",
         kpi: 20,
-        ministry: "Ministry of Environment, Forestry and Tourism (MEFT)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 10,
+            ndcActionId: 4,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
       {
         key: 5,
+        type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
         nationalPlanObj:
           "Strengthen the role of the state in guiding and facilitating development",
         kpi: 10,
-        ministry: "Ministry of Tourism (MoT)",
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 11,
+            ndcActionId: 5,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 13,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Convert to solar energy",
+        kpi: 50000,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 11,
+            ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Convert to solar energy",
+            kpi: "3000",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 14,
+            ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 15,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Strengthen the private sector to create jobs",
+        kpi: 10000,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 16,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "7200",
+            ministry: "Ministry of Tourism (MoT)",
+          },
+          {
+            key: 17,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 18,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Other",
+        kpi: '',
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 19,
+            ndcActionId: 18,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 20,
+            ndcActionId: 18,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
       },
     ];
     const initialPeriods = [
@@ -422,7 +700,7 @@ export const NdcDetailsComponent = (props: any) => {
       });
     }
 
-    addedNdcDetailId.current = 5;
+    addedNdcDetailId.current = 20;
     setPeriodItems(initialPeriods);
     periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
