@@ -70,8 +70,6 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
           );
           await this.eventProcessor.process(programme, undefined, 0, 0)
           newSeq = row.hash
-        }
-        if (newSeq != 0) {
           await this.counterRepo.save({ id: CounterType.REPLICATE_SEQ, counter:  newSeq})
         }
       }
