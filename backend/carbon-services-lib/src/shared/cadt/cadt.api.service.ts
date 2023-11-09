@@ -233,6 +233,7 @@ export class CadtApiService {
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
     const credit = await this.sendHttpPost('v1/units', {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
+        "currentRegistry": this.configService.get('systemCountryName'),
         "unitOwner": programme.companyId.join(', '),
         "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
         "unitBlockStart": String(blockStart),
