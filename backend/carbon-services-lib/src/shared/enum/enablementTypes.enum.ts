@@ -3,7 +3,7 @@ export enum EnablementTypes {
     // // InstitutionalArrangement = 'Institutional Arrangement',
     // StakeholderFramework = 'Stakeholder Framework',
     TechnologyTransfer = 'Technology Transfer',
-    Financial = 'FInancial',
+    Financial = 'Financial',
   }
   
   export const enablementTypesAndValues = [
