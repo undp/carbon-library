@@ -1639,7 +1639,27 @@ export class ProgrammeService {
             await em.save<ProgrammeDocument>(environmentalImpactAssessmentDoc);
           }
           if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
-          return await em.save<Programme>(programme);
+            let address: any[] = [];
+            const programmeProperties = programme.programmeProperties;
+            if (programmeProperties.geographicalLocation) {
+              for (
+                let index = 0;
+                index < programmeProperties.geographicalLocation.length;
+                index++
+              ) {
+                address.push(programmeProperties.geographicalLocation[index]);
+              }
+            }
+            await this.locationService.getCoordinatesForRegion([...address]).then(
+              (response: any) => {
+                console.log(
+                  "response from forwardGeoCoding function -> ",
+                  response
+                );
+                programme.geographicalLocationCordintes = [...response];
+              }
+            );
+            return await em.save<Programme>(programme);
           }
         })
         .catch((err: any) => {
