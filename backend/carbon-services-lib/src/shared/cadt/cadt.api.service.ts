@@ -10,6 +10,7 @@ import { NDCAction } from '../entities/ndc.action.entity';
 import { TypeOfMitigation } from '../enum/typeofmitigation.enum';
 import { TxType } from '../enum/txtype.enum';
 import { Sector } from '../enum/sector.enum';
+import { ProgrammeTransfer } from '../entities/programme.transfer';
 
 @Injectable()
 export class CadtApiService {
@@ -233,13 +234,20 @@ export class CadtApiService {
 
     const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
-    const credit = await this.sendHttpPost('v1/units', {
+
+    const list = []
+    for (const cIndex in programme.companyId) {
+      const cId = programme.companyId[cIndex];
+
+      let currentStart = blockStart;
+      const cAmount = Number((amount * programme.proponentPercentage[cIndex]/100).toFixed(0))
+      const credit = await this.sendHttpPost('v1/units', {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
-        "unitOwner": programme.companyId.join(', '),
+        "unitOwner": cId,
         "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
         "unitBlockStart": String(blockStart),
         "unitBlockEnd": String(blockStart + amount - 1),
-        "unitCount": amount,
+        "unitCount": cAmount,
         "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
         "unitType": this.getUnitType(programme.sector),
         "unitStatus": this.getUnitStatus(TxType.ISSUE),
@@ -254,8 +262,59 @@ export class CadtApiService {
              "verificationReportDate": this.getProjectDate(new Date().getTime()), //TODO
              "verificationBody": gov.name // TODO
         }
-    });
+      });
+
+      currentStart += cAmount
+      list.push(credit)
+    }
+  
     await await this.sendHttpPost('v1/staging/commit', undefined);
-    return credit;
+    return list
+  }
+
+  public async transferCredit(
+    programme: Programme,
+    transfer: ProgrammeTransfer,
+    // ndcAction: NDCAction,
+    amount: number
+  ) {
+
+    // if (!programme.cadtId) {
+    //     this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
+    //     return;
+    // }
+
+    // const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
+    // const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
+
+    // for (const cIndex in programme.companyId) {
+    //   const cId = programme.companyId[cIndex];
+
+    //   let currentStart = blockStart;
+    //   let cAmount = Number((amount * programme.proponentPercentage[cIndex]/100))
+    //   const roundedAmount = Number(cAmount.toFixed(0))
+    //   if (transfer.fromCompanyId == cId) {
+    //     const remainingAmount = Number((amount * programme.creditOwnerPercentage[cIndex]/100))
+    //     const transferredAmount = Number((cAmount - remainingAmount).toFixed(0))
+    //     const existingUnit = {
+    //       "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
+    //       "unitOwner": cId,
+    //       "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
+    //       "unitBlockStart": String(blockStart),
+    //       "unitBlockEnd": String(blockStart + amount - 1 - transferredAmount - Number(transfer.creditAmount.toFixed(0))),
+    //       "unitCount": cAmount,
+    //       "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
+    //       "unitType": this.getUnitType(programme.sector),
+    //       "unitStatus": this.getUnitStatus(TxType.ISSUE),
+    //       "unitRegistryLink": this.configService.get('host') + "/creditTransfers/viewAll",
+    //       "correspondingAdjustmentDeclaration": "Unknown",
+    //       "correspondingAdjustmentStatus": "Not Started",
+    //     };
+    //   }
+
+    //   currentStart += roundedAmount
+    // }
+  
+    await await this.sendHttpPost('v1/staging/commit', undefined);
   }
 }
