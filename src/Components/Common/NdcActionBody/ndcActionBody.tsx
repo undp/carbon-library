@@ -418,8 +418,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (
@@ -500,8 +500,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (
@@ -646,8 +646,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (
@@ -733,8 +733,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (

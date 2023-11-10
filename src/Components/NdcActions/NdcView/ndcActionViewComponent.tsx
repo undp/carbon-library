@@ -25,7 +25,11 @@ import {
 } from "../../../Definitions";
 import { InfoView } from "../../Common/InfoView/info.view";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
-import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
+import {
+  linkDocVisible,
+  uploadDocUserPermission,
+} from "../../../Utils/documentsPermission";
+import moment from "moment";
 
 export const NdcActionViewComponent = (props: any) => {
   const {
@@ -44,6 +48,12 @@ export const NdcActionViewComponent = (props: any) => {
   const { state } = useLocation();
   const [ndcActionReportDetails, setNdcActionReportDetails] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [monitoringReportData, setMonitoringReportData] = useState<any>();
+  const [monitoringReportversion, setMonitoringReportversion] =
+    useState<any>("");
+  const [verificationReportData, setVerificationReportData] = useState<any>();
+  const [verificationReportVersion, setVerificationReportversion] =
+    useState<any>("");
   const [ndcActionDetails, setNdcActionDetails] = useState<NdcAction>();
   const [coBenifitsComponentDetails, setCoBenifitsComponentnDetails] =
     useState<any>();
@@ -84,7 +94,7 @@ export const NdcActionViewComponent = (props: any) => {
     }
   };
 
-  const getProjectReportActions = (reportData: any) => {
+  const getProjectReportActions = (reportData: any, reportVersion: any) => {
     return (
       <Row>
         <div className="icon">
@@ -116,6 +126,14 @@ export const NdcActionViewComponent = (props: any) => {
             </a>
           )}
         </div>
+        {reportData?.txTime && (
+          <div className="time">
+            {moment(parseInt(reportData?.txTime)).format(
+              "DD MMMM YYYY @ HH:mm"
+            )}
+            {" ~ " + reportVersion}
+          </div>
+        )}
       </Row>
     );
   };
@@ -185,11 +203,25 @@ export const NdcActionViewComponent = (props: any) => {
             if (item?.status === DocumentStatus.ACCEPTED) {
               setMonitoringReportAccepted(true);
             }
+            const versionfull =
+              (item?.url).split("_")[(item?.url).split("_").length - 1];
+            const version = versionfull ? versionfull.split(".")[0] : "1";
+            const moniteringVersion = version.startsWith("V") ? version : "V1";
             reportDetails[t("ndcAction:viewMoniteringReport")] =
-              getProjectReportActions(item);
+              getProjectReportActions(item, moniteringVersion);
+            setMonitoringReportData(item);
+            setMonitoringReportversion(moniteringVersion);
           } else if (item?.url?.includes("VERIFICATION_REPORT")) {
+            const versionfull =
+              (item?.url).split("_")[(item?.url).split("_").length - 1];
+            const version = versionfull ? versionfull.split(".")[0] : "1";
+            const verificationVersion = version.startsWith("V")
+              ? version
+              : "V1";
             reportDetails[t("ndcAction:viewVerificationReport")] =
-              getProjectReportActions(item);
+              getProjectReportActions(item, verificationVersion);
+            setVerificationReportData(item);
+            setVerificationReportversion(verificationVersion);
           }
         });
       }
@@ -498,12 +530,184 @@ export const NdcActionViewComponent = (props: any) => {
           <Col lg={8} md={24}>
             <Skeleton loading={isLoading} active>
               <Card className="card-container fix-height">
-                <div>
-                  <InfoView
+                <div className="title">
+                  <span className="title-icon">{<Icon.FileEarmarkText />}</span>
+                  <span className="title-text">
+                    {t("ndcAction:viewReportsTitle")}
+                  </span>
+                </div>
+                <div className="ndc-action-report-body">
+                  <div className="report-details">
+                    <div className="report-type">
+                      <div className="name-time-container">
+                        <div
+                          className={
+                            canUploadMonitorReport && monitoringReportAccepted
+                              ? "name"
+                              : "empty"
+                          }
+                        >
+                          {t("programme:monitoringReport")}
+                        </div>
+                        {monitoringReportData?.txTime && (
+                          <div className="time">
+                            {moment(
+                              parseInt(monitoringReportData?.txTime)
+                            ).format("DD MMMM YYYY @ HH:mm")}
+                            {" ~ " + monitoringReportversion}
+                          </div>
+                        )}
+                      </div>
+                      <div className="icon">
+                        {!monitoringReportData?.url && (
+                          <Tooltip
+                            arrowPointAtCenter
+                            placement="top"
+                            trigger="hover"
+                            title={
+                              userInfoState?.userRole === Role.ViewOnly
+                                ? t("programme:notAuthToUploadDoc")
+                                : uploadDocUserPermission(
+                                    userInfoState,
+                                    DocType.MONITORING_REPORT,
+                                    programmeOwnerId
+                                  )
+                                ? !canUploadMonitorReport &&
+                                  t("programme:programmeNotAuth")
+                                : t("programme:orgNotAuth")
+                            }
+                            overlayClassName="custom-tooltip"
+                          >
+                            <FileAddOutlined />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </div>
+                    {monitoringReportData?.url && (
+                      <Row>
+                        <div className="icon">
+                          {monitoringReportData?.status ===
+                            DocumentStatus.ACCEPTED && (
+                            <CheckCircleOutlined
+                              className="common-progress-icon"
+                              style={{ color: "#5DC380" }}
+                            />
+                          )}
+                          {monitoringReportData?.status ===
+                            DocumentStatus.REJECTED && (
+                            <ExclamationCircleOutlined
+                              className="common-progress-icon"
+                              style={{ color: "#FD6F70" }}
+                            />
+                          )}
+                        </div>
+                        <div className="link mg-left-1">
+                          {monitoringReportData?.url &&
+                            linkDocVisible(monitoringReportData?.status) && (
+                              <a
+                                href={monitoringReportData?.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                              >
+                                <BookOutlined
+                                  className="common-progress-icon margin-right-1"
+                                  style={{ color: "#3F3A47" }}
+                                />
+                              </a>
+                            )}
+                        </div>
+                      </Row>
+                    )}
+                  </div>
+                  <div className="report-details">
+                    <div className="report-type">
+                      <div className="name-time-container">
+                        <div
+                          className={
+                            canUploadMonitorReport && monitoringReportAccepted
+                              ? "name"
+                              : "empty"
+                          }
+                        >
+                          {t("programme:verificationReport")}
+                        </div>
+                        {verificationReportData?.txTime && (
+                          <div className="time">
+                            {moment(
+                              parseInt(verificationReportData?.txTime)
+                            ).format("DD MMMM YYYY @ HH:mm")}
+                            {" ~ " + verificationReportVersion}
+                          </div>
+                        )}
+                      </div>
+                      <div className="icon">
+                        {!verificationReportData?.url && (
+                          <Tooltip
+                            arrowPointAtCenter
+                            placement="top"
+                            trigger="hover"
+                            title={
+                              userInfoState?.userRole === Role.ViewOnly
+                                ? t("programme:notAuthToUploadDoc")
+                                : uploadDocUserPermission(
+                                    userInfoState,
+                                    DocType.VERIFICATION_REPORT,
+                                    programmeOwnerId
+                                  )
+                                ? !monitoringReportAccepted &&
+                                  t("programme:monitoringRepNotApproved")
+                                : t("programme:notAuthToUploadDoc")
+                            }
+                            overlayClassName="custom-tooltip"
+                          >
+                            <FileAddOutlined />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </div>
+                    {verificationReportData?.url && (
+                      <Row>
+                        <div className="icon">
+                          {verificationReportData?.status ===
+                            DocumentStatus.ACCEPTED && (
+                            <CheckCircleOutlined
+                              className="common-progress-icon"
+                              style={{ color: "#5DC380" }}
+                            />
+                          )}
+                          {verificationReportData?.status ===
+                            DocumentStatus.REJECTED && (
+                            <ExclamationCircleOutlined
+                              className="common-progress-icon"
+                              style={{ color: "#FD6F70" }}
+                            />
+                          )}
+                        </div>
+                        <div className="link mg-left-1">
+                          {verificationReportData?.url &&
+                            linkDocVisible(verificationReportData?.status) && (
+                              <a
+                                href={verificationReportData?.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                              >
+                                <BookOutlined
+                                  className="common-progress-icon margin-right-1"
+                                  style={{ color: "#3F3A47" }}
+                                />
+                              </a>
+                            )}
+                        </div>
+                      </Row>
+                    )}
+                  </div>
+                  {/* <InfoView
                     data={ndcActionReportDetails}
                     title={t("ndcAction:viewReportsTitle")}
                     icon={<Icon.FileEarmarkText />}
-                  />
+                  /> */}
                 </div>
               </Card>
             </Skeleton>
