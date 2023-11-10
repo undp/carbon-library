@@ -79,44 +79,70 @@ export const NdcDetailsComponent = (props: any) => {
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
 
-  const handleSave = (row: any) => {
-    if (row.type === NdcActionType.main) {
-      const newData = [...ndcDetailsData];
-      const index = newData.findIndex((item) => row.key === item.key);
-      const item = newData[index];
-      newData.splice(index, 1, {
-        ...item,
-        ...row,
-      });
-      setNdcDetailsData(newData);
-    } else {
-      const newData = [...ndcDetailsData];
-      const parentIndex = newData.findIndex(
-        (item) => row.ndcActionId === item.key
-      );
-      const parentItem = newData[parentIndex];
-      if (parentItem) {
-        if (parentItem.subNdcDetails) {
-          const itemIndex = parentItem.subNdcDetails.findIndex(
-            (item: any) => row.key === item.key
-          );
-          if (itemIndex === -1) {
-            parentItem.subNdcDetails.push(row);
-          } else {
-            parentItem.subNdcDetails.splice(itemIndex, 1, {
-              ...row,
-            });
-          }
-        } else {
-          parentItem.subNdcDetails = [row];
-        }
+  function onAddNewSubNdcDetail() {
+    const range = selectedTab.split('-');
+    const ndcDetail = ndcDetailsData.find(
+      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
+    );
+    const ndcDetailItemIndex = ndcDetailsData.findIndex(
+      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
+    );
+
+    if (ndcDetail) {
+      addedNdcDetailId.current = addedNdcDetailId.current + 1;
+      const newData = {
+        key: addedNdcDetailId.current,
+        startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
+        endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
+        ndcActionId: ndcDetail?.key,
+        nationalPlanObj: '',
+        kpi: '',
+        ministry: '',
+      };
+      if (!ndcDetail.subNdcDetails) {
+        ndcDetail.subNdcDetails = [];
       }
-      newData.splice(parentIndex, 1, {
-        ...parentItem,
-      });
-      setNdcDetailsData(newData);
-      setTableKey((key) => key + 1);
+      ndcDetail.subNdcDetails.push(newData);
     }
+
+    ndcDetailsData[ndcDetailItemIndex] = ndcDetail;
+    setNdcDetailsData(ndcDetailsData);
+    setTableKey((key: any) => key + 1);
+  }
+
+  const handleSave = (row: any) => {
+    setNdcDetailsData((prevData: any) => {
+      const newData = JSON.parse(JSON.stringify(prevData));
+      if (row.type === NdcActionType.main) {
+        const index = newData.findIndex((item: any) => row.key === item.key);
+        if (index !== -1) {
+          newData[index] = { ...newData[index], ...row };
+        }
+      } else {
+        const parentIndex = newData.findIndex((item: any) => row.ndcActionId === item.key);
+        const parentItem = newData[parentIndex];
+
+        if (parentItem) {
+          if (parentItem.subNdcDetails) {
+            const itemIndex = parentItem.subNdcDetails.findIndex(
+              (item: any) => row.key === item.key
+            );
+
+            if (itemIndex === -1) {
+              parentItem.subNdcDetails.push(row);
+            } else {
+              parentItem.subNdcDetails[itemIndex] = { ...row };
+            }
+          } else {
+            parentItem.subNdcDetails = [row];
+          }
+        }
+
+        newData[parentIndex] = { ...parentItem };
+        setTableKey((key: any) => key + 1);
+      }
+      return newData;
+    });
   };
 
   const getNdcDetailsForPeriod = () => {
@@ -140,6 +166,17 @@ export const NdcDetailsComponent = (props: any) => {
       (item: NdcDetail) => item.key === key
     );
     if (ndcDetail) {
+      if (
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry.trim() !== '' &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj.trim() !==
+        '' &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj &&
+        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi).trim() !== '' &&
+        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi)
+      ) {
+        onAddNewSubNdcDetail();
+      }
       return ndcDetail.subNdcDetails;
     } else {
       return [];
@@ -164,7 +201,6 @@ export const NdcDetailsComponent = (props: any) => {
             <input
               placeholder="Please add the National Plan Objective"
               className="ant-input"
-              disabled
               type="text"
             ></input>
           )}
@@ -188,7 +224,6 @@ export const NdcDetailsComponent = (props: any) => {
             <input
               placeholder="Enter Kpi"
               className="ant-input"
-              disabled
               type="text"
             ></input>
           )}
@@ -212,7 +247,6 @@ export const NdcDetailsComponent = (props: any) => {
             <input
               placeholder="Please add the Ministry name"
               className="ant-input"
-              disabled
               type="text"
             ></input>
           )}
@@ -265,36 +299,6 @@ export const NdcDetailsComponent = (props: any) => {
     setNdcDetailsData([...ndcDetailsData, newData]);
   }
 
-  function onAddNewSubNdcDetail() {
-    const range = selectedTab.split("-");
-    const ndcDetail = ndcDetailsData.find(
-      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
-    );
-    const ndcDetailItemIndex = ndcDetailsData.findIndex(
-      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
-    );
-
-    if (ndcDetail) {
-      addedNdcDetailId.current = addedNdcDetailId.current + 1;
-      const newData = {
-        key: addedNdcDetailId.current,
-        startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
-        endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-        nationalPlanObj: t("ndc:enterNewPlanTxt"),
-        kpi: 0,
-        ministry: "Please add the Ministry name",
-      };
-      if (!ndcDetail.subNdcDetails) {
-        ndcDetail.subNdcDetails = [];
-      }
-      ndcDetail.subNdcDetails.push(newData);
-    }
-
-    ndcDetailsData[ndcDetailItemIndex] = ndcDetail;
-    setNdcDetailsData(ndcDetailsData);
-    setTableKey((key) => key + 1);
-  }
-
   const components = {
     body: {
       row: EditableRow,
@@ -327,7 +331,7 @@ export const NdcDetailsComponent = (props: any) => {
     );
   }
 
-  const onCancelPeriod = () => {};
+  const onCancelPeriod = () => { };
 
   const onAddNewPeriod = () => {
     if (selectedPeriod && selectedPeriod.current) {
@@ -413,22 +417,22 @@ export const NdcDetailsComponent = (props: any) => {
         columns={columns}
         showHeader={false}
         pagination={false}
-        // footer={() =>
-        //   isAddSubNdcActionVisible() && (
-        //     <Row justify={"center"}>
-        //       <Button
-        //         onClick={onAddNewSubNdcDetail}
-        //         type="default"
-        //         style={{
-        //           marginBottom: 16,
-        //           width: "100%",
-        //         }}
-        //       >
-        //         {t("ndc:addSubNdcAction")}
-        //       </Button>
-        //     </Row>
-        //   )
-        // }
+      // footer={() =>
+      //   isAddSubNdcActionVisible() && (
+      //     <Row justify={"center"}>
+      //       <Button
+      //         onClick={onAddNewSubNdcDetail}
+      //         type="default"
+      //         style={{
+      //           marginBottom: 16,
+      //           width: "100%",
+      //         }}
+      //       >
+      //         {t("ndc:addSubNdcAction")}
+      //       </Button>
+      //     </Row>
+      //   )
+      // }
       />
     );
   }
