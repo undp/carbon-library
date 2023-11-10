@@ -286,6 +286,7 @@ export class CompanyService {
         const templateData = {
           organisationName: company.name,
           countryName: this.configService.get("systemCountryName"),
+          systemName: this.configService.get("systemName"),
           organisationRole:
             company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
               ? "Programme Developer"
