@@ -1,5 +1,6 @@
 name: Publish to NPM UI
 on:
+  workflow_dispatch:
   push:
     paths:
       - src/**
