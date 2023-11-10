@@ -22,8 +22,8 @@ export class EmailService {
         user: this.configService.get<string>("email.username"),
         pass: this.configService.get<string>("email.password"),
       },
-      pool: true,
-      maxMessages : 14
+      // pool: true,
+      // maxMessages : 14
     });
   }
 

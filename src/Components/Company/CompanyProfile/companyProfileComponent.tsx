@@ -63,6 +63,11 @@ export const CompanyProfileComponent = (props: any) => {
             operation: "=",
             value: companyId,
           },
+          {
+            key: "isPending",
+            operation: "=",
+            value: true,
+          },
         ],
       });
       if (response && response.data) {
@@ -309,8 +314,7 @@ export const CompanyProfileComponent = (props: any) => {
             !isLoading &&
             companyDetails && (
               <Button
-                className="mg-left-1 btn-reject"
-                type="primary"
+                className="btn-danger"
                 onClick={onRejectOrganisation}
               >
                 {t("common:reject")}
@@ -325,7 +329,7 @@ export const CompanyProfileComponent = (props: any) => {
             !isLoading &&
             companyDetails && (
               <Button
-                className="mg-left-1 btn-approve"
+                className="mg-left-1"
                 type="primary"
                 onClick={onApproveOrganisation}
               >
@@ -570,6 +574,17 @@ export const CompanyProfileComponent = (props: any) => {
                         {userDetails?.email ? userDetails?.email : "-"}
                       </Col>
                     </Row>
+                    <Row className="field">
+                      <Col span={12} className="field-key">
+                        {t("companyProfile:adminPhone")}
+                      </Col>
+                      <Col span={12} className="field-value">
+                        {userDetails?.phoneNo
+                          ? userDetails?.phoneNo
+                          : "-"}
+                      </Col>
+                    </Row>
+
                   </div>
                 </Card>
               )}

@@ -1,9 +1,12 @@
 name: Publish to NPM UI
 on:
+  workflow_dispatch:
   push:
     paths:
       - src/**
       - package.json
+concurrency:
+  group: ${{ github.ref }}
 
 jobs:
   deploy_front_end:

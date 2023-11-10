@@ -15,12 +15,12 @@ import {
   Typography,
   Form,
   Tooltip,
-  Button,
+  Button
 } from "antd";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
-import "../investmentComponent.scss";
+import "../supportComponent.scss";
 import "../../../Styles/common.table.scss";
 import * as Icon from "react-bootstrap-icons";
 import {
@@ -57,15 +57,15 @@ type PopupInfo = {
   remarkRequired: boolean;
 };
 
-export const InvestmentManagementComponent = (props: any) => {
+export const SupportManagementComponent = (props: any) => {
   const {
     translator,
     useConnection,
     onNavigateToProgrammeView,
     useUserContext,
     useSettingsContext,
-    onClickAddOwnership,
-    enableAddOwnership
+    enableAddSupport,
+    onClickAddSupport
   } = props;
 
   const t = translator.t;
@@ -445,23 +445,6 @@ export const InvestmentManagementComponent = (props: any) => {
       },
     },
     {
-      title: t("programme:programmeName"),
-      dataIndex: "programmeTitle",
-      key: "programmeTitle",
-      sorter: true,
-      align: "left" as const,
-      render: (item: any) => {
-        return <span className="clickable">{item}</span>;
-      },
-      onCell: (record: any, rowIndex: any) => {
-        return {
-          onClick: (ev: any) => {
-            onNavigateToProgrammeView(record.programmeId);
-          },
-        };
-      },
-    },
-    {
       title: t("programme:type"),
       key: "type",
       sorter: true,
@@ -595,36 +578,6 @@ export const InvestmentManagementComponent = (props: any) => {
       },
     },
     {
-      title: t("programme:owner"),
-      key: "fromCompanyId",
-      sorter: true,
-      align: "left" as const,
-      render: (item: any, itemObj: any) => {
-        return (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {itemObj.sender &&
-              itemObj.sender.map((v: any, i: any) => {
-                return (
-                  <Tooltip
-                    title={v.name}
-                    color={TooltipColor}
-                    key={TooltipColor}
-                  >
-                    <div>
-                      <ProfileIcon
-                        icon={v.logo}
-                        bg={getCompanyBgColor(v.companyRole)}
-                        name={v.name}
-                      />
-                    </div>
-                  </Tooltip>
-                );
-              })}
-          </div>
-        );
-      },
-    },
-    {
       title: t("programme:status"),
       key: "status",
       sorter: true,
@@ -691,24 +644,24 @@ export const InvestmentManagementComponent = (props: any) => {
 
   return (
     <div className="investment-management content-container">
-      <div className="investment-title-bar">
+      <div className="support-title-bar">
         <div className="title-bar">
-          <div className="body-title">{t("programme:investmentTitle")}</div>
+          <div className="body-title">{t("programme:supportTitle")}</div>
           <div className="body-sub-title">
-            {t("programme:investmentDesc")}
+            {t("programme:supportDesc")}
           </div>
         </div>
         <div className="actions">
-          {enableAddOwnership && (
+          {enableAddSupport && (
             <div className="action-bar">
               <Button
                 type="primary"
                 size="large"
                 block
                 icon={<PlusOutlined />}
-                onClick={onClickAddOwnership}
+                onClick={onClickAddSupport}
               >
-                {t("programme:addOwnership")}
+                {t("programme:addSupportBtnText")}
               </Button>
             </div>
           )}

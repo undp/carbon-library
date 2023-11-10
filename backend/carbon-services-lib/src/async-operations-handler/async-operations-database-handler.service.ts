@@ -1,11 +1,11 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { AsyncOperationsHandlerInterface } from "./async-operations-handler-interface.service";
-import { AsyncOperationsHandlerService } from "./async-operations-handler.service";
-import { AsyncActionEntity } from "../shared/entities/async.action.entity";
-import { CounterType } from "../shared/util/counter.type.enum";
-import { Counter } from "../shared/entities/counter.entity";
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AsyncOperationsHandlerInterface } from './async-operations-handler-interface.service';
+import { AsyncOperationsHandlerService } from './async-operations-handler.service';
+import { AsyncActionEntity } from '../shared/entities/async.action.entity';
+import { CounterType } from '../shared/util/counter.type.enum';
+import { Counter } from '../shared/entities/counter.entity';
 
 @Injectable()
 export class AsyncOperationsDatabaseHandlerService
@@ -16,11 +16,11 @@ export class AsyncOperationsDatabaseHandlerService
     @InjectRepository(Counter) private counterRepo: Repository<Counter>,
     @InjectRepository(AsyncActionEntity)
     private asyncActionRepo: Repository<AsyncActionEntity>,
-    private asyncOperationsHandlerService: AsyncOperationsHandlerService
+    private asyncOperationsHandlerService: AsyncOperationsHandlerService,
   ) {}
 
   async asyncHandler(event: any): Promise<any> {
-    this.logger.log("database asyncHandler started", JSON.stringify(event));
+    this.logger.log('database asyncHandler started', JSON.stringify(event));
 
     const seqObj = await this.counterRepo.findOneBy({
       id: CounterType.ASYNC_OPERATIONS,
@@ -31,46 +31,45 @@ export class AsyncOperationsDatabaseHandlerService
     }
     let retryCount = 0;
     const retryLimit = 10;
-    const intervalId = setInterval(async () => {
+    const doActions = async () => {
+      console.log('lastSeq', lastSeq, 'retryCount', retryCount);
       const notExecutedActions = await this.asyncActionRepo
-        .createQueryBuilder("asyncAction")
-        .where("asyncAction.actionId > :lastExecuted", {
+        .createQueryBuilder('asyncAction')
+        .where('asyncAction.actionId > :lastExecuted', {
           lastExecuted: lastSeq,
         })
-        .orderBy(
-          '"actionId"',
-          'ASC',
-        )
+        .orderBy('"actionId"', 'ASC')
         .select(['"actionId"', '"actionType"', '"actionProps"'])
         .getRawMany();
-
-      if(notExecutedActions.length === 0)return;
-
-      try {
-        for (const action of notExecutedActions) {
-          console.log('Action start', action.actionType, action.actionId)
-          await this.asyncOperationsHandlerService.handler(
-            action.actionType,
-            JSON.parse(action.actionProps)
-          );
-          lastSeq = action.actionId ;
-          await this.counterRepo.save({
-            id: CounterType.ASYNC_OPERATIONS,
-            counter: lastSeq,
-          });
-          retryCount=0
-        }
-        
-      } catch (exception) {
-        this.logger.log("database asyncHandler failed", exception);
-        if(retryCount>retryLimit){
-          this.logger.log("database asyncHandler terminated")
-          clearInterval(intervalId)
-        }
-        else {
-          retryCount+=1
+      if (notExecutedActions.length !== 0) {
+        try {
+          for (const action of notExecutedActions) {
+            console.log('Action start', action.actionType, action.actionId);
+            await this.asyncOperationsHandlerService.handler(
+              action.actionType,
+              JSON.parse(action.actionProps),
+            );
+            lastSeq = action.actionId; //ref
+            await this.counterRepo.save({
+              id: CounterType.ASYNC_OPERATIONS,
+              counter: lastSeq,
+            });
+            retryCount = 0; //ref
+          }
+        } catch (exception) {
+          this.logger.log('database asyncHandler failed', exception);
+          if (retryCount > retryLimit) {
+            this.logger.log('database asyncHandler terminated');
+            return;
+          } else {
+            retryCount += 1; //ref
+            doActions;
+          }
         }
       }
-    }, 5000);
+      setTimeout(doActions, 5000);
+    };
+
+    await doActions();
   }
 }

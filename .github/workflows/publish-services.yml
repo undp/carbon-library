@@ -1,9 +1,11 @@
 name: Publish to NPM Services
 on:
+  workflow_dispatch:
   push:
     paths:
       - backend/carbon-services-lib/**
-
+concurrency:
+  group: ${{ github.ref }}
 jobs:
   publish_carbon_libs:
     runs-on: ubuntu-latest
