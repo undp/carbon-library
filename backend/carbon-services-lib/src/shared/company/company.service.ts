@@ -45,7 +45,7 @@ import { SYSTEM_TYPE } from "../enum/system.names.enum";
 @Injectable()
 export class CompanyService {
   constructor(
-    @InjectRepository(Company) private companyRepo: Repository<Company>,
+  @InjectRepository(Company) private companyRepo: Repository<Company>,
     private logger: Logger,
     private configService: ConfigService,
     private helperService: HelperService,

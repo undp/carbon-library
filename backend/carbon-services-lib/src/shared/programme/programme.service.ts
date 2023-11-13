@@ -838,6 +838,15 @@ export class ProgrammeService {
       } 
       if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+        if (program.cadtId) {
+          program.currentStage = ProgrammeStage.APPROVED;
+          await this.asyncOperationsInterface.AddAction({
+            actionType: AsyncActionType.CADTUpdateProgramme,
+            actionProps: {
+              programme: program
+            },
+          });
+        }
       }
     }
     console.log('NDC COmmit', ndc)
@@ -1100,10 +1109,27 @@ export class ProgrammeService {
   }
 
   async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
-    this.logger.log('Add Document triggered')
+    this.logger.log('Add Registry Document triggered')
 
     const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
+
+    const sqlProgram = await this.findByExternalId(documentDto.externalId);
     const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
+
+    console.log('Add document on registry', sqlProgram, resp, documentDto)
+
+    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
+      resp.cadtId = sqlProgram.cadtId;
+
+      console.log('Add action', resp)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: resp
+        },
+      });
+    }
+    
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
@@ -1676,7 +1702,12 @@ export class ProgrammeService {
     
     if((this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
         this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED) && !pr){
+      // console.log("111111111111111111111111111111111111111111111111111")
       savedProgramme = await this.programmeLedger.createProgramme(programme);
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTProgrammeCreate,
+        actionProps: programme,
+      });
     }
 
     if (savedProgramme || pr) {
@@ -3094,9 +3125,25 @@ export class ProgrammeService {
   }
 
   async programmeAccept(accept: ProgrammeAcceptedDto): Promise<DataResponseDto | undefined> {
-    this.logger.log('Add accept triggered')
+    this.logger.log('Add accept triggered', accept.type)
     const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
+
+    const sqlProgram = await this.findByExternalId(accept.externalId);
     const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.type, accept.creditEst, certifierId);
+    
+    console.log('Add accept on registry', sqlProgram, resp, accept)
+
+    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
+      resp.cadtId = sqlProgram.cadtId;
+
+      console.log('Add action', resp)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: resp
+        },
+      });
+    }
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
@@ -3755,6 +3802,18 @@ export class ProgrammeService {
       issueCReq
     );
 
+    const sqlProgram = await this.findById(program.programmeId);
+    if (sqlProgram.cadtId) {
+      program.cadtId = sqlProgram.cadtId;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTCreditIssue,
+        actionProps: {
+          programme: program,
+          amount: req.issueAmount,
+        },
+      });
+    }
+
     const hostAddress = this.configService.get("host");
     updated.companyId.forEach(async (companyId) => {
       await this.emailHelperService.sendEmailToOrganisationAdmins(
@@ -3853,6 +3912,13 @@ export class ProgrammeService {
         txTime: new Date().getTime(),
       }
     );
+    
+    // try{
+    //   const resp = await this.cadtService.issueCredit()
+    // }
+    // catch(error){
+    //   console.log("Issued Credit Added in CAD-Trust")
+    // }
 
     return new DataResponseDto(HttpStatus.OK, programme);
   }
@@ -4070,6 +4136,17 @@ export class ProgrammeService {
       );
     }
 
+    const sqlProgram = await this.findById(program.programmeId);
+    if (sqlProgram.cadtId) {
+      updated.cadtId = sqlProgram.cadtId;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: updated
+        },
+      });
+    }
+
     const authRe: AsyncAction = {
       actionType: AsyncActionType.AuthProgramme,
       actionProps: {
@@ -4164,6 +4241,16 @@ export class ProgrammeService {
           ),
           HttpStatus.BAD_REQUEST
         );
+      }
+
+      if (programme.cadtId) {
+        programme.currentStage = ProgrammeStage.REJECTED;
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+            programme: programme
+          },
+        });
       }
   
       const authRe: AsyncAction = {
