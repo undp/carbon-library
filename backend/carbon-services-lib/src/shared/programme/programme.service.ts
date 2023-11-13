@@ -442,6 +442,17 @@ export class ProgrammeService {
       }
     }
 
+    const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
+    if(req.fromCompanyIds.includes(govProfile.companyId) && req.percentage[req.fromCompanyIds.indexOf(govProfile.companyId)]!==0){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.cannotInvestOnGovernmentOwnership",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     this.logger.verbose(`Investment on programme ${JSON.stringify(programme)}`);
 
     if (
@@ -1323,7 +1334,16 @@ export class ProgrammeService {
     const programme: Programme = this.toProgramme(programmeDto);
     this.logger.verbose("Programme  create", JSON.stringify(programme));
 
-    
+    const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
+    if(Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId) && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.govermentOwnershipOfProgramme",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
     if (
       programmeDto.proponentTaxVatId.length > 1 &&
       (!programmeDto.proponentPercentage ||
@@ -1450,10 +1470,10 @@ export class ProgrammeService {
         );
       }
 
-      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER) {
+      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER && projectCompany.companyRole != CompanyRole.GOVERNMENT) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "programme.proponentIsNotAProgrammeDev",
+            "programme.proponentIsNotAProgrammeDevOrGov ",
             []
           ),
           HttpStatus.BAD_REQUEST
@@ -1700,19 +1720,21 @@ export class ProgrammeService {
       );
 
       const hostAddress = this.configService.get("host");
-      await this.emailHelperService.sendEmailToGovernmentAdmins(
-        EmailTemplates.PROGRAMME_CREATE,
-        {
-          organisationName: orgNamesList,
-          programmePageLink:
-            hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
-        },undefined,undefined,
-        {
-          filename: 'Request For Letter Of Intent.pdf',
-          path: letterOfIntentRequestLetterUrl
-        }
-      );
+      if(govProfile.nationalSopValue==0){
+        await this.emailHelperService.sendEmailToGovernmentAdmins(
+          EmailTemplates.PROGRAMME_CREATE,
+          {
+            organisationName: orgNamesList,
+            programmePageLink:
+              hostAddress +
+              `/programmeManagement/view?id=${programme.programmeId}`,
+          },undefined,undefined,
+          {
+            filename: 'Request For Letter Of Intent.pdf',
+            path: letterOfIntentRequestLetterUrl
+          }
+        );
+      }
 
       const orgNames = await this.companyService.query({
         size: 10,
@@ -3606,7 +3628,6 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
-
       if (companyAvailableCredit < transferCompanyCredit) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
@@ -4480,7 +4501,7 @@ export class ProgrammeService {
     }
 
     if (
-      investment.fromCompanyId != requester.companyId
+      investment.initiatorCompanyId != requester.companyId
     ) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
