@@ -36,6 +36,10 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
       }
     }
 
+    if (action.actionType === AsyncActionType.CADTProgrammeCreate && !this.configService.get('cadTrust.enable')) {
+      return false;
+    }
+
     // params = {
     //   MessageAttributes: {
     //     actionType: {
