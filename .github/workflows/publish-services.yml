@@ -1,5 +1,6 @@
 name: Publish to NPM Services
 on:
+  workflow_dispatch:
   push:
     paths:
       - backend/carbon-services-lib/**

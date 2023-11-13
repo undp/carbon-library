@@ -6,7 +6,7 @@ import {
   ExclamationCircleOutlined,
   FileAddOutlined,
   LikeOutlined,
-  LinkOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import { RcFile } from "antd/lib/upload";
 import { Skeleton, Tooltip, message } from "antd";
@@ -55,7 +55,11 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
   const { get, put, post } = useConnection();
   const [loading, setLoading] = useState<boolean>(false);
   const [monitoringReportData, setMonitoringReportData] = useState<any>();
+  const [monitoringReportversion, setMonitoringReportversion] =
+    useState<any>("");
   const [verificationReportData, setVerificationReportData] = useState<any>();
+  const [verificationReportVersion, setVerificationReportversion] =
+    useState<any>("");
   const [ndcActionId, setNdcActionId] = useState<any>();
   const [openRejectDocConfirmationModal, setOpenRejectDocConfirmationModal] =
     useState(false);
@@ -187,9 +191,21 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
       setNdcActionId(item?.id);
       if (item?.monitoringReport) {
         setMonitoringReportData(item?.monitoringReport);
+        const versionfull =
+          item?.monitoringReport.url.split("_")[
+            item?.monitoringReport.url.split("_").length - 1
+          ];
+        const version = versionfull ? versionfull.split(".")[0] : "V1";
+        setMonitoringReportversion(version.startsWith("V") ? version : "V1");
       }
       if (item?.verificationReport) {
         setVerificationReportData(item?.verificationReport);
+        const versionfull =
+          item?.verificationReport.url.split("_")[
+            item?.verificationReport.url.split("_").length - 1
+          ];
+        const version = versionfull ? versionfull.split(".")[0] : "V1";
+        setVerificationReportversion(version.startsWith("V") ? version : "V1");
       }
     });
   }, [data]);
@@ -231,6 +247,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                   {moment(parseInt(monitoringReportData?.txTime)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ " + monitoringReportversion}
                 </div>
               )}
             </div>
@@ -324,8 +341,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (
@@ -368,7 +385,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                     rel="noopener noreferrer"
                     download
                   >
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon margin-right-1"
                       style={{ color: "#3F3A47" }}
                     />
@@ -406,8 +423,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (
@@ -457,6 +474,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                   {moment(parseInt(verificationReportData?.txTime)).format(
                     "DD MMMM YYYY @ HH:mm"
                   )}
+                  {" ~ " + verificationReportVersion}
                 </div>
               )}
             </div>
@@ -551,8 +569,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (
@@ -600,7 +618,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                     rel="noopener noreferrer"
                     download
                   >
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon margin-right-1"
                       style={{ color: "#3F3A47" }}
                     />
@@ -638,8 +656,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer" }
-                          : { color: "#cacaca", cursor: "default" }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
                       }
                       onClick={() => {
                         if (

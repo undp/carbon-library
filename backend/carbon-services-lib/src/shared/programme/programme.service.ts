@@ -1189,13 +1189,13 @@ export class ProgrammeService {
     if (documentDto.actionId) {
       whr["actionId"] = documentDto.actionId;
     }
-    const currentDoc = await this.documentRepo.findOne({
+    const currentDoc = await this.documentRepo.find({
       where: whr,
     });
-
+    const fileNo = currentDoc.length + 1
     const url = await this.uploadDocument(
       documentDto.type,
-      programme.programmeId + (documentDto.actionId ? ('_' + documentDto.actionId) : ''),
+      programme.programmeId + (documentDto.actionId ? ('_' + documentDto.actionId) : '') + (fileNo? ('_V' + fileNo) : ''),
       documentDto.data
     );
     const dr = new ProgrammeDocument();
@@ -1230,16 +1230,7 @@ export class ProgrammeService {
       if (dr.status === DocumentStatus.ACCEPTED) {
         await this.approveDocumentCommit(em, dr, ndc, undefined, programme);
       }
-      if (!currentDoc) {
-        return await em.save(dr);
-      } else {
-        return await em.update(ProgrammeDocument, whr, {
-          status: dr.status,
-          txTime: dr.txTime,
-          url: dr.url,
-          remark: dr.remark
-        });
-      }
+      return await em.save(dr);
     });
 
     if (user.companyRole === CompanyRole.GOVERNMENT ||
@@ -1922,6 +1913,16 @@ export class ProgrammeService {
         return err;
       });
     return new DataResponseDto(HttpStatus.OK, saved);
+  }
+
+  async queryNdcDetails(
+    query: QueryDto,
+    abilityCondition: string
+  ): Promise<DataListResponseDto> {
+    return new DataListResponseDto(
+      undefined,
+      undefined
+    );
   }
 
   async queryNdcActions(
@@ -4263,18 +4264,18 @@ export class ProgrammeService {
         );
       }
 
-      if (user.companyRole === CompanyRole.MINISTRY) {
-        const permission = await this.findPermissionForMinistryUser(
-          user,
-          programme.sectoralScope
-        );
-        if (!permission) {
-          throw new HttpException(
-            this.helperService.formatReqMessagesString("user.userUnAUth", []),
-            HttpStatus.FORBIDDEN
-          );
-        }
-      }
+      // if (user.companyRole === CompanyRole.MINISTRY) {
+      //   const permission = await this.findPermissionForMinistryUser(
+      //     user,
+      //     programme.sectoralScope
+      //   );
+      //   if (!permission) {
+      //     throw new HttpException(
+      //       this.helperService.formatReqMessagesString("user.userUnAUth", []),
+      //       HttpStatus.FORBIDDEN
+      //     );
+      //   }
+      // }
 
       const resp = await this.programmeRepo.update(
         {

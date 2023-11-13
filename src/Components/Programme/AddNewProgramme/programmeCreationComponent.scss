@@ -135,7 +135,17 @@
           border-radius: 5px !important;
           height: 40px !important;
         }
-
+        .add-Document{
+          display: flex ;
+          .ant-form-item{
+            width: 100%;
+          }
+          .addDoc-info{
+            position: absolute;
+            margin-left: 130px;
+            margin-top: 1.1px;
+          }
+        }
         .space-container {
           width: 100%;
 
