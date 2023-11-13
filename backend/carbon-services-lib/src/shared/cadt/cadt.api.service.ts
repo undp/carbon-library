@@ -236,17 +236,26 @@ export class CadtApiService {
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
 
     const list = []
+    let blockBounds = programme.blockBounds || {}
+
+    let currentStart = blockStart;
     for (const cIndex in programme.companyId) {
       const cId = programme.companyId[cIndex];
+      const cName = (await this.companyService.findByCompanyId(cId))?.name
 
-      let currentStart = blockStart;
+      let issuesStart = currentStart
+      if (blockBounds[cId] && blockBounds[cId].length > 0) {
+        issuesStart = Number(blockBounds[cId][blockBounds[cId].length - 1].unitBlockEnd) + 1
+      }
+
       const cAmount = Number((amount * programme.proponentPercentage[cIndex]/100).toFixed(0))
-      const credit = await this.sendHttpPost('v1/units', {
+      const gap = Number((programme.creditEst * programme.proponentPercentage[cIndex]/100).toFixed(0))
+      const req = {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
-        "unitOwner": cId,
+        "unitOwner": cName,
         "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
-        "unitBlockStart": String(blockStart),
-        "unitBlockEnd": String(blockStart + amount - 1),
+        "unitBlockStart": String(issuesStart),
+        "unitBlockEnd": String(issuesStart + cAmount - 1),
         "unitCount": cAmount,
         "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
         "unitType": this.getUnitType(programme.sector),
@@ -262,59 +271,133 @@ export class CadtApiService {
              "verificationReportDate": this.getProjectDate(new Date().getTime()), //TODO
              "verificationBody": gov.name // TODO
         }
-      });
+      }
+      const credit = await this.sendHttpPost('v1/units', req);
 
-      currentStart += cAmount
+      currentStart += gap
       list.push(credit)
+
+      if (!blockBounds[cId]) {
+        blockBounds[cId] = []
+      }
+      blockBounds[cId].push({
+        unitBlockStart: req.unitBlockStart,
+        unitBlockEnd: req.unitBlockEnd,
+        unitId: credit?.data?.uuid,
+        amount: cAmount
+      })
     }
   
+    console.log('Bounds', blockBounds)
     await await this.sendHttpPost('v1/staging/commit', undefined);
+
+    //TODO: Make this reliable
+    const response = await this.programmeRepo
+    .update(
+      {
+        programmeId: programme.programmeId,
+      },
+      {
+        blockBounds: blockBounds
+      },
+    )
+    .catch((err: any) => {
+      this.logger.error(
+        `CADT id update failed on programme ${programme.programmeId}`,
+      );
+      return err;
+    });
+
     return list
   }
 
   public async transferCredit(
     programme: Programme,
-    transfer: ProgrammeTransfer,
-    // ndcAction: NDCAction,
-    amount: number
+    transfer: ProgrammeTransfer
   ) {
 
-    // if (!programme.cadtId) {
-    //     this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
-    //     return;
-    // }
+    if (!programme.cadtId) {
+        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
+        return;
+    }
 
-    // const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
-    // const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
+    const programBlockBounds = programme.blockBounds[transfer.fromCompanyId];
+    if (!programBlockBounds) {
+      this.logger.log(`Programme block bounds does not exist. Dropping record ${programme.programmeId}`)
+      return;
+    }
 
-    // for (const cIndex in programme.companyId) {
-    //   const cId = programme.companyId[cIndex];
+    const toCompany = await this.companyService.findByCompanyId(transfer.toCompanyId);
+    const fromCompany = await this.companyService.findByCompanyId(transfer.fromCompanyId);
 
-    //   let currentStart = blockStart;
-    //   let cAmount = Number((amount * programme.proponentPercentage[cIndex]/100))
-    //   const roundedAmount = Number(cAmount.toFixed(0))
-    //   if (transfer.fromCompanyId == cId) {
-    //     const remainingAmount = Number((amount * programme.creditOwnerPercentage[cIndex]/100))
-    //     const transferredAmount = Number((cAmount - remainingAmount).toFixed(0))
-    //     const existingUnit = {
-    //       "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
-    //       "unitOwner": cId,
-    //       "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
-    //       "unitBlockStart": String(blockStart),
-    //       "unitBlockEnd": String(blockStart + amount - 1 - transferredAmount - Number(transfer.creditAmount.toFixed(0))),
-    //       "unitCount": cAmount,
-    //       "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
-    //       "unitType": this.getUnitType(programme.sector),
-    //       "unitStatus": this.getUnitStatus(TxType.ISSUE),
-    //       "unitRegistryLink": this.configService.get('host') + "/creditTransfers/viewAll",
-    //       "correspondingAdjustmentDeclaration": "Unknown",
-    //       "correspondingAdjustmentStatus": "Not Started",
-    //     };
-    //   }
+    let txAmount = Number(transfer.creditAmount.toFixed(0))
+    for (const bound of programBlockBounds) {
+      if (bound.isTransferred) {
+        continue;
+      }
 
-    //   currentStart += roundedAmount
-    // }
-  
+      if ( txAmount < bound.amount) {
+        const records = [
+          {
+            "unitCount": bound.amount - txAmount,
+            "unitOwner": fromCompany?.name,
+            "unitBlockStart": String(Number(bound.unitBlockStart) + txAmount),
+            "unitBlockEnd": bound.unitBlockEnd
+          },
+          {
+            "unitCount": txAmount,
+            "unitOwner": toCompany?.name,
+            "unitBlockStart": String(bound.unitBlockStart),
+            "unitBlockEnd": String(Number(bound.unitBlockStart) + txAmount - 1)
+          }
+        ]
+        bound.unitBlockStart = String(Number(bound.unitBlockStart) + txAmount)
+        bound.amount = bound.amount - txAmount
+    
+        const resp = await this.sendHttpPost('v1/units/split', {
+          warehouseUnitId: bound.unitId,
+          records: records
+        })
+        break;
+      } else {
+        const req = {
+          "warehouseUnitId": bound.unitId,
+          "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
+          "unitOwner": toCompany?.name,
+          "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
+          "unitBlockStart": String(bound.unitBlockStart),
+          "unitBlockEnd": String(bound.unitBlockEnd),
+          "unitCount": Number(bound.amount),
+          "vintageYear": this.getYearFromSerialNumber(programme.serialNo),
+          "unitType": this.getUnitType(programme.sector),
+          "unitStatus": this.getUnitStatus(TxType.ISSUE),
+          "unitRegistryLink": this.configService.get('host') + "/creditTransfers/viewAll",
+          "correspondingAdjustmentDeclaration": "Unknown",
+          "correspondingAdjustmentStatus": "Not Started",
+        }
+        bound.isTransferred = true
+        await this.sendHttpPut('v1/units', req);
+        txAmount -= Number(bound.amount)
+      }
+    }
+
+    console.log("Bounds", programme.blockBounds)
+    //TODO: Make this reliable
+    const response = await this.programmeRepo
+    .update(
+      {
+        programmeId: programme.programmeId,
+      },
+      {
+        blockBounds: programme.blockBounds
+      },
+    )
+    .catch((err: any) => {
+      this.logger.error(
+        `CADT id update failed on programme ${programme.programmeId}`,
+      );
+      return err;
+    });
     await await this.sendHttpPost('v1/staging/commit', undefined);
   }
 }
