@@ -332,7 +332,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 {designDocStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop:'3px' }}
                   />
                 )}
                 {designDocStatus === DocumentStatus.REJECTED && (
@@ -559,7 +559,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 {methodDocStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop:'3px' }}
                   />
                 )}
                 {methodDocStatus === DocumentStatus.REJECTED && (
@@ -798,7 +798,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                 {impactAssessmentStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop:'3px' }}
                   />
                 )}
                 {impactAssessmentStatus === DocumentStatus.REJECTED && (
