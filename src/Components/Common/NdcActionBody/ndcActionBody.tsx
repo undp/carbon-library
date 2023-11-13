@@ -341,8 +341,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px" }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px"  }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px", paddingTop:'3px' }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
                       }
                       onClick={() => {
                         if (
@@ -423,8 +423,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px"  }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
                       }
                       onClick={() => {
                         if (
@@ -569,8 +569,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px"  }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
                       }
                       onClick={() => {
                         if (
@@ -656,8 +656,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px"  }
+                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
+                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 1.5px 0px", paddingTop:'3px'  }
                       }
                       onClick={() => {
                         if (
