@@ -310,7 +310,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           docAction(designDocId, DocumentStatus.ACCEPTED)
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop:'3px' }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -325,7 +325,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop:'3px' }}
                       />
                     </>
                   )}
@@ -537,7 +537,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           docAction(methDocId, DocumentStatus.ACCEPTED)
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop:'3px' }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -552,7 +552,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop:'3px' }}
                       />
                     </>
                   )}
@@ -776,7 +776,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           docAction(impactAssessmentId, DocumentStatus.ACCEPTED)
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop:'3px' }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -791,7 +791,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop:'3px' }}
                       />
                     </>
                   )}
@@ -878,7 +878,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                             DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT
                           );
                         }}
-                      />1.5px
+                      />
                     </>
                   )}
                 </div>
