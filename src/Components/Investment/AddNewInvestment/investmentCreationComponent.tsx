@@ -220,7 +220,7 @@ export const InvestmentCreationComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
       }
-      onNavigateToProgrammeView();
+      onNavigateToProgrammeView(data.programmeId);
     } catch (error: any) {
       console.log("Error in investment creation - ", error);
       message.open({
