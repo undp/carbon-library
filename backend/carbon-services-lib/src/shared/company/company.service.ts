@@ -45,7 +45,7 @@ import { SYSTEM_TYPE } from "../enum/system.names.enum";
 @Injectable()
 export class CompanyService {
   constructor(
-    @InjectRepository(Company) private companyRepo: Repository<Company>,
+  @InjectRepository(Company) private companyRepo: Repository<Company>,
     private logger: Logger,
     private configService: ConfigService,
     private helperService: HelperService,
@@ -287,6 +287,7 @@ export class CompanyService {
         const templateData = {
           organisationName: company.name,
           countryName: this.configService.get("systemCountryName"),
+          systemName: this.configService.get("systemName"),
           organisationRole:
             company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
               ? "Programme Developer"
@@ -704,10 +705,7 @@ export class CompanyService {
 
   async increaseProgrammeCount(companyId: any) {
     const companyDetails = await this.findByCompanyId(companyId);
-    const programmeCount =
-      companyDetails.companyRole === CompanyRole.GOVERNMENT
-        ? null
-        : Number(companyDetails.programmeCount) + 1;
+    const programmeCount = Number(companyDetails.programmeCount) + 1;
 
     const response = await this.companyRepo
       .update(

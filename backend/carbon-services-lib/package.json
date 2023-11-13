@@ -1,6 +1,6 @@
 {
-  "name": "carbon-services-lib",
-  "version": "0.0.231-feature/carbon-283.0",
+  "name": "@undp/carbon-services-lib",
+  "version": "0.0.242",
   "description": "Backend library",
   "author": "",
   "private": false,

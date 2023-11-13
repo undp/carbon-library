@@ -52,6 +52,7 @@ import { LocationInterface } from "../location/location.interface";
 import { CompanyState } from "../enum/company.state.enum";
 import { OrganisationDto } from "../dto/organisation.dto";
 import { PasswordHashService } from "../util/passwordHash.service";
+import { FilterEntry } from "../dto/filter.entry";
 
 @Injectable()
 export class UserService {
@@ -376,12 +377,13 @@ export class UserService {
           const templateData = {
             name: user.user_name,
             countryName: this.configService.get("systemCountryName"),
+            systemName: this.configService.get("systemName"),
             tempPassword: generatedPassword,
             home: hostAddress,
             email: user.user_email,
             address: this.configService.get("email.adresss"),
             liveChat: this.configService.get("liveChat"),
-            helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
+            helpDoc: hostAddress +`/help`,
           };
           const action: AsyncAction = {
             actionType: AsyncActionType.Email,
@@ -570,7 +572,7 @@ export class UserService {
       if(company.companyRole === CompanyRole.MINISTRY && companyRole === CompanyRole.MINISTRY) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "user.minUserCannotCreateMin",
+            "user.userUnAUth",
             []
           ),
           HttpStatus.FORBIDDEN
@@ -682,6 +684,7 @@ export class UserService {
         const templateData = {
           organisationName: company.name,
           countryName: this.configService.get("systemCountryName"),
+          systemName: this.configService.get("systemName"),
           organisationRole:
             company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
               ? "Programme Developer"
@@ -724,7 +727,7 @@ export class UserService {
       u.isPending = true;
 
       const hostAddress = this.configService.get("host");
-      const users = await this.getGovAdminAndManagerUsers();
+      const users = await this.getGovAdminUsers();
 
       users.forEach(async (user: any) => {
         const templateData = {
@@ -765,12 +768,13 @@ export class UserService {
       const templateData = {
         name: u.name,
         countryName: this.configService.get("systemCountryName"),
+        systemName: this.configService.get("systemName"),
         tempPassword: generatedPassword,
         home: hostAddress,
         email: u.email,
         address: this.configService.get("email.adresss"),
         liveChat: this.configService.get("liveChat"),
-        helpDoc: "https://nationalcarbonregistrydemo.tawk.help",
+        helpDoc: hostAddress +`/help`,
       };
   
       const action: AsyncAction = {
@@ -872,6 +876,25 @@ export class UserService {
   }
 
   async query(query: QueryDto, abilityCondition: string): Promise<any> {
+    
+    if (query.filterAnd) {
+      if (!query.filterAnd.some(filter => filter.key === "isPending")) {
+        query.filterAnd.push({
+          key: "isPending",
+          operation: "=",
+          value: false,
+        });
+      }
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: "isPending",
+        operation: "=",
+        value: false,
+      });
+      query.filterAnd = filterAnd;
+    }
+    
     const resp = await this.userRepo
       .createQueryBuilder("user")
       .where(
@@ -979,6 +1002,21 @@ export class UserService {
     return result;
 
     //return result.map((item) => {return item.user_email});
+  }
+
+  async getGovAdminUsers() {
+    const result = await this.userRepo
+      .createQueryBuilder("user")
+      .where("user.role in (:admin)", {
+        admin: Role.Admin,
+      })
+      .andWhere("user.companyRole= :companyRole", {
+        companyRole: CompanyRole.GOVERNMENT,
+      })
+      .select(["user.name", "user.email"])
+      .getRawMany();
+
+    return result;
   }
 
   async getOrganisationAdminAndManagerUsers(organisationId) {

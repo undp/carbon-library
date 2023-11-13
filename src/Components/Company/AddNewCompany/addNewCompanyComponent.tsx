@@ -639,6 +639,7 @@ export const AddNewCompanyComponent = (props: any) => {
                       size="large"
                       disabled={isUpdate}
                       onChange={onChangeCompanyRole}
+                      style={isGuest && { justifyContent: "start" }}
                     >
                       {isUpdate ? (
                         <div
@@ -694,8 +695,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               CompanyRole.MINISTRY
                                 ? {
                                     width: "45%",
+                                    marginLeft: isGuest ?  "30px" : 0,
                                   }
-                                : {}
+                                : {marginLeft: isGuest ? "30px" : 0,}
                             }
                           >
                             <Tooltip
@@ -712,7 +714,7 @@ export const AddNewCompanyComponent = (props: any) => {
                             </Tooltip>
                           </div>
                           {(userInfoState?.companyRole !==
-                            CompanyRole.MINISTRY) && (
+                            CompanyRole.MINISTRY) && !isGuest && (
                             <div className="minister-radio-container">
                               <Tooltip
                                 placement="top"
@@ -721,7 +723,6 @@ export const AddNewCompanyComponent = (props: any) => {
                                 <Radio.Button
                                   className="minister"
                                   value="Ministry"
-                                  disabled={isGuest}
                                 >
                                   <AuditOutlined className="role-icons" />
                                   Ministry
