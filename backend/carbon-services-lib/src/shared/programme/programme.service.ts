@@ -2535,6 +2535,23 @@ export class ProgrammeService {
       isRetirement
     );
 
+    const sqlProgram = await this.findById(programme.programmeId);
+  
+    console.log('Add transfer', sqlProgram)
+
+    if (sqlProgram.cadtId) {
+      programme.cadtId = sqlProgram.cadtId;
+      programme.blockBounds = sqlProgram.blockBounds;
+      console.log('Add action', programme)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTTransferCredit,
+        actionProps: {
+          programme: programme,
+          transfer: transfer
+        },
+      });
+    }
+
     this.logger.log("Programme updated");
     const result = await this.programmeTransferRepo
       .update(
@@ -3040,23 +3057,6 @@ export class ProgrammeService {
           false
         )
       ).data;
-      
-    const sqlProgram = await this.findById(updateProgramme.programmeId);
-  
-    console.log('Add transfer', sqlProgram)
-
-    if (sqlProgram.cadtId) {
-      updateProgramme.cadtId = sqlProgram.cadtId;
-      updateProgramme.blockBounds = sqlProgram.blockBounds;
-      console.log('Add action', updateProgramme)
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTTransferCredit,
-        actionProps: {
-          programme: updateProgramme,
-          transfer: trf
-        },
-      });
-    }
 
       await this.emailHelperService.sendEmailToOrganisationAdmins(
         trf.toCompanyId,
