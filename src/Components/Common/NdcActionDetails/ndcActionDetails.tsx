@@ -886,6 +886,11 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                               `${t("ndcAction:allowOnlyNumericValue")}`
                             );
                           }
+                          if (!Number.isInteger(value)) {
+                            throw new Error(
+                              `${t("ndcAction:allowOnlyIntegerValue")}`
+                            );
+                          }
                         },
                       },
                     ]}
@@ -927,6 +932,11 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                           if (value < 0) {
                             throw new Error(
                               `${t("ndcAction:allowOnlyNumericValue")}`
+                            );
+                          }
+                          if (!Number.isInteger(value)) {
+                            throw new Error(
+                              `${t("ndcAction:allowOnlyIntegerValue")}`
                             );
                           }
                         },
