@@ -210,8 +210,8 @@ export class ProgrammeLedgerService {
           }
 
           if (
-            currentCredit[transfer.fromCompanyId] -
-              frozenCredit[transfer.fromCompanyId] <
+            (currentCredit[transfer.fromCompanyId] -
+              frozenCredit[transfer.fromCompanyId]) <
             transfer.creditAmount
           ) {
             throw new HttpException(
@@ -226,7 +226,7 @@ export class ProgrammeLedgerService {
           for (const i in programme.creditOwnerPercentage) {
             if (programme.companyId[i] == transfer.fromCompanyId) {
               percentages.push(
-                programme.creditBalance - transfer.creditAmount != 0
+                (programme.creditBalance - transfer.creditAmount )!= 0
                   ? parseFloat(
                       (
                         ((currentCredit[transfer.fromCompanyId] -
@@ -239,7 +239,7 @@ export class ProgrammeLedgerService {
               );
             } else {
               percentages.push(
-                programme.creditBalance - transfer.creditAmount != 0
+                (programme.creditBalance - transfer.creditAmount) != 0
                   ? parseFloat(
                       (
                         (currentCredit[programme.companyId[i]] * 100) /
@@ -280,6 +280,9 @@ export class ProgrammeLedgerService {
             programme.creditRetired = new Array(
               programme.creditOwnerPercentage.length
             ).fill(0);
+          }
+          else if (programme.creditRetired.length!==programme.creditOwnerPercentage.length && programme.creditRetired.length<programme.creditOwnerPercentage.length){
+            programme.creditRetired.push(...new Array(programme.creditOwnerPercentage.length-programme.creditRetired.length).fill(0))
           }
           programme.creditRetired[compIndex] += transfer.creditAmount;
         } else {
