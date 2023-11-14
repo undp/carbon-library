@@ -23,6 +23,8 @@ import { ProgrammeDocumentViewEntity } from '../entities/document.view.entity';
 import { NDCAction } from '../entities/ndc.action.entity';
 import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
+import { CadtModule } from '../cadt/cadt.module';
+
 @Module({
   imports: [
     ProgrammeLedgerModule,
@@ -47,7 +49,7 @@ import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
     EmailHelperModule,
     LocationModule,
     AsyncOperationsModule,
-    FileHandlerModule
+    FileHandlerModule,
   ],
   providers: [Logger, ProgrammeService],
   exports: [ProgrammeService],

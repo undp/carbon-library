@@ -92,6 +92,9 @@ export class Company implements EntitySubject {
 
   @Column("varchar", { array: true, nullable: true })
   sectoralScope: SectoralScope[];
+
+  @Column({ type: "bigint", nullable: true })
+  nationalSopValue: number;
   
   @BeforeInsert()
   setDefaultState() {
@@ -110,6 +113,9 @@ export class Company implements EntitySubject {
       this.creditBalance = 0;
     } else if (this.companyRole === CompanyRole.CERTIFIER) {
       this.creditBalance = null;
+    }
+    if (this.companyRole === CompanyRole.GOVERNMENT){
+      this.nationalSopValue=0;
     }
   }
 }

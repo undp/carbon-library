@@ -89,7 +89,7 @@ export const CompanyProfileComponent = (props: any) => {
       setUserRole(userRoleValue);
       setCompanyRole(localStorage.getItem("companyRole") as string);
       if (state.record?.state == "2" || state.record?.state == "3") {
-        getUserDetails(state.record.companyId)
+        getUserDetails(state.record.companyId);
       }
     }
   }, []);
@@ -170,7 +170,6 @@ export const CompanyProfileComponent = (props: any) => {
   const onApproveOrgCanceled = () => {
     setOpenApproveModal(false);
   };
-
 
   const onRejectOrgConfirmed = async (remarks: string) => {
     try {
@@ -310,7 +309,7 @@ export const CompanyProfileComponent = (props: any) => {
                 {t("common:edit")}
               </Button>
             )}
-          {(parseInt(companyDetails?.state) === 2) &&
+          {parseInt(companyDetails?.state) === 2 &&
             ability.can(Action.Reject, plainToClass(Company, companyDetails)) &&
             !isLoading &&
             companyDetails && (
@@ -321,8 +320,12 @@ export const CompanyProfileComponent = (props: any) => {
                 {t("common:reject")}
               </Button>
             )}
-          {(parseInt(companyDetails?.state) === 2 || parseInt(companyDetails?.state) === 3) &&
-            ability.can(Action.Approve, plainToClass(Company, companyDetails)) &&
+          {(parseInt(companyDetails?.state) === 2 ||
+            parseInt(companyDetails?.state) === 3) &&
+            ability.can(
+              Action.Approve,
+              plainToClass(Company, companyDetails)
+            ) &&
             !isLoading &&
             companyDetails && (
               <Button
@@ -392,7 +395,10 @@ export const CompanyProfileComponent = (props: any) => {
                         {t("companyProfile:taxId")}
                       </Col>
                       <Col span={12} className="field-value nextline-overflow">
-                        {companyDetails.taxId ? companyDetails.taxId : "-"}
+                        {companyDetails.taxId &&
+                        companyDetails?.companyRole !== CompanyRole.GOVERNMENT
+                          ? companyDetails.taxId
+                          : "-"}
                       </Col>
                     </Row>
                     <Row className="field">
@@ -400,7 +406,9 @@ export const CompanyProfileComponent = (props: any) => {
                         {t("companyProfile:paymentId")}
                       </Col>
                       <Col span={12} className="field-value nextline-overflow">
-                        {companyDetails.paymentId ? companyDetails.paymentId : "-"}
+                        {companyDetails.paymentId
+                          ? companyDetails.paymentId
+                          : "-"}
                       </Col>
                     </Row>
                     <Row className="field">
@@ -521,10 +529,25 @@ export const CompanyProfileComponent = (props: any) => {
                     ) : (
                       ""
                     )}
+                    {companyDetails?.companyRole === CompanyRole.GOVERNMENT && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:nationalSopValue")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.nationalSopValue
+                              ? companyDetails.nationalSopValue
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                   </Skeleton>
                 </div>
               </Card>
-              {(companyDetails?.state == "2" || companyDetails?.state == "3") &&
+              {(companyDetails?.state == "2" ||
+                companyDetails?.state == "3") && (
                 <Card className="card-container">
                   <div className="info-view">
                     <div className="title">
@@ -540,9 +563,7 @@ export const CompanyProfileComponent = (props: any) => {
                         {t("companyProfile:adminName")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {userDetails?.name
-                          ? userDetails?.name
-                          : "-"}
+                        {userDetails?.name ? userDetails?.name : "-"}
                       </Col>
                     </Row>
                     <Row className="field">
@@ -550,9 +571,7 @@ export const CompanyProfileComponent = (props: any) => {
                         {t("companyProfile:adminEmail")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {userDetails?.email
-                          ? userDetails?.email
-                          : "-"}
+                        {userDetails?.email ? userDetails?.email : "-"}
                       </Col>
                     </Row>
                     <Row className="field">
@@ -567,10 +586,8 @@ export const CompanyProfileComponent = (props: any) => {
                     </Row>
 
                   </div>
-
                 </Card>
-              }
-              
+              )}
             </Col>
           </Row>
         </div>

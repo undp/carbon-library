@@ -24,7 +24,7 @@ import { DataCountResponseDto } from "../shared/dto/data.count.response";
 import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
 import { InvestmentStatus } from "../shared/enum/investment.status";
-import { SYSTEM_TYPE } from "../shared/enum/system.names.enum"; 
+import { SYSTEM_TYPE } from "../shared/enum/system.names.enum";
 @Injectable()
 export class AggregateAPIService {
   private timeDropFields = [

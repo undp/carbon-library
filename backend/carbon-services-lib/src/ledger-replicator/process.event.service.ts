@@ -165,10 +165,7 @@ export class ProcessEventService {
         } else {
           updateObj = {
             creditBalance: overall.credit,
-            programmeCount:
-              company.companyRole === CompanyRole.GOVERNMENT
-                ? null
-                : Number(company.programmeCount) +
+            programmeCount:Number(company.programmeCount) +
                   (overall.txType == TxType.AUTH ? 1 : 0),
             lastUpdateVersion: version,
             creditTxTime: [
