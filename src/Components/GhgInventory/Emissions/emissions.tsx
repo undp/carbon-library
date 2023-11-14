@@ -1557,7 +1557,6 @@ export const GHGEmissionsComponent = (props: any) => {
                             )
                           : Object.entries(panelContent).map(
                               ([subPanelHeading, subPanelContent]) => (
-                                //   <Col span={12} key={subPanelHeading}>
                                 <div className="sub-panel">
                                   <div className="sub-panel-heading">
                                     {renderPanelHeader(subPanelHeading)}
