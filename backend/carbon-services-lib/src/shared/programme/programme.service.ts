@@ -90,6 +90,8 @@ import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
+import { NdcDetailsPeriod } from "../entities/ndc.Details.period.entity";
+import { NdcDetailsAction } from "../entities/ndc.details.action.entity";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -139,7 +141,11 @@ export class ProgrammeService {
     private letterOfIntentRequestGen: LetterOfIntentRequestGen,
     private letterOfIntentResponseGen: LetterOfIntentResponseGen,
     private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen,
-    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen
+    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen,
+    @InjectRepository(NdcDetailsPeriod) 
+    private ndcDetailsPeriodRepo: Repository<NdcDetailsPeriod>,
+    @InjectRepository(NdcDetailsAction) 
+    private ndcDetailsActionRepo: Repository<NdcDetailsAction>,
   ) {}
 
   private fileExtensionMap = new Map([
@@ -4692,6 +4698,39 @@ export class ProgrammeService {
     );
 
     return transferResult;
+  }
+
+  async getNdcDetailsPeriods(abilityCondition: any, user: User) {
+    return await this.ndcDetailsPeriodRepo.find({
+      select: {
+        id: true,
+        startYear: true,
+        endYear: true,
+        finalized: true,
+      }
+    });
+  }
+  async addNdcDetailsPeriod(ndcDetailsPeriod:NdcDetailsPeriod, abilityCondition: any, user: User) {
+    const addedNdcDetailsPeriod = this.ndcDetailsPeriodRepo.create(ndcDetailsPeriod);
+    await this.ndcDetailsPeriodRepo.save(addedNdcDetailsPeriod);
+    return addedNdcDetailsPeriod;
+  }
+
+  async getNdcDetailActions(abilityCondition: any, user: User){
+    return await this.ndcDetailsActionRepo.find({
+      select: {
+        id: true,
+        nationalPlanObjective: true,
+        kpi: true,
+        ministryName: true,
+      }
+    });
+  }
+
+  async addMainNdcDetailAction(ndcDetailsAction:NdcDetailsAction, abilityCondition: any, user: User) {
+    const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
+    await this.ndcDetailsActionRepo.save(addedNdcDetailsAction);
+    return addedNdcDetailsAction;
   }
 
 }

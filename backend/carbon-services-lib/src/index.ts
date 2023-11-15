@@ -138,6 +138,8 @@ export * from './shared/dto/stat.filter'
 export * from './shared/dto/stat.list.dto'
 export * from './shared/dto/user.dto'
 export * from './shared/dto/user.update.dto'
+export * from './shared/dto/ndc.details.period.dto'
+
 //from transparency
 export * from './shared/dto/adaptation.properties'
 export * from './shared/dto/co.benefits'
