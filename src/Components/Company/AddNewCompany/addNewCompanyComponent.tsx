@@ -4,9 +4,11 @@ import {
   Col,
   Form,
   Input,
+  InputNumber,
   Radio,
   Row,
   Select,
+  Space,
   Steps,
   Tooltip,
   Upload,
@@ -28,7 +30,11 @@ import "../../../Styles/app.scss";
 import { RcFile, UploadFile } from "antd/lib/upload";
 import { UserProps } from "../../../Definitions/Definitions/userInformationContext.definitions";
 import validator from "validator";
-import { SectoralScope, getBase64 } from "../../../Definitions";
+import {
+  CarbonSystemType,
+  SectoralScope,
+  getBase64,
+} from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const AddNewCompanyComponent = (props: any) => {
@@ -42,6 +48,7 @@ export const AddNewCompanyComponent = (props: any) => {
     regionField,
     isGuest,
     onNavigateToHome,
+    systemType,
   } = props;
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -252,6 +259,11 @@ export const AddNewCompanyComponent = (props: any) => {
         values.sectoralScope = formOneValues.sectoralScope;
         values.nameOfMinister = formOneValues.nameOfMinister;
       }
+      if (state?.record?.companyRole === CompanyRole.GOVERNMENT) {
+        values.nationalSopValue = Math.floor(
+          Number(formOneValues.nationalSopValue)
+        );
+      }
 
       if (formOneValues.website) {
         values.website = "https://" + formOneValues.website;
@@ -384,33 +396,36 @@ export const AddNewCompanyComponent = (props: any) => {
                     : null}
                   {companyRole !== CompanyRole.MINISTRY
                     ? (!isUpdate ||
-                      (isUpdate &&
-                        companyRole !== CompanyRole.GOVERNMENT)) && (
-                      <Form.Item
-                        label="Registration Payment ID"
-                        initialValue={state?.record?.paymentId}
-                        name="paymentId"
-                        rules={[
-                          {
-                            required: true,
-                            message: "",
-                          },
-                          {
-                            validator: async (rule, value) => {
-                              if (
-                                String(value).trim() === "" ||
-                                String(value).trim() === undefined ||
-                                value === null ||
-                                value === undefined
-                              ) {
-                                throw new Error(`Registration Payment ID ${t("isRequired")}`);
-                              }
+                        (isUpdate &&
+                          companyRole !== CompanyRole.GOVERNMENT)) && (
+                        <Form.Item
+                          label="Registration Payment ID"
+                          initialValue={state?.record?.paymentId}
+                          name="paymentId"
+                          rules={[
+                            {
+                              required: true,
+                              message: "",
                             },
-                          },
-                        ]}
-                      >
-                        <Input size="large" />
-                      </Form.Item>)
+                            {
+                              validator: async (rule, value) => {
+                                if (
+                                  String(value).trim() === "" ||
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
+                                  throw new Error(
+                                    `Registration Payment ID ${t("isRequired")}`
+                                  );
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <Input size="large" />
+                        </Form.Item>
+                      )
                     : null}
                   <Form.Item
                     label="Email"
@@ -554,6 +569,55 @@ export const AddNewCompanyComponent = (props: any) => {
                     >
                       <Input.TextArea rows={3} maxLength={100} />
                     </Form.Item>
+                  )}
+                  {companyRole === CompanyRole.GOVERNMENT && (
+                    <div className="space-container" style={{ width: "100%" }}>
+                      <Space
+                        wrap={true}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="center"
+                        size={"large"}
+                      >
+                        <Form.Item
+                          style={{ width: "100%" }}
+                          name="nationalSopValue"
+                          label="National Share of Proceeds"
+                          initialValue={state?.record?.nationalSopValue}
+                          rules={[
+                            { required: true, message: "" },
+                            {
+                              validator: async (rule, value) => {
+                                if (
+                                  String(value).trim() === "" ||
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
+                                  throw new Error(
+                                    `National Share of Proceeds  ${t(
+                                      "isRequired"
+                                    )}`
+                                  );
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            style={{ width: "100%" }}
+                            size="large"
+                            min={0}
+                            max={99}
+                            formatter={(value) => `${value}%`}
+                            parser={(value: any) => value.replace("%", "")}
+                            disabled={systemType == CarbonSystemType.REGISTRY}
+                          />
+                        </Form.Item>
+                      </Space>
+                    </div>
                   )}
                 </div>
               </Col>
