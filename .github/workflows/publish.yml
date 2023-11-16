@@ -26,7 +26,7 @@ jobs:
       - name: Determine changed libraries
         id: changes
         run: |
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
 
           if echo "$CHANGED_FILES" | grep -q "backend/carbon-services-lib/"; then
             echo "Backend changes detected."
