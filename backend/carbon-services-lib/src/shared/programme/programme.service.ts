@@ -90,7 +90,7 @@ import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
-import { NdcDetailsPeriod } from "../entities/ndc.Details.period.entity";
+import { NdcDetailsPeriod } from "../entities/ndc.details.period.entity";
 import { NdcDetailsAction } from "../entities/ndc.details.action.entity";
 
 export declare function PrimaryGeneratedColumn(
@@ -4726,7 +4726,7 @@ export class ProgrammeService {
       }
     });
   }
-  
+
 
   async addMainNdcDetailAction(ndcDetailsAction:NdcDetailsAction, abilityCondition: any, user: User) {
     const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
