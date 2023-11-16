@@ -13,4 +13,7 @@ export class NdcDetailsPeriod {
 
     @Column()
     finalized: boolean
+
+    @Column('boolean', { default: false })
+    deleted: boolean
 }

@@ -4708,6 +4708,9 @@ export class ProgrammeService {
         startYear: true,
         endYear: true,
         finalized: true,
+      },
+      where: {
+        deleted : false
       }
     });
   }
@@ -4719,7 +4722,7 @@ export class ProgrammeService {
   }
 
   async deleteNdcDetailsPeriod(id: number, abilityCondition: any, user: User){
-      await this.ndcDetailsPeriodRepo.delete(id);
+      await this.ndcDetailsPeriodRepo.update(id,{deleted: true});
       return true;
   }
 
