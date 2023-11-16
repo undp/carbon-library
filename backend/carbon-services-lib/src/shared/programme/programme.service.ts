@@ -4711,10 +4711,16 @@ export class ProgrammeService {
       }
     });
   }
+
   async addNdcDetailsPeriod(ndcDetailsPeriod:NdcDetailsPeriodDto, abilityCondition: any, user: User) {
     const addedNdcDetailsPeriod = this.ndcDetailsPeriodRepo.create(ndcDetailsPeriod);
     await this.ndcDetailsPeriodRepo.save(addedNdcDetailsPeriod);
     return addedNdcDetailsPeriod;
+  }
+
+  async deleteNdcDetailsPeriod(id: number, abilityCondition: any, user: User){
+      await this.ndcDetailsPeriodRepo.delete(id);
+      return true;
   }
 
   async getNdcDetailActions(abilityCondition: any, user: User){
@@ -4724,6 +4730,10 @@ export class ProgrammeService {
         nationalPlanObjective: true,
         kpi: true,
         ministryName: true,
+        periodId: true,
+        parentActionId: true,
+        actionType: true,
+        status: true
       }
     });
   }
