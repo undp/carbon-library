@@ -591,7 +591,6 @@ export const GHGEmissionsComponent = (props: any) => {
   };
 
   const getEmissionData = async () => {
-    console.log('------- IN GET ALL');
     setLoading(true);
     try {
       const response: any = await get('national/emissions');
@@ -613,7 +612,6 @@ export const GHGEmissionsComponent = (props: any) => {
   };
 
   useEffect(() => {
-    console.log('------- CALLING GET ALL');
     const fetchData = async () => {
       await getEmissionData();
       //   setIsPendingFinalization(data.some((item: any) => item.state === 'SAVED'));
