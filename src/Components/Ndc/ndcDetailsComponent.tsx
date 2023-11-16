@@ -19,11 +19,7 @@ import {
 } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role } from "../../Definitions";
-
-type Period = {
-  start: number;
-  end: number;
-};
+import { Period } from "../../Definitions/Definitions/ndcDetails.definitions";
 
 type NdcDetail = {
   key: number;
@@ -44,23 +40,20 @@ export const NdcDetailsComponent = (props: any) => {
   const { RangePicker } = DatePicker;
   const [ndcDetailsData, setNdcDetailsData] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const periodItemsRef = useRef([] as any[]);
   const [periodItems, setPeriodItems] = useState([] as any[]);
-  const [selectedTab, setSelectedTab] = useState("add_new");
-  const selectedPeriod = useRef({} as Period);
+  const [selectedPeriod, setSelectedPeriod] = useState({} as any);
+  const selectedDateRangeRef = useRef({} as any);
   const addedNdcDetailId = useRef(0);
   const selectedNdcDetail = useRef({} as NdcDetail);
   const [tableKey, setTableKey] = useState(0);
+  const { get, post } = useConnection();
 
   const { userInfoState } = useUserContext();
 
-  const isAddRangeVisible = () => {
-    return (
-      (userInfoState?.companyRole === CompanyRole.MINISTRY ||
-        userInfoState?.companyRole === CompanyRole.GOVERNMENT) &&
-      userInfoState?.userRole !== Role.ViewOnly
-    );
-  };
+  const isAddRangeVisible =
+    (userInfoState?.companyRole === CompanyRole.MINISTRY ||
+      userInfoState?.companyRole === CompanyRole.GOVERNMENT) &&
+    userInfoState?.userRole !== Role.ViewOnly;
 
   const isAddNdcActionVisible = () => {
     return (
@@ -80,7 +73,8 @@ export const NdcDetailsComponent = (props: any) => {
     num >= min && num <= max;
 
   function onAddNewSubNdcDetail() {
-    const range = selectedTab.split('-');
+    //const range = selectedPeriod.split("-");
+    const range: any = [];
     const ndcDetail = ndcDetailsData.find(
       (item: NdcDetail) => item.key === selectedNdcDetail.current.key
     );
@@ -95,9 +89,9 @@ export const NdcDetailsComponent = (props: any) => {
         startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
         endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
         ndcActionId: ndcDetail?.key,
-        nationalPlanObj: '',
-        kpi: '',
-        ministry: '',
+        nationalPlanObj: "",
+        kpi: "",
+        ministry: "",
       };
       if (!ndcDetail.subNdcDetails) {
         ndcDetail.subNdcDetails = [];
@@ -119,7 +113,9 @@ export const NdcDetailsComponent = (props: any) => {
           newData[index] = { ...newData[index], ...row };
         }
       } else {
-        const parentIndex = newData.findIndex((item: any) => row.ndcActionId === item.key);
+        const parentIndex = newData.findIndex(
+          (item: any) => row.ndcActionId === item.key
+        );
         const parentItem = newData[parentIndex];
 
         if (parentItem) {
@@ -146,7 +142,8 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const getNdcDetailsForPeriod = () => {
-    const range = selectedTab.split("-");
+    //const range = selectedPeriod.split("-");
+    const range: any = [];
     if (range.length > 1) {
       const filteredData = ndcDetailsData.filter((item: NdcDetail) => {
         return inRange(
@@ -167,13 +164,22 @@ export const NdcDetailsComponent = (props: any) => {
     );
     if (ndcDetail) {
       if (
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry.trim() !== '' &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj.trim() !==
-        '' &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj &&
-        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi).trim() !== '' &&
-        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi)
+        ndcDetail?.subNdcDetails[
+          ndcDetail?.subNdcDetails?.length - 1
+        ]?.ministry.trim() !== "" &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
+          ?.ministry &&
+        ndcDetail?.subNdcDetails[
+          ndcDetail?.subNdcDetails?.length - 1
+        ]?.nationalPlanObj.trim() !== "" &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
+          ?.nationalPlanObj &&
+        String(
+          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
+        ).trim() !== "" &&
+        String(
+          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
+        )
       ) {
         onAddNewSubNdcDetail();
       }
@@ -272,7 +278,8 @@ export const NdcDetailsComponent = (props: any) => {
   });
 
   function onAddNewNdcDetail() {
-    const range = selectedTab.split("-");
+    //const range = selectedPeriod.split("-");
+    const range: any = [];
     const ndcActionId = ++addedNdcDetailId.current;
     const newData = {
       key: ndcActionId,
@@ -306,52 +313,110 @@ export const NdcDetailsComponent = (props: any) => {
     },
   };
 
-  //commented because rendering issue
+  const onDeletePeriod = async () => {
+    const result = await post("national/programme/deleteNdcDetailsPeriod", {
+      id: selectedPeriod.id,
+    });
+    if (result) {
+      fetchNdcDetailPeriods();
+    }
+  };
+
+  const onFinalizePeriod = () => {
+    //
+  };
+
   function ndcDetailsTableContent() {
     return (
-      <div></div>
-      // <div>
-      //   <Button
-      //     onClick={onAddNewNdcDetail}
-      //     type="primary"
-      //     style={{
-      //       marginBottom: 16,
-      //     }}
-      //   >
-      //     Add a row
-      //   </Button>
-      //   <Table
-      //     components={components}
-      //     rowClassName={() => 'editable-row'}
-      //     bordered
-      //     dataSource={ndcDetailsData}
-      //     columns={columns}
-      //   />
-      // </div>
+      <div>
+        <Row>
+          <Col span={24}>
+            <Table
+              key={tableKey}
+              components={components}
+              rowClassName={() => "editable-row"}
+              bordered
+              dataSource={getNdcDetailsForPeriod()}
+              columns={columns}
+              expandable={{
+                expandedRowRender: (record) => getSubNdcActionContent(record),
+                indentSize: 0,
+                defaultExpandedRowKeys: [selectedNdcDetail.current.key],
+              }}
+              footer={() =>
+                isAddNdcActionVisible() && (
+                  <Row justify={"center"}>
+                    <Button
+                      onClick={onAddNewNdcDetail}
+                      type="default"
+                      style={{
+                        marginBottom: 16,
+                        width: "100%",
+                      }}
+                    >
+                      {t("ndc:addNdcAction")}
+                    </Button>
+                  </Row>
+                )
+              }
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Button
+              type="primary"
+              onClick={onDeletePeriod}
+              htmlType="submit"
+              loading={loading}
+            >
+              {t("ndc:delete")}
+            </Button>
+            <Button
+              type="primary"
+              onClick={onFinalizePeriod}
+              htmlType="submit"
+              loading={loading}
+            >
+              {t("ndc:finalize")}
+            </Button>
+          </Col>
+        </Row>
+      </div>
     );
   }
 
-  const onCancelPeriod = () => { };
+  const onCancelPeriod = () => {};
 
-  const onAddNewPeriod = () => {
-    if (selectedPeriod && selectedPeriod.current) {
-      const newPeriodItem = {
-        key: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
-        label: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
-        start: selectedPeriod.current.start,
-        end: selectedPeriod.current.end,
-        children: ndcDetailsTableContent(),
+  const onAddNewPeriod = async () => {
+    if (selectedDateRangeRef && selectedDateRangeRef.current) {
+      const periodItem = {
+        startYear: selectedDateRangeRef.current.startYear,
+        endYear: selectedDateRangeRef.current.endYear,
+        finalized: false,
       };
 
-      const existingIndex = periodItemsRef.current.findIndex(
+      const existingIndex = periodItems.findIndex(
         (item: any) =>
-          inRange(newPeriodItem.start, item.start, item.end) ||
-          inRange(newPeriodItem.end, item.start, item.end)
+          inRange(periodItem.startYear, item.startYear, item.endYear) ||
+          inRange(periodItem.endYear, item.startYear, item.endYear)
       );
 
       if (existingIndex === -1) {
-        setPeriodItems((items: any) => [...items, newPeriodItem]);
-        periodItemsRef.current = [...periodItemsRef.current, newPeriodItem];
+        const response = await post("national/programme/addNdcDetailsPeriod", {
+          ...periodItem,
+        });
+
+        if (response && response.data) {
+          const addedPeriodItem = response.data;
+          const updatedPeriodItem = {
+            ...addedPeriodItem,
+            key: addedPeriodItem.id,
+            label: `${addedPeriodItem.startYear}-${addedPeriodItem.endYear}`,
+          };
+          setPeriodItems((items: any) => [...items, updatedPeriodItem]);
+          setSelectedPeriod(updatedPeriodItem);
+        }
       } else {
         message.open({
           type: "error",
@@ -363,28 +428,22 @@ export const NdcDetailsComponent = (props: any) => {
     }
   };
 
-  useEffect(() => {
-    if (periodItems && periodItems.length > 3) {
-      setSelectedTab(periodItems[periodItems.length - 1].key);
-    }
-  }, [periodItems]);
-
   const onDateRangeChanged = (range: any) => {
     const period = {
-      start: Number(moment(range[0]).year()),
-      end: Number(moment(range[1]).year()),
+      startYear: Number(moment(range[0]).year()),
+      endYear: Number(moment(range[1]).year()),
     };
-    selectedPeriod.current = period;
+    selectedDateRangeRef.current = period;
   };
 
   function addNewPeriodContent() {
     return (
       <div>
-        <Row>
-          <RangePicker onChange={onDateRangeChanged} picker="year" />
-        </Row>
-        <Row className="mg-top-1">
-          <div className="ndc-steps-actions">
+        <Row justify="start" align="middle" gutter={[16, 16]}>
+          <Col flex="340px">
+            <RangePicker onChange={onDateRangeChanged} picker="year" />
+          </Col>
+          <Col flex="auto">
             <Button
               type="primary"
               onClick={onAddNewPeriod}
@@ -393,14 +452,7 @@ export const NdcDetailsComponent = (props: any) => {
             >
               {t("ndc:submit")}
             </Button>
-            <Button
-              className="back-btn"
-              onClick={onCancelPeriod}
-              loading={loading}
-            >
-              {t("ndc:back")}
-            </Button>
-          </div>
+          </Col>
         </Row>
       </div>
     );
@@ -417,31 +469,61 @@ export const NdcDetailsComponent = (props: any) => {
         columns={columns}
         showHeader={false}
         pagination={false}
-      // footer={() =>
-      //   isAddSubNdcActionVisible() && (
-      //     <Row justify={"center"}>
-      //       <Button
-      //         onClick={onAddNewSubNdcDetail}
-      //         type="default"
-      //         style={{
-      //           marginBottom: 16,
-      //           width: "100%",
-      //         }}
-      //       >
-      //         {t("ndc:addSubNdcAction")}
-      //       </Button>
-      //     </Row>
-      //   )
-      // }
+        // footer={() =>
+        //   isAddSubNdcActionVisible() && (
+        //     <Row justify={"center"}>
+        //       <Button
+        //         onClick={onAddNewSubNdcDetail}
+        //         type="default"
+        //         style={{
+        //           marginBottom: 16,
+        //           width: "100%",
+        //         }}
+        //       >
+        //         {t("ndc:addSubNdcAction")}
+        //       </Button>
+        //     </Row>
+        //   )
+        // }
       />
     );
   }
 
   const onTabChange = (key: string) => {
-    setSelectedTab(key);
+    const selectedPeriod = periodItems.find((item: any) => item.key === key);
+    setSelectedPeriod(selectedPeriod);
+  };
+
+  const fetchNdcDetailPeriods = async () => {
+    let periods = [];
+    let addNewTab = {
+      id: "add_new",
+      key: "add_new",
+      label: "Add New",
+      startYear: 0,
+      endYear: 0,
+    };
+    const response = await get("national/programme/queryNdcDetailsPeriod");
+    if (response && response.data) {
+      periods = response.data.map((period: any) => {
+        return {
+          ...period,
+          key: period.id,
+          label: `${period.startYear}-${period.endYear}`,
+        };
+      });
+    }
+    if (isAddRangeVisible) {
+      periods.unshift(addNewTab);
+    }
+
+    setPeriodItems(periods);
+    setSelectedPeriod(addNewTab);
   };
 
   useEffect(() => {
+    fetchNdcDetailPeriods();
+
     const defaultNdcDetails = [
       {
         key: 1,
@@ -651,7 +733,7 @@ export const NdcDetailsComponent = (props: any) => {
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
         nationalPlanObj: "Other",
-        kpi: '',
+        kpi: "",
         ministry: "Ministry of Environment",
         subNdcDetails: [
           {
@@ -677,36 +759,8 @@ export const NdcDetailsComponent = (props: any) => {
         ],
       },
     ];
-    const initialPeriods = [
-      {
-        key: `2019-2020`,
-        label: `2019-2020`,
-        start: 2019,
-        end: 2020,
-        children: ndcDetailsTableContent(),
-      },
-      {
-        key: `2021-2023`,
-        label: `2021-2023`,
-        start: 2021,
-        end: 2021,
-        children: ndcDetailsTableContent(),
-      },
-    ];
-
-    if (isAddRangeVisible()) {
-      initialPeriods.unshift({
-        key: "add_new",
-        label: "Add New",
-        start: 0,
-        end: 0,
-        children: addNewPeriodContent(),
-      });
-    }
 
     addedNdcDetailId.current = 20;
-    setPeriodItems(initialPeriods);
-    periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
   }, []);
 
@@ -725,45 +779,15 @@ export const NdcDetailsComponent = (props: any) => {
           centered={false}
           defaultActiveKey="1"
           items={periodItems}
-          activeKey={selectedTab}
+          activeKey={selectedPeriod}
           onChange={onTabChange}
         />
       </div>
-      {selectedTab !== "add_new" && (
-        <div>
-          <div>
-            <Table
-              key={tableKey}
-              components={components}
-              rowClassName={() => "editable-row"}
-              bordered
-              dataSource={getNdcDetailsForPeriod()}
-              columns={columns}
-              expandable={{
-                expandedRowRender: (record) => getSubNdcActionContent(record),
-                indentSize: 0,
-                defaultExpandedRowKeys: [selectedNdcDetail.current.key],
-              }}
-              footer={() =>
-                isAddNdcActionVisible() && (
-                  <Row justify={"center"}>
-                    <Button
-                      onClick={onAddNewNdcDetail}
-                      type="default"
-                      style={{
-                        marginBottom: 16,
-                        width: "100%",
-                      }}
-                    >
-                      {t("ndc:addNdcAction")}
-                    </Button>
-                  </Row>
-                )
-              }
-            />
-          </div>
-        </div>
-      )}
+      <div>
+        {selectedPeriod.id === "add_new"
+          ? addNewPeriodContent()
+          : ndcDetailsTableContent()}
+      </div>
     </div>
   );
 };
