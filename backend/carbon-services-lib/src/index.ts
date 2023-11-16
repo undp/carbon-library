@@ -203,6 +203,8 @@ export * from './shared/entities/programmeTransfer.view.entity'
 export * from './shared/entities/region.entity'
 export * from './shared/entities/user.entity'
 export * from './shared/entities/userPasswordResetToken.entity'
+export * from './shared/entities/ndc.details.period.entity'
+export * from './shared/entities/ndc.details.action.entity'
 //from transparency
 export * from './shared/entities/document.view.entity'
 export * from './shared/entities/investment.entity'
