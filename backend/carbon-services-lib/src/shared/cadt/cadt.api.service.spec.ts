@@ -148,65 +148,65 @@ describe('CadtApiService', () => {
     // })
 
 
-    it('should be transfer credit', async () => {
-      program.currentStage = ProgrammeStage.AUTHORISED;
-      program.cadtId = '1294466d-ea52-43e1-a4bf-96ce2719975b';
-      program.blockBounds = {
-        '3': [
-          {
-            unitBlockStart: '1001',
-            unitBlockEnd: '1040',
-            unitId: 'c39f3500-cf33-4c6b-a11a-9e7d5383c96f',
-            amount: 40
-          },
-          {
-            unitBlockStart: '1041',
-            unitBlockEnd: '1060',
-            unitId: 'bffaee9e-334a-4ceb-a693-b1c7c84602fd',
-            amount: 20
-          }
-        ],
-        '5': [
-          {
-            unitBlockStart: '1161',
-            unitBlockEnd: '1220',
-            unitId: 'd01364bf-72c1-4a15-8682-bff6d33e256d',
-            amount: 60
-          },
-          {
-            unitBlockStart: '1221',
-            unitBlockEnd: '1250',
-            unitId: 'd87c6682-a7a2-4bf1-b001-320b54aeaf9b',
-            amount: 30
-          }
-        ]
-      }
-      await service.transferCredit(program, {
-        requestId: 0,
-        programmeId: '',
-        initiator: 0,
-        initiatorCompanyId: 0,
-        toCompanyId: 1,
-        toAccount: '',
-        toCompanyMeta: undefined,
-        retirementType: RetireType.CROSS_BORDER,
-        fromCompanyId: 3,
-        creditAmount: 15,
-        comment: '',
-        txRef: '',
-        txTime: 0,
-        createdTime: 0,
-        authTime: 0,
-        status: TransferStatus.APPROVED,
-        isRetirement: false
-      })
-    })
+    // it('should be transfer credit', async () => {
+    //   program.currentStage = ProgrammeStage.AUTHORISED;
+    //   program.cadtId = '1294466d-ea52-43e1-a4bf-96ce2719975b';
+    //   program.blockBounds = {
+    //     '3': [
+    //       {
+    //         unitBlockStart: '1001',
+    //         unitBlockEnd: '1040',
+    //         unitId: 'c39f3500-cf33-4c6b-a11a-9e7d5383c96f',
+    //         amount: 40
+    //       },
+    //       {
+    //         unitBlockStart: '1041',
+    //         unitBlockEnd: '1060',
+    //         unitId: 'bffaee9e-334a-4ceb-a693-b1c7c84602fd',
+    //         amount: 20
+    //       }
+    //     ],
+    //     '5': [
+    //       {
+    //         unitBlockStart: '1161',
+    //         unitBlockEnd: '1220',
+    //         unitId: 'd01364bf-72c1-4a15-8682-bff6d33e256d',
+    //         amount: 60
+    //       },
+    //       {
+    //         unitBlockStart: '1221',
+    //         unitBlockEnd: '1250',
+    //         unitId: 'd87c6682-a7a2-4bf1-b001-320b54aeaf9b',
+    //         amount: 30
+    //       }
+    //     ]
+    //   }
+    //   await service.transferCredit(program, {
+    //     requestId: 0,
+    //     programmeId: '',
+    //     initiator: 0,
+    //     initiatorCompanyId: 0,
+    //     toCompanyId: 1,
+    //     toAccount: '',
+    //     toCompanyMeta: undefined,
+    //     retirementType: RetireType.CROSS_BORDER,
+    //     fromCompanyId: 3,
+    //     creditAmount: 15,
+    //     comment: '',
+    //     txRef: '',
+    //     txTime: 0,
+    //     createdTime: 0,
+    //     authTime: 0,
+    //     status: TransferStatus.APPROVED,
+    //     isRetirement: false
+    //   })
+    // })
 
-  // it('create programme', async () => {
-  //   // program.currentStage = ProgrammeStage.AUTHORISED;
-  //   // program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
-  //   await service.createProgramme(program)
-  // })
+  it('create programme', async () => {
+    // program.currentStage = ProgrammeStage.AUTHORISED;
+    // program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
+    await service.createProgramme(program)
+  })
 
   // it('should be update status', async () => {
   //   program.currentStage = ProgrammeStage.AUTHORISED;
