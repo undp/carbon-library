@@ -61,9 +61,11 @@ jobs:
           fi
       
       - run: yarn install --frozen-lockfile
+        name: Carbon Service Lib Install
         if: steps.changes.outputs.backend-changes == 'true'
         working-directory: backend/carbon-services-lib
       - if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend-changes == 'true'
+        name: Carbon Service Lib Versioning Main
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -74,6 +76,7 @@ jobs:
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/carbon-services-lib
       - if: github.ref != 'refs/heads/main' && steps.changes.outputs.backend-changes == 'true'
+        name: Carbon Service Lib Versioning Test
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -84,14 +87,17 @@ jobs:
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/carbon-services-lib
       - run: yarn run build && cp package.json ./dist/
+        name: Carbon Service Lib Build
         if: steps.changes.outputs.backend-changes == 'true'
         working-directory: backend/carbon-services-lib
       - run: npm publish --access public
+        name: Carbon Service Lib Publish
         if: steps.changes.outputs.backend-changes == 'true'
         working-directory: backend/carbon-services-lib/dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend-changes == 'true'
+        name: Carbon Service Lib Invoke Dependant CI/CD
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
@@ -115,8 +121,10 @@ jobs:
               ref: 'develop'
             })
       - run: yarn install --frozen-lockfile
+        name: Carbon UI Lib Install
         if: steps.changes.outputs.frontend-changes == 'true'
       - if: github.ref == 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
+        name: Carbon UI Lib Versioning Main
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -126,6 +134,7 @@ jobs:
           CI_COMMIT_MESSAGE: Carbon UI Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
       - if: github.ref != 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
+        name: Carbon UI Lib Versioning Test
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -135,12 +144,15 @@ jobs:
           CI_COMMIT_MESSAGE: Carbon UI Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
       - run: yarn run build
+        name: Carbon UI Lib Build
         if: steps.changes.outputs.frontend-changes == 'true'
       - run: npm publish --access public
+        name: Carbon UI Lib Publish
         if: steps.changes.outputs.frontend-changes == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - if: github.ref == 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
+        name: Carbon UI Lib Invoke Dependant CI/CD
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
@@ -166,7 +178,9 @@ jobs:
       - run: yarn install --frozen-lockfile
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
-      - run: |
+        name: Credit Calc Lib Install
+      - name: Credit Calc Lib Versioning
+        run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
           yarn version --patch
@@ -177,17 +191,21 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
       - run: yarn run build
+        name: Credit Calc Lib Build
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
       - run: npm publish --access public
+        name: Credit Calc Lib Publish
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn install --frozen-lockfile
+        name: Serial Gen Lib Install
         working-directory: backend/serial-number-gen
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
-      - run: |
+      - name: Serial Gen Lib Versioning
+        run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
           yarn version --patch
@@ -198,9 +216,11 @@ jobs:
         working-directory: backend/serial-number-gen
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
       - run: yarn run build
+        name: Serial Gen Lib Build
         working-directory: backend/serial-number-gen
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
       - run: npm publish --access public
+        name: Serial Gen Lib Publish
         working-directory: backend/serial-number-gen
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
         env:
