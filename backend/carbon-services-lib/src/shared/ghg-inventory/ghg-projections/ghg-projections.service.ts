@@ -125,6 +125,10 @@ export class GhgProjectionsService {
         return { status: HttpStatus.CREATED, data: savedProjection };
     }
 
+    async getAllProjections(){
+        return await this.projectionRepo.find({ order: { state: 'ASC', year: "DESC", } });
+    }
+
     getEmissionByYear = async (year: string) => {
         return await this.projectionRepo.find({
             where: {

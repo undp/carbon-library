@@ -9,6 +9,44 @@
     color: rgba(58, 53, 65, 0.5);
 }
 
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+    width: 65px !important;
+        height: 32px !important;
+        text-align: center !important;
+        border-radius: 50px !important;
+        background: $primary-color !important;
+        line-height: 30px !important;
+}
+
+.ant-picker-cell-disabled::before {
+    width: 65px !important;
+    height: 32px !important;
+    text-align: center !important;
+    border-radius: 50px !important;
+    line-height: 30px !important;
+}
+
+.ant-picker-cell::before {
+    left: 11px;
+}
+
+.ant-input-suffix {
+    display: flex;
+    flex: none;
+    align-items: center;
+    height: 50px;
+
+    button {
+        border: none;
+        color: #8C8C8C;
+    }
+}
+
+.ant-input-affix-wrapper {
+    padding: 0 11px;
+    border-radius: 5px;
+}
+
 .emission-tab-container .add-emission {
     display: flex;
     flex-direction: column;
@@ -38,6 +76,7 @@
     .add-new-upload-file-name-input {
         input {
             height: 50px;
+            color: $primary-color;
         }
     }
 

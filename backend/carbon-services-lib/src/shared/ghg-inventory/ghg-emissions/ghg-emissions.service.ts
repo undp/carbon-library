@@ -136,6 +136,10 @@ export class GhgEmissionsService {
         });
     }
 
+    async getAllEmissions(){
+        return await this.emissionRepo.find({ order: { state: 'ASC', year: "DESC", } });
+    }
+
     private toEmission(emissionDto: EmissionDto): Emission {
         const data = instanceToPlain(emissionDto);
         this.logger.verbose("Converted emissionDto to Emission entity", JSON.stringify(data));
