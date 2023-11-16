@@ -134,7 +134,7 @@ export const InvestmentCreationComponent = (props: any) => {
         setOrganisationList(response?.data);
       }
     } catch (error: any) {
-      console.log("Error in getting organization list", error);
+      console.log("Error in getting organisation list", error);
     } finally {
       setLoadingList(false);
     }

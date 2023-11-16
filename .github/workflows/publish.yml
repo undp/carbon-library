@@ -26,7 +26,7 @@ jobs:
       - name: Determine changed libraries
         id: changes
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD
 
           if echo "$CHANGED_FILES" | grep -q "backend/carbon-services-lib/"; then
             echo "Backend changes detected."
@@ -114,7 +114,8 @@ jobs:
               workflow_id: 'service-lib-update.yml',
               ref: 'develop'
             })
-            - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile
+        if: steps.changes.outputs.frontend-changes == 'true'
       - if: github.ref == 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
