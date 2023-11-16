@@ -30,40 +30,40 @@ jobs:
 
           if echo "$CHANGED_FILES" | grep -q "backend/carbon-services-lib/"; then
             echo "Backend changes detected."
-            echo "::set-output name=backend-changes::true"
+            echo "backend-changes=true" >> $GITHUB_OUTPUT
           else
             echo "No Backend changes detected."
-            echo "::set-output name=backend-changes::false"
+            echo "backend-changes=false" >> $GITHUB_OUTPUT
           fi
 
-          if [[ echo "$CHANGED_FILES" | grep -q "src/" ]] || [[ echo "$CHANGED_FILES" | grep -q "package.json" ]]; then
+          if echo "$CHANGED_FILES" | grep -q "src/" || echo "$CHANGED_FILES" | grep -q "package.json"; then
             echo "Frontend changes detected."
-            echo "::set-output name=frontend-changes::true"
+            echo "frontend-changes=true" >> $GITHUB_OUTPUT
           else
             echo "No Backend changes detected."
-            echo "::set-output name=frontend-changes::false"
+            echo "frontend-changes=false" >> $GITHUB_OUTPUT
           fi
 
           if echo "$CHANGED_FILES" | grep -q "backend/serial-number-gen/"; then
             echo "serial changes detected."
-            echo "::set-output name=serial-changes::true"
+            echo "serial-changes=true" >> $GITHUB_OUTPUT
           else
             echo "No serial changes detected."
-            echo "::set-output name=serial-changes::false"
+            echo "serial-changes=false" >> $GITHUB_OUTPUT
           fi
 
           if echo "$CHANGED_FILES" | grep -q "backend/carbon-credit-calculator/"; then
             echo "calculator changes detected."
-            echo "::set-output name=calculator-changes::true"
+            echo "calculator-changes=true" >> $GITHUB_OUTPUT
           else
             echo "No calculator changes detected."
-            echo "::set-output name=calculator-changes::false"
+            echo "calculator-changes=false" >> $GITHUB_OUTPUT
           fi
       
       - run: yarn install --frozen-lockfile
-        if: steps.frontend-changes.outputs.backend-changes == 'true'
+        if: steps.changes.outputs.backend-changes == 'true'
         working-directory: backend/carbon-services-lib
-      - if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.backend-changes == 'true'
+      - if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend-changes == 'true'
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -73,7 +73,7 @@ jobs:
           CI_COMMIT_MESSAGE: Carbon Service Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/carbon-services-lib
-      - if: github.ref != 'refs/heads/main' && steps.frontend-changes.outputs.backend-changes == 'true'
+      - if: github.ref != 'refs/heads/main' && steps.changes.outputs.backend-changes == 'true'
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -84,14 +84,14 @@ jobs:
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/carbon-services-lib
       - run: yarn run build && cp package.json ./dist/
-        if: steps.frontend-changes.outputs.backend-changes == 'true'
+        if: steps.changes.outputs.backend-changes == 'true'
         working-directory: backend/carbon-services-lib
       - run: npm publish --access public
-        if: steps.frontend-changes.outputs.backend-changes == 'true'
+        if: steps.changes.outputs.backend-changes == 'true'
         working-directory: backend/carbon-services-lib/dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.backend-changes == 'true'
+      - if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend-changes == 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
@@ -115,7 +115,7 @@ jobs:
               ref: 'develop'
             })
             - run: yarn install --frozen-lockfile
-      - if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.frontend-changes == 'true'
+      - if: github.ref == 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -124,7 +124,7 @@ jobs:
         env:
           CI_COMMIT_MESSAGE: Carbon UI Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
-      - if: github.ref != 'refs/heads/main' && steps.frontend-changes.outputs.frontend-changes == 'true'
+      - if: github.ref != 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -134,12 +134,12 @@ jobs:
           CI_COMMIT_MESSAGE: Carbon UI Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
       - run: yarn run build
-        if: steps.frontend-changes.outputs.frontend-changes == 'true'
+        if: steps.changes.outputs.frontend-changes == 'true'
       - run: npm publish --access public
-        if: steps.frontend-changes.outputs.frontend-changes == 'true'
+        if: steps.changes.outputs.frontend-changes == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.frontend-changes == 'true'
+      - if: github.ref == 'refs/heads/main' && steps.changes.outputs.frontend-changes == 'true'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
@@ -163,7 +163,7 @@ jobs:
               ref: 'develop'
             })
       - run: yarn install --frozen-lockfile
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.calculator-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
       - run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
@@ -173,19 +173,19 @@ jobs:
         env:
           CI_COMMIT_MESSAGE: Credit Calculator Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.calculator-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
       - run: yarn run build
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.calculator-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
       - run: npm publish --access public
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.calculator-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: yarn install --frozen-lockfile
         working-directory: backend/serial-number-gen
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.serial-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
       - run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
@@ -195,12 +195,12 @@ jobs:
           CI_COMMIT_MESSAGE: Serial Number Gen Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/serial-number-gen
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.serial-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
       - run: yarn run build
         working-directory: backend/serial-number-gen
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.serial-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
       - run: npm publish --access public
         working-directory: backend/serial-number-gen
-        if: github.ref == 'refs/heads/main' && steps.frontend-changes.outputs.serial-changes == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
