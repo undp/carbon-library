@@ -16,10 +16,10 @@ export class NdcDetailsAction {
     @Column()
     ministryName: string;
 
-    @Column()
+    @Column({nullable: true})
     periodId: number;
 
-    @Column()
+    @Column({nullable: true})
     parentActionId: number;
 
     @Column({
