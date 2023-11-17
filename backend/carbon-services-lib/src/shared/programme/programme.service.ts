@@ -93,6 +93,7 @@ import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable
 import { NdcDetailsPeriod } from "../entities/ndc.details.period.entity";
 import { NdcDetailsAction } from "../entities/ndc.details.action.entity";
 import { NdcDetailsPeriodDto } from "../dto/ndc.details.period.dto";
+import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -4741,8 +4742,7 @@ export class ProgrammeService {
     });
   }
 
-
-  async addMainNdcDetailAction(ndcDetailsAction:NdcDetailsAction, abilityCondition: any, user: User) {
+  async addNdcDetailAction(ndcDetailsAction:NdcDetailsActionDto, abilityCondition: any, user: User) {
     const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
     await this.ndcDetailsActionRepo.save(addedNdcDetailsAction);
     return addedNdcDetailsAction;
