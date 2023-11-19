@@ -4747,5 +4747,17 @@ export class ProgrammeService {
     await this.ndcDetailsActionRepo.save(addedNdcDetailsAction);
     return addedNdcDetailsAction;
   }
+
+  async updateNdcDetailsAction(ndcDetailsAction:NdcDetailsActionDto, abilityCondition: any, user: User) {
+    const result = await this.ndcDetailsActionRepo.update({
+      id: ndcDetailsAction.id
+    },{
+      ...ndcDetailsAction
+    })
+
+    if (result.affected > 0){
+      return HttpStatus.OK;
+    } 
+  }
 }
 
