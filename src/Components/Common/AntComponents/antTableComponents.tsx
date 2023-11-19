@@ -80,12 +80,12 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       <Form.Item
         style={{ margin: 0 }}
         name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`,
-          },
-        ]}
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: `${title} is required.`,
+        //   },
+        // ]}
       >
         <Input ref={inputRef} onPressEnter={save} onBlur={save} />
       </Form.Item>
