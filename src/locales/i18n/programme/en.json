@@ -73,5 +73,15 @@
     "description": "Description",
     "emissionReductionAchievedandCreditIssued": "Emission Reduction Achieved/ Credit Issued",
     "environmentalImpactAssessment": "Environmental Impact Assessment",
-    "docUploadProgrammeRejected": "This document cannot be uploaded for rejected programmes"
+    "docUploadProgrammeRejected": "This document cannot be uploaded for rejected programmes",
+    "typeCreation": "Type",
+    "New": "NEW",
+    "Existing": "EXISTING",
+    "addOwnership": "ADD INVESTMENT",
+    "supportTitle": "Supports",
+    "supportDesc": "Supports made on projects in the Transparency System",
+    "addSupport": "Add Support",
+    "addSupportBtnText": "ADD SUPPORT",
+    "addSupportSub": "Add Support to a project in the Transparency System",
+    "programmeExistsWithAssessmentRegId": "Project already exist with the given environmental assessment registration number"
 }

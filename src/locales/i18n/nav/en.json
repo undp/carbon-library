@@ -1,5 +1,6 @@
 {
   "dashboard": "Dashboard",
+  "ghgInventory": "GHG Inventory",
   "programmes": "Programmes",
   "transfers": "Transfers",
   "companies": "Organisations",
@@ -7,5 +8,8 @@
   "viewAll": "View All",
   "addNew": "Add New",
   "investments": "Investments",
-  "ndcActions": "NDC Actions"
+  "ndcActions": "NDC Actions",
+  "ndcDetails": "NDC Actions",
+  "reports": "Reports",
+  "support": "Financing"
 }
