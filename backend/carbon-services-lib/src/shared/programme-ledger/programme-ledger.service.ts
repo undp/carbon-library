@@ -192,8 +192,8 @@ export class ProgrammeLedgerService {
           const frozenCredit = {};
           for (const i in programme.creditOwnerPercentage) {
             currentCredit[programme.companyId[i]] =
-              (programme.creditBalance * programme.creditOwnerPercentage[i]) /
-              100;
+            this.helperService.halfUpToPrecision((programme.creditBalance * programme.creditOwnerPercentage[i]) /
+              100);
 
             frozenCredit[programme.companyId[i]] = programme.creditFrozen
               ? programme.creditFrozen[i]
@@ -208,7 +208,6 @@ export class ProgrammeLedgerService {
               HttpStatus.BAD_REQUEST
             );
           }
-
           if (
             (currentCredit[transfer.fromCompanyId] -
               frozenCredit[transfer.fromCompanyId]) <
@@ -227,25 +226,21 @@ export class ProgrammeLedgerService {
             if (programme.companyId[i] == transfer.fromCompanyId) {
               percentages.push(
                 (programme.creditBalance - transfer.creditAmount )!= 0
-                  ? parseFloat(
-                      (
-                        ((currentCredit[transfer.fromCompanyId] -
-                          transfer.creditAmount) *
-                          100) /
-                        (programme.creditBalance - transfer.creditAmount)
-                      ).toFixed(6)
-                    )
+                  ? this.helperService.halfUpToPrecision((
+                    ((currentCredit[transfer.fromCompanyId] -
+                      transfer.creditAmount) *
+                      100) /
+                    (programme.creditBalance - transfer.creditAmount)
+                  ), 6 )
                   : 0
               );
             } else {
               percentages.push(
                 (programme.creditBalance - transfer.creditAmount) != 0
-                  ? parseFloat(
-                      (
-                        (currentCredit[programme.companyId[i]] * 100) /
-                        (programme.creditBalance - transfer.creditAmount)
-                      ).toFixed(6)
-                    )
+                  ? this.helperService.halfUpToPrecision((
+                    (currentCredit[programme.companyId[i]] * 100) /
+                    (programme.creditBalance - transfer.creditAmount)
+                  ), 6 )
                   : 0
               );
             }
@@ -295,7 +290,7 @@ export class ProgrammeLedgerService {
           programme.creditTransferred[compIndex] += transfer.creditAmount;
         }
         programme.creditChange = transfer.creditAmount;
-        programme.creditBalance -= transfer.creditAmount;
+        programme.creditBalance = this.helperService.halfUpToPrecision(programme.creditBalance - transfer.creditAmount);
 
         // if (programme.creditBalance <= 0) {
         //   programme.currentStage = ProgrammeStage.TRANSFERRED;
@@ -335,7 +330,7 @@ export class ProgrammeLedgerService {
         for (const com of [fromAccount, toAccountID]) {
           if (companyCreditBalances[com] != undefined) {
             updateMap[this.ledger.companyTableName + "#" + com] = {
-              credit: this.round2Precision(
+              credit: this.helperService.halfUpToPrecision(
                 companyCreditBalances[com] + companyCreditDistribution[com]
               ),
               txRef: transfer.requestId + "#" + programme.serialNo,
@@ -346,7 +341,7 @@ export class ProgrammeLedgerService {
             };
           } else {
             insertMap[this.ledger.companyTableName + "#" + com] = {
-              credit: this.round2Precision(companyCreditDistribution[com]),
+              credit: this.helperService.halfUpToPrecision(companyCreditDistribution[com]),
               txRef: transfer.requestId + "#" + programme.serialNo,
               txType: TxType.TRANSFER,
               txId: com,
@@ -668,7 +663,7 @@ export class ProgrammeLedgerService {
               programme.creditOwnerPercentage = [100];
             }
 
-            const freezeCredit = this.round2Precision(
+            const freezeCredit = this.helperService.halfUpToPrecision(
               (programme.creditBalance *
                 programme.creditOwnerPercentage[index]) /
                 100
@@ -687,7 +682,7 @@ export class ProgrammeLedgerService {
               programme.creditFrozen[index] === null
             )
               continue;
-            const unFrozenCredit = this.round2Precision(
+            const unFrozenCredit = this.helperService.halfUpToPrecision(
               programme.creditFrozen[index]
             );
             if (unFrozenCredit === 0) continue;
@@ -779,7 +774,7 @@ export class ProgrammeLedgerService {
             programme.creditOwnerPercentage = [100];
           }
 
-          const freezeCredit =
+          const freezeCredit = //this.helperService.halfUpToPrecision
             (programme.creditBalance * programme.creditOwnerPercentage[index]) /
             100;
           if (!programme.creditFrozen) {
@@ -1036,8 +1031,8 @@ export class ProgrammeLedgerService {
         if (programme.creditOwnerPercentage) {
           for (const j in programme.creditOwnerPercentage) {
             companyCreditDistribution[String(programme.companyId[j])] =
-              (programme.creditIssued * programme.creditOwnerPercentage[j]) /
-              100;
+              this.helperService.halfUpToPrecision((programme.creditIssued * programme.creditOwnerPercentage[j]) /
+              100);
           }
         } else if (programme.companyId.length == 1) {
           companyCreditDistribution[String(programme.companyId[0])] =
@@ -1083,7 +1078,7 @@ export class ProgrammeLedgerService {
         for (const com of programme.companyId) {
           if (companyCreditBalances[String(com)] != undefined) {
             updateMap[this.ledger.companyTableName + "#" + com] = {
-              credit: this.round2Precision(
+              credit: this.helperService.halfUpToPrecision(
                 companyCreditBalances[String(com)] +
                   companyCreditDistribution[String(com)]
               ),
@@ -1095,7 +1090,7 @@ export class ProgrammeLedgerService {
             };
           } else {
             insertMap[this.ledger.companyTableName + "#" + com] = {
-              credit: this.round2Precision(
+              credit: this.helperService.halfUpToPrecision(
                 companyCreditDistribution[String(com)]
               ),
               txRef: serialNo,
@@ -1192,21 +1187,19 @@ export class ProgrammeLedgerService {
         if (programme.creditOwnerPercentage) {
           const percentages = [];
 
-          for (const i in programme.creditOwnerPercentage) {
+          for (const i in programme.creditOwnerPercentage) {//this.helperService.halfUpToPrecision
             const currentCredit =
-              (currentTotalBalance * programme.creditOwnerPercentage[i]) / 100;
+              this.helperService.halfUpToPrecision((currentTotalBalance * programme.creditOwnerPercentage[i]) / 100);
             const changeCredit =
-              (programme.creditChange * programme.proponentPercentage[i]) / 100;
+              this.helperService.halfUpToPrecision((programme.creditChange * programme.proponentPercentage[i]) / 100);
 
             companyCreditDistribution[String(programme.companyId[i])] =
               changeCredit;
             percentages.push(
-              parseFloat(
-                (
-                  ((currentCredit + changeCredit) * 100) /
-                  programme.creditBalance
-                ).toFixed(6)
-              )
+              this.helperService.halfUpToPrecision(
+                  (((currentCredit + changeCredit) * 100) /
+                  programme.creditBalance), 6
+                )
             );
           }
           programme.creditOwnerPercentage = percentages;
@@ -1242,7 +1235,7 @@ export class ProgrammeLedgerService {
           );
           if (companyCreditBalances[String(com)] != undefined) {
             updateMap[this.ledger.companyTableName + "#" + com] = {
-              credit: this.round2Precision(
+              credit: this.helperService.halfUpToPrecision(
                 companyCreditBalances[String(com)] +
                   companyCreditDistribution[String(com)]
               ),
@@ -1302,7 +1295,7 @@ export class ProgrammeLedgerService {
         suspendedCompanies.forEach(async (company) => {
           const index = programme.companyId.indexOf(company.companyId);
           const freezeCredit =
-            (issueAmount * programme.creditOwnerPercentage[index]) / 100;
+            this.helperService.halfUpToPrecision((issueAmount * programme.creditOwnerPercentage[index]) / 100);
           programme.creditFrozen[index] += freezeCredit;
           programme.creditChange = freezeCredit;
 
@@ -1606,16 +1599,16 @@ export class ProgrammeLedgerService {
 
         let investmentPerc = undefined
         if (programme.creditBalance && Number(programme.creditBalance) != 0) {
-          const ownerCreditAmount = programme.creditBalance * programme.creditOwnerPercentage[ownerIndex] / 100;
+          const ownerCreditAmount = this.helperService.halfUpToPrecision(programme.creditBalance * programme.creditOwnerPercentage[ownerIndex] / 100);
           for (const j in programme.companyId) {
             // updatedCreditOwnership[companyIds[j]]
             if (Number(companyIds[j]) === owner) {
-              const investorCredit = (ownerCreditAmount * shareFromOwner / 100);
+              const investorCredit =this.helperService.halfUpToPrecision(ownerCreditAmount * shareFromOwner / 100);
               if (!ownershipPercentage[investor]) {
                 ownershipPercentage[investor] = 0
               }
-              ownershipPercentage[investor] += parseFloat((investorCredit * 100 / programme.creditBalance).toFixed(6))
-              ownershipPercentage[owner] = parseFloat(((ownerCreditAmount - investorCredit) * 100 / programme.creditBalance).toFixed(6))
+              ownershipPercentage[investor] += this.helperService.halfUpToPrecision((investorCredit * 100 / programme.creditBalance),6)
+              ownershipPercentage[owner] = this.helperService.halfUpToPrecision(((ownerCreditAmount - investorCredit) * 100 / programme.creditBalance),6)
             } else {
               if (ownershipPercentage[companyIds[j]]) {
                 ownershipPercentage[companyIds[j]] += programme.creditOwnerPercentage[j]  

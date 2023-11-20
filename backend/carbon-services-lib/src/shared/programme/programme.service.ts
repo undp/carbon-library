@@ -2605,7 +2605,7 @@ export class ProgrammeService {
       );
       const companyProponent = programme.creditOwnerPercentage[companyIndex];
       const creditBalance =
-        (programme.creditBalance * companyProponent) / 100;
+        this.helperService.halfUpToPrecision((programme.creditBalance * companyProponent) / 100);
       if (transfer.creditAmount > creditBalance) {
         const result = await this.programmeTransferRepo
           .update(
@@ -2941,7 +2941,7 @@ export class ProgrammeService {
     if (!req.companyCredit) {
       req.companyCredit = programme.creditOwnerPercentage.map(
         (p, i) =>
-          (programme.creditBalance * p) / 100 -
+          this.helperService.halfUpToPrecision((programme.creditBalance * p) / 100) -
           (programme.creditFrozen ? programme.creditFrozen[i] : 0)
       );
     }
@@ -2992,7 +2992,7 @@ export class ProgrammeService {
         frozenCredit[fromCompanyId]
       );
       const companyAvailableCredit =
-        (programme.creditBalance * ownershipMap[fromCompanyId]) / 100 -
+        this.helperService.halfUpToPrecision((programme.creditBalance * ownershipMap[fromCompanyId]) / 100) -
         (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0);
 
       let transferCompanyCredit;
@@ -3554,10 +3554,10 @@ export class ProgrammeService {
 
       if (!req.companyCredit) {
         const reqIndex = programme.companyId.indexOf(requester.companyId);
-        req.companyCredit = [
-          (programme.creditBalance *
+        req.companyCredit = [ 
+          this.helperService.halfUpToPrecision((programme.creditBalance *
             programme.creditOwnerPercentage[reqIndex]) /
-            100 -
+            100) -
             (programme.creditFrozen ? programme.creditFrozen[reqIndex] : 0),
         ];
       }
@@ -3568,7 +3568,7 @@ export class ProgrammeService {
       if (!req.companyCredit) {
         req.companyCredit = programme.creditOwnerPercentage.map(
           (p, i) =>
-            (programme.creditBalance * p) / 100 -
+          this.helperService.halfUpToPrecision((programme.creditBalance * p) / 100 )-
             (programme.creditFrozen ? programme.creditFrozen[i] : 0)
         );
       }
@@ -3606,14 +3606,14 @@ export class ProgrammeService {
         );
       }
       const companyAvailableCredit =
-        (programme.creditBalance * ownershipMap[fromCompanyId]) / 100 -
+      this.helperService.halfUpToPrecision((programme.creditBalance * ownershipMap[fromCompanyId]) / 100) -
         (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0);
 
       let transferCompanyCredit;
       if (req.fromCompanyIds.length == 1 && !req.companyCredit) {
         transferCompanyCredit = companyAvailableCredit;
       } else {
-        transferCompanyCredit = req.companyCredit[j];
+        transferCompanyCredit = this.helperService.halfUpToPrecision(req.companyCredit[j]);
       }
 
       if (
