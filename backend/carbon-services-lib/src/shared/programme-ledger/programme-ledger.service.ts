@@ -287,7 +287,10 @@ export class ProgrammeLedgerService {
               programme.creditOwnerPercentage.length
             ).fill(0);
           }
-          programme.creditTransferred[compIndex] = this.helperService.halfUpToPrecision(programme.creditTransferred[compIndex] + transfer.creditAmount);
+          else if (programme.creditTransferred.length!==programme.creditOwnerPercentage.length && programme.creditTransferred.length<programme.creditOwnerPercentage.length){
+            programme.creditTransferred.push(...new Array(programme.creditOwnerPercentage.length-programme.creditTransferred.length).fill(0))
+          }
+          programme.creditTransferred[compIndex] += transfer.creditAmount;
         }
         programme.creditChange = transfer.creditAmount;
         programme.creditBalance = this.helperService.halfUpToPrecision(programme.creditBalance - transfer.creditAmount);
@@ -1115,7 +1118,8 @@ export class ProgrammeLedgerService {
     countryCodeA2: string,
     companyIds: number[],
     issueCredit: number,
-    user: string
+    user: string,
+    mitigationActions:any
   ): Promise<Programme> {
     this.logger.log(`Issue programme credit ${programmeId}`);
 
@@ -1219,7 +1223,8 @@ export class ProgrammeLedgerService {
           txTime: programme.txTime,
           txType: programme.txType,
           creditOwnerPercentage: programme.creditOwnerPercentage,
-          emissionReductionAchieved: programme.emissionReductionAchieved
+          emissionReductionAchieved: programme.emissionReductionAchieved,
+          mitigationActions:mitigationActions
         };
         updateWhereMap[this.ledger.tableName] = {
           programmeId: programmeId,
@@ -1517,7 +1522,20 @@ export class ProgrammeLedgerService {
         if (!programme.mitigationActions) {
           programme.mitigationActions = [];
         }
-
+        
+        if(mitigation.properties){
+          mitigation.properties={
+            ...mitigation.properties,
+            issuedCredits:0,
+            availableCredits:mitigation.userEstimatedCredits
+          }
+        }
+        else{
+          mitigation.properties={
+            issuedCredits:0,
+            availableCredits:mitigation.userEstimatedCredits
+          }
+        }
         programme.mitigationActions.push(mitigation);
         updateMap[this.ledger.tableName] = {
           txRef: programme.txRef,
