@@ -292,6 +292,9 @@ export class ProgrammeLedgerService {
               programme.creditOwnerPercentage.length
             ).fill(0);
           }
+          else if (programme.creditTransferred.length!==programme.creditOwnerPercentage.length && programme.creditTransferred.length<programme.creditOwnerPercentage.length){
+            programme.creditTransferred.push(...new Array(programme.creditOwnerPercentage.length-programme.creditTransferred.length).fill(0))
+          }
           programme.creditTransferred[compIndex] += transfer.creditAmount;
         }
         programme.creditChange = transfer.creditAmount;
