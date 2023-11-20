@@ -6,8 +6,16 @@ import {
   AgricultureConstants,
   AgricultureCreationRequest,
   calculateCredit,
+  SoilEnrichmentConstants,
+  SoilEnrichmentCreationRequest,
   SolarConstants,
   SolarCreationRequest,
+  SolarWaterPumpingOffGridConstants,
+  SolarWaterPumpingOffGridCreationRequest,
+  SolarWaterPumpingOnGridConstants,
+  SolarWaterPumpingOnGridCreationRequest,
+  StovesHousesNamibiaConstants,
+  StovesHousesNamibiaCreationRequest,
 } from "@undp/carbon-credit-calculator";
 import { QueryDto } from "../dto/query.dto";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
@@ -18,7 +26,7 @@ import { ConstantUpdateDto } from "../dto/constants.update.dto";
 import { ProgrammeApprove } from "../dto/programme.approve";
 import { BasicResponseDto } from "../dto/basic.response.dto";
 import { ConfigService } from "@nestjs/config";
-import { TypeOfMitigation, sectorMitigationTypesListMapped } from "../enum/typeofmitigation.enum";
+import { SubTypeOfMitigation, TypeOfMitigation, mitigationSubTypesListMapped, sectorMitigationTypesListMapped } from "../enum/typeofmitigation.enum";
 import { ProgrammeTransferRequest } from "../dto/programme.transfer.request";
 import { User } from "../entities/user.entity";
 import { ProgrammeTransfer } from "../entities/programme.transfer";
@@ -89,6 +97,10 @@ import { ProgrammeDocumentRegistryDto } from "../dto/programme.document.registry
 import { LetterOfIntentRequestGen } from "../util/letter.of.intent.request.gen";
 import { LetterOfIntentResponseGen } from "../util/letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "../util/letter.of.authorisation.request.gen";
+import { SolarWaterPumpOffGridProperties } from "../dto/solar.water.pump.off.grid.properties";
+import { SolarWaterPumpOnGridProperties } from "../dto/solar.water.pump.on.grid.properties";
+import { StovesHousesInNamibiaProperties } from "../dto/stoves.houses.in.namibia.properties";
+import { SoilEnhancementBiocharProperties } from "../dto/soil.enhancement.biochar.properties";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
@@ -594,28 +606,83 @@ export class ProgrammeService {
     programme: Programme,
     constants: ConstantEntity
   ) {
-    switch (ndcActionDto.typeOfMitigation) {
-      case TypeOfMitigation.AGRICULTURE:
-        const ar = new AgricultureCreationRequest();
-        ar.duration = programme.endTime - programme.startTime;
-        ar.durationUnit = "s";
-        ar.landArea = ndcActionDto.agricultureProperties.landArea;
-        ar.landAreaUnit = ndcActionDto.agricultureProperties.landAreaUnit;
-        if (constants) {
-          ar.agricultureConstants = constants.data as AgricultureConstants;
-        }
-        return ar;
-      case TypeOfMitigation.SOLAR:
-        const sr = new SolarCreationRequest();
-        sr.buildingType = ndcActionDto.solarProperties.consumerGroup;
-        sr.energyGeneration = ndcActionDto.solarProperties.energyGeneration;
-        sr.energyGenerationUnit =
-          ndcActionDto.solarProperties.energyGenerationUnit;
-        if (constants) {
-          sr.solarConstants = constants.data as SolarConstants;
-        }
-        return sr;
+
+    if (ndcActionDto.typeOfMitigation === TypeOfMitigation.AGRICULTURE &&
+      ndcActionDto.subTypeOfMitigation === SubTypeOfMitigation.RICE_CROPS) {
+      const ar = new AgricultureCreationRequest();
+      ar.duration = programme.endTime - programme.startTime;
+      ar.durationUnit = "s";
+      ar.landArea = ndcActionDto.agricultureProperties.landArea;
+      ar.landAreaUnit = ndcActionDto.agricultureProperties.landAreaUnit;
+      if (constants) {
+        ar.agricultureConstants = constants.data as AgricultureConstants;
+      }
+      return ar;
     }
+
+    if (ndcActionDto.typeOfMitigation === TypeOfMitigation.SOLAR &&
+      ndcActionDto.subTypeOfMitigation === SubTypeOfMitigation.SOLAR_PHOTOVOLTAICS_PV) {
+      const sr = new SolarCreationRequest();
+      sr.buildingType = ndcActionDto.solarProperties.consumerGroup;
+      sr.energyGeneration = ndcActionDto.solarProperties.energyGeneration;
+      sr.energyGenerationUnit =
+        ndcActionDto.solarProperties.energyGenerationUnit;
+      if (constants) {
+        sr.solarConstants = constants.data as SolarConstants;
+      }
+      return sr;
+    }
+
+    if (ndcActionDto.typeOfMitigation === TypeOfMitigation.SOLAR &&
+      ndcActionDto.subTypeOfMitigation === SubTypeOfMitigation.SOLAR_WATER_PUMPING_OFF_GRID) {
+      const sr = new SolarWaterPumpingOffGridCreationRequest();
+      const solarWaterPumpOff = ndcActionDto.creditCalculationProperties as SolarWaterPumpOffGridProperties;
+      sr.energyGeneration = solarWaterPumpOff?.energyGeneration;
+      sr.energyGenerationUnit =
+        solarWaterPumpOff?.energyGenerationUnit;
+      if (constants) {
+        sr.solarWaterPumpingOffGridConstants = constants.data as SolarWaterPumpingOffGridConstants;
+      }
+      return sr;
+    }
+
+    if (ndcActionDto.typeOfMitigation === TypeOfMitigation.SOLAR &&
+      ndcActionDto.subTypeOfMitigation === SubTypeOfMitigation.SOLAR_WATER_PUMPING_ON_GRID) {
+      const sr = new SolarWaterPumpingOnGridCreationRequest();
+      const solarWaterPumpOn = ndcActionDto.creditCalculationProperties as SolarWaterPumpOnGridProperties;
+      sr.energyGeneration = solarWaterPumpOn?.energyGeneration;
+      sr.energyGenerationUnit =
+      solarWaterPumpOn?.energyGenerationUnit;
+      if (constants) {
+        sr.solarWaterPumpingOnGridConstants = constants.data as SolarWaterPumpingOnGridConstants;
+      }
+      return sr;
+    }
+
+    if (ndcActionDto.typeOfMitigation === TypeOfMitigation.EE_HOUSEHOLDS &&
+      ndcActionDto.subTypeOfMitigation === SubTypeOfMitigation.STOVES_HOUSES_IN_NAMIBIA) {
+      const sr = new StovesHousesNamibiaCreationRequest();
+      const stoves = ndcActionDto.creditCalculationProperties as StovesHousesInNamibiaProperties;
+      sr.numberOfDays = stoves?.numberOfDays;
+      sr.numberOfPeopleInHousehold =
+      stoves?.numberOfPeopleInHousehold;
+      if (constants) {
+        sr.stovesHousesNamibiaConstants = constants.data as StovesHousesNamibiaConstants;
+      }
+      return sr;
+    }
+
+    if (ndcActionDto.typeOfMitigation === TypeOfMitigation.AGRICULTURE &&
+      ndcActionDto.subTypeOfMitigation === SubTypeOfMitigation.SOIL_ENRICHMENT_BIOCHAR) {
+      const sr = new SoilEnrichmentCreationRequest();
+      const soilEnhancementBiocharProperties = ndcActionDto.creditCalculationProperties as SoilEnhancementBiocharProperties;
+      sr.weight = soilEnhancementBiocharProperties?.weight;
+      if (constants) {
+        sr.soilEnrichmentConstants = constants.data as SoilEnrichmentConstants;
+      }
+      return sr;
+    }
+
     return null;
   }
 
@@ -1851,6 +1918,16 @@ export class ProgrammeService {
         throw new HttpException(
             this.helperService.formatReqMessagesString(
               "programme.wrongMItigationSectorMapping",
+              []
+              ),
+              HttpStatus.BAD_REQUEST
+      );
+      }
+
+      if(ndcAction.subTypeOfMitigation && !mitigationSubTypesListMapped[ndcAction.typeOfMitigation].includes(ndcAction.subTypeOfMitigation)) {
+        throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "programme.wrongSubMitigationMapping",
               []
               ),
               HttpStatus.BAD_REQUEST

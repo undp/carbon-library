@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-services-lib",
-  "version": "0.0.249",
+  "version": "0.0.250-NAM-17.0",
   "description": "Backend library",
   "author": "",
   "private": false,
@@ -34,7 +34,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.3",
     "@nestjs/typeorm": "^9.0.1",
-    "@undp/carbon-credit-calculator": "^1.0.0",
+    "@undp/carbon-credit-calculator": "^1.1.1",
     "@undp/serial-number-gen": "^1.0.0",
     "amazon-qldb-driver-nodejs": "^3.0.1",
     "aws-kinesis-agg": "^4.2.6",

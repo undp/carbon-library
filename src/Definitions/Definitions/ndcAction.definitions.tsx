@@ -1,6 +1,7 @@
 import { BuildingType } from "@undp/carbon-credit-calculator";
 import { NdcActionTypes } from "../Enums/ndcActionTypes.enum";
 import { MitigationTypes } from "../Enums/mitigation.types.enum";
+import { MitigationSubTypes } from "../Enums/mitigation.types.enum";
 import { NdcActionStatus } from "../Enums/ndcAction.status.enum";
 
 export interface AgricultureProperties {
@@ -23,6 +24,19 @@ export interface AdaptationProperties {
   ghgEmissionsAvoided: any;
 }
 
+export interface CreditCalculationProperties {
+  typeOfMitigation?: MitigationTypes;
+  subTypeOfMitigation?: MitigationSubTypes;
+  energyGeneration?: number;
+  energyGenerationUnit?: string;
+  consumerGroup?: BuildingType;
+  landArea?: number;
+  landAreaUnit?: string;
+  numberOfDays?: number;
+  numberOfPeopleInHousehold?: number;
+  weight?: number;
+}
+
 export interface CoBenefitsProperties {}
 
 export interface EnablementProperties {
@@ -42,8 +56,10 @@ export interface NdcAction {
   action: NdcActionTypes;
   methodology: string;
   typeOfMitigation: MitigationTypes;
+  subTypeOfMitigation: MitigationSubTypes;
   agricultureProperties?: AgricultureProperties;
   solarProperties?: SolarProperties;
+  creditCalculationProperties?: CreditCalculationProperties; 
   adaptationProperties: AdaptationProperties;
   ndcFinancing?: NdcFinancing;
   monitoringReport?: string;
