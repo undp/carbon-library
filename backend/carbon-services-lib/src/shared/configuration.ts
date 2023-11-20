@@ -70,7 +70,7 @@ export default () => ({
     image:process.env.CERTIFIER_IMAGE
   },
   registry: {
-    syncEnable: process.env.SYNC_ENABLE || false,
+    syncEnable: process.env.SYNC_ENABLE === "true" ? true : false,
     endpoint: process.env.SYNC_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
     apiToken: process.env.SYNC_API_TOKEN
   },
@@ -82,7 +82,7 @@ export default () => ({
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
   },
   cadTrust: {
-    enable: process.env.CADTRUST_ENABLE || false,
+    enable: process.env.CADTRUST_ENABLE === "true" ? true : false,
     endpoint: process.env.CADTRUST_ENDPOINT || "http://44.212.139.61:31310/"
   },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",

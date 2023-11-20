@@ -1123,7 +1123,7 @@ export class ProgrammeService {
 
     if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
       resp.cadtId = sqlProgram.cadtId;
-
+      resp.blockBounds = sqlProgram.blockBounds;
       console.log('Add action', resp)
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTUpdateProgramme,
@@ -2588,6 +2588,23 @@ export class ProgrammeService {
       isRetirement
     );
 
+    const sqlProgram = await this.findById(programme.programmeId);
+  
+    console.log('Add transfer', sqlProgram)
+
+    if (sqlProgram.cadtId) {
+      programme.cadtId = sqlProgram.cadtId;
+      programme.blockBounds = sqlProgram.blockBounds;
+      console.log('Add action', programme)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTTransferCredit,
+        actionProps: {
+          programme: programme,
+          transfer: transfer
+        },
+      });
+    }
+
     this.logger.log("Programme updated");
     const result = await this.programmeTransferRepo
       .update(
@@ -3093,6 +3110,7 @@ export class ProgrammeService {
           false
         )
       ).data;
+
       await this.emailHelperService.sendEmailToOrganisationAdmins(
         trf.toCompanyId,
         EmailTemplates.CREDIT_SEND_DEVELOPER,
@@ -3166,6 +3184,7 @@ export class ProgrammeService {
 
     if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
       resp.cadtId = sqlProgram.cadtId;
+      resp.blockBounds = sqlProgram.blockBounds;
 
       console.log('Add action', resp)
       await this.asyncOperationsInterface.AddAction({
@@ -3880,6 +3899,7 @@ export class ProgrammeService {
     const sqlProgram = await this.findById(program.programmeId);
     if (sqlProgram.cadtId) {
       program.cadtId = sqlProgram.cadtId;
+      program.blockBounds = sqlProgram.blockBounds;
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTCreditIssue,
         actionProps: {
@@ -4299,6 +4319,7 @@ export class ProgrammeService {
     const sqlProgram = await this.findById(program.programmeId);
     if (sqlProgram.cadtId) {
       updated.cadtId = sqlProgram.cadtId;
+      updated.blockBounds = sqlProgram.blockBounds;
       await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.CADTUpdateProgramme,
         actionProps: {
