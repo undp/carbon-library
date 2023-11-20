@@ -5,6 +5,7 @@ import {
   Empty,
   PaginationProps,
   Row,
+  Select,
   Space,
   Table,
   Tabs,
@@ -38,12 +39,18 @@ export const NdcDetailsComponent = (props: any) => {
   const selectedNdcDetail = useRef({} as NdcDetail);
   const [tableKey, setTableKey] = useState(0);
   const { get, post, put } = useConnection();
+  const [ministryOrgList, setMinistryOrgList] = useState([] as any);
 
   const { userInfoState } = useUserContext();
 
-  const governmentMinistry = process.env.REACT_APP_GOVERNMENT_MINISTRY
-    ? process.env.REACT_APP_GOVERNMENT_MINISTRY
-    : "Test ministryName";
+  const loginMinistry =
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT
+      ? process.env.REACT_APP_GOVERNMENT_MINISTRY
+        ? process.env.REACT_APP_GOVERNMENT_MINISTRY
+        : "Test ministryName"
+      : userInfoState?.companyRole === CompanyRole.MINISTRY
+      ? userInfoState?.companyName
+      : undefined;
 
   const isAddRangeVisible =
     (userInfoState?.companyRole === CompanyRole.MINISTRY ||
@@ -60,7 +67,20 @@ export const NdcDetailsComponent = (props: any) => {
         })
       : [];
 
-  const isNdcActionsEditable = !selectedPeriod.finalized;
+  const isMainNdcActionsEditable =
+    !selectedPeriod.finalized &&
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+    userInfoState?.userRole !== Role.ViewOnly;
+
+  const isSubNdcActionsEditable = (record: NdcDetail) => {
+    return (
+      !selectedPeriod.finalized &&
+      (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+        (userInfoState?.companyRole === CompanyRole.MINISTRY &&
+          userInfoState?.companyName === record.ministryName)) &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
+  };
 
   const getSubNdcDetailsForPeriod = (id: number) => {
     const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
@@ -74,7 +94,7 @@ export const NdcDetailsComponent = (props: any) => {
       actionType: NdcActionType.subAction,
       nationalPlanObjective: "",
       kpi: 0,
-      ministryName: governmentMinistry,
+      ministryName: loginMinistry,
       status: NdcDetailsActionStatus.pending,
       parentActionId: id,
     };
@@ -123,8 +143,8 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "nationalPlanObjective",
       key: "nationalPlanObjective",
       align: "left" as const,
-      editable: true,
       width: "50%",
+      editable: true,
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObjective ? (
@@ -146,8 +166,8 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "kpi",
       key: "kpi",
       align: "left" as const,
-      editable: true,
       width: "10%",
+      editable: true,
       render: (_: any, record: any) => (
         <>
           {record.kpi ? (
@@ -169,21 +189,19 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "ministryName",
       key: "ministryName",
       align: "left" as const,
-      editable: true,
       width: "40%",
+      editable: false,
       render: (_: any, record: any) => (
         <>
-          {record.ministryName ? (
-            <Space size="middle">
-              <span>{record.ministryName}</span>
-            </Space>
-          ) : (
-            <input
-              placeholder="Please add the ministryName name"
-              className="ant-input"
-              type="text"
-            ></input>
-          )}
+          <Select
+            disabled={!isSubNdcActionsEditable(record)}
+            defaultValue={
+              record.ministryName ? record.ministryName : loginMinistry
+            }
+            style={{ width: 320 }}
+            onChange={() => {}}
+            options={ministryOrgList}
+          />
         </>
       ),
     },
@@ -195,11 +213,14 @@ export const NdcDetailsComponent = (props: any) => {
     }
     return {
       ...col,
-      onCell: (record: any) => {
-        console.log('record', record);
+      onCell: (record: NdcDetail) => {
+        console.log("record", record);
         return {
           record,
-          editable: col.editable,
+          editable:
+            record.actionType === NdcActionType.mainAction
+              ? isMainNdcActionsEditable
+              : isSubNdcActionsEditable(record),
           dataIndex: col.dataIndex,
           title: col.title,
           handleSave,
@@ -215,7 +236,7 @@ export const NdcDetailsComponent = (props: any) => {
         actionType: NdcActionType.mainAction,
         nationalPlanObjective: "",
         kpi: 0,
-        ministryName: governmentMinistry,
+        ministryName: loginMinistry,
         periodId: periodId,
         status: NdcDetailsActionStatus.pending,
       };
@@ -444,9 +465,24 @@ export const NdcDetailsComponent = (props: any) => {
     }
   };
 
+  const fetchMinistries = async () => {
+    const response = await get("national/company/getMinistries");
+    console.log('fetchMinistries', response);
+    if (response && response.data) {
+      const ministryOrgDetails = response.data.map((value: any) => {
+        return {
+          value: value.user_id,
+          label: value.user_name,
+        };
+      });
+      setMinistryOrgList(ministryOrgDetails);
+    }
+  };
+
   useEffect(() => {
     fetchNdcDetailPeriods();
     fetchNdcDetailActions();
+    fetchMinistries();
   }, []);
 
   return (
