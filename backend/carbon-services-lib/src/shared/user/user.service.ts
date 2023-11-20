@@ -1045,4 +1045,20 @@ export class UserService {
 
     return result;
   }
+
+  async getMinistryUsers() {
+    const result = await this.userRepo
+      .createQueryBuilder("user")
+      .where("user.role in (:admin,:manager)", {
+        admin: Role.Admin,
+        manager: Role.Manager,
+      })
+      .andWhere("user.companyRole= :companyRole", {
+        companyRole: CompanyRole.MINISTRY,
+      })
+      .select(["user.name", "user.id"])
+      .getRawMany();
+
+    return result;
+  }
 }
