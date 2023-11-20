@@ -35,7 +35,6 @@ export const NdcDetailsComponent = (props: any) => {
   const [periodItems, setPeriodItems] = useState([] as Period[]);
   const [selectedPeriod, setSelectedPeriod] = useState({} as Period);
   const selectedDateRangeRef = useRef({} as DateRange);
-  const addedNdcDetailId = useRef(0);
   const selectedNdcDetail = useRef({} as NdcDetail);
   const [tableKey, setTableKey] = useState(0);
   const { get, post, put } = useConnection();
@@ -60,6 +59,8 @@ export const NdcDetailsComponent = (props: any) => {
           );
         })
       : [];
+
+  const isNdcActionsEditable = !selectedPeriod.finalized;
 
   const getSubNdcDetailsForPeriod = (id: number) => {
     const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
@@ -97,38 +98,6 @@ export const NdcDetailsComponent = (props: any) => {
 
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
-
-  function onAddNewSubNdcDetail() {
-    //const range = selectedPeriod.split("-");
-    const range: any = [];
-    const ndcDetail = ndcDetailsData.find(
-      (item: NdcDetail) => item.id === selectedNdcDetail.current.id
-    );
-    const ndcDetailItemIndex = ndcDetailsData.findIndex(
-      (item: NdcDetail) => item.id === selectedNdcDetail.current.id
-    );
-
-    if (ndcDetail) {
-      addedNdcDetailId.current = addedNdcDetailId.current + 1;
-      const newData = {
-        key: addedNdcDetailId.current,
-        startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
-        endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-        ndcActionId: ndcDetail?.id,
-        nationalPlanObjective: "",
-        kpi: "",
-        ministryName: "",
-      };
-      // if (!ndcDetail.subNdcDetails) {
-      //   ndcDetail.subNdcDetails = [];
-      // }
-      //ndcDetail.subNdcDetails.push(newData);
-    }
-
-    // ndcDetailsData[ndcDetailItemIndex] = ndcDetail;
-    // setNdcDetailsData(ndcDetailsData);
-    setTableKey((key: any) => key + 1);
-  }
 
   const handleSave = async (row: any) => {
     const updatedItemIndex = ndcDetailsData.findIndex(
@@ -226,13 +195,16 @@ export const NdcDetailsComponent = (props: any) => {
     }
     return {
       ...col,
-      onCell: (record: any) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
+      onCell: (record: any) => {
+        console.log('record', record);
+        return {
+          record,
+          editable: col.editable,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          handleSave,
+        };
+      },
     };
   });
 
