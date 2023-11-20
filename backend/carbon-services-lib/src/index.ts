@@ -139,6 +139,7 @@ export * from './shared/dto/stat.list.dto'
 export * from './shared/dto/user.dto'
 export * from './shared/dto/user.update.dto'
 export * from './shared/dto/ndc.details.period.dto'
+export * from './shared/dto/programme.mitigation.issue'
 export * from './shared/dto/ndc.details.action.dto'
 
 //from transparency

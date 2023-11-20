@@ -122,12 +122,19 @@ body {
   height: 35px !important;
 }
 
+.space-container {
+  width: 100%;
+  .ant-space-item {
+    width: 100%;
+  }
+}
+
 .PhoneInput {
   .PhoneInputCountry {
     border: 1px solid #d9d9d9 !important;
     border-radius: 5px !important;
     padding: 0 1rem 0 1rem;
-  }
+  } 
   .PhoneInputInput {
     flex: 1 1;
     min-width: 0;
