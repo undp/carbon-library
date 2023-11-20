@@ -16,6 +16,13 @@ export class NdcFinancing {
     @IsNumber()
     systemEstimatedCredits: number;
 
-    issuedCredits?: number
-    availableCredits?: number
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    issuedCredits: number
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsNumber()
+    availableCredits: number
 }
