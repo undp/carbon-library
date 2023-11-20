@@ -16,7 +16,7 @@ export * from "./NdcActions/NdcView/ndcActionViewComponent";
 export * from "./Transfers/creditTransfersComponent";
 export * from "./MrvDashboard/mrvDashboardViewComponent";
 export * from "./RegistryDashboard/registryDashboardViewComponent";
-export * from "./Ndc/ndcDetailsComponent"
+export * from "./Ndc/ndcDetailsComponent";
 export * from "./Common/Loading/loading";
 export * from "./Common/LegendItem/legendItem";
 export * from "./Common/Maps/mapComponent";
