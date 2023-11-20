@@ -4727,6 +4727,11 @@ export class ProgrammeService {
       return true;
   }
 
+  async finalizeNdcDetailsPeriod(id: number, abilityCondition: any, user: User){
+      await this.ndcDetailsPeriodRepo.update(id,{finalized: true});
+      return true;
+  }
+
   async getNdcDetailActions(abilityCondition: any, user: User){
     return await this.ndcDetailsActionRepo.find({
       select: {
