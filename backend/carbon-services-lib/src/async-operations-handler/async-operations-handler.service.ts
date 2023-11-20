@@ -2,12 +2,14 @@ import { Injectable, Logger } from "@nestjs/common";
 import { RegistryClientService } from "../shared/registry-client/registry-client.service";
 import { EmailService } from "../shared/email/email.service";
 import { AsyncActionType } from "../shared/enum/async.action.type.enum";
+import { CadtApiService } from "../shared/cadt/cadt.api.service";
 
 @Injectable()
 export class AsyncOperationsHandlerService {
   constructor(
     private emailService: EmailService,
     private registryClient: RegistryClientService,
+    private cadtService: CadtApiService,
     private logger: Logger
   ) {}
 
@@ -37,6 +39,16 @@ export class AsyncOperationsHandlerService {
           return this.registryClient.updateOwnership(dataObject);
         case AsyncActionType.AddMitigation.toString():
           return this.registryClient.addMitigation(dataObject);
+
+        case AsyncActionType.CADTProgrammeCreate.toString():
+          return this.cadtService.createProgramme(dataObject)
+        case AsyncActionType.CADTUpdateProgramme.toString():
+          return this.cadtService.updateProgramme(dataObject.programme);
+        case AsyncActionType.CADTCreditIssue.toString():
+          return this.cadtService.issueCredit(dataObject.programme, dataObject.amount);
+        case AsyncActionType.CADTTransferCredit.toString():
+          return this.cadtService.transferCredit(dataObject.programme, dataObject.transfer);
+        
       }
     }
   }

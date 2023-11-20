@@ -15,6 +15,7 @@ import {
   Typography,
   Form,
   Tooltip,
+  Button,
 } from "antd";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DateTime } from "luxon";
@@ -45,6 +46,7 @@ import { RoleIcon } from "../../Common/RoleIcon/role.icon";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { Role } from "../../../Definitions/Enums/role.enum";
+import { PlusOutlined } from "@ant-design/icons";
 
 type PopupInfo = {
   title: string;
@@ -62,6 +64,8 @@ export const InvestmentManagementComponent = (props: any) => {
     onNavigateToProgrammeView,
     useUserContext,
     useSettingsContext,
+    onClickAddOwnership,
+    enableAddOwnership
   } = props;
 
   const t = translator.t;
@@ -678,8 +682,8 @@ export const InvestmentManagementComponent = (props: any) => {
       sorter.order === "ascend"
         ? "ASC"
         : sorter.order === "descend"
-        ? "DESC"
-        : undefined
+          ? "DESC"
+          : undefined
     );
     setSortField(sorter.columnKey);
     // setCurrentPage(1);
@@ -687,15 +691,28 @@ export const InvestmentManagementComponent = (props: any) => {
 
   return (
     <div className="investment-management content-container">
-      <div className="title-bar">
-        <Row justify="space-between" align="middle">
-          <Col span={20}>
-            <div className="body-title">{t("programme:investmentTitle")}</div>
-            <div className="body-sub-title">
-              {t("programme:investmentDesc")}
+      <div className="investment-title-bar">
+        <div className="title-bar">
+          <div className="body-title">{t("programme:investmentTitle")}</div>
+          <div className="body-sub-title">
+            {t("programme:investmentDesc")}
+          </div>
+        </div>
+        <div className="actions">
+          {enableAddOwnership && (
+            <div className="action-bar">
+              <Button
+                type="primary"
+                size="large"
+                block
+                icon={<PlusOutlined />}
+                onClick={onClickAddOwnership}
+              >
+                {t("programme:addOwnership")}
+              </Button>
             </div>
-          </Col>
-        </Row>
+          )}
+        </div>
       </div>
       <div className="content-card">
         <Row>

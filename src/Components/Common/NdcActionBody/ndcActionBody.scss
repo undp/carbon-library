@@ -45,6 +45,9 @@
       display: flex;
       flex-direction: row;
       width: 40%;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
 
       .version {
         font-weight: 600;

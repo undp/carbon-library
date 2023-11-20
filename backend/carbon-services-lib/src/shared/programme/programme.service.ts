@@ -102,6 +102,9 @@ import { SolarWaterPumpOnGridProperties } from "../dto/solar.water.pump.on.grid.
 import { StovesHousesInNamibiaProperties } from "../dto/stoves.houses.in.namibia.properties";
 import { SoilEnhancementBiocharProperties } from "../dto/soil.enhancement.biochar.properties";
 import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable.dev.support";
+import { MitigationProperties } from "../dto/mitigation.properties";
+import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
+import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -452,6 +455,17 @@ export class ProgrammeService {
           HttpStatus.FORBIDDEN
         );
       }
+    }
+
+    const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
+    if(req.fromCompanyIds.includes(govProfile.companyId) && req.percentage[req.fromCompanyIds.indexOf(govProfile.companyId)]!==0){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.cannotInvestOnGovernmentOwnership",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     this.logger.verbose(`Investment on programme ${JSON.stringify(programme)}`);
@@ -894,6 +908,15 @@ export class ProgrammeService {
       } 
       if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+        if (program.cadtId) {
+          program.currentStage = ProgrammeStage.APPROVED;
+          await this.asyncOperationsInterface.AddAction({
+            actionType: AsyncActionType.CADTUpdateProgramme,
+            actionProps: {
+              programme: program
+            },
+          });
+        }
       }
     }
     console.log('NDC COmmit', ndc)
@@ -1092,7 +1115,7 @@ export class ProgrammeService {
           programmeName: programme.title,
           programmePageLink:
             hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
+            `/programmeManagement/view/${programme.programmeId}`,
         }, undefined, undefined, undefined,
         {
           filename: 'Letter of Intent Response.pdf',
@@ -1144,7 +1167,7 @@ export class ProgrammeService {
       {
         organisationName: companyNames,
         programmePageLink:
-          hostAddress + `/programmeManagement/view?id=${programme.programmeId}`,
+          hostAddress + `/programmeManagement/view/${programme.programmeId}`,
       },undefined,undefined,
       {
         filename: 'Letter of Request for Authorisation.pdf',
@@ -1156,10 +1179,27 @@ export class ProgrammeService {
   }
 
   async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
-    this.logger.log('Add Document triggered')
+    this.logger.log('Add Registry Document triggered')
 
     const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
+
+    const sqlProgram = await this.findByExternalId(documentDto.externalId);
     const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
+
+    console.log('Add document on registry', sqlProgram, resp, documentDto)
+
+    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
+      resp.cadtId = sqlProgram.cadtId;
+      resp.blockBounds = sqlProgram.blockBounds;
+      console.log('Add action', resp)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: resp
+        },
+      });
+    }
+    
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
@@ -1230,13 +1270,13 @@ export class ProgrammeService {
     if (documentDto.actionId) {
       whr["actionId"] = documentDto.actionId;
     }
-    const currentDoc = await this.documentRepo.findOne({
+    const currentDoc = await this.documentRepo.find({
       where: whr,
     });
-
+    const fileNo = currentDoc.length + 1
     const url = await this.uploadDocument(
       documentDto.type,
-      programme.programmeId + (documentDto.actionId ? ('_' + documentDto.actionId) : ''),
+      programme.programmeId + (documentDto.actionId ? ('_' + documentDto.actionId) : '') + (fileNo? ('_V' + fileNo) : ''),
       documentDto.data
     );
     const dr = new ProgrammeDocument();
@@ -1271,16 +1311,7 @@ export class ProgrammeService {
       if (dr.status === DocumentStatus.ACCEPTED) {
         await this.approveDocumentCommit(em, dr, ndc, undefined, programme);
       }
-      if (!currentDoc) {
-        return await em.save(dr);
-      } else {
-        return await em.update(ProgrammeDocument, whr, {
-          status: dr.status,
-          txTime: dr.txTime,
-          url: dr.url,
-          remark: dr.remark
-        });
-      }
+      return await em.save(dr);
     });
 
     if (user.companyRole === CompanyRole.GOVERNMENT ||
@@ -1292,6 +1323,10 @@ export class ProgrammeService {
 
       if (resp && dr.type === DocType.METHODOLOGY_DOCUMENT && dr.status === DocumentStatus.ACCEPTED) {
         await this.sendRequestForLetterOfAuthorisation(programme);
+      }
+      if (resp && dr.type === DocType.VERIFICATION_REPORT && dr.status === DocumentStatus.ACCEPTED) {
+        const programmeData = await this.findById(programme.programmeId);
+        return new DataResponseDto(HttpStatus.OK, {...resp,programme:programmeData});
       }
     }
 
@@ -1366,6 +1401,15 @@ export class ProgrammeService {
       actionType: action,
       actionProps: req,
     });
+
+    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED &&
+    (docType === DocType.MONITORING_REPORT || docType === DocType.VERIFICATION_REPORT) &&
+    (ndcAction.action === NDCActionType.Mitigation || ndcAction.action === NDCActionType.CrossCutting) && 
+    ndcAction && ndcAction.typeOfMitigation
+    ){
+      const certifierId = (await this.companyService.findByTaxId(req.certifierTaxId))?.companyId;
+      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.type, 0, certifierId);
+    }
   }
 
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
@@ -1373,7 +1417,16 @@ export class ProgrammeService {
     const programme: Programme = this.toProgramme(programmeDto);
     this.logger.verbose("Programme  create", JSON.stringify(programme));
 
-    
+    const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
+    if(Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId) && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.govermentOwnershipOfProgramme",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
     if (
       programmeDto.proponentTaxVatId.length > 1 &&
       (!programmeDto.proponentPercentage ||
@@ -1500,10 +1553,10 @@ export class ProgrammeService {
         );
       }
 
-      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER) {
+      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER && projectCompany.companyRole != CompanyRole.GOVERNMENT) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "programme.proponentIsNotAProgrammeDev",
+            "programme.proponentIsNotAProgrammeDevOrGov ",
             []
           ),
           HttpStatus.BAD_REQUEST
@@ -1732,7 +1785,12 @@ export class ProgrammeService {
     
     if((this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY ||
         this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED) && !pr){
+      // console.log("111111111111111111111111111111111111111111111111111")
       savedProgramme = await this.programmeLedger.createProgramme(programme);
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTProgrammeCreate,
+        actionProps: programme,
+      });
     }
 
     if (savedProgramme || pr) {
@@ -1745,19 +1803,21 @@ export class ProgrammeService {
       );
 
       const hostAddress = this.configService.get("host");
-      await this.emailHelperService.sendEmailToGovernmentAdmins(
-        EmailTemplates.PROGRAMME_CREATE,
-        {
-          organisationName: orgNamesList,
-          programmePageLink:
-            hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
-        },undefined,undefined,
-        {
-          filename: 'Request For Letter Of Intent.pdf',
-          path: letterOfIntentRequestLetterUrl
-        }
-      );
+      if(govProfile.nationalSopValue==0){
+        await this.emailHelperService.sendEmailToGovernmentAdmins(
+          EmailTemplates.PROGRAMME_CREATE,
+          {
+            organisationName: orgNamesList,
+            programmePageLink:
+              hostAddress +
+            `/programmeManagement/view/${programme.programmeId}`,
+          },undefined,undefined,
+          {
+            filename: 'Request For Letter Of Intent.pdf',
+            path: letterOfIntentRequestLetterUrl
+          }
+        );
+      }
 
       const orgNames = await this.companyService.query({
         size: 10,
@@ -1792,7 +1852,7 @@ export class ProgrammeService {
             organisationName: orgNamesList,
             programmePageLink:
             hostAddress +
-            `/programmeManagement/view?id=${programme.programmeId}`,
+            `/programmeManagement/view/${programme.programmeId}`,
           },undefined,undefined,undefined,
           [
             {
@@ -1912,10 +1972,25 @@ export class ProgrammeService {
       ndcActionDto.action == NDCActionType.Mitigation ||
       ndcActionDto.action == NDCActionType.CrossCutting
     ) {
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.AddMitigation,
-        actionProps: ndcAction,
-      });
+      ndcAction.ndcFinancing.issuedCredits=0
+      ndcAction.ndcFinancing.availableCredits=ndcAction.ndcFinancing.userEstimatedCredits
+      if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_UNIFIED){
+        const addMitigationLedger = {
+          typeOfMitigation: ndcAction.typeOfMitigation,
+          userEstimatedCredits: ndcAction.ndcFinancing?.userEstimatedCredits,
+          methodology: ndcAction?.methodology ? ndcAction?.methodology : '-',
+          systemEstimatedCredits: ndcAction.ndcFinancing?.systemEstimatedCredits ? ndcAction.ndcFinancing?.systemEstimatedCredits : 0,
+          actionId: ndcAction.id,
+          constantVersion: '' + ndcAction.constantVersion,
+          properties: (ndcAction.agricultureProperties ? ndcAction.agricultureProperties : ndcAction.solarProperties ? ndcAction.solarProperties : undefined)
+        };
+        await this.programmeLedger.addMitigation(program.externalId, addMitigationLedger);
+      }else{
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.AddMitigation,
+          actionProps: ndcAction,
+        });
+      }
     }
 
     let dr;
@@ -1968,6 +2043,16 @@ export class ProgrammeService {
         return err;
       });
     return new DataResponseDto(HttpStatus.OK, saved);
+  }
+
+  async queryNdcDetails(
+    query: QueryDto,
+    abilityCondition: string
+  ): Promise<DataListResponseDto> {
+    return new DataListResponseDto(
+      undefined,
+      undefined
+    );
   }
 
   async queryNdcActions(
@@ -2580,6 +2665,23 @@ export class ProgrammeService {
       isRetirement
     );
 
+    const sqlProgram = await this.findById(programme.programmeId);
+  
+    console.log('Add transfer', sqlProgram)
+
+    if (sqlProgram.cadtId) {
+      programme.cadtId = sqlProgram.cadtId;
+      programme.blockBounds = sqlProgram.blockBounds;
+      console.log('Add action', programme)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTTransferCredit,
+        actionProps: {
+          programme: programme,
+          transfer: transfer
+        },
+      });
+    }
+
     this.logger.log("Programme updated");
     const result = await this.programmeTransferRepo
       .update(
@@ -3085,6 +3187,7 @@ export class ProgrammeService {
           false
         )
       ).data;
+
       await this.emailHelperService.sendEmailToOrganisationAdmins(
         trf.toCompanyId,
         EmailTemplates.CREDIT_SEND_DEVELOPER,
@@ -3148,9 +3251,26 @@ export class ProgrammeService {
   }
 
   async programmeAccept(accept: ProgrammeAcceptedDto): Promise<DataResponseDto | undefined> {
-    this.logger.log('Add accept triggered')
+    this.logger.log('Add accept triggered', accept.type)
     const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
+
+    const sqlProgram = await this.findByExternalId(accept.externalId);
     const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.type, accept.creditEst, certifierId);
+    
+    console.log('Add accept on registry', sqlProgram, resp, accept)
+
+    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
+      resp.cadtId = sqlProgram.cadtId;
+      resp.blockBounds = sqlProgram.blockBounds;
+
+      console.log('Add action', resp)
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: resp
+        },
+      });
+    }
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
@@ -3635,7 +3755,6 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
-
       if (companyAvailableCredit < transferCompanyCredit) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
@@ -3732,7 +3851,7 @@ export class ProgrammeService {
     return new DataListResponseDto(allTransferList, allTransferList.length);
   }
 
-  async issueProgrammeCredit(req: ProgrammeIssue, user: User) {
+  async issueProgrammeCredit(req: ProgrammeMitigationIssue, user: User) {
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`
     );
@@ -3758,7 +3877,50 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST
       );
     }
-    if (program.creditEst - program.creditIssued < req.issueAmount) {
+
+    let verfiedMitigationMap={}
+    let totalCreditIssuance=0
+    let countedActions=[]
+    program.mitigationActions.map(action=>{
+      if(action.projectMaterial && this.isVerfiedMitigationAction(action.projectMaterial)){
+        verfiedMitigationMap[action.actionId]=action.properties
+      }
+    })
+    req.issueAmount.map(action=>{
+      if(countedActions.includes(action.actionId)){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.duplicateMitigationActionIds",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      countedActions.push(action.actionId)
+      if(!verfiedMitigationMap[action.actionId]){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.noVerfiedMitigationActionUnderActionId",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      if(action.issueCredit>verfiedMitigationMap[action.actionId].availableCredits){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.issuedCreditCannotExceedEstMitigationActionCredits",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
+      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
+      totalCreditIssuance+=action.issueCredit
+      this.updateMitigationProps(program.mitigationActions,action.actionId,verfiedMitigationMap[action.actionId])
+    })
+    if ((program.creditEst - program.creditIssued )< totalCreditIssuance) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.issuedCreditAmountcantExceedPendingCredit",
@@ -3785,8 +3947,9 @@ export class ProgrammeService {
       req.programmeId,
       this.configService.get("systemCountry"),
       program.companyId,
-      req.issueAmount,
-      this.getUserRefWithRemarks(user, req.comment)
+      totalCreditIssuance,
+      `${this.getUserRefWithRemarks(user, req.comment)}#${this.getNdcCreditIssuanceRef(req.issueAmount)}`,
+      program.mitigationActions
     );
     if (!updated) {
       return new BasicResponseDto(
@@ -3810,6 +3973,19 @@ export class ProgrammeService {
       issueCReq
     );
 
+    const sqlProgram = await this.findById(program.programmeId);
+    if (sqlProgram.cadtId) {
+      program.cadtId = sqlProgram.cadtId;
+      program.blockBounds = sqlProgram.blockBounds;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTCreditIssue,
+        actionProps: {
+          programme: program,
+          amount: req.issueAmount,
+        },
+      });
+    }
+
     const hostAddress = this.configService.get("host");
     updated.companyId.forEach(async (companyId) => {
       await this.emailHelperService.sendEmailToOrganisationAdmins(
@@ -3817,10 +3993,10 @@ export class ProgrammeService {
         EmailTemplates.CREDIT_ISSUANCE,
         {
           programmeName: updated.title,
-          credits: req.issueAmount,
+          credits: totalCreditIssuance,
           serialNumber: updated.serialNo,
           pageLink:
-            hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+            hostAddress + `/programmeManagement/view/${updated.programmeId}`,
         }
       );
     });
@@ -3836,7 +4012,7 @@ export class ProgrammeService {
     if (suspendedCompanies.length > 0) {
       updated = await this.programmeLedger.freezeIssuedCredit(
         req.programmeId,
-        req.issueAmount,
+        totalCreditIssuance,
         this.getUserRef(user),
         suspendedCompanies
       );
@@ -3860,10 +4036,34 @@ export class ProgrammeService {
       });
     }
 
+    req.issueAmount.map(action=>{
+      updated.mitigationActions.map(actionData=>{
+        if(actionData.actionId===action.actionId){
+          actionData.properties.issuedCredits+=action.issueCredit
+          actionData.properties.availableCredits-=action.issueCredit
+        }
+      })
+    })
+
     return new DataResponseDto(HttpStatus.OK, updated);
   }
 
-  async issueCredit(issue: ProgrammeIssue) {
+  isVerfiedMitigationAction(documents:string[]):boolean{
+    for(var document of documents){
+      if(document.includes('VERIFICATION_REPORT'))return true
+    }
+    return false
+  }
+
+  updateMitigationProps(mitigationActions:MitigationProperties[],actionId:string,props:any){
+    mitigationActions.map(mitigationAction=>{
+      if(mitigationAction.actionId==actionId){
+        mitigationAction.properties=props
+      }
+    })
+  }
+
+  async issueCredit(issue: ProgrammeMitigationIssue,abilityCondition: string) {
     const programme = await this.findByExternalId(issue.externalId?issue.externalId:issue.programmeId);
     if (!programme) {
       throw new HttpException(
@@ -3874,13 +4074,64 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST
       );
     }
+    if (programme.currentStage != ProgrammeStage.AUTHORISED) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.notInAUthorizedState",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
     if (!programme.creditIssued) {
       programme.creditIssued = 0;
     }
 
+    const ndcQuery:QueryDto={page:1,size:10,filterAnd:[{ key: "status", operation: "=", value: NDCStatus.APPROVED }],sort:{key:"txTime",order:"DESC"},filterBy:undefined,filterOr:[{ key: "action", operation: "=", value: NDCActionType.CrossCutting },{ key: "action", operation: "=", value: NDCActionType.Mitigation }]}
+    const approvedMitigationActions= await this.queryNdcActions(ndcQuery,abilityCondition)
+    let verfiedMitigationMap={}
+    let totalCreditIssuance=0
+    let countedActions=[]
+    approvedMitigationActions.data.map(action=>{
+      verfiedMitigationMap[action.id]=action.ndcFinancing
+    })
+    issue.issueAmount.map(action=>{
+      if(countedActions.includes(action.actionId)){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.duplicateMitigationActionIds",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      countedActions.push(action.actionId)
+      if(!verfiedMitigationMap[action.actionId]){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.noVerfiedMitigationActionUnderActionId",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      if(action.issueCredit>verfiedMitigationMap[action.actionId].availableCredits){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.issuedCreditCannotExceedEstMitigationActionCredits",
+            [action.actionId]
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
+      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
+      totalCreditIssuance+=action.issueCredit
+    })
+    
     if (
-      parseFloat(String(programme.creditIssued)) + issue.issueAmount >
+      parseFloat(String(programme.creditIssued)) + totalCreditIssuance >
       programme.creditEst
     ) {
       throw new HttpException(
@@ -3892,10 +4143,20 @@ export class ProgrammeService {
       );
     }
 
-    const issued =
-      parseFloat(String(programme.creditIssued)) + issue.issueAmount;
+    const issued = parseFloat(String(programme.creditIssued)) + totalCreditIssuance;
     programme.creditIssued = issued;
     programme.emissionReductionAchieved = issued;
+
+    for (const actionId in verfiedMitigationMap){
+      await this.ndcActionRepo.update(
+        {
+          id:actionId
+        },
+        {
+          ndcFinancing:verfiedMitigationMap[actionId]
+        }
+      )
+    }
 
     const resp = await this.programmeRepo.update(
       {
@@ -3908,6 +4169,13 @@ export class ProgrammeService {
         txTime: new Date().getTime(),
       }
     );
+    
+    // try{
+    //   const resp = await this.cadtService.issueCredit()
+    // }
+    // catch(error){
+    //   console.log("Issued Credit Added in CAD-Trust")
+    // }
 
     return new DataResponseDto(HttpStatus.OK, programme);
   }
@@ -4046,7 +4314,7 @@ export class ProgrammeService {
               serialNumber: auth.serialNo,
               programmePageLink:
                 hostAddress +
-                `/programmeManagement/view?id=${programme.programmeId}`,
+                `/programmeManagement/view/${programme.programmeId}`,
             },undefined,undefined,undefined,
             {
               filename: 'AUTHORISATION_LETTER.pdf',
@@ -4125,6 +4393,18 @@ export class ProgrammeService {
       );
     }
 
+    const sqlProgram = await this.findById(program.programmeId);
+    if (sqlProgram.cadtId) {
+      updated.cadtId = sqlProgram.cadtId;
+      updated.blockBounds = sqlProgram.blockBounds;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: updated
+        },
+      });
+    }
+
     const authRe: AsyncAction = {
       actionType: AsyncActionType.AuthProgramme,
       actionProps: {
@@ -4166,7 +4446,7 @@ export class ProgrammeService {
             authorisedDate: formattedDate,
             serialNumber: updated.serialNo,
             programmePageLink:
-              hostAddress + `/programmeManagement/view?id=${updated.programmeId}`,
+              hostAddress + `/programmeManagement/view/${updated.programmeId}`,
           }
         );
       });
@@ -4220,6 +4500,16 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
+
+      if (programme.cadtId) {
+        programme.currentStage = ProgrammeStage.REJECTED;
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+            programme: programme
+          },
+        });
+      }
   
       const authRe: AsyncAction = {
         actionType: AsyncActionType.RejectProgramme,
@@ -4253,18 +4543,18 @@ export class ProgrammeService {
         );
       }
 
-      if (user.companyRole === CompanyRole.MINISTRY) {
-        const permission = await this.findPermissionForMinistryUser(
-          user,
-          programme.sectoralScope
-        );
-        if (!permission) {
-          throw new HttpException(
-            this.helperService.formatReqMessagesString("user.userUnAUth", []),
-            HttpStatus.FORBIDDEN
-          );
-        }
-      }
+      // if (user.companyRole === CompanyRole.MINISTRY) {
+      //   const permission = await this.findPermissionForMinistryUser(
+      //     user,
+      //     programme.sectoralScope
+      //   );
+      //   if (!permission) {
+      //     throw new HttpException(
+      //       this.helperService.formatReqMessagesString("user.userUnAUth", []),
+      //       HttpStatus.FORBIDDEN
+      //     );
+      //   }
+      // }
 
       const resp = await this.programmeRepo.update(
         {
@@ -4394,6 +4684,14 @@ export class ProgrammeService {
     return `${user.companyId}#${user.companyName}#${user.id}#${remarks}`;
   };
 
+  private getNdcCreditIssuanceRef = (issueAmount: mitigationIssueProperties[]) =>{
+    let ref =""
+    issueAmount.map(action=>{
+      ref+=`${action.actionId}?${action.issueCredit}&`
+    })
+    return ref.slice(0,-1)
+  }
+
   async queryInvestment(query: QueryDto, abilityCondition: any, user: User) {
     let queryBuilder = await this.investmentViewRepo
       .createQueryBuilder("investment")
@@ -4469,7 +4767,7 @@ export class ProgrammeService {
     }
 
     if (
-      investment.fromCompanyId != requester.companyId
+      investment.initiatorCompanyId != requester.companyId
     ) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(

@@ -164,7 +164,7 @@ export class RegistryClientService {
             authorisedDate: formattedDate,
             serialNumber: actionProps.serialNo,
             programmePageLink:
-              hostAddress + `/programmeManagement/view?id=${actionProps.programmeId}`,
+              hostAddress + `/programmeManagement/view/${actionProps.programmeId}`,
           },undefined,undefined,undefined,
           {
             filename: 'AUTHORISATION_LETTER.pdf',
