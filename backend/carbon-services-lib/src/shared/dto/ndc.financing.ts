@@ -19,10 +19,10 @@ export class NdcFinancing {
     @ApiPropertyOptional()
     @IsOptional()
     @IsNumber()
-    issuedCredits?: number
+    issuedCredits: number
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsNumber()
-    availableCredits?: number
+    availableCredits: number
 }
