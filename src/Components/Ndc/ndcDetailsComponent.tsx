@@ -61,6 +61,26 @@ export const NdcDetailsComponent = (props: any) => {
         })
       : [];
 
+  const getSubNdcDetailsForPeriod = (id: number) => {
+    const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
+      return (
+        ndcDetail.parentActionId === id &&
+        ndcDetail.actionType === NdcActionType.subAction
+      );
+    });
+
+    const emptySubNdcRow = {
+      actionType: NdcActionType.subAction,
+      nationalPlanObjective: "",
+      kpi: 0,
+      ministryName: governmentMinistry,
+      status: NdcDetailsActionStatus.pending,
+      parentActionId: id,
+    };
+
+    return [...subNdcDetails, emptySubNdcRow];
+  };
+
   const isAddNdcActionVisible = () => {
     return (
       userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
@@ -111,7 +131,6 @@ export const NdcDetailsComponent = (props: any) => {
   }
 
   const handleSave = async (row: any) => {
-    console.log("handleSave", row);
     const updatedItemIndex = ndcDetailsData.findIndex(
       (item: NdcDetail) => item.id === row.id
     );
@@ -120,115 +139,13 @@ export const NdcDetailsComponent = (props: any) => {
         ...row,
         kpi: parseInt(row.kpi),
       });
-      console.log("handleSave created", response);
     } else {
       const response = await put("national/programme/updateNdcDetailsAction", {
         ...row,
         kpi: parseInt(row.kpi),
       });
-      console.log("handleSave updated", response);
     }
     fetchNdcDetailActions();
-
-    // setNdcDetailsData((prevData: any) => {
-    //   const newData = JSON.parse(JSON.stringify(prevData));
-    //   if (row.type === NdcActionType.mainAction) {
-    //     const index = newData.findIndex((item: any) => row.key === item.key);
-    //     if (index !== -1) {
-    //       newData[index] = { ...newData[index], ...row };
-    //     }
-    //   } else {
-    //     const parentIndex = newData.findIndex(
-    //       (item: any) => row.ndcActionId === item.key
-    //     );
-    //     const parentItem = newData[parentIndex];
-
-    //     if (parentItem) {
-    //       if (parentItem.subNdcDetails) {
-    //         const itemIndex = parentItem.subNdcDetails.findIndex(
-    //           (item: any) => row.key === item.key
-    //         );
-
-    //         if (itemIndex === -1) {
-    //           parentItem.subNdcDetails.push(row);
-    //         } else {
-    //           parentItem.subNdcDetails[itemIndex] = { ...row };
-    //         }
-    //       } else {
-    //         parentItem.subNdcDetails = [row];
-    //       }
-    //     }
-
-    //     newData[parentIndex] = { ...parentItem };
-    //     setTableKey((key: any) => key + 1);
-    //   }
-    //   return newData;
-    // });
-  };
-
-  // const getNdcDetailsForPeriod = () => {
-  //   //const range = selectedPeriod.split("-");
-  //   const range: any = [];
-  //   if (range.length > 1) {
-  //     const filteredData = ndcDetailsData.filter((item: NdcDetail) => {
-  //       return inRange(
-  //         Number(moment(item.startDate).year()),
-  //         Number(range[0]),
-  //         Number(range[1])
-  //       );
-  //     });
-  //     return filteredData;
-  //   } else {
-  //     return [];
-  //   }
-  // };
-
-  const getSubNdcDetailsForPeriod = (id: number) => {
-    const ndcDetail = ndcDetailsData.find((item: NdcDetail) => item.id === id);
-    const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
-      return (
-        ndcDetail.parentActionId === id &&
-        ndcDetail.actionType === NdcActionType.subAction
-      );
-    });
-
-    const emptySubNdcRow = {
-      actionType: NdcActionType.subAction,
-      nationalPlanObjective: "",
-      kpi: 0,
-      ministryName: governmentMinistry,
-      status: NdcDetailsActionStatus.pending,
-      parentActionId: id,
-    };
-
-    return [...subNdcDetails, emptySubNdcRow];
-
-    // if (ndcDetail) {
-    //   if (
-    //     ndcDetail?.subNdcDetails[
-    //       ndcDetail?.subNdcDetails?.length - 1
-    //     ]?.ministryName.trim() !== "" &&
-    //     ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
-    //       ?.ministryName &&
-    //     ndcDetail?.subNdcDetails[
-    //       ndcDetail?.subNdcDetails?.length - 1
-    //     ]?.nationalPlanObjective.trim() !== "" &&
-    //     ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
-    //       ?.nationalPlanObjective &&
-    //     String(
-    //       ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
-    //     ).trim() !== "" &&
-    //     String(
-    //       ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
-    //     )
-    //   ) {
-    //     onAddNewSubNdcDetail();
-    //   }
-    //   return ndcDetail.subNdcDetails;
-    // } else {
-    //   return [];
-    // }
-    //return [];
   };
 
   const defaultColumns: any = [
@@ -337,7 +254,6 @@ export const NdcDetailsComponent = (props: any) => {
 
       if (response && response.data) {
         const newlyCreatedNdcAction = response.data;
-        newlyCreatedNdcAction.key = newlyCreatedNdcAction.id;
         setNdcDetailsData((ndcDetailsData: NdcDetail[]) => [
           ...ndcDetailsData,
           newlyCreatedNdcAction,
@@ -374,6 +290,7 @@ export const NdcDetailsComponent = (props: any) => {
           <Col span={24}>
             <Table
               key={tableKey}
+              rowKey="id"
               components={components}
               rowClassName={() => "editable-row"}
               bordered
@@ -501,6 +418,7 @@ export const NdcDetailsComponent = (props: any) => {
     selectedNdcDetail.current = record;
     return (
       <Table
+        rowKey="id"
         components={components}
         rowClassName={() => "editable-row"}
         bordered
@@ -550,13 +468,7 @@ export const NdcDetailsComponent = (props: any) => {
   const fetchNdcDetailActions = async () => {
     const response = await get("national/programme/queryNdcDetailsAction");
     if (response && response.data) {
-      const updatedData = response.data.map((item: NdcDetail) => {
-        return {
-          ...item,
-          key: item.id,
-        };
-      });
-      setNdcDetailsData(updatedData);
+      setNdcDetailsData(response.data);
     }
   };
 
