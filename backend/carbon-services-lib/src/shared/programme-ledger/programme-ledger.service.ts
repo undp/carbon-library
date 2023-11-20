@@ -209,7 +209,7 @@ export class ProgrammeLedgerService {
             );
           }
           if (
-            (currentCredit[transfer.fromCompanyId] -
+            this.helperService.halfUpToPrecision(currentCredit[transfer.fromCompanyId] -
               frozenCredit[transfer.fromCompanyId]) <
             transfer.creditAmount
           ) {
@@ -279,7 +279,7 @@ export class ProgrammeLedgerService {
           else if (programme.creditRetired.length!==programme.creditOwnerPercentage.length && programme.creditRetired.length<programme.creditOwnerPercentage.length){
             programme.creditRetired.push(...new Array(programme.creditOwnerPercentage.length-programme.creditRetired.length).fill(0))
           }
-          programme.creditRetired[compIndex] += transfer.creditAmount;
+          programme.creditRetired[compIndex] = this.helperService.halfUpToPrecision(programme.creditRetired[compIndex] + transfer.creditAmount);
         } else {
           programme.txType = TxType.TRANSFER;
           if (!programme.creditTransferred) {
@@ -287,7 +287,7 @@ export class ProgrammeLedgerService {
               programme.creditOwnerPercentage.length
             ).fill(0);
           }
-          programme.creditTransferred[compIndex] += transfer.creditAmount;
+          programme.creditTransferred[compIndex] = this.helperService.halfUpToPrecision(programme.creditTransferred[compIndex] + transfer.creditAmount);
         }
         programme.creditChange = transfer.creditAmount;
         programme.creditBalance = this.helperService.halfUpToPrecision(programme.creditBalance - transfer.creditAmount);
@@ -1017,7 +1017,7 @@ export class ProgrammeLedgerService {
           programme.creditIssued = 0;
           // programme.creditPending = 0
         } else {
-          programme.creditIssued = issueCredit;
+          programme.creditIssued = this.helperService.halfUpToPrecision(issueCredit);
           // programme.creditPending = programme.creditEst - issueCredit;
         }
         programme.creditBalance = programme.creditIssued;
@@ -1168,17 +1168,17 @@ export class ProgrammeLedgerService {
         programme.txTime = new Date().getTime();
 
         if (!issueCredit) {
-          programme.creditChange = programme.creditEst - programme.creditIssued;
+          programme.creditChange = this.helperService.halfUpToPrecision(programme.creditEst - programme.creditIssued);
           programme.creditIssued = programme.creditEst;
           // programme.creditPending = 0
         } else {
-          programme.creditIssued += issueCredit;
+          programme.creditIssued = this.helperService.halfUpToPrecision(programme.creditIssued + issueCredit);
           programme.creditChange = issueCredit;
           // programme.creditPending = programme.creditEst - issueCredit;
         }
         programme.emissionReductionAchieved = programme.creditIssued
         const currentTotalBalance = programme.creditBalance;
-        programme.creditBalance += programme.creditChange;
+        programme.creditBalance =this.helperService.halfUpToPrecision(programme.creditBalance + programme.creditChange);
         programme.txRef = user;
         programme.txType = TxType.ISSUE;
         updatedProgramme = programme;
@@ -1296,7 +1296,7 @@ export class ProgrammeLedgerService {
           const index = programme.companyId.indexOf(company.companyId);
           const freezeCredit =
             this.helperService.halfUpToPrecision((issueAmount * programme.creditOwnerPercentage[index]) / 100);
-          programme.creditFrozen[index] += freezeCredit;
+          programme.creditFrozen[index] = this.helperService.halfUpToPrecision(programme.creditFrozen[index] + freezeCredit);
           programme.creditChange = freezeCredit;
 
           (programme.txTime = new Date().getTime()),
@@ -1607,11 +1607,11 @@ export class ProgrammeLedgerService {
               if (!ownershipPercentage[investor]) {
                 ownershipPercentage[investor] = 0
               }
-              ownershipPercentage[investor] += this.helperService.halfUpToPrecision((investorCredit * 100 / programme.creditBalance),6)
+              ownershipPercentage[investor] = this.helperService.halfUpToPrecision((ownershipPercentage[investor]+(investorCredit * 100 / programme.creditBalance)),6)
               ownershipPercentage[owner] = this.helperService.halfUpToPrecision(((ownerCreditAmount - investorCredit) * 100 / programme.creditBalance),6)
             } else {
               if (ownershipPercentage[companyIds[j]]) {
-                ownershipPercentage[companyIds[j]] += programme.creditOwnerPercentage[j]  
+                ownershipPercentage[companyIds[j]] = this.helperService.halfUpToPrecision((ownershipPercentage[companyIds[j]] + programme.creditOwnerPercentage[j]) ,6) 
               } else {
                 ownershipPercentage[companyIds[j]] = programme.creditOwnerPercentage[j]
               }
