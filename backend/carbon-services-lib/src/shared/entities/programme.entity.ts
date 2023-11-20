@@ -151,6 +151,16 @@ export class Programme implements EntitySubject {
   @Column({ nullable: true })
   cadtId: string;
 
+  // @Column("string", { array: true, nullable: true  })
+  // cadtUnitId: string[];
+
+  @Column({
+    type: "jsonb",
+    array: false,
+    nullable: true,
+  })
+  blockBounds: any;
+
   @Column({ unique: true, nullable: true })
   environmentalAssessmentRegistrationNo: string;
 

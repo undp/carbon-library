@@ -14,5 +14,4 @@ export enum AsyncActionType {
   CADTCreditIssue,
   CADTCertify,
   CADTTransferCredit,
-  CADTRetireCredit,
 }
