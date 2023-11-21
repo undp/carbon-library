@@ -240,7 +240,7 @@
         .ant-input-number {
             height: 40px;
             width: 50px;
-            margin-left: 25%;
+            margin-left: 35%;
         }
     }
 
@@ -286,6 +286,9 @@
           color: $primary-color;
           margin-right: 1rem;
         }
+        .submit-btn {
+            margin-right: 1rem;
+          }
         .back-btn {
           border: 1px solid $border-default-btn;
           color: $border-default-btn;
@@ -293,6 +296,15 @@
         }
         .mg-left-1 {
           margin-left: 1rem;
+        }
+      }
+
+      @media only screen and (max-width: 1600px) {
+        .panel-content-input-box-row {
+    
+            .ant-input-number {
+                margin-left: 30%;
+            }
         }
       }
     

@@ -63,4 +63,7 @@ export class Projection implements EntitySubject {
 
   @Column({ type: 'timestamptz', nullable: true })
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  remarks: string;
 }

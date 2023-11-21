@@ -1,22 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  ArrayMinSize,
-  IsArray,
-  IsEnum,
   IsInt,
   IsNotEmpty,
-  IsNotEmptyObject,
-  IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { SectoralScope } from '@undp/serial-number-gen';
-import { ProgrammeProperties } from './programme.properties';
-import { Sector } from '../enum/sector.enum';
 import { Type } from 'class-transformer';
-import { NDCActionDto } from './ndc.action.dto';
 import { EmissionEnergyEmissions } from './emission.energy.emissions';
 import { EmissionIndustrialProcessesProductUse } from './emission.industrial.processes.product.use';
 import { EmissionAgricultureForestryOtherLandUse } from './emission.agriculture.forestry.other.land.use';
@@ -74,4 +63,8 @@ export class EmissionDto {
   @IsString()
   @IsNotEmpty()
   state: string;
+
+  @ApiPropertyOptional()
+  @IsInt()
+  version: number;
 }

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -62,4 +63,8 @@ export class ProjectionDto {
   @IsString()
   @IsNotEmpty()
   state: string;
+
+  @ApiPropertyOptional()
+  @IsInt()
+  version: number;
 }

@@ -52,6 +52,13 @@ export class GhgProjectionsService {
                 );
             }
 
+            if (projectionDto.version !== result[0].version) {
+                throw new HttpException(
+                    this.helperService.formatReqMessagesString("ghgInventory.notTheLatestVersion", []),
+                    HttpStatus.CONFLICT
+                );
+            }
+
             const version = result[0].version + 1;
             projection.id = result[0]?.id;
             if (projectionDto.emissionDocument) {
@@ -78,7 +85,8 @@ export class GhgProjectionsService {
                             state: projection.state,
                             emissionDocument: projection.emissionDocument,
                             version: version,
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
+                            remarks: projection.remarks
                         });
                     await em.save<ProjectionEvent>(this.toProjectionEvent(projection, user));
                     return updatedData;

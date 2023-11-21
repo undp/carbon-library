@@ -53,6 +53,13 @@ export class GhgEmissionsService {
                 );
             }
 
+            if (emissionDto.version !== result[0].version) {
+                throw new HttpException(
+                    this.helperService.formatReqMessagesString("ghgInventory.notTheLatestVersion", []),
+                    HttpStatus.CONFLICT
+                );
+            }
+
             const version = result[0].version + 1;
             emission.id = result[0]?.id;
             if (emissionDto.emissionDocument) {
@@ -79,7 +86,8 @@ export class GhgEmissionsService {
                             state: emission.state,
                             emissionDocument: emission.emissionDocument,
                             version: version,
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
+                            remarks: emission.remarks
                         });
                     await em.save<EmissionEvent>(this.toEmissionEvent(emission, user));
                     return updatedData;

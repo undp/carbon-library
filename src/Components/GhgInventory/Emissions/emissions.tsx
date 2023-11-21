@@ -21,6 +21,7 @@ import {
   MinusCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import moment from 'moment';
@@ -31,7 +32,9 @@ import { EmissionSectors, formFields } from '../emission.mappings';
 import { CompanyRole } from '../../../Definitions';
 import { HttpStatusCode } from 'axios';
 import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesConfirmationModel';
-// import React from 'react';
+import { ClipboardCheck } from 'react-bootstrap-icons';
+import { GHGRecordState } from '../../../Definitions/Enums/ghg.record.state.enum';
+import GHGUserActionConfirmationModel from '../../Common/Models/ghgUserActionConfirmationModel';
 
 export const GHGEmissionsComponent = (props: any) => {
   const {
@@ -107,6 +110,11 @@ export const GHGEmissionsComponent = (props: any) => {
   const [otherCo2Eq, setOtherCo2Eq] = useState<number>(0);
 
   const [isSavedFormDataSet, setIsSavedFormDataSet] = useState<boolean>(false);
+  const [formDataVersion, setFormDataVersion] = useState(1);
+  const [isFormChanged, setIsFormChanged] = useState(false);
+
+  const [openSaveFormModal, setOpenSaveFormModal] = useState(false);
+  const [openFinalizeFormModal, setOpenFinalizeFormModal] = useState(false);
   const [openResetFormModal, setOpenResetFormModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<any>('');
   const [actionInfo, setActionInfo] = useState<any>({});
@@ -217,20 +225,8 @@ export const GHGEmissionsComponent = (props: any) => {
   };
 
   useEffect(() => {
-    console.log('++++++++++++++data', data);
     const hasSaveState = data.some((item: any) => item.state === 'SAVED');
-    console.log('++++++++++++++hasSaveState', hasSaveState);
-    // const years = data.map((item: any) => !(item.state === 'SAVED') && item.year);
-    // console.log('++++++++++++++data, years', data, years);
-    console.log(uploadedFileName);
     setIsPendingFinalization(hasSaveState);
-    // Update 'disabledYears' only if 'years' array has changed
-    // setDisabledYears((prevYears) => {
-    //   if (JSON.stringify(prevYears) !== JSON.stringify(years)) {
-    //     return years;
-    //   }
-    //   return prevYears;
-    // });
   }, [data, uploadedFileName]);
 
   const handleYearChange = (date: any, dateString: string) => {
@@ -253,12 +249,18 @@ export const GHGEmissionsComponent = (props: any) => {
     return sum;
   }
 
-  const onValuesChange = (changedValues2: any, allValues: any) => {
+  const onValuesChange = (changedValues: any, allValues: any) => {
     // Track the changed values
-    setChangedValues((prevChangedValues: any) => ({
-      ...prevChangedValues,
-      ...changedValues2,
-    }));
+    let initialValues = null;
+    if (isPendingFinalization) {
+      const savedData = data.filter((item: any) => item.state === 'SAVED');
+      initialValues = savedData[0];
+    }
+    const currentValues = form.getFieldsValue(true);
+    const isChanged = !(
+      JSON.stringify(currentValues) === JSON.stringify(initialValues)
+    );
+    setIsFormChanged(isChanged);
   };
 
   const getBase64 = (file: RcFile): Promise<string> =>
@@ -269,7 +271,7 @@ export const GHGEmissionsComponent = (props: any) => {
       reader.onerror = (error) => reject(error);
     });
 
-  const createSaveRequestPayload = async (fields: any) => {
+  const createSaveRequestPayload = async (fields: any, remarks: string, status: GHGRecordState) => {
     let requestBody: any = {};
     const savedEmission = {
       year: fields?.year.year(),
@@ -481,7 +483,9 @@ export const GHGEmissionsComponent = (props: any) => {
         n2o: fields?.totalCo2WithLand_n2o,
         co2eq: fields?.totalCo2WithLand_co2eq,
       },
-      state: 'SAVED',
+      state: status,
+      remarks,
+      version: formDataVersion,
     };
     requestBody = savedEmission;
     if (fields?.emissionsDocument) {
@@ -495,6 +499,45 @@ export const GHGEmissionsComponent = (props: any) => {
     return requestBody;
   };
 
+  const clearForm = () => {
+    form.resetFields();
+
+    setFuelCombustionActivitiesCo2(0);
+    setFuelCombustionActivitiesCh4(0);
+    setFuelCombustionActivitiesN2o(0);
+    setFuelCombustionActivitiesCo2Eq(0);
+
+    setFugitiveEmissionsFromFuelsCo2(0);
+    setFugitiveEmissionsFromFuelsCh4(0);
+    setFugitiveEmissionsFromFuelsN2o(0);
+    setFugitiveEmissionsFromFuelsCo2Eq(0);
+
+    setCarbonDioxideTransportStorageCo2(0);
+    setCarbonDioxideTransportStorageCh4(0);
+    setCarbonDioxideTransportStorageN2o(0);
+    setCarbonDioxideTransportStorageCo2Eq(0);
+
+    setIndustrialProcessesProductUseCo2(0);
+    setIndustrialProcessesProductUseCh4(0);
+    setIndustrialProcessesProductUseN2o(0);
+    setIndustrialProcessesProductUseCo2Eq(0);
+
+    setAgricultureForestryOtherLandUseCo2(0);
+    setAgricultureForestryOtherLandUseCh4(0);
+    setAgricultureForestryOtherLandUseN2o(0);
+    setAgricultureForestryOtherLandUseCo2Eq(0);
+
+    setWasteCo2(0);
+    setWasteCh4(0);
+    setWasteN2o(0);
+    setWasteCo2Eq(0);
+
+    setOtherCo2(0);
+    setOtherCh4(0);
+    setOtherN2o(0);
+    setOtherCo2Eq(0);
+  }
+
   const resetForm = async () => {
     // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     await getEmissionData();
@@ -502,50 +545,21 @@ export const GHGEmissionsComponent = (props: any) => {
     setIsSavedFormDataSet(false);
     clearUploadDoc();
     if (!isPendingFinalization) {
-      form.resetFields();
-
-      setFuelCombustionActivitiesCo2(0);
-      setFuelCombustionActivitiesCh4(0);
-      setFuelCombustionActivitiesN2o(0);
-      setFuelCombustionActivitiesCo2Eq(0);
-
-      setFugitiveEmissionsFromFuelsCo2(0);
-      setFugitiveEmissionsFromFuelsCh4(0);
-      setFugitiveEmissionsFromFuelsN2o(0);
-      setFugitiveEmissionsFromFuelsCo2Eq(0);
-
-      setCarbonDioxideTransportStorageCo2(0);
-      setCarbonDioxideTransportStorageCh4(0);
-      setCarbonDioxideTransportStorageN2o(0);
-      setCarbonDioxideTransportStorageCo2Eq(0);
-
-      setIndustrialProcessesProductUseCo2(0);
-      setIndustrialProcessesProductUseCh4(0);
-      setIndustrialProcessesProductUseN2o(0);
-      setIndustrialProcessesProductUseCo2Eq(0);
-
-      setAgricultureForestryOtherLandUseCo2(0);
-      setAgricultureForestryOtherLandUseCh4(0);
-      setAgricultureForestryOtherLandUseN2o(0);
-      setAgricultureForestryOtherLandUseCo2Eq(0);
-
-      setWasteCo2(0);
-      setWasteCh4(0);
-      setWasteN2o(0);
-      setWasteCo2Eq(0);
-
-      setOtherCo2(0);
-      setOtherCh4(0);
-      setOtherN2o(0);
-      setOtherCo2Eq(0);
+      clearForm();
     }
+    message.open({
+      type: 'success',
+      content: t('ghgInventory:formCancelledSuccess'),
+      duration: 4,
+      style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+    });
   };
 
   const onResetFormCanceled = () => {
     setOpenResetFormModal(false);
   };
 
-  const onResetFormModel = () => {
+  const onOpenResetFormModel = () => {
     setActionInfo({
       action: `${t('ghgInventory:proceed')}`,
       headerText: `${t('ghgInventory:discardHeaderText')}`,
@@ -556,36 +570,91 @@ export const GHGEmissionsComponent = (props: any) => {
     setOpenResetFormModal(true);
   };
 
-  const onSubmitForm = async (values: any) => {
+  const onSaveFormCanceled = () => {
+    setOpenSaveFormModal(false);
+  };
+
+  const onOpenSaveFormModel = () => {
+    if (!isFormChanged) {
+      message.open({
+        type: 'error',
+        content: t('ghgInventory:formNotChanged'),
+        duration: 4,
+        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+      });
+    } else {
+      setActionInfo({
+        action: `${t("ghgInventory:submit")}`,
+        headerText: `${t("ghgInventory:submitModelHeader")}`,
+        type: "primary",
+        icon: <CheckCircleOutlined />,
+      });
+      setErrorMsg('');
+      setOpenSaveFormModal(true);
+    }
+  };
+
+  const onFinalizeFormCanceled = () => {
+    setOpenFinalizeFormModal(false);
+  };
+
+  const onOpenFinalizeFormModel = () => {
+    setActionInfo({
+      action: `${t("ghgInventory:finalize")}`,
+      headerText: `${t("ghgInventory:finalizeModelHeader")}`,
+      type: "primary",
+      icon: <ClipboardCheck />,
+    });
+    setErrorMsg('');
+    setOpenFinalizeFormModal(true);
+  };
+
+  const onSubmitForm = async (remarks: string, status: GHGRecordState) => {
     const fields = form.getFieldsValue(true);
-    const payload = await createSaveRequestPayload(fields);
+    const payload = await createSaveRequestPayload(fields, remarks, status);
     setLoading(true);
     try {
       const response: any = await post('national/emissions', payload);
       console.log('Emission creation -> ', response);
       if (response?.statusText === 'SUCCESS') {
+
+        setOpenSaveFormModal(false);
+        let messageContent = response?.status == HttpStatusCode.Created ?
+          t('ghgInventory:emissionCreationSuccess')
+          : t('ghgInventory:emissionUpdateSuccess');
+
+        if (status === GHGRecordState.FINALIZED) {
+          clearUploadDoc();
+          clearForm();
+          messageContent = t('ghgInventory:emissionFinalizedSuccess');
+        }
+        setOpenFinalizeFormModal(false);
         message.open({
           type: 'success',
-          content:
-            // eslint-disable-next-line eqeqeq
-            response?.status == HttpStatusCode.Created
-              ? t('ghgInventory:emissionCreationSuccess')
-              : t('ghgInventory:emissionUpdateSuccess'),
+          content: messageContent,
           duration: 4,
           style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
         });
+        clearUploadDoc();
+        await getEmissionData();
       }
     } catch (error: any) {
       console.log('Error in emission creation - ', error);
+      setOpenSaveFormModal(false);
+      setOpenFinalizeFormModal(false);
       message.open({
         type: 'error',
         content: error?.message,
         duration: 4,
         style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
       });
+      if (error.statusCode == HttpStatusCode.Conflict) {
+        await getEmissionData();
+        clearUploadDoc();
+      }
     } finally {
       // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
-      await getEmissionData();
+      setIsFormChanged(false);
       setLoading(false);
     }
   };
@@ -607,6 +676,7 @@ export const GHGEmissionsComponent = (props: any) => {
         style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
       });
     } finally {
+      setIsFormChanged(false);
       setLoading(false);
     }
   };
@@ -614,7 +684,6 @@ export const GHGEmissionsComponent = (props: any) => {
   useEffect(() => {
     const fetchData = async () => {
       await getEmissionData();
-      //   setIsPendingFinalization(data.some((item: any) => item.state === 'SAVED'));
     };
 
     fetchData();
@@ -734,13 +803,16 @@ export const GHGEmissionsComponent = (props: any) => {
   };
 
   useEffect(() => {
-    // if (isPendingFinalization) {
+    const savedData = data.filter((item: any) => item.state === 'SAVED');
     if (!isSavedFormDataSet) {
-      const savedData = data.filter((item: any) => item.state === 'SAVED');
       if (savedData && savedData.length > 0) {
         setFormValues(savedData[0]);
       }
     }
+    if (savedData && savedData.length > 0) {
+      setFormDataVersion(savedData[0].version);
+    }
+    console.log("data changed - version updated2? = ", formDataVersion);
     const years: number[] = data
       .filter((item: any) => !(item.state === 'SAVED' && item.year)) // Filter out items where state is not 'SAVED'
       .map((item: any) => parseInt(item.year));
@@ -795,17 +867,17 @@ export const GHGEmissionsComponent = (props: any) => {
   useEffect(() => {
     setTotalNationalCo2(
       energyEmissionsCo2 +
-        industrialProcessesProductUseCo2 +
-        agricultureForestryOtherLandUseCo2 +
-        wasteCo2 +
-        otherCo2
-    );
-  }, [
-    energyEmissionsCo2 +
       industrialProcessesProductUseCo2 +
       agricultureForestryOtherLandUseCo2 +
       wasteCo2 +
-      otherCo2,
+      otherCo2
+    );
+  }, [
+    energyEmissionsCo2 +
+    industrialProcessesProductUseCo2 +
+    agricultureForestryOtherLandUseCo2 +
+    wasteCo2 +
+    otherCo2,
   ]);
 
   useEffect(() => {
@@ -821,17 +893,17 @@ export const GHGEmissionsComponent = (props: any) => {
   useEffect(() => {
     setTotalNationalCh4(
       energyEmissionsCh4 +
-        industrialProcessesProductUseCh4 +
-        agricultureForestryOtherLandUseCh4 +
-        wasteCh4 +
-        otherCh4
-    );
-  }, [
-    energyEmissionsCh4 +
       industrialProcessesProductUseCh4 +
       agricultureForestryOtherLandUseCh4 +
       wasteCh4 +
-      otherCh4,
+      otherCh4
+    );
+  }, [
+    energyEmissionsCh4 +
+    industrialProcessesProductUseCh4 +
+    agricultureForestryOtherLandUseCh4 +
+    wasteCh4 +
+    otherCh4,
   ]);
 
   useEffect(() => {
@@ -847,24 +919,24 @@ export const GHGEmissionsComponent = (props: any) => {
   useEffect(() => {
     setTotalNationalN2o(
       energyEmissionsN2o +
-        industrialProcessesProductUseN2o +
-        agricultureForestryOtherLandUseN2o +
-        wasteN2o +
-        otherN2o
-    );
-  }, [
-    energyEmissionsN2o +
       industrialProcessesProductUseN2o +
       agricultureForestryOtherLandUseN2o +
       wasteN2o +
-      otherN2o,
+      otherN2o
+    );
+  }, [
+    energyEmissionsN2o +
+    industrialProcessesProductUseN2o +
+    agricultureForestryOtherLandUseN2o +
+    wasteN2o +
+    otherN2o,
   ]);
 
   useEffect(() => {
     setEnergyEmissionsCo2Eq(
       fuelCombustionActivitiesCo2Eq +
-        fugitiveEmissionsFromFuelsCo2Eq +
-        carbonDioxideTransportStorageCo2Eq
+      fugitiveEmissionsFromFuelsCo2Eq +
+      carbonDioxideTransportStorageCo2Eq
     );
   }, [
     fuelCombustionActivitiesCo2Eq,
@@ -875,17 +947,17 @@ export const GHGEmissionsComponent = (props: any) => {
   useEffect(() => {
     setTotalNationalCo2Eq(
       energyEmissionsCo2Eq +
-        industrialProcessesProductUseCo2Eq +
-        agricultureForestryOtherLandUseCo2Eq +
-        wasteCo2Eq +
-        otherCo2Eq
-    );
-  }, [
-    energyEmissionsCo2Eq +
       industrialProcessesProductUseCo2Eq +
       agricultureForestryOtherLandUseCo2Eq +
       wasteCo2Eq +
-      otherCo2Eq,
+      otherCo2Eq
+    );
+  }, [
+    energyEmissionsCo2Eq +
+    industrialProcessesProductUseCo2Eq +
+    agricultureForestryOtherLandUseCo2Eq +
+    wasteCo2Eq +
+    otherCo2Eq,
   ]);
 
   const calculateSumCo2 = (event: any, panelHeading: any) => {
@@ -1371,197 +1443,197 @@ export const GHGEmissionsComponent = (props: any) => {
           <Tabs defaultActiveKey="Add New" centered>
             {(userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
               userInfoState?.companyRole === CompanyRole.MINISTRY) && (
-              <Tabs.TabPane key="Add New" tab={t(`ghgInventory:addNew`)}>
-                <div>
-                  <Form
-                    labelCol={{ span: 20 }}
-                    wrapperCol={{ span: 24 }}
-                    name="add-emission"
-                    className="programme-details-form"
-                    layout="vertical"
-                    requiredMark={true}
-                    form={form}
-                    onValuesChange={onValuesChange}
-                    onFinish={onSubmitForm}
-                  >
-                    <Row>
-                      <Col xl={12} md={12} className="add-new-year-picker-col">
-                        <div>
-                          <Form.Item
-                            label={t('ghgInventory:year')}
-                            name="year"
-                            rules={[
-                              {
-                                required: true,
-                                message: '',
-                              },
-                              {
-                                validator: async (rule, value) => {
-                                  if (
-                                    String(value).trim() === '' ||
-                                    String(value).trim() === undefined ||
-                                    value === null ||
-                                    value === undefined
-                                  ) {
-                                    throw new Error(`${t('ghgInventory:year')} ${t('isRequired')}`);
-                                  }
-                                },
-                              },
-                            ]}
-                          >
-                            <DatePicker
-                              onChange={handleYearChange}
-                              picker="year"
-                              disabledDate={isYearDisabled}
-                              size="large"
-                              disabled={isPendingFinalization}
-                            />
-                          </Form.Item>
-                        </div>
-                      </Col>
-                      <Col xl={12} md={12} className="add-new-upload-file-col">
-                        <Row className="add-new-upload-file-label">
-                          {t(`ghgInventory:emissionRemovalDocument`)}
-                        </Row>
-                        <Row>
-                          <Col xl={5} md={5} className="add-new-upload-file-inner-col">
-                            <Form.Item
-                              name="emissionsDocument"
-                              valuePropName="fileList"
-                              getValueFromEvent={normFile}
-                              required={true}
-                            >
-                              <Upload
-                                accept=".xlsx"
-                                showUploadList={false}
-                                beforeUpload={(file) => {
-                                  if (!checkFile(file)) {
-                                    message.open({
-                                      type: 'error',
-                                      content: t('ghgInventory:invalidFileType'),
-                                      duration: 4,
-                                      style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
-                                    });
-                                    return false;
-                                  }
-                                  // show an error message in UI
-                                  const reader = new FileReader();
-                                  reader.onload = (e) => {
-                                    const xldata = e.target?.result;
-                                    if (xldata) {
-                                      try {
-                                        const workbook = XLSX.read(xldata, { type: 'array' });
-                                        const sheetName = workbook.SheetNames[0];
-                                        const sheet = workbook.Sheets[sheetName];
-
-                                        const firstRow = XLSX.utils.sheet_to_json(sheet, {
-                                          header: 1,
-                                        })[0];
-                                        if (!validateExcelDataFormat(firstRow)) {
-                                          message.open({
-                                            type: 'error',
-                                            content: t('ghgInventory:invalidDataInExcel'),
-                                            duration: 4,
-                                            style: {
-                                              textAlign: 'right',
-                                              marginRight: 15,
-                                              marginTop: 10,
-                                            },
-                                          });
-                                          return false;
-                                        }
-                                        const excelData = XLSX.utils.sheet_to_json(sheet);
-                                        handleFileUploadData(excelData);
-                                        setUploadedFileName(file.name);
-                                      } catch (error) {
-                                        console.log(error, 'error', file);
-                                      }
-                                    }
-                                  };
-                                  reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for Excel files
-
-                                  // Prevent upload
-                                  return false;
-                                }}
-                              >
-                                <Button icon={<UploadOutlined />}>
-                                  {t(`ghgInventory:upload`)}
-                                </Button>
-                              </Upload>
-                            </Form.Item>
-                          </Col>
-                          <Col xl={16} md={16} className="add-new-upload-file-name-input">
-                            <Input
-                              value={uploadedFileName}
-                              readOnly
-                              suffix={
-                                uploadedFileName && (
-                                  <Button
-                                    onClick={clearUploadDoc}
-                                    icon={<DeleteOutlined />}
-                                    style={{ marginRight: '-10px', padding: '0px 6px' }}
-                                  />
-                                )
-                              }
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={16}>
-                      <Col span={9} offset={12}>
-                        <Row gutter={16} className="table-heading-row">
-                          <Col xl={6} className="table-heading-col">
-                            CO<sub>2</sub>
-                          </Col>
-                          <Col xl={6} className="table-heading-col">
-                            CH<sub>4</sub>
-                          </Col>
-                          <Col xl={6} className="table-heading-col">
-                            N<sub>2</sub>O
-                          </Col>
-                          <Col xl={6} className="table-heading-col">
-                            CO<sub>2</sub>-eq
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} className="total-emission-row">
-                      <Col xl={12} md={12}>
-                        <span className="total-emission-title">
-                          {t(`ghgInventory:totalNationalEmission`)}
-                        </span>
-                      </Col>
-                      <Col xl={9} md={9}>
-                        <Row gutter={16} className="total-emission-value-col">
-                          <Col xl={6}>
-                            <div className="co2-total-pill">{totalNationalCo2}</div>
-                          </Col>
-                          <Col xl={6}>
-                            <div className="ch4-total-pill">{totalNationalCh4}</div>
-                          </Col>
-                          <Col xl={6}>
-                            <div className="n2o-total-pill">{totalNationalN2o}</div>
-                          </Col>
-                          <Col xl={6}>
-                            <div className="co2eq-total-pill">{totalNationalCo2Eq}</div>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Collapse
-                      ghost
-                      expandIcon={({ isActive }) =>
-                        isActive ? <MinusCircleOutlined /> : <PlusCircleOutlined />
-                      }
+                <Tabs.TabPane key="Add New" tab={t(`ghgInventory:addNew`)}>
+                  <div>
+                    <Form
+                      labelCol={{ span: 20 }}
+                      wrapperCol={{ span: 24 }}
+                      name="add-emission"
+                      className="programme-details-form"
+                      layout="vertical"
+                      requiredMark={true}
+                      form={form}
+                      onValuesChange={onValuesChange}
+                      onFinish={onOpenSaveFormModel}
                     >
-                      {Object.entries(formFields).map(([panelHeading, panelContent]) => (
-                        <Panel header={renderPanelHeader(panelHeading)} key={panelHeading}>
-                          {Array.isArray(panelContent)
-                            ? panelContent.map((item, index) =>
+                      <Row>
+                        <Col xl={12} md={12} className="add-new-year-picker-col">
+                          <div>
+                            <Form.Item
+                              label={t('ghgInventory:year')}
+                              name="year"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: '',
+                                },
+                                {
+                                  validator: async (rule, value) => {
+                                    if (
+                                      String(value).trim() === '' ||
+                                      String(value).trim() === undefined ||
+                                      value === null ||
+                                      value === undefined
+                                    ) {
+                                      throw new Error(`${t('ghgInventory:year')} ${t('isRequired')}`);
+                                    }
+                                  },
+                                },
+                              ]}
+                            >
+                              <DatePicker
+                                onChange={handleYearChange}
+                                picker="year"
+                                disabledDate={isYearDisabled}
+                                size="large"
+                                disabled={isPendingFinalization}
+                              />
+                            </Form.Item>
+                          </div>
+                        </Col>
+                        <Col xl={12} md={12} className="add-new-upload-file-col">
+                          <Row className="add-new-upload-file-label">
+                            {t(`ghgInventory:emissionRemovalDocument`)}
+                          </Row>
+                          <Row>
+                            <Col xl={5} md={5} className="add-new-upload-file-inner-col">
+                              <Form.Item
+                                name="emissionsDocument"
+                                valuePropName="fileList"
+                                getValueFromEvent={normFile}
+                                required={true}
+                              >
+                                <Upload
+                                  accept=".xlsx"
+                                  showUploadList={false}
+                                  beforeUpload={(file) => {
+                                    if (!checkFile(file)) {
+                                      message.open({
+                                        type: 'error',
+                                        content: t('ghgInventory:invalidFileType'),
+                                        duration: 4,
+                                        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+                                      });
+                                      return false;
+                                    }
+                                    // show an error message in UI
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                      const xldata = e.target?.result;
+                                      if (xldata) {
+                                        try {
+                                          const workbook = XLSX.read(xldata, { type: 'array' });
+                                          const sheetName = workbook.SheetNames[0];
+                                          const sheet = workbook.Sheets[sheetName];
+
+                                          const firstRow = XLSX.utils.sheet_to_json(sheet, {
+                                            header: 1,
+                                          })[0];
+                                          if (!validateExcelDataFormat(firstRow)) {
+                                            message.open({
+                                              type: 'error',
+                                              content: t('ghgInventory:invalidDataInExcel'),
+                                              duration: 4,
+                                              style: {
+                                                textAlign: 'right',
+                                                marginRight: 15,
+                                                marginTop: 10,
+                                              },
+                                            });
+                                            return false;
+                                          }
+                                          const excelData = XLSX.utils.sheet_to_json(sheet);
+                                          handleFileUploadData(excelData);
+                                          setUploadedFileName(file.name);
+                                        } catch (error) {
+                                          console.log(error, 'error', file);
+                                        }
+                                      }
+                                    };
+                                    reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for Excel files
+
+                                    // Prevent upload
+                                    return false;
+                                  }}
+                                >
+                                  <Button icon={<UploadOutlined />}>
+                                    {t(`ghgInventory:upload`)}
+                                  </Button>
+                                </Upload>
+                              </Form.Item>
+                            </Col>
+                            <Col xl={16} md={16} className="add-new-upload-file-name-input">
+                              <Input
+                                value={uploadedFileName}
+                                readOnly
+                                suffix={
+                                  uploadedFileName && (
+                                    <Button
+                                      onClick={clearUploadDoc}
+                                      icon={<DeleteOutlined />}
+                                      style={{ marginRight: '-10px', padding: '0px 6px' }}
+                                    />
+                                  )
+                                }
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Row gutter={16}>
+                        <Col span={9} offset={12}>
+                          <Row gutter={16} className="table-heading-row">
+                            <Col xl={6} className="table-heading-col">
+                              CO<sub>2</sub>
+                            </Col>
+                            <Col xl={6} className="table-heading-col">
+                              CH<sub>4</sub>
+                            </Col>
+                            <Col xl={6} className="table-heading-col">
+                              N<sub>2</sub>O
+                            </Col>
+                            <Col xl={6} className="table-heading-col">
+                              CO<sub>2</sub>-eq
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Row gutter={16} className="total-emission-row">
+                        <Col xl={12} md={12}>
+                          <span className="total-emission-title">
+                            {t(`ghgInventory:totalNationalEmission`)}
+                          </span>
+                        </Col>
+                        <Col xl={9} md={9}>
+                          <Row gutter={16} className="total-emission-value-col">
+                            <Col xl={6}>
+                              <div className="co2-total-pill">{totalNationalCo2}</div>
+                            </Col>
+                            <Col xl={6}>
+                              <div className="ch4-total-pill">{totalNationalCh4}</div>
+                            </Col>
+                            <Col xl={6}>
+                              <div className="n2o-total-pill">{totalNationalN2o}</div>
+                            </Col>
+                            <Col xl={6}>
+                              <div className="co2eq-total-pill">{totalNationalCo2Eq}</div>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Collapse
+                        ghost
+                        expandIcon={({ isActive }) =>
+                          isActive ? <MinusCircleOutlined /> : <PlusCircleOutlined />
+                        }
+                      >
+                        {Object.entries(formFields).map(([panelHeading, panelContent]) => (
+                          <Panel header={renderPanelHeader(panelHeading)} key={panelHeading}>
+                            {Array.isArray(panelContent)
+                              ? panelContent.map((item, index) =>
                                 renderPanelContent(panelHeading, item, index)
                               )
-                            : Object.entries(panelContent).map(
+                              : Object.entries(panelContent).map(
                                 ([subPanelHeading, subPanelContent]) => (
                                   <div className="sub-panel">
                                     <div className="sub-panel-heading">
@@ -1573,85 +1645,87 @@ export const GHGEmissionsComponent = (props: any) => {
                                   </div>
                                 )
                               )}
-                        </Panel>
-                      ))}
-                    </Collapse>
-                    <Row
-                      gutter={16}
-                      key={'totalCo2WithoutLand'}
-                      className="total-co2-without-land-row"
-                    >
-                      <Col xl={12} md={12} className="total-co2-without-land-title">
-                        <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
-                      </Col>
-                      <Col xl={9} md={9}>
-                        <Row gutter={16} className="panel-content-input-box-row">
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_co2">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_ch4">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_n2o">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_co2eq">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
-                      <Col xl={12} md={12} className="total-co2-with-land-title">
-                        <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
-                      </Col>
-                      <Col xl={9} md={9}>
-                        <Row gutter={16} className="panel-content-input-box-row">
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_co2">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_ch4">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_n2o">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_co2eq">
-                              <InputNumber />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <div className="steps-actions">
-                      <Button type="primary" htmlType="submit" loading={loading}>
-                        {/* {t('addProgramme:submit')} */}
-                        Submit
-                      </Button>
-                      <Button className="back-btn" onClick={onResetFormModel} loading={loading}>
-                        {/* {t('addProgramme:back')} */}
-                        Cancel
-                      </Button>
-                    </div>
-                  </Form>
-                </div>
-              </Tabs.TabPane>
-            )}
+                          </Panel>
+                        ))}
+                      </Collapse>
+                      <Row
+                        gutter={16}
+                        key={'totalCo2WithoutLand'}
+                        className="total-co2-without-land-row"
+                      >
+                        <Col xl={12} md={12} className="total-co2-without-land-title">
+                          <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
+                        </Col>
+                        <Col xl={9} md={9}>
+                          <Row gutter={16} className="panel-content-input-box-row">
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithoutLand_co2">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithoutLand_ch4">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithoutLand_n2o">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithoutLand_co2eq">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
+                        <Col xl={12} md={12} className="total-co2-with-land-title">
+                          <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
+                        </Col>
+                        <Col xl={9} md={9}>
+                          <Row gutter={16} className="panel-content-input-box-row">
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithLand_co2">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithLand_ch4">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithLand_n2o">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                            <Col xl={6}>
+                              <Form.Item name="totalCo2WithLand_co2eq">
+                                <InputNumber />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <div className="steps-actions">
+                        {userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+                          (<Button className="finalize-btn" type="primary" loading={loading} onClick={onOpenFinalizeFormModel}>
+                            Finalize
+                          </Button>)}
+                        <Button className="submit-btn" type="primary" htmlType="submit" loading={loading}>
+                          Submit
+                        </Button>
+                        <Button className="back-btn" onClick={onOpenResetFormModel} loading={loading}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </Form>
+                  </div>
+                </Tabs.TabPane>
+              )}
 
             {data.map(
               (tabData: any) =>
@@ -1671,7 +1745,6 @@ export const GHGEmissionsComponent = (props: any) => {
                           <div>
                             <Row className="add-new-upload-file-label">Year</Row>
                             <DatePicker
-                              //   onChange={handleYearChange}
                               picker="year"
                               disabledDate={isYearDisabled}
                               defaultValue={moment(tabData.year, 'YYYY')}
@@ -1801,52 +1874,52 @@ export const GHGEmissionsComponent = (props: any) => {
                           >
                             {Array.isArray(panelContent)
                               ? panelContent.map((item, index) => {
-                                  for (const key in tabData) {
-                                    if (key === panelHeading) {
-                                      const emissionsObject = tabData[key];
-                                      const emissionsData = emissionsObject[item];
-                                      return renderPanelContentView(
-                                        emissionsData?.co2,
-                                        emissionsData?.ch4,
-                                        emissionsData?.n2o,
-                                        emissionsData?.co2eq,
-                                        item,
-                                        index
-                                      );
-                                    }
+                                for (const key in tabData) {
+                                  if (key === panelHeading) {
+                                    const emissionsObject = tabData[key];
+                                    const emissionsData = emissionsObject[item];
+                                    return renderPanelContentView(
+                                      emissionsData?.co2,
+                                      emissionsData?.ch4,
+                                      emissionsData?.n2o,
+                                      emissionsData?.co2eq,
+                                      item,
+                                      index
+                                    );
                                   }
-                                })
+                                }
+                              })
                               : Object.entries(panelContent).map(
-                                  ([subPanelHeading, subPanelContent]) => (
-                                    <div className="sub-panel">
-                                      <div className="sub-panel-heading">
-                                        {renderPanelHeaderView(
-                                          subPanelHeading,
-                                          tabData.energyEmissions
-                                        )}
-                                      </div>
-                                      {subPanelContent.map((item, index) => {
-                                        for (const key in tabData.energyEmissions[
-                                          subPanelHeading
-                                        ]) {
-                                          if (key === item) {
-                                            const emissionsObject =
-                                              tabData.energyEmissions[subPanelHeading];
-                                            const emissionsData = emissionsObject[item];
-                                            return renderPanelContentView(
-                                              emissionsData?.co2,
-                                              emissionsData?.ch4,
-                                              emissionsData?.n2o,
-                                              emissionsData?.co2eq,
-                                              item,
-                                              index
-                                            );
-                                          }
-                                        }
-                                      })}
+                                ([subPanelHeading, subPanelContent]) => (
+                                  <div className="sub-panel">
+                                    <div className="sub-panel-heading">
+                                      {renderPanelHeaderView(
+                                        subPanelHeading,
+                                        tabData.energyEmissions
+                                      )}
                                     </div>
-                                  )
-                                )}
+                                    {subPanelContent.map((item, index) => {
+                                      for (const key in tabData.energyEmissions[
+                                        subPanelHeading
+                                      ]) {
+                                        if (key === item) {
+                                          const emissionsObject =
+                                            tabData.energyEmissions[subPanelHeading];
+                                          const emissionsData = emissionsObject[item];
+                                          return renderPanelContentView(
+                                            emissionsData?.co2,
+                                            emissionsData?.ch4,
+                                            emissionsData?.n2o,
+                                            emissionsData?.co2eq,
+                                            item,
+                                            index
+                                          );
+                                        }
+                                      }
+                                    })}
+                                  </div>
+                                )
+                              )}
                           </Panel>
                         ))}
                       </Collapse>
@@ -1857,6 +1930,24 @@ export const GHGEmissionsComponent = (props: any) => {
           </Tabs>
         </div>
       </div>
+      <GHGUserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onSubmitForm}
+        onActionCanceled={onSaveFormCanceled}
+        openModal={openSaveFormModal}
+        errorMsg={errorMsg}
+        loading={loading}
+      />
+      <GHGUserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onSubmitForm}
+        onActionCanceled={onFinalizeFormCanceled}
+        openModal={openFinalizeFormModal}
+        errorMsg={errorMsg}
+        loading={loading}
+      />
       <DiscardChangesConfirmationModel
         t={t}
         actionInfo={actionInfo}

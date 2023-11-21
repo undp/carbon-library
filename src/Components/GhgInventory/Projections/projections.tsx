@@ -21,6 +21,7 @@ import {
   MinusCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import moment from 'moment';
@@ -31,6 +32,10 @@ import { CompanyRole } from '../../../Definitions';
 import { RcFile } from 'antd/lib/upload';
 import { HttpStatusCode } from 'axios';
 import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesConfirmationModel';
+import { ClipboardCheck } from 'react-bootstrap-icons';
+import { GHGRecordState } from '../../../Definitions/Enums/ghg.record.state.enum';
+import GHGUserActionConfirmationModel from '../../Common/Models/ghgUserActionConfirmationModel';
+
 
 export const GHGProjectionsComponent = (props: any) => {
   const {
@@ -113,6 +118,11 @@ export const GHGProjectionsComponent = (props: any) => {
   const [otherUnconditionalNdc, setOtherUnconditionalNdc] = useState<number>(0);
 
   const [isSavedFormDataSet, setIsSavedFormDataSet] = useState<boolean>(false);
+  const [formDataVersion, setFormDataVersion] = useState(1);
+  const [isFormChanged, setIsFormChanged] = useState(false);
+
+  const [openSaveFormModal, setOpenSaveFormModal] = useState(false);
+  const [openFinalizeFormModal, setOpenFinalizeFormModal] = useState(false);
   const [openResetFormModal, setOpenResetFormModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<any>('');
   const [actionInfo, setActionInfo] = useState<any>({});
@@ -227,20 +237,8 @@ export const GHGProjectionsComponent = (props: any) => {
 
 
   useEffect(() => {
-    console.log('++++++++++++++data', data);
     const hasSaveState = data.some((item: any) => item.state === 'SAVED');
-    console.log('++++++++++++++hasSaveState', hasSaveState);
-    // const years = data.map((item: any) => !(item.state === 'SAVED') && item.year);
-    // console.log('++++++++++++++data, years', data, years);
-    console.log(uploadedFileName);
     setIsPendingFinalization(hasSaveState);
-    // Update 'disabledYears' only if 'years' array has changed
-    // setDisabledYears((prevYears) => {
-    //   if (JSON.stringify(prevYears) !== JSON.stringify(years)) {
-    //     return years;
-    //   }
-    //   return prevYears;
-    // });
   }, [data, uploadedFileName]);
 
   function calculateSumEmissionView(obj: any, conditionType: string) {
@@ -259,17 +257,18 @@ export const GHGProjectionsComponent = (props: any) => {
     return sum;
   }
 
-  const onValuesChange = (changedValues2: any, allValues: any) => {
+  const onValuesChange = (changedValues: any, allValues: any) => {
     // Track the changed values
-    console.log(
-      '=================onValuesChange changedValues, allValues',
-      changedValues2,
-      allValues
+    let initialValues = null;
+    if (isPendingFinalization) {
+      const savedData = data.filter((item: any) => item.state === 'SAVED');
+      initialValues = savedData[0];
+    }
+    const currentValues = form.getFieldsValue(true);
+    const isChanged = !(
+      JSON.stringify(currentValues) === JSON.stringify(initialValues)
     );
-    setChangedValues((prevChangedValues: any) => ({
-      ...prevChangedValues,
-      ...changedValues2,
-    }));
+    setIsFormChanged(isChanged);
   };
 
   const getBase64 = (file: RcFile): Promise<string> =>
@@ -280,7 +279,7 @@ export const GHGProjectionsComponent = (props: any) => {
       reader.onerror = (error) => reject(error);
     });
 
-  const createSaveRequestPayload = async (fields: any) => {
+  const createSaveRequestPayload = async (fields: any, remarks: string, status: GHGRecordState) => {
     let requestBody: any = {};
     const savedEmission = {
       year: fields?.year.year(),
@@ -460,7 +459,9 @@ export const GHGProjectionsComponent = (props: any) => {
         conditionalNdc: fields?.totalCo2WithLand_conditionalNdc,
         unconditionalNdc: fields?.totalCo2WithLand_unconditionalNdc,
       },
-      state: 'SAVED',
+      state: status,
+      remarks,
+      version: formDataVersion,
     };
     requestBody = savedEmission;
     if (fields?.emissionsDocument) {
@@ -474,6 +475,38 @@ export const GHGProjectionsComponent = (props: any) => {
     return requestBody;
   };
 
+  const clearForm = () => {
+    form.resetFields();
+
+    setFuelCombustionActivitiesBau(0);
+    setFuelCombustionActivitiesConditionalNdc(0);
+    setFuelCombustionActivitiesUnconditionalNdc(0);
+
+    setFugitiveEmissionsFromFuelsBau(0);
+    setFugitiveEmissionsFromFuelsConditionalNdc(0);
+    setFugitiveEmissionsFromFuelsUnconditionalNdc(0);
+
+    setCarbonDioxideTransportStorageBau(0);
+    setCarbonDioxideTransportStorageConditionalNdc(0);
+    setCarbonDioxideTransportStorageUnconditionalNdc(0);
+
+    setIndustrialProcessesProductUseBau(0);
+    setIndustrialProcessesProductUseConditionalNdc(0);
+    setIndustrialProcessesProductUseUnconditionalNdc(0);
+
+    setAgricultureForestryOtherLandUseBau(0);
+    setAgricultureForestryOtherLandUseConditionalNdc(0);
+    setAgricultureForestryOtherLandUseUnconditionalNdc(0);
+
+    setWasteBau(0);
+    setWasteConditionalNdc(0);
+    setWasteUnconditionalNdc(0);
+
+    setOtherBau(0);
+    setOtherConditionalNdc(0);
+    setOtherUnconditionalNdc(0);
+  }
+
   const resetForm = async () => {
     // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
     await getProjectionData();
@@ -481,43 +514,21 @@ export const GHGProjectionsComponent = (props: any) => {
     setIsSavedFormDataSet(false);
     clearUploadDoc();
     if (!isPendingFinalization) {
-      form.resetFields();
-
-      setFuelCombustionActivitiesBau(0);
-      setFuelCombustionActivitiesConditionalNdc(0);
-      setFuelCombustionActivitiesUnconditionalNdc(0);
-
-      setFugitiveEmissionsFromFuelsBau(0);
-      setFugitiveEmissionsFromFuelsConditionalNdc(0);
-      setFugitiveEmissionsFromFuelsUnconditionalNdc(0);
-
-      setCarbonDioxideTransportStorageBau(0);
-      setCarbonDioxideTransportStorageConditionalNdc(0);
-      setCarbonDioxideTransportStorageUnconditionalNdc(0);
-
-      setIndustrialProcessesProductUseBau(0);
-      setIndustrialProcessesProductUseConditionalNdc(0);
-      setIndustrialProcessesProductUseUnconditionalNdc(0);
-
-      setAgricultureForestryOtherLandUseBau(0);
-      setAgricultureForestryOtherLandUseConditionalNdc(0);
-      setAgricultureForestryOtherLandUseUnconditionalNdc(0);
-
-      setWasteBau(0);
-      setWasteConditionalNdc(0);
-      setWasteUnconditionalNdc(0);
-
-      setOtherBau(0);
-      setOtherConditionalNdc(0);
-      setOtherUnconditionalNdc(0);
+      clearForm();
     }
+    message.open({
+      type: 'success',
+      content: t('ghgInventory:formCancelledSuccess'),
+      duration: 4,
+      style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+    });
   };
 
   const onResetFormCanceled = () => {
     setOpenResetFormModal(false);
   };
 
-  const onResetFormModel = () => {
+  const onOpenResetFormModel = () => {
     setActionInfo({
       action: `${t('ghgInventory:proceed')}`,
       headerText: `${t('ghgInventory:discardHeaderText')}`,
@@ -526,6 +537,45 @@ export const GHGProjectionsComponent = (props: any) => {
     });
     setErrorMsg('');
     setOpenResetFormModal(true);
+  };
+
+  const onSaveFormCanceled = () => {
+    setOpenSaveFormModal(false);
+  };
+
+  const onOpenSaveFormModel = () => {
+    if (!isFormChanged) {
+      message.open({
+        type: 'error',
+        content: t('ghgInventory:formNotChanged'),
+        duration: 4,
+        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+      });
+    } else {
+      setActionInfo({
+        action: `${t("ghgInventory:submit")}`,
+        headerText: `${t("ghgInventory:submitModelHeader")}`,
+        type: "primary",
+        icon: <CheckCircleOutlined />,
+      });
+      setErrorMsg('');
+      setOpenSaveFormModal(true);
+    }
+  };
+
+  const onFinalizeFormCanceled = () => {
+    setOpenFinalizeFormModal(false);
+  };
+
+  const onOpenFinalizeFormModel = () => {
+      setActionInfo({
+        action: `${t("ghgInventory:finalize")}`,
+        headerText: `${t("ghgInventory:finalizeModelHeader")}`,
+        type: "primary",
+        icon: <ClipboardCheck />,
+      });
+      setErrorMsg('');
+      setOpenFinalizeFormModal(true);
   };
 
   const getProjectionData = async () => {
@@ -545,6 +595,7 @@ export const GHGProjectionsComponent = (props: any) => {
         style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
       });
     } finally {
+      setIsFormChanged(false);
       setLoading(false);
     }
   };
@@ -557,31 +608,51 @@ export const GHGProjectionsComponent = (props: any) => {
     fetchData();
   }, []);
 
-  const onSubmitForm = async (values: any) => {
+  const onSubmitForm = async (remarks: string, status: GHGRecordState) => {
     const fields = form.getFieldsValue(true);
-    const payload = await createSaveRequestPayload(fields);
+    const payload = await createSaveRequestPayload(fields, remarks, status);
     setLoading(true);
     try {
       const response: any = await post('national/projections', payload);
       console.log('Projections creation -> ', response);
       if (response?.statusText === 'SUCCESS') {
+        setOpenSaveFormModal(false);
+        let messageContent = response?.status == HttpStatusCode.Created ?
+          t('ghgInventory:projectionCreationSuccess')
+          : t('ghgInventory:projectionUpdateSuccess');
+
+        if (status === GHGRecordState.FINALIZED) {
+          clearUploadDoc();
+          clearForm();
+          messageContent = t('ghgInventory:projectionFinalizedSuccess');
+        }
+        setOpenFinalizeFormModal(false);
         message.open({
           type: 'success',
-          content: response?.status == HttpStatusCode.Created ? t('ghgInventory:projectionCreationSuccess') : t('ghgInventory:projectionUpdateSuccess'),
+          content: messageContent,
           duration: 4,
           style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
         });
+        clearUploadDoc();
+        await getProjectionData();
       }
     } catch (error: any) {
       console.log('Error in projection creation - ', error);
+      setOpenSaveFormModal(false);
+      setOpenFinalizeFormModal(false);
       message.open({
         type: 'error',
         content: error?.message,
         duration: 4,
         style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
       });
+      if (error.statusCode == HttpStatusCode.Conflict) {
+        await getProjectionData();
+        clearUploadDoc();
+      }
     } finally {
-      getProjectionData();
+      // eslint-disable-next-line no-use-before-define, @typescript-eslint/no-use-before-define
+      setIsFormChanged(false);
       setLoading(false);
     }
   };
@@ -715,12 +786,14 @@ export const GHGProjectionsComponent = (props: any) => {
   };
 
   useEffect(() => {
-    // if (isPendingFinalization) {
+    const savedData = data.filter((item: any) => item.state === 'SAVED');
     if (!isSavedFormDataSet) {
-      const savedData = data.filter((item: any) => item.state === 'SAVED');
       if (savedData && savedData.length > 0) {
         setFormValues(savedData[0]);
       }
+    }
+    if (savedData && savedData.length > 0) {
+      setFormDataVersion(savedData[0].version);
     }
     const years: number[] = data
       .filter((item: any) => !(item.state === 'SAVED' && item.year)) // Filter out items where state is not 'SAVED'
@@ -1254,7 +1327,7 @@ export const GHGProjectionsComponent = (props: any) => {
                       requiredMark={true}
                       form={form}
                       onValuesChange={onValuesChange}
-                      onFinish={onSubmitForm}
+                      onFinish={onOpenSaveFormModel}
                     >
                       <Row>
                         <Col xl={12} md={12} className="add-new-year-picker-col">
@@ -1499,15 +1572,16 @@ export const GHGProjectionsComponent = (props: any) => {
                         </Col>
                       </Row>
                       <div className="steps-actions">
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          loading={loading}
-                        >
+                        {userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+                          (<Button className="finalize-btn" type="primary" loading={loading} onClick={onOpenFinalizeFormModel}>
+                            {/* {t('addProgramme:submit')} */}
+                            Finalize
+                          </Button>)}
+                        <Button className="submit-btn" type="primary" htmlType="submit" loading={loading}>
                           {/* {t('addProgramme:submit')} */}
                           Submit
                         </Button>
-                        <Button className="back-btn" onClick={onResetFormModel} loading={loading}>
+                        <Button className="back-btn" onClick={onOpenResetFormModel} loading={loading}>
                           {/* {t('addProgramme:back')} */}
                           Cancel
                         </Button>
@@ -1709,6 +1783,24 @@ export const GHGProjectionsComponent = (props: any) => {
           </Tabs>
         </div>
       </div>
+      <GHGUserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onSubmitForm}
+        onActionCanceled={onSaveFormCanceled}
+        openModal={openSaveFormModal}
+        errorMsg={errorMsg}
+        loading={loading}
+      />
+      <GHGUserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onSubmitForm}
+        onActionCanceled={onFinalizeFormCanceled}
+        openModal={openFinalizeFormModal}
+        errorMsg={errorMsg}
+        loading={loading}
+      />
       <DiscardChangesConfirmationModel
         t={t}
         actionInfo={actionInfo}
