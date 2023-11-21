@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
-
 import { Repository } from "typeorm";
 import { StatList } from "../shared/dto/stat.list.dto";
 import { StatType } from "../shared/enum/stat.type.enum";
@@ -14,7 +13,7 @@ import { Company } from "../shared/entities/company.entity";
 import { StatFilter } from "../shared/dto/stat.filter";
 import { ProgrammeStage } from "../shared/enum/programme-status.enum";
 import { Stat } from "../shared/dto/stat.dto";
-import { Sector } from "../shared/enum/sector.enum";
+import { Sector } from "../shared/enum/sector.enum"; 
 import { PRECISION } from "@undp/carbon-credit-calculator/dist/esm/calculator";
 import { HelperService } from "../shared/util/helpers.service";
 import { Programme } from "../shared/entities/programme.entity";

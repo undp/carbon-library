@@ -268,12 +268,13 @@ export class RegistryClientService {
   private createNDCReq(ndc: NDCAction | NDCActionDto) {
     return {
         typeOfMitigation: ndc.typeOfMitigation,
+        subTypeOfMitigation: ndc.subTypeOfMitigation,
         userEstimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
         methodology: ndc?.methodology ? ndc?.methodology : '-',
         systemEstimatedCredits: ndc.ndcFinancing?.systemEstimatedCredits ? ndc.ndcFinancing?.systemEstimatedCredits : 0,
         actionId: ndc.id,
         constantVersion: '' + ndc.constantVersion,
-        properties: (ndc.agricultureProperties ? ndc.agricultureProperties : ndc.solarProperties ? ndc.solarProperties : undefined)
+        properties: (ndc.creditCalculationProperties ? ndc.creditCalculationProperties : undefined)
     };
   }
 }
