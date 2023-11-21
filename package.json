@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-library",
-  "version": "1.0.168",
+  "version": "1.0.173",
   "description": "Shared Library of tools for Carbon Credits applications ecosystem for ExO and and HQ/GEF",
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-typescript": "^11.1.1",
     "@storybook/addon-styling-webpack": "^0.0.5",
-    "@undp/carbon-credit-calculator": "^1.0.0",
+    "@undp/carbon-credit-calculator": "^1.1.1",
     "node-sass": "^7.0.3",
     "postcss": "^8.4.23",
     "react-circle-flags": "^0.0.19",
