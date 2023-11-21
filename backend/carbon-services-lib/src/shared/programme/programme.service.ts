@@ -906,7 +906,7 @@ export class ProgrammeService {
           await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, certifierUser ? this.getUserRef(certifierUser):'', d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
         }
       } 
-      if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
+      if((program && d.type == DocType.METHODOLOGY_DOCUMENT) || (program && this.configService.get('ITMOSystem.enable')==true && em === undefined) ) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
           program.currentStage = ProgrammeStage.APPROVED;
@@ -921,7 +921,7 @@ export class ProgrammeService {
     }
     else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
       if(program) {
-        await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "Approve By ITMO System");
+        await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
           program.currentStage = ProgrammeStage.APPROVED;
           await this.asyncOperationsInterface.AddAction({
