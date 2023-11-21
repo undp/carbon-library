@@ -258,7 +258,6 @@ export const GHGProjectionsComponent = (props: any) => {
   }
 
   const onValuesChange = (changedValues: any, allValues: any) => {
-    // Track the changed values
     let initialValues = null;
     if (isPendingFinalization) {
       const savedData = data.filter((item: any) => item.state === 'SAVED');
