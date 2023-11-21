@@ -10,6 +10,7 @@ import { Counter } from "../shared/entities/counter.entity";
 import { CounterType } from "../shared/util/counter.type.enum";
 import { Programme } from "../shared/entities/programme.entity";
 import { CreditOverall } from "../shared/entities/credit.overall.entity";
+import { DataImporterService } from "../data-importer/data-importer.service";
 
 
 @Injectable()
@@ -19,8 +20,9 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
     @InjectRepository(Counter) private counterRepo: Repository<Counter>,
     private configService: ConfigService,
     private eventProcessor: ProcessEventService,
+    private dataImportService : DataImporterService
   ) {}
-
+  
   async replicate(event): Promise<any> {
     this.logger.log("Start received", JSON.stringify(event));
     const replicateActions = async()=>{
@@ -98,6 +100,23 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
           await this.eventProcessor.process(undefined, creditOverall, row.hash, new Date(row.meta.txTime).getTime())
           await this.counterRepo.save({ id: CounterType.REPLICATE_SEQ_COMP, counter:  newSeq})
         }
+      }
+
+      const date = new Date(); 
+      const year = String(date.getFullYear());
+      const diff = Number(date) - Number(new Date(date.getFullYear(), 0, 0));
+      const dayOfYear = String(Math.floor(diff / (1000 * 60 * 60 * 24)));
+      const today = Number(year+dayOfYear)
+      const lastItmoseq = await this.counterRepo.findOneBy({
+        id: CounterType.ITMO_SYSTEM,
+      });
+      let lastDate = 0
+      if (lastItmoseq) {
+        lastDate = lastItmoseq.counter;
+      }
+      if(today>lastDate){
+        await this.dataImportService.importData({importTypes:'ITMO_SYSTEM'})
+        await this.counterRepo.save({ id: CounterType.ITMO_SYSTEM, counter:  today})
       }
       setTimeout( replicateActions , 1000)
     }

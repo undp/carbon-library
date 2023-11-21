@@ -849,6 +849,20 @@ export class ProgrammeService {
         }
       }
     }
+    else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
+      if(program) {
+        await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "Approve By ITMO System");
+        if (program.cadtId) {
+          program.currentStage = ProgrammeStage.APPROVED;
+          await this.asyncOperationsInterface.AddAction({
+            actionType: AsyncActionType.CADTUpdateProgramme,
+            actionProps: {
+                programme: program
+            },
+          });
+        }
+      }
+    }
     console.log('NDC COmmit', ndc)
     if (ndc) {
       await em.update(
