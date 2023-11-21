@@ -65,6 +65,7 @@ export default () => ({
     apiKey: process.env.ITMO_API_KEY,
     email: process.env.ITMO_EMAIL,
     password: process.env.ITMO_PASSWORD,
+    enable: process.env.ITMO_ENABLE === "true" ? true : false,
   },
   CERTIFIER:{
     image:process.env.CERTIFIER_IMAGE

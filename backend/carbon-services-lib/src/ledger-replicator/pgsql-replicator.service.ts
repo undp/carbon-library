@@ -115,7 +115,7 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
         lastDate = lastItmoseq.counter;
       }
       if(today>lastDate){
-        await this.dataImportService.importData({importTypes:'ITMO_SYSTEM'})
+        await this.dataImportService.importData({importTypes: this.configService.get('ITMOSystem.enable')})
         await this.counterRepo.save({ id: CounterType.ITMO_SYSTEM, counter:  today})
       }
       setTimeout( replicateActions , 1000)
