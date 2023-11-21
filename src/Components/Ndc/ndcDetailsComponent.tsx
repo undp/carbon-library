@@ -3,13 +3,18 @@ import {
   Col,
   DatePicker,
   Empty,
+  List,
   PaginationProps,
+  Popover,
   Row,
   Select,
   Space,
   Table,
   Tabs,
   TabsProps,
+  Tag,
+  Tooltip,
+  Typography,
   message,
 } from "antd";
 import moment from "moment";
@@ -19,14 +24,20 @@ import {
   EditableCell,
 } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
-import { CompanyRole, Role } from "../../Definitions";
+import { CompanyRole, Role, addSpaces } from "../../Definitions";
 import {
   DateRange,
-  NdcActionType,
+  NdcDetailsActionType,
   NdcDetail,
   NdcDetailsActionStatus,
   Period,
+  getNdcActionStatusTagType,
+  PopupInfo,
 } from "../../Definitions/Definitions/ndcDetails.definitions";
+import { TooltipColor } from "../../Styles";
+import { EllipsisOutlined, LockOutlined } from "@ant-design/icons";
+import * as Icon from "react-bootstrap-icons";
+import UserActionConfirmationModel from "../Common/Models/userActionConfirmationModel";
 
 export const NdcDetailsComponent = (props: any) => {
   const { t, useConnection, useUserContext } = props;
@@ -40,6 +51,8 @@ export const NdcDetailsComponent = (props: any) => {
   const [tableKey, setTableKey] = useState(0);
   const { get, post, put } = useConnection();
   const [ministryOrgList, setMinistryOrgList] = useState([] as any);
+  const [actionInfo, setActionInfo] = useState<any>({});
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
 
   const { userInfoState } = useUserContext();
 
@@ -52,9 +65,8 @@ export const NdcDetailsComponent = (props: any) => {
       ? userInfoState?.companyName
       : undefined;
 
-  const isAddRangeVisible =
-    (userInfoState?.companyRole === CompanyRole.MINISTRY ||
-      userInfoState?.companyRole === CompanyRole.GOVERNMENT) &&
+  const isGovernmentUser =
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
     userInfoState?.userRole !== Role.ViewOnly;
 
   const ndcMainDetailsForPeriod =
@@ -62,7 +74,7 @@ export const NdcDetailsComponent = (props: any) => {
       ? ndcDetailsData.filter((ndcDetail: NdcDetail) => {
           return (
             ndcDetail.periodId === parseInt(selectedPeriod.key) &&
-            ndcDetail.actionType === NdcActionType.mainAction
+            ndcDetail.actionType === NdcDetailsActionType.MainAction
           );
         })
       : [];
@@ -75,6 +87,7 @@ export const NdcDetailsComponent = (props: any) => {
   const isSubNdcActionsEditable = (record: NdcDetail) => {
     return (
       !selectedPeriod.finalized &&
+      record.status !== NdcDetailsActionStatus.Approved &&
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
         (userInfoState?.companyRole === CompanyRole.MINISTRY &&
           userInfoState?.companyName === record.ministryName)) &&
@@ -86,34 +99,20 @@ export const NdcDetailsComponent = (props: any) => {
     const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
       return (
         ndcDetail.parentActionId === id &&
-        ndcDetail.actionType === NdcActionType.subAction
+        ndcDetail.actionType === NdcDetailsActionType.SubAction
       );
     });
 
     const emptySubNdcRow = {
-      actionType: NdcActionType.subAction,
+      actionType: NdcDetailsActionType.SubAction,
       nationalPlanObjective: "",
       kpi: 0,
       ministryName: loginMinistry,
-      status: NdcDetailsActionStatus.pending,
+      status: NdcDetailsActionStatus.Pending,
       parentActionId: id,
     };
 
     return [...subNdcDetails, emptySubNdcRow];
-  };
-
-  const isAddNdcActionVisible = () => {
-    return (
-      userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
-      userInfoState?.userRole !== Role.ViewOnly
-    );
-  };
-
-  const isAddSubNdcActionVisible = () => {
-    return (
-      userInfoState?.companyRole === CompanyRole.MINISTRY &&
-      userInfoState?.userRole !== Role.ViewOnly
-    );
   };
 
   const inRange = (num: number, min: number, max: number) =>
@@ -137,13 +136,64 @@ export const NdcDetailsComponent = (props: any) => {
     fetchNdcDetailActions();
   };
 
+  const actionMenu = (record: NdcDetail) => {
+    if (record.status === NdcDetailsActionStatus.Pending && isGovernmentUser) {
+      return (
+        <List
+          className="action-menu"
+          size="small"
+          dataSource={[
+            {
+              text: t("ndc:approve"),
+              icon: <Icon.BoxArrowInDown />,
+              click: () => {
+                setActionInfo({
+                  action: "Approve",
+                  headerText: t("ndc:actionApproveTitle"),
+                  type: "primary",
+                  icon: <Icon.BoxArrowInDown />,
+                  recordId: record.id,
+                });
+                setOpenConfirmationModal(true);
+              },
+            },
+            {
+              text: t("ndc:reject"),
+              icon: <Icon.XOctagon />,
+              click: () => {
+                setActionInfo({
+                  action: "Reject",
+                  headerText: t("ndc:rejectApproveTitle"),
+                  type: "danger",
+                  icon: <Icon.BoxArrowInDown />,
+                  recordId: record.id,
+                });
+                setOpenConfirmationModal(true);
+              },
+            },
+          ]}
+          renderItem={(item: any) => (
+            <List.Item onClick={item.click}>
+              <Typography.Text className="action-icon color-error">
+                {item.icon}
+              </Typography.Text>
+              <span>{item.text}</span>
+            </List.Item>
+          )}
+        ></List>
+      );
+    } else {
+      return null;
+    }
+  };
+
   const defaultColumns: any = [
     {
       title: t("ndc:ndcColumnsNationalPlanObj"),
       dataIndex: "nationalPlanObjective",
       key: "nationalPlanObjective",
       align: "left" as const,
-      width: "50%",
+      width: "40%",
       editable: true,
       render: (_: any, record: any) => (
         <>
@@ -166,7 +216,7 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "kpi",
       key: "kpi",
       align: "left" as const,
-      width: "10%",
+      width: "15%",
       editable: true,
       render: (_: any, record: any) => (
         <>
@@ -185,11 +235,11 @@ export const NdcDetailsComponent = (props: any) => {
       ),
     },
     {
-      title: "ministryName",
+      title: t("ndc:ndcColumnsMinistry"),
       dataIndex: "ministryName",
       key: "ministryName",
       align: "left" as const,
-      width: "40%",
+      width: "30%",
       editable: false,
       render: (_: any, record: any) => (
         <>
@@ -205,6 +255,51 @@ export const NdcDetailsComponent = (props: any) => {
         </>
       ),
     },
+    {
+      title: t("ndc:ndcColumnsStatus"),
+      dataIndex: "status",
+      key: "status",
+      align: "left" as const,
+      width: "15%",
+      editable: false,
+      render: (_: any, record: any) => {
+        const menu = actionMenu(record);
+        return (
+          <>
+            {record.actionType === NdcDetailsActionType.SubAction ? (
+              <Tooltip
+                title={record.status}
+                color={TooltipColor}
+                key={TooltipColor}
+              >
+                <Tag
+                  className="clickable"
+                  color={getNdcActionStatusTagType(record.status)}
+                >
+                  {addSpaces(record.status)}
+                </Tag>
+              </Tooltip>
+            ) : (
+              ""
+            )}
+            {record.actionType === NdcDetailsActionType.SubAction && menu ? (
+              <Popover placement="bottomRight" content={menu} trigger="click">
+                <EllipsisOutlined
+                  rotate={90}
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                  }}
+                />
+              </Popover>
+            ) : (
+              <span></span>
+            )}
+          </>
+        );
+      },
+    },
   ];
 
   const columns = defaultColumns.map((col: any) => {
@@ -214,11 +309,10 @@ export const NdcDetailsComponent = (props: any) => {
     return {
       ...col,
       onCell: (record: NdcDetail) => {
-        console.log("record", record);
         return {
           record,
           editable:
-            record.actionType === NdcActionType.mainAction
+            record.actionType === NdcDetailsActionType.MainAction
               ? isMainNdcActionsEditable
               : isSubNdcActionsEditable(record),
           dataIndex: col.dataIndex,
@@ -233,12 +327,12 @@ export const NdcDetailsComponent = (props: any) => {
     if (selectedPeriod.key !== "add_new") {
       const periodId: number = parseInt(selectedPeriod.key);
       const newData: NdcDetail = {
-        actionType: NdcActionType.mainAction,
+        actionType: NdcDetailsActionType.MainAction,
         nationalPlanObjective: "",
         kpi: 0,
         ministryName: loginMinistry,
         periodId: periodId,
-        status: NdcDetailsActionStatus.pending,
+        status: NdcDetailsActionStatus.Pending,
       };
 
       const response = await post("national/programme/addNdcDetailsAction", {
@@ -263,17 +357,27 @@ export const NdcDetailsComponent = (props: any) => {
     },
   };
 
-  const onDeletePeriod = async () => {
-    const result = await post("national/programme/deleteNdcDetailsPeriod", {
-      id: selectedPeriod.key,
+  const onClickedDeletePeriod = async () => {
+    setActionInfo({
+      action: "Delete",
+      headerText: t("ndc:periodDeleteConfirmTitle"),
+      type: "danger",
+      icon: <Icon.XCircle />,
+      recordId: selectedPeriod.key,
     });
-    if (result) {
-      fetchNdcDetailPeriods();
-    }
+    setOpenConfirmationModal(true);
   };
 
-  const onFinalizePeriod = () => {
-    //
+  const onClickedFinalizePeriod = async () => {
+    setActionInfo({
+      action: "Finalize",
+      headerText: t("ndc:finalizeApproveTitle"),
+      text: t("ndc:finalizeApproveSubTitle"),
+      type: "primary",
+      icon: <Icon.Clipboard2Check />,
+      recordId: selectedPeriod.key,
+    });
+    setOpenConfirmationModal(true);
   };
 
   function ndcDetailsTableContent() {
@@ -295,7 +399,8 @@ export const NdcDetailsComponent = (props: any) => {
                 //defaultExpandedRowKeys: [parseInt(selectedNdcDetail.current.id)],
               }}
               footer={() =>
-                isAddNdcActionVisible() && (
+                isGovernmentUser &&
+                !selectedPeriod.finalized && (
                   <Row justify={"center"}>
                     <Button
                       onClick={onClickedAddNewNdcDetail}
@@ -313,26 +418,30 @@ export const NdcDetailsComponent = (props: any) => {
             />
           </Col>
         </Row>
-        <Row justify="end">
-          <Button
-            className="mg-left-1"
-            type="primary"
-            onClick={onDeletePeriod}
-            htmlType="submit"
-            loading={loading}
-          >
-            {t("ndc:delete")}
-          </Button>
-          <Button
-            className="mg-left-1"
-            type="primary"
-            onClick={onFinalizePeriod}
-            htmlType="submit"
-            loading={loading}
-          >
-            {t("ndc:finalize")}
-          </Button>
-        </Row>
+        {isGovernmentUser && !selectedPeriod.finalized ? (
+          <Row justify="end">
+            <Button
+              className="mg-left-1"
+              type="primary"
+              onClick={onClickedDeletePeriod}
+              htmlType="submit"
+              loading={loading}
+            >
+              {t("ndc:delete")}
+            </Button>
+            <Button
+              className="mg-left-1"
+              type="primary"
+              onClick={onClickedFinalizePeriod}
+              htmlType="submit"
+              loading={loading}
+            >
+              {t("ndc:finalize")}
+            </Button>
+          </Row>
+        ) : (
+          ""
+        )}
       </div>
     );
   }
@@ -430,6 +539,43 @@ export const NdcDetailsComponent = (props: any) => {
     }
   };
 
+  const onActionConfirmed = async () => {
+    if (actionInfo.action === "Approve") {
+      const response = await get("national/programme/approveNdcDetailsAction", {
+        id: actionInfo.recordId,
+      });
+      console.log("response", response);
+    } else if (actionInfo.action === "Reject") {
+      const response = await get("national/programme/rejectNdcDetailsAction", {
+        id: actionInfo.recordId,
+      });
+      console.log("response", response);
+    } else if (actionInfo.action === "Finalize") {
+      const response = await post(
+        "national/programme/finalizeNdcDetailsPeriod",
+        {
+          id: selectedPeriod.key,
+        }
+      );
+      console.log("response", response);
+      if (response) {
+        fetchNdcDetailPeriods();
+      }
+    } else if (actionInfo.action === "Delete") {
+      const result = await post("national/programme/deleteNdcDetailsPeriod", {
+        id: selectedPeriod.key,
+      });
+      if (result) {
+        fetchNdcDetailPeriods();
+      }
+    }
+    setOpenConfirmationModal(false);
+  };
+
+  const onActionCanceled = () => {
+    setOpenConfirmationModal(false);
+  };
+
   const fetchNdcDetailPeriods = async () => {
     let periods = [];
     let addNewTab: Period = {
@@ -446,11 +592,17 @@ export const NdcDetailsComponent = (props: any) => {
         return {
           ...period,
           key: period.id,
-          label: `${period.startYear}-${period.endYear}`,
+          label: period.finalized ? (
+            <span>
+              <LockOutlined /> {period.startYear}-{period.endYear}{" "}
+            </span>
+          ) : (
+            `${period.startYear}-${period.endYear}`
+          ),
         };
       });
     }
-    if (isAddRangeVisible) {
+    if (isGovernmentUser) {
       periods.unshift(addNewTab);
     }
 
@@ -466,13 +618,13 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const fetchMinistries = async () => {
-    const response = await get("national/company/getMinistries");
-    console.log('fetchMinistries', response);
+    const response = await get("national/organisation/getMinistries");
+    console.log("fetchMinistries", response);
     if (response && response.data) {
       const ministryOrgDetails = response.data.map((value: any) => {
         return {
-          value: value.user_id,
-          label: value.user_name,
+          value: value.company_companyId,
+          label: value.company_name,
         };
       });
       setMinistryOrgList(ministryOrgDetails);
@@ -509,6 +661,15 @@ export const NdcDetailsComponent = (props: any) => {
           ? addNewPeriodContent()
           : ndcDetailsTableContent()}
       </div>
+      <UserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onActionConfirmed}
+        onActionCanceled={onActionCanceled}
+        openModal={openConfirmationModal}
+        errorMsg=""
+        loading={false}
+      />
     </div>
   );
 };

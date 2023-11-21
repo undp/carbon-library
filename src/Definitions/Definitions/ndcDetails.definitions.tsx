@@ -9,7 +9,7 @@ export type Period = {
 
 export type NdcDetail = {
   id?: number;
-  actionType: NdcActionType;
+  actionType: NdcDetailsActionType;
   nationalPlanObjective: string;
   kpi: number;
   ministryName: string;
@@ -24,12 +24,43 @@ export type DateRange = {
   endYear: number
 }
 
-export enum NdcActionType {
-  mainAction,
-  subAction,
+export enum NdcDetailsActionType {
+  MainAction = 'MainAction',
+  SubAction = 'SubAction',
 }
 
 export enum NdcDetailsActionStatus {
-  pending,
-  approved
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected'
 }
+
+export const getNdcActionStatusEnumVal = (value: string) => {
+  const index = Object.keys(NdcDetailsActionStatus).indexOf(value);
+  if (index < 0) {
+    return value;
+  }
+  return Object.values(NdcDetailsActionStatus)[index];
+};
+
+export const getNdcActionStatusTagType = (status: NdcDetailsActionStatus) => {
+  switch (getNdcActionStatusEnumVal(status)) {
+    case NdcDetailsActionStatus.Rejected:
+      return "error";
+    case NdcDetailsActionStatus.Pending:
+      return "processing";
+    case NdcDetailsActionStatus.Approved:
+      return "success";
+    default:
+      return "default";
+  }
+};
+
+export type PopupInfo = {
+  title: string;
+  icon: any;
+  actionBtnText: string;
+  okAction: any;
+  type: "primary" | "danger";
+  remarkRequired: boolean;
+};
