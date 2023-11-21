@@ -5039,7 +5039,7 @@ export class ProgrammeService {
 
     await this.ndcDetailsActionRepo.save({
       ...ndcAction,
-      status : NdcDetailsActionStatus.approved
+      status : NdcDetailsActionStatus.Approved
     })
   }
 
@@ -5050,7 +5050,7 @@ export class ProgrammeService {
 
     await this.ndcDetailsActionRepo.save({
       ...ndcAction,
-      status : NdcDetailsActionStatus.rejected
+      status : NdcDetailsActionStatus.Rejected
     })
   }
 }

@@ -1,5 +1,5 @@
 export enum NdcDetailsActionStatus {
-    pending,
-    approved,
-    rejected
+    Pending = 'Pending',
+    Approved = 'Approved',
+    Rejected = 'Rejected'
 }

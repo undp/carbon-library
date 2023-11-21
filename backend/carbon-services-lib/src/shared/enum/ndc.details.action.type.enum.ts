@@ -1,4 +1,4 @@
 export enum NdcDetailsActionType {
-    mainAction,
-    subAction
+    MainAction = 'MainAction',
+    SubAction = 'SubAction',
 }

@@ -26,7 +26,7 @@ export class NdcDetailsAction {
         type: "enum",
         enum: NdcDetailsActionType,
         array: false,
-        default: NdcDetailsActionType.mainAction,
+        default: NdcDetailsActionType.MainAction,
     })
     actionType: NdcDetailsActionType;
 
@@ -34,7 +34,7 @@ export class NdcDetailsAction {
         type: "enum",
         enum: NdcDetailsActionStatus,
         array: false,
-        default: NdcDetailsActionStatus.pending,
+        default: NdcDetailsActionStatus.Pending,
     })
     status: NdcDetailsActionStatus;
 }

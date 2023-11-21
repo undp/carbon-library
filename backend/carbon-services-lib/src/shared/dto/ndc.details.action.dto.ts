@@ -20,12 +20,12 @@ export class NdcDetailsActionDto {
     @IsString()
     ministryName: string;
 
-    @ValidateIf(o => o.actionType === NdcDetailsActionType.mainAction)
+    @ValidateIf(o => o.actionType === NdcDetailsActionType.MainAction)
     @ApiProperty()
     @IsNumber()
     periodId: number;
 
-    @ValidateIf(o => o.actionType === NdcDetailsActionType.subAction)
+    @ValidateIf(o => o.actionType === NdcDetailsActionType.SubAction)
     @ApiProperty()
     @IsNumber()
     parentActionId: number;
