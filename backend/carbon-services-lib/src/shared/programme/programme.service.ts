@@ -109,6 +109,7 @@ import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
 import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
+import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -5029,6 +5030,28 @@ export class ProgrammeService {
     if (result.affected > 0){
       return HttpStatus.OK;
     } 
+  }
+
+  async approveNdcDetailsAction(actionId: number,abilityCondition: any, user: User){
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: { id: actionId}
+    });
+
+    await this.ndcDetailsActionRepo.save({
+      ...ndcAction,
+      status : NdcDetailsActionStatus.approved
+    })
+  }
+
+  async rejectNdcDetailsAction(actionId: number,abilityCondition: any, user: User){
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: { id: actionId}
+    });
+
+    await this.ndcDetailsActionRepo.save({
+      ...ndcAction,
+      status : NdcDetailsActionStatus.rejected
+    })
   }
 }
 
