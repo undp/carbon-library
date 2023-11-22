@@ -22,10 +22,11 @@ import {
   CloseCircleOutlined,
   DeleteOutlined,
   CheckCircleOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import moment from 'moment';
-import { EmissionSectors, formFields } from '../emission.mappings';
+import { EmissionSectors, formFields, projectionsCsvFieldMap } from '../emission.mappings';
 import { ProjectionTypes } from '../projection.types';
 import React from 'react';
 import { CompanyRole } from '../../../Definitions';
@@ -1302,6 +1303,81 @@ export const GHGProjectionsComponent = (props: any) => {
     );
   };
 
+  
+  const objectToCSV = (dataToDownload: any) => {
+    const flattenObject = (obj: any, prefix = '') => {
+      return Object.keys(obj).reduce((acc: any, key) => {
+        const pre: any = prefix.length ? `${prefix}_` : '';
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          Object.assign(acc, flattenObject(obj[key], pre + key));
+        } else {
+          acc[pre + key] = obj[key];
+        }
+        return acc;
+      }, {});
+    };
+
+    const headers: any[] = [];
+    const contentKeys: any[] = [];
+
+
+      const flattenedObj = flattenObject(dataToDownload);
+      const objKeys: any = Object.keys(flattenedObj);
+      objKeys.map((key: any) => {
+        if (projectionsCsvFieldMap[key]) {
+          headers.push(projectionsCsvFieldMap[key])
+          contentKeys.push(key);
+        }
+      });
+
+
+    const flattenedData = [dataToDownload].map((item) => {
+      const flattened: any = flattenObject(item);
+      return contentKeys.map((header: any) => flattened[header]);
+    });
+
+    const csvContent =
+      headers.map((header) => `"${header}"`).join(',') +
+      '\n' +
+      flattenedData.map((row) => row.map((value) => (value === undefined || value === null) ? "" : value).join(',')).join('\n');
+
+    return csvContent;
+  };
+
+  const downloadCSV = (dataToDownload: any) => {
+    const csvContent = objectToCSV(dataToDownload);
+    const encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `GHG-Reporting Projections_${dataToDownload.year}_V${dataToDownload.version}.csv`);
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  const isRowDataEmpty = (projectionDataObj: any) => {
+    if (projectionDataObj == undefined || projectionDataObj == null) {
+      return true;
+    }
+
+    const bau = projectionDataObj?.bau;
+    const conditionalNdc = projectionDataObj?.conditionalNdc;
+    const unconditionalNdc = projectionDataObj?.unconditionalNdc;
+
+    if (!bau && !conditionalNdc && !unconditionalNdc) {
+      return true;
+    }
+
+    return false;
+  }
+
+  const isSectionDataEmpty = (sectionTotalBau: number, sectionTotalConditionalNdc: number, sectionTotalUnconditionalNdc: number) => {
+    if (!sectionTotalBau && !sectionTotalConditionalNdc && !sectionTotalUnconditionalNdc) {
+      return true;
+    }
+
+    return false;
+  }
+
   return (
     <div>
       <div className="content-container projection-tab-container">
@@ -1593,7 +1669,7 @@ export const GHGProjectionsComponent = (props: any) => {
             {data.map(
               (tabData: any) =>
                 tabData.state === 'FINALIZED' && (
-                  <Tabs.TabPane
+                  <Tabs.TabPane className='view-data-panel'
                     key={tabData.id.toString()}
                     tab={
                       <span>
@@ -1622,57 +1698,15 @@ export const GHGProjectionsComponent = (props: any) => {
                             {t(`ghgInventory:emissionRemovalDocument`)}
                           </Row>
                           <Row>
-                            <Col xl={5} md={5} className="add-new-upload-file-inner-col">
-                              <Form.Item>
-                                <Upload
-                                  accept=".xlsx"
-                                  customRequest={({ onSuccess, onError, file }) => {
-                                    const reader = new FileReader();
-
-                                    reader.onload = (e) => {
-                                      if (e && e.target) {
-                                        // Check if e and e.target are defined
-                                        const xldata = e.target.result;
-                                        if (xldata) {
-                                          try {
-                                            const workbook = XLSX.read(xldata, { type: 'array' });
-                                            const sheetName = workbook.SheetNames[0];
-                                            const sheet = workbook.Sheets[sheetName];
-                                            const excelData = XLSX.utils.sheet_to_json(sheet);
-
-                                            // Use excelData as needed, e.g., display it in a table.
-                                            console.log(excelData);
-
-                                            // You can perform any further processing with the data here.
-                                            // For example, you can call a function to handle the uploaded data.
-                                            // handleFileUpload(excelData);
-
-                                            //   onSuccess('ok', file);
-                                          } catch (error) {
-                                            //   onError(error, 'error', file);
-                                          }
-                                        } else {
-                                          // onError(new Error('File upload failed'), 'error', file);
-                                        }
-                                      } else {
-                                        //   onError(
-                                        //     new Error('Event or target is undefined'),
-                                        //     'error',
-                                        //     file
-                                        //   );
-                                      }
-                                    };
-
-                                    //   reader.readAsArrayBuffer(file);
-                                  }}
-                                >
-                                  <Button icon={<UploadOutlined />}>{t(`ghgInventory:upload`)}</Button>
-                                </Upload>
-                              </Form.Item>
+                            <Col xl={15} md={15} className="view-download-file-name-input">
+                              <Input value={`GHG-Reporting Emission_${tabData.year}_V${tabData.version}.csv`} disabled />
                             </Col>
-                            <Col xl={16} md={16} className="add-new-upload-file-name-input">
-                              <Input value={uploadedFileName} readOnly />
+                            <Col xl={5} md={5} className="view-download-file-inner-col">
+                              <Button icon={<DownloadOutlined />} onClick={() => {downloadCSV(tabData)}}>
+                                {t(`ghgInventory:download`)}
+                              </Button>
                             </Col>
+
                           </Row>
                         </Col>
                       </Row>
@@ -1721,60 +1755,122 @@ export const GHGProjectionsComponent = (props: any) => {
                           isActive ? <MinusCircleOutlined /> : <PlusCircleOutlined />
                         }
                       >
-                        {Object.entries(formFields).map(([panelHeading, panelContent]) => (
-                          <Panel
-                            header={renderPanelHeaderView(panelHeading, tabData)}
-                            key={panelHeading}
-                          >
-                            {Array.isArray(panelContent)
-                              ? panelContent.map((item, index) => {
-                                for (const key in tabData) {
-                                  if (key === panelHeading) {
-                                    const emissionsObject = tabData[key];
-                                    const emissionsData = emissionsObject[item];
-                                    return renderPanelContentView(
-                                      emissionsData?.bau,
-                                      emissionsData?.conditionalNdc,
-                                      emissionsData?.unconditionalNdc,
-                                      item,
-                                      index
-                                    );
-                                  }
-                                }
-                              })
-                              : Object.entries(panelContent).map(
-                                ([subPanelHeading, subPanelContent]) => (
-                                  <div className="sub-panel">
-                                    <div className="sub-panel-heading">
-                                      {renderPanelHeaderView(
-                                        subPanelHeading,
-                                        tabData.energyEmissions
-                                      )}
-                                    </div>
-                                    {subPanelContent.map((item, index) => {
-                                      for (const key in tabData.energyEmissions[
-                                        subPanelHeading
-                                      ]) {
-                                        if (key === item) {
-                                          const emissionsObject =
-                                            tabData.energyEmissions[subPanelHeading];
-                                          const emissionsData = emissionsObject[item];
-                                          return renderPanelContentView(
-                                            emissionsData?.bau,
-                                            emissionsData?.conditionalNdc,
-                                            emissionsData?.unconditionalNdc,
-                                            item,
-                                            index
-                                          );
+                        {Object.entries(formFields).map(([panelHeading, panelContent]) => {
+                          const projectionsObject = tabData[panelHeading];
+                          const sectionTotalBau = calculateSumEmissionView(projectionsObject, 'bau');
+                          const sectionTotalConditionalNdc = calculateSumEmissionView(projectionsObject, 'conditionalNdc');
+                          const sectionTotalUnconditionalNdc = calculateSumEmissionView(projectionsObject, 'unconditionalNdc');
+                          if (!isSectionDataEmpty(sectionTotalBau, sectionTotalConditionalNdc, sectionTotalUnconditionalNdc)) {
+                            return (
+                              <Panel
+                                header={renderPanelHeaderView(panelHeading, tabData)}
+                                key={panelHeading}
+                              >
+                                {Array.isArray(panelContent)
+                                  ? panelContent.map((item, index) => {
+                                    for (const key in tabData) {
+                                      if (key === panelHeading) {
+                                        const emissionsObject = tabData[key];
+                                        const emissionsData = emissionsObject[item];
+                                        if (!isRowDataEmpty(emissionsData)) {
+                                        return renderPanelContentView(
+                                          emissionsData?.bau,
+                                          emissionsData?.conditionalNdc,
+                                          emissionsData?.unconditionalNdc,
+                                          item,
+                                          index
+                                        );
                                         }
                                       }
-                                    })}
-                                  </div>
-                                )
-                              )}
-                          </Panel>
-                        ))}
+                                    }
+                                  })
+                                  : Object.entries(panelContent).map(
+                                    ([subPanelHeading, subPanelContent]) => {
+                                      const projectionsObject = tabData.energyEmissions[subPanelHeading];
+                          const sectionTotalBau = calculateSumEmissionView(projectionsObject, 'bau');
+                          const sectionTotalConditionalNdc = calculateSumEmissionView(projectionsObject, 'conditionalNdc');
+                          const sectionTotalUnconditionalNdc = calculateSumEmissionView(projectionsObject, 'unconditionalNdc');
+                          if (!isSectionDataEmpty(sectionTotalBau, sectionTotalConditionalNdc, sectionTotalUnconditionalNdc)) {
+                                      return (
+                                      <div className="sub-panel">
+                                        <div className="sub-panel-heading">
+                                          {renderPanelHeaderView(
+                                            subPanelHeading,
+                                            tabData.energyEmissions
+                                          )}
+                                        </div>
+                                        {subPanelContent.map((item, index) => {
+                                          for (const key in tabData.energyEmissions[
+                                            subPanelHeading
+                                          ]) {
+                                            if (key === item) {
+                                              const emissionsObject =
+                                                tabData.energyEmissions[subPanelHeading];
+                                              const emissionsData = emissionsObject[item];
+                                              if (!isRowDataEmpty(emissionsData)) {
+                                              return renderPanelContentView(
+                                                emissionsData?.bau,
+                                                emissionsData?.conditionalNdc,
+                                                emissionsData?.unconditionalNdc,
+                                                item,
+                                                index
+                                              );
+                                              }
+                                            }
+                                          }
+                                        })}
+                                      </div>
+                                    )
+                                      }
+                                  }
+                                  )}
+                              </Panel>
+                            )
+                          }
+                        })}
                       </Collapse>
+                      {(!isRowDataEmpty(tabData.totalCo2WithoutLand)) && (
+                      <Row
+                              gutter={16}
+                              key={'totalCo2WithoutLand'}
+                              className="total-co2-without-land-row"
+                            >
+                              <Col xl={12} md={12} className="total-co2-without-land-title">
+                                <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
+                              </Col>
+                              <Col xl={9} md={9}>
+                                <Row gutter={16} className="panel-content-input-box-row">
+                                  <Col xl={7}>
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.bau} disabled />
+                                  </Col>
+                                  <Col xl={7}>
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.conditionalNdc} disabled />
+                                  </Col>
+                                  <Col xl={7}>
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.unconditionalNdc} disabled />
+                                  </Col>
+                                </Row>
+                              </Col>
+                            </Row>)}
+                            {(!isRowDataEmpty(tabData.totalCo2WithLand)) && (
+                            <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
+                              <Col xl={12} md={12} className="total-co2-with-land-title">
+                                <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
+                              </Col>
+                              <Col xl={9} md={9}>
+                                <Row gutter={16} className="panel-content-input-box-row">
+                                  <Col xl={7}>
+                                    <InputNumber value={tabData.totalCo2WithLand?.bau} disabled />
+                                  </Col>
+                                  <Col xl={7}>
+                                    <InputNumber value={tabData.totalCo2WithLand?.conditionalNdc} disabled />
+                                  </Col>
+                                  <Col xl={7}>
+                                    <InputNumber value={tabData.totalCo2WithLand?.unconditionalNdc} disabled />
+                                  </Col>
+                                </Row>
+                              </Col>
+                            </Row>)}
                     </div>
                   </Tabs.TabPane>
                 )

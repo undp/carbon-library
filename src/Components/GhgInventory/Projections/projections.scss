@@ -88,6 +88,25 @@
         }
     }
 
+    .view-download-file-name-input {
+        input {
+            height: 50px;
+            color: $primary-color;
+        }
+    }
+
+    .view-download-file-inner-col {
+        button {
+            height: 50px;
+            font-size: 12px;
+            font-weight: 400;
+            width: 135px;
+            margin-left: 5px;
+            color: #8C8C8C;
+            border-radius: 4px;
+        }
+    }
+
     .table-heading-row {
         padding-top: 20px;
         padding-bottom: 25px;
@@ -273,6 +292,12 @@
             border-bottom: 1px solid rgba(217, 217, 217, 0.6);
         }
 
+    }
+
+    .view-data-panel {
+        .panel-content-input-box-row {
+            padding-bottom: 24px;
+        }
     }
 
     .steps-actions {
