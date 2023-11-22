@@ -102,21 +102,23 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
         }
       }
 
-      const date = new Date(); 
-      const year = String(date.getFullYear());
-      const diff = Number(date) - Number(new Date(date.getFullYear(), 0, 0));
-      const dayOfYear = String(Math.floor(diff / (1000 * 60 * 60 * 24)));
-      const today = Number(year+dayOfYear)
-      const lastItmoseq = await this.counterRepo.findOneBy({
-        id: CounterType.ITMO_SYSTEM,
-      });
-      let lastDate = 0
-      if (lastItmoseq) {
-        lastDate = lastItmoseq.counter;
-      }
-      if(today>lastDate){
-        await this.dataImportService.importData({importTypes: this.configService.get('ITMOSystem.enable')})
-        await this.counterRepo.save({ id: CounterType.ITMO_SYSTEM, counter:  today})
+      if(this.configService.get('ITMOSystem.enable')){
+        const date = new Date(); 
+        const year = String(date.getFullYear());
+        const diff = Number(date) - Number(new Date(date.getFullYear(), 0, 0));
+        const dayOfYear = String(Math.floor(diff / (1000 * 60 * 60 * 24)));
+        const today = Number(year+dayOfYear)
+        const lastItmoseq = await this.counterRepo.findOneBy({
+          id: CounterType.ITMO_SYSTEM,
+        });
+        let lastDate = 0
+        if (lastItmoseq) {
+          lastDate = lastItmoseq.counter;
+        }
+        if(today>lastDate){
+          await this.dataImportService.importData({importTypes:"ITMO_SYSTEM"})
+          await this.counterRepo.save({ id: CounterType.ITMO_SYSTEM, counter:  today})
+        }
       }
       setTimeout( replicateActions , 1000)
     }

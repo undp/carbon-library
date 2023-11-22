@@ -906,7 +906,7 @@ export class ProgrammeService {
           await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, certifierUser ? this.getUserRef(certifierUser):'', d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
         }
       } 
-      if((program && d.type == DocType.METHODOLOGY_DOCUMENT) || (program && this.configService.get('ITMOSystem.enable')) ) {
+      if(program && ((d && d.type == DocType.METHODOLOGY_DOCUMENT) || this.configService.get('ITMOSystem.enable'))) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
           program.currentStage = ProgrammeStage.APPROVED;

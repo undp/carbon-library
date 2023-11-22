@@ -18,6 +18,7 @@ import { EmailTemplates } from "../../shared/email-helper/email.template";
 import { EmailHelperService } from "../../shared/email-helper/email-helper.service";
 import { AuthorizationLetterGen } from "../../shared/util/authorisation.letter.gen";
 import { DataListResponseDto } from "../../shared/dto/data.list.response";
+import { SYSTEM_TYPE } from "../../shared/enum/system.names.enum";
 
 function flatten(ary) {
   if (!ary) {
@@ -273,14 +274,16 @@ export class ITMOSystemImporter implements ImporterInterface {
                       "designDocUrl",
                       "methodologyDocUrl"
                     );
-                    const updateprogrammetable = await this.programmeLedger.addDocument(
-                      projectDetails.id,
-                      undefined,
-                      authLetterUrl,
-                      undefined,
-                      undefined,
-                      undefined
-                    )
+                    if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
+                      const updateprogrammetable = await this.programmeLedger.addDocument(
+                        projectDetails.id,
+                        undefined,
+                        authLetterUrl,
+                        undefined,
+                        undefined,
+                        undefined
+                      )
+                    }
                   } catch(error){
                     this.logger.error("Error in Authorising ITMO project",error)
                     }
