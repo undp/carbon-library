@@ -3,42 +3,34 @@ import {
   Col,
   DatePicker,
   Empty,
-  Form,
   PaginationProps,
-  Popconfirm,
   Row,
   Space,
   Table,
   Tabs,
   TabsProps,
-  Tooltip,
-  Typography,
   message,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import { EditableCell } from "../Common/AntComponents/antTableComponents";
+import {
+  EditableRow,
+  EditableCell,
+} from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role } from "../../Definitions";
-import {
-  EditOutlined,
-  ExclamationCircleOutlined,
-  SaveOutlined,
-} from "@ant-design/icons";
 
-type NdcPeriod = {
+type Period = {
   start: number;
   end: number;
 };
 
 type NdcDetail = {
-  key: string;
-  ndcActionId: string;
+  key: number;
   startDate: Date;
   endDate: Date;
   nationalPlanObj: string;
   kpi: number;
-  ministry: string;
   subNdcDetails?: [];
 };
 
@@ -55,30 +47,12 @@ export const NdcDetailsComponent = (props: any) => {
   const periodItemsRef = useRef([] as any[]);
   const [periodItems, setPeriodItems] = useState([] as any[]);
   const [selectedTab, setSelectedTab] = useState("add_new");
-  const selectedPeriod = useRef({} as NdcPeriod);
+  const selectedPeriod = useRef({} as Period);
   const addedNdcDetailId = useRef(0);
   const selectedNdcDetail = useRef({} as NdcDetail);
   const [tableKey, setTableKey] = useState(0);
-  const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState("");
 
   const { userInfoState } = useUserContext();
-
-  const isEditing = (record: NdcDetail) => record.key === editingKey;
-
-  const onEditRow = (record: Partial<NdcDetail> & { key: React.Key }) => {
-    form.setFieldsValue({
-      nationalPlanObj: "",
-      kpi: "",
-      ministry: "",
-      ...record,
-    });
-    setEditingKey(record.key);
-  };
-
-  const onEditCancel = () => {
-    setEditingKey("");
-  };
 
   const isAddRangeVisible = () => {
     return (
@@ -105,64 +79,70 @@ export const NdcDetailsComponent = (props: any) => {
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
 
-  const onHandleSave = async (record: any) => {
-    try {
-      const updatedNdcDetails = [...ndcDetailsData];
-      const editedData = (await form.validateFields()) as NdcDetail;
-      if (record) {
-        if (record.type === NdcActionType.main) {
-          const index = updatedNdcDetails.findIndex(
-            (item) => record.key === item.key
-          );
-          updatedNdcDetails.splice(index, 1, {
-            ...record,
-            ...editedData,
-          });
-          setNdcDetailsData(updatedNdcDetails);
-        } else {
-          const parentIndex = updatedNdcDetails.findIndex(
-            (item: any) => record.ndcActionId === item.key
-          );
-          const parentItem = updatedNdcDetails[parentIndex];
-          if (parentItem) {
-            if (parentItem.subNdcDetails) {
-              const itemIndex = parentItem.subNdcDetails.findIndex(
-                (item: any) => record.key === item.key
-              );
-              if (itemIndex !== -1) {
-                parentItem.subNdcDetails.splice(itemIndex, 1, {
-                  ...record,
-                  ...editedData,
-                });
-              }
-              if (itemIndex + 1 === parentItem.subNdcDetails.length) {
-                parentItem.subNdcDetails.push({
-                  key: ++addedNdcDetailId.current,
-                  ndcActionId: parentItem.key,
-                  type: NdcActionType.sub,
-                  startDate: new Date("2019-03-25"),
-                  endDate: new Date("2020-03-25"),
-                  nationalPlanObj: "",
-                  kpi: "",
-                  ministry: "",
-                });
-              }
-            }
+  function onAddNewSubNdcDetail() {
+    const range = selectedTab.split('-');
+    const ndcDetail = ndcDetailsData.find(
+      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
+    );
+    const ndcDetailItemIndex = ndcDetailsData.findIndex(
+      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
+    );
 
-            updatedNdcDetails.splice(parentIndex, 1, {
-              ...parentItem,
-            });
-            setNdcDetailsData(updatedNdcDetails);
+    if (ndcDetail) {
+      addedNdcDetailId.current = addedNdcDetailId.current + 1;
+      const newData = {
+        key: addedNdcDetailId.current,
+        startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
+        endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
+        ndcActionId: ndcDetail?.key,
+        nationalPlanObj: '',
+        kpi: '',
+        ministry: '',
+      };
+      if (!ndcDetail.subNdcDetails) {
+        ndcDetail.subNdcDetails = [];
+      }
+      ndcDetail.subNdcDetails.push(newData);
+    }
+
+    ndcDetailsData[ndcDetailItemIndex] = ndcDetail;
+    setNdcDetailsData(ndcDetailsData);
+    setTableKey((key: any) => key + 1);
+  }
+
+  const handleSave = (row: any) => {
+    setNdcDetailsData((prevData: any) => {
+      const newData = JSON.parse(JSON.stringify(prevData));
+      if (row.type === NdcActionType.main) {
+        const index = newData.findIndex((item: any) => row.key === item.key);
+        if (index !== -1) {
+          newData[index] = { ...newData[index], ...row };
+        }
+      } else {
+        const parentIndex = newData.findIndex((item: any) => row.ndcActionId === item.key);
+        const parentItem = newData[parentIndex];
+
+        if (parentItem) {
+          if (parentItem.subNdcDetails) {
+            const itemIndex = parentItem.subNdcDetails.findIndex(
+              (item: any) => row.key === item.key
+            );
+
+            if (itemIndex === -1) {
+              parentItem.subNdcDetails.push(row);
+            } else {
+              parentItem.subNdcDetails[itemIndex] = { ...row };
+            }
+          } else {
+            parentItem.subNdcDetails = [row];
           }
         }
-        setEditingKey("");
-        setTableKey((key) => key + 1);
-      } else {
-        throw new Error("Save failed");
+
+        newData[parentIndex] = { ...parentItem };
+        setTableKey((key: any) => key + 1);
       }
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
-    }
+      return newData;
+    });
   };
 
   const getNdcDetailsForPeriod = () => {
@@ -181,11 +161,22 @@ export const NdcDetailsComponent = (props: any) => {
     }
   };
 
-  const getSubNdcDetails = (key: string) => {
+  const getSubNdcDetails = (key: number) => {
     const ndcDetail = ndcDetailsData.find(
       (item: NdcDetail) => item.key === key
     );
     if (ndcDetail) {
+      if (
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry.trim() !== '' &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj.trim() !==
+        '' &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj &&
+        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi).trim() !== '' &&
+        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi)
+      ) {
+        onAddNewSubNdcDetail();
+      }
       return ndcDetail.subNdcDetails;
     } else {
       return [];
@@ -199,7 +190,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "nationalPlanObj",
       align: "left" as const,
       editable: true,
-      width: 800,
+      width: "50%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -207,7 +198,11 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.nationalPlanObj}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Please add the National Plan Objective"
+              className="ant-input"
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -218,7 +213,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "kpi",
       align: "left" as const,
       editable: true,
-      width: 100,
+      width: "10%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -226,7 +221,11 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpi}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Enter Kpi"
+              className="ant-input"
+              type="text"
+            ></input>
           )}
         </>
       ),
@@ -237,6 +236,7 @@ export const NdcDetailsComponent = (props: any) => {
       key: "ministry",
       align: "left" as const,
       editable: true,
+      width: "40%",
       render: (_: any, record: any) => (
         <>
           {record.nationalPlanObj ? (
@@ -244,44 +244,14 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.ministry}</span>
             </Space>
           ) : (
-            <input className="ant-input" disabled type="text"></input>
+            <input
+              placeholder="Please add the Ministry name"
+              className="ant-input"
+              type="text"
+            ></input>
           )}
         </>
       ),
-    },
-    {
-      title: "Action",
-      dataIndex: "operation",
-      render: (_: any, record: NdcDetail) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Tooltip title="Save">
-              <Typography.Link
-                onClick={() => onHandleSave(record)}
-                style={{ marginRight: 20 }}
-              >
-                <SaveOutlined />
-              </Typography.Link>
-            </Tooltip>
-            <Tooltip title="Cancel">
-              <Typography.Link
-                onClick={onEditCancel}
-                style={{ marginRight: 8 }}
-              >
-                <ExclamationCircleOutlined />
-              </Typography.Link>
-            </Tooltip>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => onEditRow(record)}
-          >
-            <EditOutlined />
-          </Typography.Link>
-        );
-      },
     },
   ];
 
@@ -296,7 +266,7 @@ export const NdcDetailsComponent = (props: any) => {
         editable: col.editable,
         dataIndex: col.dataIndex,
         title: col.title,
-        editing: isEditing(record),
+        handleSave,
       }),
     };
   });
@@ -309,9 +279,9 @@ export const NdcDetailsComponent = (props: any) => {
       type: NdcActionType.main,
       startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
       endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-      nationalPlanObj: t("ndc:enterNewPlanTxt"),
-      kpi: 0,
-      ministry: "Please add the Ministry name",
+      nationalPlanObj: "",
+      kpi: "",
+      ministry: "",
       subNdcDetails: [
         {
           key: ++addedNdcDetailId.current,
@@ -331,15 +301,37 @@ export const NdcDetailsComponent = (props: any) => {
 
   const components = {
     body: {
+      row: EditableRow,
       cell: EditableCell,
     },
   };
 
+  //commented because rendering issue
   function ndcDetailsTableContent() {
-    return <div></div>;
+    return (
+      <div></div>
+      // <div>
+      //   <Button
+      //     onClick={onAddNewNdcDetail}
+      //     type="primary"
+      //     style={{
+      //       marginBottom: 16,
+      //     }}
+      //   >
+      //     Add a row
+      //   </Button>
+      //   <Table
+      //     components={components}
+      //     rowClassName={() => 'editable-row'}
+      //     bordered
+      //     dataSource={ndcDetailsData}
+      //     columns={columns}
+      //   />
+      // </div>
+    );
   }
 
-  const onCancelPeriod = () => {};
+  const onCancelPeriod = () => { };
 
   const onAddNewPeriod = () => {
     if (selectedPeriod && selectedPeriod.current) {
@@ -425,13 +417,28 @@ export const NdcDetailsComponent = (props: any) => {
         columns={columns}
         showHeader={false}
         pagination={false}
+      // footer={() =>
+      //   isAddSubNdcActionVisible() && (
+      //     <Row justify={"center"}>
+      //       <Button
+      //         onClick={onAddNewSubNdcDetail}
+      //         type="default"
+      //         style={{
+      //           marginBottom: 16,
+      //           width: "100%",
+      //         }}
+      //       >
+      //         {t("ndc:addSubNdcAction")}
+      //       </Button>
+      //     </Row>
+      //   )
+      // }
       />
     );
   }
 
   const onTabChange = (key: string) => {
     setSelectedTab(key);
-    setEditingKey("");
   };
 
   useEffect(() => {
@@ -581,13 +588,85 @@ export const NdcDetailsComponent = (props: any) => {
         type: NdcActionType.main,
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Other",
-        kpi: 10,
+        nationalPlanObj: "Convert to solar energy",
+        kpi: 50000,
         ministry: "Ministry of Environment",
         subNdcDetails: [
           {
             key: 11,
             ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Convert to solar energy",
+            kpi: "3000",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 14,
+            ndcActionId: 13,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 15,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Strengthen the private sector to create jobs",
+        kpi: 10000,
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 16,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "7200",
+            ministry: "Ministry of Tourism (MoT)",
+          },
+          {
+            key: 17,
+            ndcActionId: 15,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "",
+            kpi: "",
+            ministry: "",
+          },
+        ],
+      },
+      {
+        key: 18,
+        type: NdcActionType.main,
+        startDate: new Date("2022-03-25"),
+        endDate: new Date("2023-03-25"),
+        nationalPlanObj: "Other",
+        kpi: '',
+        ministry: "Ministry of Environment",
+        subNdcDetails: [
+          {
+            key: 19,
+            ndcActionId: 18,
+            type: NdcActionType.sub,
+            startDate: new Date("2019-03-25"),
+            endDate: new Date("2020-03-25"),
+            nationalPlanObj: "Strengthen the private sector to create jobs",
+            kpi: "",
+            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
+          },
+          {
+            key: 20,
+            ndcActionId: 18,
             type: NdcActionType.sub,
             startDate: new Date("2019-03-25"),
             endDate: new Date("2020-03-25"),
@@ -625,7 +704,7 @@ export const NdcDetailsComponent = (props: any) => {
       });
     }
 
-    addedNdcDetailId.current = 5;
+    addedNdcDetailId.current = 20;
     setPeriodItems(initialPeriods);
     periodItemsRef.current = initialPeriods;
     setNdcDetailsData(defaultNdcDetails);
@@ -653,37 +732,35 @@ export const NdcDetailsComponent = (props: any) => {
       {selectedTab !== "add_new" && (
         <div>
           <div>
-            <Form form={form} component={false}>
-              <Table
-                key={tableKey}
-                components={components}
-                rowClassName={() => "editable-row"}
-                bordered
-                dataSource={getNdcDetailsForPeriod()}
-                columns={columns}
-                expandable={{
-                  expandedRowRender: (record) => getSubNdcActionContent(record),
-                  indentSize: 0,
-                  defaultExpandedRowKeys: [selectedNdcDetail.current.key],
-                }}
-                footer={() =>
-                  isAddNdcActionVisible() && (
-                    <Row justify={"center"}>
-                      <Button
-                        onClick={onAddNewNdcDetail}
-                        type="default"
-                        style={{
-                          marginBottom: 16,
-                          width: "100%",
-                        }}
-                      >
-                        {t("ndc:addNdcAction")}
-                      </Button>
-                    </Row>
-                  )
-                }
-              />
-            </Form>
+            <Table
+              key={tableKey}
+              components={components}
+              rowClassName={() => "editable-row"}
+              bordered
+              dataSource={getNdcDetailsForPeriod()}
+              columns={columns}
+              expandable={{
+                expandedRowRender: (record) => getSubNdcActionContent(record),
+                indentSize: 0,
+                defaultExpandedRowKeys: [selectedNdcDetail.current.key],
+              }}
+              footer={() =>
+                isAddNdcActionVisible() && (
+                  <Row justify={"center"}>
+                    <Button
+                      onClick={onAddNewNdcDetail}
+                      type="default"
+                      style={{
+                        marginBottom: 16,
+                        width: "100%",
+                      }}
+                    >
+                      {t("ndc:addNdcAction")}
+                    </Button>
+                  </Row>
+                )
+              }
+            />
           </div>
         </div>
       )}

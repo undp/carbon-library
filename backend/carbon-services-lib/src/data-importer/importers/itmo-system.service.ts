@@ -223,18 +223,18 @@ export class ITMOSystemImporter implements ImporterInterface {
                   }))
               
               this.logger.log(`Issue list values: ${list}`)
-              if (list && list.includes("Upload Final Monitoring Report")) {
-                const resp = await this.programmeService.issueProgrammeCredit(
-                  {
-                    programmeId: programmeEvents[programmeEvents.length - 1].data.programmeId,
-                    issueAmount: 10,
-                    comment: "ITMO system issue",
-                  },
-                  rootUser
-                );
+              // if (list && list.includes("Upload Final Monitoring Report")) {
+              //   const resp = await this.programmeService.issueProgrammeCredit(
+              //     {
+              //       programmeId: programmeEvents[programmeEvents.length - 1].data.programmeId,
+              //       issueAmount: 10,
+              //       comment: "ITMO system issue",
+              //     },
+              //     rootUser
+              //   );
 
-                this.logger.log(`Issue credit response ${resp}`)
-              }
+              //   this.logger.log(`Issue credit response ${resp}`)
+              // }
             }
           }
         }
