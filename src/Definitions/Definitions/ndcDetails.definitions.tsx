@@ -8,10 +8,10 @@ export type Period = {
 };
 
 export type NdcDetail = {
-  id?: number;
+  id: number;
   actionType: NdcDetailsActionType;
   nationalPlanObjective: string;
-  kpi: number;
+  kpi: number|string;
   ministryName: string;
   periodId?: number;
   status: NdcDetailsActionStatus;
@@ -30,6 +30,7 @@ export enum NdcDetailsActionType {
 }
 
 export enum NdcDetailsActionStatus {
+  New = 'New',
   Pending = 'Pending',
   Approved = 'Approved',
   Rejected = 'Rejected'

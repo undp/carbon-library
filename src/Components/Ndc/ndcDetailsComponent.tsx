@@ -3,6 +3,7 @@ import {
   Col,
   DatePicker,
   Empty,
+  Form,
   List,
   PaginationProps,
   Popover,
@@ -19,10 +20,7 @@ import {
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  EditableRow,
-  EditableCell,
-} from "../Common/AntComponents/antTableComponents";
+import { EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role, addSpaces } from "../../Definitions";
 import {
@@ -53,6 +51,15 @@ export const NdcDetailsComponent = (props: any) => {
   const [ministryOrgList, setMinistryOrgList] = useState([] as any);
   const [actionInfo, setActionInfo] = useState<any>({});
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [form] = Form.useForm();
+  const [editingKey, setEditingKey] = useState<number>(-1);
+  const [nextAvailableActionId, setNextAvailableActionId] = useState(0);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([] as any[]);
+  const [subNdcDetailsForPeriod, setSubNdcDetailsForPeriod] = useState(
+    [] as NdcDetail[]
+  );
+
+  const isEditing = (record: NdcDetail) => record.id === editingKey;
 
   const { userInfoState } = useUserContext();
 
@@ -95,45 +102,38 @@ export const NdcDetailsComponent = (props: any) => {
     );
   };
 
-  const getSubNdcDetailsForPeriod = (id: number) => {
-    const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
-      return (
-        ndcDetail.parentActionId === id &&
-        ndcDetail.actionType === NdcDetailsActionType.SubAction
-      );
-    });
-
-    const emptySubNdcRow = {
-      actionType: NdcDetailsActionType.SubAction,
-      nationalPlanObjective: "",
-      kpi: 0,
-      ministryName: loginMinistry,
-      status: NdcDetailsActionStatus.Pending,
-      parentActionId: id,
-    };
-
-    return [...subNdcDetails, emptySubNdcRow];
-  };
-
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
 
   const handleSave = async (row: any) => {
-    const updatedItemIndex = ndcDetailsData.findIndex(
-      (item: NdcDetail) => item.id === row.id
-    );
-    if (updatedItemIndex === -1) {
-      const response = await post("national/programme/addNdcDetailsAction", {
+    try {
+      const updatedFields = (await form.validateFields()) as NdcDetail;
+      const updatedItem = {
         ...row,
-        kpi: parseInt(row.kpi),
-      });
-    } else {
-      const response = await put("national/programme/updateNdcDetailsAction", {
-        ...row,
-        kpi: parseInt(row.kpi),
-      });
+        ...updatedFields,
+      };
+
+      if (updatedItem.status === NdcDetailsActionStatus.New) {
+        updatedItem.status = NdcDetailsActionStatus.Pending;
+        const response = await post("national/programme/addNdcDetailsAction", {
+          ...updatedItem,
+          kpi: parseInt(updatedItem.kpi),
+        });
+      } else {
+        updatedItem.status = NdcDetailsActionStatus.Pending;
+        const response = await put(
+          "national/programme/updateNdcDetailsAction",
+          {
+            ...updatedItem,
+            kpi: parseInt(updatedItem.kpi),
+          }
+        );
+      }
+      fetchNdcDetailActions();
+      setEditingKey(-1);
+    } catch (exception) {
+      console.log("error", exception);
     }
-    fetchNdcDetailActions();
   };
 
   const actionMenu = (record: NdcDetail) => {
@@ -195,21 +195,6 @@ export const NdcDetailsComponent = (props: any) => {
       align: "left" as const,
       width: "40%",
       editable: true,
-      render: (_: any, record: any) => (
-        <>
-          {record.nationalPlanObjective ? (
-            <Space size="middle">
-              <span>{record.nationalPlanObjective}</span>
-            </Space>
-          ) : (
-            <input
-              placeholder="Please add the National Plan Objective"
-              className="ant-input"
-              type="text"
-            ></input>
-          )}
-        </>
-      ),
     },
     {
       title: t("ndc:ndcColumnsKpi"),
@@ -218,21 +203,6 @@ export const NdcDetailsComponent = (props: any) => {
       align: "left" as const,
       width: "15%",
       editable: true,
-      render: (_: any, record: any) => (
-        <>
-          {record.kpi ? (
-            <Space size="middle">
-              <span>{record.kpi}</span>
-            </Space>
-          ) : (
-            <input
-              placeholder="Enter Kpi"
-              className="ant-input"
-              type="text"
-            ></input>
-          )}
-        </>
-      ),
     },
     {
       title: t("ndc:ndcColumnsMinistry"),
@@ -244,12 +214,15 @@ export const NdcDetailsComponent = (props: any) => {
       render: (_: any, record: any) => (
         <>
           <Select
-            disabled={!isSubNdcActionsEditable(record)}
+            disabled={!(isSubNdcActionsEditable(record) && isEditing(record))}
             defaultValue={
               record.ministryName ? record.ministryName : loginMinistry
             }
             style={{ width: 320 }}
-            onChange={() => {}}
+            onChange={(value: any, option: any) => {
+              record.ministryName = option.label;
+              handleSave(record);
+            }}
             options={ministryOrgList}
           />
         </>
@@ -266,7 +239,8 @@ export const NdcDetailsComponent = (props: any) => {
         const menu = actionMenu(record);
         return (
           <>
-            {record.actionType === NdcDetailsActionType.SubAction ? (
+            {record.actionType === NdcDetailsActionType.SubAction &&
+            record.status !== NdcDetailsActionStatus.New ? (
               <Tooltip
                 title={record.status}
                 color={TooltipColor}
@@ -311,13 +285,9 @@ export const NdcDetailsComponent = (props: any) => {
       onCell: (record: NdcDetail) => {
         return {
           record,
-          editable:
-            record.actionType === NdcDetailsActionType.MainAction
-              ? isMainNdcActionsEditable
-              : isSubNdcActionsEditable(record),
+          editing: isEditing(record),
           dataIndex: col.dataIndex,
           title: col.title,
-          handleSave,
         };
       },
     };
@@ -325,34 +295,35 @@ export const NdcDetailsComponent = (props: any) => {
 
   async function onClickedAddNewNdcDetail() {
     if (selectedPeriod.key !== "add_new") {
+      form.setFieldsValue({
+        nationalPlanObjective: "",
+        kpi: "",
+      });
       const periodId: number = parseInt(selectedPeriod.key);
       const newData: NdcDetail = {
+        id: nextAvailableActionId,
         actionType: NdcDetailsActionType.MainAction,
         nationalPlanObjective: "",
-        kpi: 0,
+        kpi: "",
         ministryName: loginMinistry,
         periodId: periodId,
-        status: NdcDetailsActionStatus.Pending,
+        status: NdcDetailsActionStatus.New,
       };
 
-      const response = await post("national/programme/addNdcDetailsAction", {
-        ...newData,
-      });
+      setEditingKey(nextAvailableActionId);
 
-      if (response && response.data) {
-        const newlyCreatedNdcAction = response.data;
-        setNdcDetailsData((ndcDetailsData: NdcDetail[]) => [
-          ...ndcDetailsData,
-          newlyCreatedNdcAction,
-        ]);
-        setTableKey((key: any) => key + 1);
-      }
+      setNextAvailableActionId((value) => value + 1);
+
+      setNdcDetailsData((ndcDetailsData: NdcDetail[]) => [
+        ...ndcDetailsData,
+        newData,
+      ]);
+      setTableKey((key: any) => key + 1);
     }
   }
 
   const components = {
     body: {
-      row: EditableRow,
       cell: EditableCell,
     },
   };
@@ -380,42 +351,97 @@ export const NdcDetailsComponent = (props: any) => {
     setOpenConfirmationModal(true);
   };
 
+  const onMainTableRowExpand = (expanded: any, record: any) => {
+    const keys = [];
+    if (expanded) {
+      keys.push(record.id);
+    }
+
+    setExpandedRowKeys(keys);
+
+    const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
+      return (
+        ndcDetail.parentActionId === record.id &&
+        ndcDetail.actionType === NdcDetailsActionType.SubAction
+      );
+    });
+
+    const emptySubNdcRow = {
+      id: nextAvailableActionId,
+      actionType: NdcDetailsActionType.SubAction,
+      nationalPlanObjective: "",
+      kpi: "",
+      ministryName: loginMinistry,
+      status: NdcDetailsActionStatus.New,
+      parentActionId: record.id,
+    };
+
+    setEditingKey(nextAvailableActionId);
+    setNextAvailableActionId((value) => value + 1);
+
+    form.setFieldsValue({
+      nationalPlanObjective: "",
+      kpi: "",
+    });
+
+    setSubNdcDetailsForPeriod([...subNdcDetails, emptySubNdcRow]);
+  };
+
   function ndcDetailsTableContent() {
     return (
       <div>
         <Row>
           <Col span={24}>
-            <Table
-              key={tableKey}
-              rowKey="id"
-              components={components}
-              rowClassName={() => "editable-row"}
-              bordered
-              dataSource={ndcMainDetailsForPeriod}
-              columns={columns}
-              expandable={{
-                expandedRowRender: (record) => getSubNdcActionContent(record),
-                indentSize: 0,
-                //defaultExpandedRowKeys: [parseInt(selectedNdcDetail.current.id)],
-              }}
-              footer={() =>
-                isGovernmentUser &&
-                !selectedPeriod.finalized && (
-                  <Row justify={"center"}>
-                    <Button
-                      onClick={onClickedAddNewNdcDetail}
-                      type="default"
-                      style={{
-                        marginBottom: 16,
-                        width: "100%",
-                      }}
-                    >
-                      {t("ndc:addNdcAction")}
-                    </Button>
-                  </Row>
-                )
-              }
-            />
+            <Form form={form} component={false}>
+              <Table
+                key={tableKey}
+                rowKey="id"
+                components={components}
+                rowClassName={() => "editable-row"}
+                bordered
+                dataSource={ndcMainDetailsForPeriod}
+                columns={columns}
+                expandedRowKeys={expandedRowKeys}
+                onExpand={onMainTableRowExpand}
+                expandable={{
+                  expandedRowRender: (record) => getSubNdcActionContent(record),
+                  indentSize: 0,
+                  //defaultExpandedRowKeys: [parseInt(selectedNdcDetail.current.id)],
+                }}
+                onRow={(record: NdcDetail, rowIndex) => {
+                  return {
+                    onClick: () => {
+                      if (record.id && isMainNdcActionsEditable && !isEditing(record)) {
+                        form.setFieldsValue({ ...record });
+                        setEditingKey(record.id);
+                      }
+                    },
+                    onMouseLeave: () => {
+                      if (isEditing(record)) {
+                        handleSave(record);
+                      }
+                    },
+                  };
+                }}
+                footer={() =>
+                  isGovernmentUser &&
+                  !selectedPeriod.finalized && (
+                    <Row justify={"center"}>
+                      <Button
+                        onClick={onClickedAddNewNdcDetail}
+                        type="default"
+                        style={{
+                          marginBottom: 16,
+                          width: "100%",
+                        }}
+                      >
+                        {t("ndc:addNdcAction")}
+                      </Button>
+                    </Row>
+                  )
+                }
+              />
+            </Form>
           </Col>
         </Row>
         {isGovernmentUser && !selectedPeriod.finalized ? (
@@ -524,7 +550,22 @@ export const NdcDetailsComponent = (props: any) => {
         components={components}
         rowClassName={() => "editable-row"}
         bordered
-        dataSource={getSubNdcDetailsForPeriod(record.id)}
+        dataSource={subNdcDetailsForPeriod}
+        onRow={(record: NdcDetail, rowIndex) => {
+          return {
+            onClick: () => {
+              if (record.id && isSubNdcActionsEditable(record) && !isEditing(record)) {
+                form.setFieldsValue({ ...record });
+                setEditingKey(record.id);
+              }
+            },
+            onMouseLeave: () => {
+              if (isEditing(record)) {
+                handleSave(record);
+              }
+            },
+          };
+        }}
         columns={columns}
         showHeader={false}
         pagination={false}
@@ -544,12 +585,10 @@ export const NdcDetailsComponent = (props: any) => {
       const response = await get("national/programme/approveNdcDetailsAction", {
         id: actionInfo.recordId,
       });
-      console.log("response", response);
     } else if (actionInfo.action === "Reject") {
       const response = await get("national/programme/rejectNdcDetailsAction", {
         id: actionInfo.recordId,
       });
-      console.log("response", response);
     } else if (actionInfo.action === "Finalize") {
       const response = await post(
         "national/programme/finalizeNdcDetailsPeriod",
@@ -557,7 +596,6 @@ export const NdcDetailsComponent = (props: any) => {
           id: selectedPeriod.key,
         }
       );
-      console.log("response", response);
       if (response) {
         fetchNdcDetailPeriods();
       }
@@ -613,13 +651,16 @@ export const NdcDetailsComponent = (props: any) => {
   const fetchNdcDetailActions = async () => {
     const response = await get("national/programme/queryNdcDetailsAction");
     if (response && response.data) {
+      const maxActionId = Math.max(
+        ...response.data.map((item: NdcDetail) => item.id)
+      );
+      setNextAvailableActionId(maxActionId + 1);
       setNdcDetailsData(response.data);
     }
   };
 
   const fetchMinistries = async () => {
     const response = await get("national/organisation/getMinistries");
-    console.log("fetchMinistries", response);
     if (response && response.data) {
       const ministryOrgDetails = response.data.map((value: any) => {
         return {
