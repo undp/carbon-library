@@ -31,7 +31,7 @@ export default () => ({
     companyTable: "company",
   },
   email: {
-    source: process.env.SOURCE_EMAIL || "info@xeptagon.com",
+    source: process.env.SOURCE_EMAIL || "info@xeptagon.com", 
     endpoint:
       process.env.SMTP_ENDPOINT ||
       "vpce-02cef9e74f152b675-b00ybiai.email-smtp.us-east-1.vpce.amazonaws.com",
