@@ -52,9 +52,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   let inputNode;
 
   if (dataIndex === "nationalPlanObjective") {
-    inputNode = <Input placeholder="Enter National Plan Objective" />;
+    inputNode = <Input onClick={(event:any)=>event.stopPropagation()} placeholder="Enter National Plan Objective" />;
   } else if (dataIndex === "kpi") {
-    inputNode = <InputNumber placeholder="Enter Kpi" />;
+    inputNode = <InputNumber onClick={(event:any)=>event.stopPropagation()} placeholder="Enter Kpi" />;
   }
 
   return (

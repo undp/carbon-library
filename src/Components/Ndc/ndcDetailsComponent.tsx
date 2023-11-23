@@ -4,6 +4,7 @@ import {
   DatePicker,
   Empty,
   Form,
+  Input,
   List,
   PaginationProps,
   Popover,
@@ -45,8 +46,8 @@ export const NdcDetailsComponent = (props: any) => {
   const [periodItems, setPeriodItems] = useState([] as Period[]);
   const [selectedPeriod, setSelectedPeriod] = useState({} as Period);
   const selectedDateRangeRef = useRef({} as DateRange);
-  const selectedNdcDetail = useRef({} as NdcDetail);
   const [tableKey, setTableKey] = useState(0);
+  const [subTableKey, setSubTableKey] = useState(0);
   const { get, post, put } = useConnection();
   const [ministryOrgList, setMinistryOrgList] = useState([] as any);
   const [actionInfo, setActionInfo] = useState<any>({});
@@ -63,6 +64,13 @@ export const NdcDetailsComponent = (props: any) => {
 
   const { userInfoState } = useUserContext();
 
+  useEffect(() => {
+    if (expandedRowKeys && expandedRowKeys.length > 0) {
+      const expandedKey = expandedRowKeys[0];
+      setNdcSubActionsForMainAction(expandedKey);
+    }
+  }, ndcDetailsData);
+
   const loginMinistry =
     userInfoState?.companyRole === CompanyRole.GOVERNMENT
       ? process.env.REACT_APP_GOVERNMENT_MINISTRY
@@ -75,16 +83,6 @@ export const NdcDetailsComponent = (props: any) => {
   const isGovernmentUser =
     userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
     userInfoState?.userRole !== Role.ViewOnly;
-
-  const ndcMainDetailsForPeriod =
-    selectedPeriod.key !== "add_new"
-      ? ndcDetailsData.filter((ndcDetail: NdcDetail) => {
-          return (
-            ndcDetail.periodId === parseInt(selectedPeriod.key) &&
-            ndcDetail.actionType === NdcDetailsActionType.MainAction
-          );
-        })
-      : [];
 
   const isMainNdcActionsEditable =
     !selectedPeriod.finalized &&
@@ -102,10 +100,60 @@ export const NdcDetailsComponent = (props: any) => {
     );
   };
 
+  const isNdcActionEditable = (record: NdcDetail) => {
+    if (record.actionType === NdcDetailsActionType.MainAction) {
+      return isMainNdcActionsEditable;
+    } else if (record.actionType === NdcDetailsActionType.SubAction) {
+      return isSubNdcActionsEditable(record);
+    }
+  };
+
+  const ndcMainDetailsForPeriod =
+    selectedPeriod.key !== "add_new"
+      ? ndcDetailsData.filter((ndcDetail: NdcDetail) => {
+          return (
+            ndcDetail.periodId === parseInt(selectedPeriod.key) &&
+            ndcDetail.actionType === NdcDetailsActionType.MainAction
+          );
+        })
+      : [];
+
+  const setNdcSubActionsForMainAction = (mainActionId: number) => {
+    let subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
+      return (
+        ndcDetail.parentActionId === mainActionId &&
+        ndcDetail.actionType === NdcDetailsActionType.SubAction
+      );
+    });
+
+    const emptySubNdcRow = {
+      id: nextAvailableActionId,
+      actionType: NdcDetailsActionType.SubAction,
+      nationalPlanObjective: "",
+      kpi: "",
+      ministryName: loginMinistry,
+      status: NdcDetailsActionStatus.New,
+      parentActionId: mainActionId,
+    };
+
+    if (!selectedPeriod.finalized) {
+      subNdcDetails = [...subNdcDetails, emptySubNdcRow];
+      setEditingKey(nextAvailableActionId);
+      setNextAvailableActionId((value) => value + 1);
+
+      form.setFieldsValue({
+        nationalPlanObjective: "",
+        kpi: "",
+      });
+    }
+
+    setSubNdcDetailsForPeriod(subNdcDetails);
+  };
+
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
 
-  const handleSave = async (row: any) => {
+  const handleSave = async (row: NdcDetail) => {
     try {
       const updatedFields = (await form.validateFields()) as NdcDetail;
       const updatedItem = {
@@ -114,10 +162,17 @@ export const NdcDetailsComponent = (props: any) => {
       };
 
       if (updatedItem.status === NdcDetailsActionStatus.New) {
-        updatedItem.status = NdcDetailsActionStatus.Pending;
+        if (
+          isGovernmentUser &&
+          updatedItem.actionType === NdcDetailsActionType.SubAction
+        ) {
+          updatedItem.status = NdcDetailsActionStatus.Approved;
+        } else {
+          updatedItem.status = NdcDetailsActionStatus.Pending;
+        }
         const response = await post("national/programme/addNdcDetailsAction", {
           ...updatedItem,
-          kpi: parseInt(updatedItem.kpi),
+          kpi: parseInt(updatedItem.kpi.toString()),
         });
       } else {
         updatedItem.status = NdcDetailsActionStatus.Pending;
@@ -125,7 +180,7 @@ export const NdcDetailsComponent = (props: any) => {
           "national/programme/updateNdcDetailsAction",
           {
             ...updatedItem,
-            kpi: parseInt(updatedItem.kpi),
+            kpi: parseInt(updatedItem.kpi.toString()),
           }
         );
       }
@@ -137,7 +192,11 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const actionMenu = (record: NdcDetail) => {
-    if (record.status === NdcDetailsActionStatus.Pending && isGovernmentUser) {
+    if (
+      record.status === NdcDetailsActionStatus.Pending &&
+      isGovernmentUser &&
+      !selectedPeriod.finalized
+    ) {
       return (
         <List
           className="action-menu"
@@ -195,6 +254,28 @@ export const NdcDetailsComponent = (props: any) => {
       align: "left" as const,
       width: "40%",
       editable: true,
+      render: (_: any, record: NdcDetail) => (
+        <Space
+          size="middle"
+          onClick={(event: any) => {
+            if (
+              record.id &&
+              isNdcActionEditable(record) &&
+              !isEditing(record)
+            ) {
+              form.setFieldsValue({ ...record });
+              setEditingKey(record.id);
+            }
+            event.stopPropagation();
+          }}
+        >
+          {record.nationalPlanObjective ? (
+            <span>{record.nationalPlanObjective}</span>
+          ) : (
+            <Input placeholder="Enter National Plan Objective" />
+          )}
+        </Space>
+      ),
     },
     {
       title: t("ndc:ndcColumnsKpi"),
@@ -203,6 +284,28 @@ export const NdcDetailsComponent = (props: any) => {
       align: "left" as const,
       width: "15%",
       editable: true,
+      render: (_: any, record: NdcDetail) => (
+        <Space
+          size="middle"
+          onClick={(event: any) => {
+            if (
+              record.id &&
+              isNdcActionEditable(record) &&
+              !isEditing(record)
+            ) {
+              form.setFieldsValue({ ...record });
+              setEditingKey(record.id);
+            }
+            event.stopPropagation();
+          }}
+        >
+          {record.kpi ? (
+            <span>{record.kpi}</span>
+          ) : (
+            <Input placeholder="Enter Kpi" />
+          )}
+        </Space>
+      ),
     },
     {
       title: t("ndc:ndcColumnsMinistry"),
@@ -218,6 +321,17 @@ export const NdcDetailsComponent = (props: any) => {
             defaultValue={
               record.ministryName ? record.ministryName : loginMinistry
             }
+            onClick={(event: any) => {
+              if (
+                record.id &&
+                isNdcActionEditable(record) &&
+                !isEditing(record)
+              ) {
+                form.setFieldsValue({ ...record });
+                setEditingKey(record.id);
+              }
+              event.stopPropagation();
+            }}
             style={{ width: 320 }}
             onChange={(value: any, option: any) => {
               record.ministryName = option.label;
@@ -358,36 +472,32 @@ export const NdcDetailsComponent = (props: any) => {
     }
 
     setExpandedRowKeys(keys);
-
-    const subNdcDetails = ndcDetailsData.filter((ndcDetail: NdcDetail) => {
-      return (
-        ndcDetail.parentActionId === record.id &&
-        ndcDetail.actionType === NdcDetailsActionType.SubAction
-      );
-    });
-
-    const emptySubNdcRow = {
-      id: nextAvailableActionId,
-      actionType: NdcDetailsActionType.SubAction,
-      nationalPlanObjective: "",
-      kpi: "",
-      ministryName: loginMinistry,
-      status: NdcDetailsActionStatus.New,
-      parentActionId: record.id,
-    };
-
-    setEditingKey(nextAvailableActionId);
-    setNextAvailableActionId((value) => value + 1);
-
-    form.setFieldsValue({
-      nationalPlanObjective: "",
-      kpi: "",
-    });
-
-    setSubNdcDetailsForPeriod([...subNdcDetails, emptySubNdcRow]);
+    setNdcSubActionsForMainAction(record.id);
   };
 
-  function ndcDetailsTableContent() {
+  function addNewPeriodContent() {
+    return (
+      <div>
+        <Row justify="start" align="middle" gutter={[16, 16]}>
+          <Col flex="340px">
+            <RangePicker onChange={onDateRangeChanged} picker="year" />
+          </Col>
+          <Col flex="auto">
+            <Button
+              type="primary"
+              onClick={onAddNewPeriod}
+              htmlType="submit"
+              loading={loading}
+            >
+              {t("ndc:submit")}
+            </Button>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  function mainNdcActionTableContent() {
     return (
       <div>
         <Row>
@@ -404,21 +514,29 @@ export const NdcDetailsComponent = (props: any) => {
                 expandedRowKeys={expandedRowKeys}
                 onExpand={onMainTableRowExpand}
                 expandable={{
-                  expandedRowRender: (record) => getSubNdcActionContent(record),
+                  expandedRowRender: (record) =>
+                    subNdcActionTableContent(record),
                   indentSize: 0,
-                  //defaultExpandedRowKeys: [parseInt(selectedNdcDetail.current.id)],
                 }}
                 onRow={(record: NdcDetail, rowIndex) => {
                   return {
                     onClick: () => {
-                      if (record.id && isMainNdcActionsEditable && !isEditing(record)) {
-                        form.setFieldsValue({ ...record });
-                        setEditingKey(record.id);
-                      }
-                    },
-                    onMouseLeave: () => {
                       if (isEditing(record)) {
                         handleSave(record);
+                      }
+                    },
+                  };
+                }}
+                onHeaderRow={() => {
+                  return {
+                    onClick: () => {
+                      if (editingKey === -1) {
+                        const record = ndcDetailsData.find(
+                          (item: NdcDetail) => item.id === editingKey
+                        );
+                        if (record) {
+                          handleSave(record);
+                        }
                       }
                     },
                   };
@@ -472,6 +590,46 @@ export const NdcDetailsComponent = (props: any) => {
     );
   }
 
+  function subNdcActionTableContent(record: any) {
+    console.log("d1 return subNdcActionTableContent", subNdcDetailsForPeriod);
+    return (
+      <Table
+        key={subTableKey}
+        rowKey="id"
+        components={components}
+        rowClassName={() => "editable-row"}
+        bordered
+        dataSource={subNdcDetailsForPeriod}
+        onRow={(record: NdcDetail, rowIndex) => {
+          return {
+            onClick: () => {
+              if (isEditing(record)) {
+                handleSave(record);
+              }
+            },
+          };
+        }}
+        onHeaderRow={() => {
+          return {
+            onClick: () => {
+              if (editingKey === -1) {
+                const record = ndcDetailsData.find(
+                  (item: NdcDetail) => item.id === editingKey
+                );
+                if (record) {
+                  handleSave(record);
+                }
+              }
+            },
+          };
+        }}
+        columns={columns}
+        showHeader={false}
+        pagination={false}
+      />
+    );
+  }
+
   const onAddNewPeriod = async () => {
     if (selectedDateRangeRef && selectedDateRangeRef.current) {
       const periodItem = {
@@ -520,59 +678,6 @@ export const NdcDetailsComponent = (props: any) => {
     selectedDateRangeRef.current = period;
   };
 
-  function addNewPeriodContent() {
-    return (
-      <div>
-        <Row justify="start" align="middle" gutter={[16, 16]}>
-          <Col flex="340px">
-            <RangePicker onChange={onDateRangeChanged} picker="year" />
-          </Col>
-          <Col flex="auto">
-            <Button
-              type="primary"
-              onClick={onAddNewPeriod}
-              htmlType="submit"
-              loading={loading}
-            >
-              {t("ndc:submit")}
-            </Button>
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-
-  function getSubNdcActionContent(record: any) {
-    selectedNdcDetail.current = record;
-    return (
-      <Table
-        rowKey="id"
-        components={components}
-        rowClassName={() => "editable-row"}
-        bordered
-        dataSource={subNdcDetailsForPeriod}
-        onRow={(record: NdcDetail, rowIndex) => {
-          return {
-            onClick: () => {
-              if (record.id && isSubNdcActionsEditable(record) && !isEditing(record)) {
-                form.setFieldsValue({ ...record });
-                setEditingKey(record.id);
-              }
-            },
-            onMouseLeave: () => {
-              if (isEditing(record)) {
-                handleSave(record);
-              }
-            },
-          };
-        }}
-        columns={columns}
-        showHeader={false}
-        pagination={false}
-      />
-    );
-  }
-
   const onTabChange = (key: string) => {
     const selectedPeriod = periodItems.find((item: any) => item.key === key);
     if (selectedPeriod) {
@@ -581,31 +686,32 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const onActionConfirmed = async () => {
+    let actionResponse;
     if (actionInfo.action === "Approve") {
-      const response = await get("national/programme/approveNdcDetailsAction", {
-        id: actionInfo.recordId,
-      });
+      actionResponse = await post(
+        "national/programme/approveNdcDetailsAction",
+        {
+          id: actionInfo.recordId,
+        }
+      );
     } else if (actionInfo.action === "Reject") {
-      const response = await get("national/programme/rejectNdcDetailsAction", {
+      actionResponse = await post("national/programme/rejectNdcDetailsAction", {
         id: actionInfo.recordId,
       });
     } else if (actionInfo.action === "Finalize") {
-      const response = await post(
+      actionResponse = await post(
         "national/programme/finalizeNdcDetailsPeriod",
         {
           id: selectedPeriod.key,
         }
       );
-      if (response) {
-        fetchNdcDetailPeriods();
-      }
     } else if (actionInfo.action === "Delete") {
-      const result = await post("national/programme/deleteNdcDetailsPeriod", {
+      actionResponse = await post("national/programme/deleteNdcDetailsPeriod", {
         id: selectedPeriod.key,
       });
-      if (result) {
-        fetchNdcDetailPeriods();
-      }
+    }
+    if (actionResponse) {
+      fetchNdcDetailPeriods();
     }
     setOpenConfirmationModal(false);
   };
@@ -700,7 +806,7 @@ export const NdcDetailsComponent = (props: any) => {
       <div>
         {selectedPeriod.key === "add_new"
           ? addNewPeriodContent()
-          : ndcDetailsTableContent()}
+          : mainNdcActionTableContent()}
       </div>
       <UserActionConfirmationModel
         t={t}
