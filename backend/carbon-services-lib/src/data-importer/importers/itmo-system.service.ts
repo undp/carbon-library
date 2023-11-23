@@ -225,7 +225,7 @@ export class ITMOSystemImporter implements ImporterInterface {
                 try{
                     this.logger.log("ITMO Project "+projectDetails.name+" Approvement initialisation")
                     const programmedetails = await this.programmeService.findByExternalId(projectDetails.id)
-                    await this.programmeService.approveDocumentCommit(undefined, undefined, undefined, undefined, programmedetails, undefined);
+                    await this.programmeService.itmoProjectApprove(programmedetails);
                     
                     if (step.files && step.files.length > 0) {
                       for (const programmeMaterials of step.files){
@@ -249,8 +249,6 @@ export class ITMOSystemImporter implements ImporterInterface {
               try {
                     this.logger.log("ITMO Project "+projectDetails.name+" Authorisation initialisation")
                     const programmedetails = await this.programmeService.findByExternalId(projectDetails.id)                    
-                    const auth = await this.programmeService.approveProgramme({programmeId: programmedetails.programmeId, issueAmount: 0, comment: "ITMO Authorised"}, rootUser)
-
                     const orgNames:DataListResponseDto  = await this.companyService.queryNames({
                       size: 10,
                       page: 1,
@@ -274,6 +272,7 @@ export class ITMOSystemImporter implements ImporterInterface {
                       "designDocUrl",
                       "methodologyDocUrl"
                     );
+                    const auth = await this.programmeService.approveProgramme({programmeId: programmedetails.programmeId, issueAmount: 0, comment: "ITMO Authorised"}, rootUser, authLetterUrl)
                     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
                       const updateprogrammetable = await this.programmeLedger.addDocument(
                         projectDetails.id,

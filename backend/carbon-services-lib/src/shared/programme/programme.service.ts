@@ -906,21 +906,7 @@ export class ProgrammeService {
           await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, certifierUser ? this.getUserRef(certifierUser):'', d.type == DocType.METHODOLOGY_DOCUMENT ? ProgrammeStage.APPROVED : undefined);
         }
       } 
-      if(program && ((d && d.type == DocType.METHODOLOGY_DOCUMENT) || this.configService.get('ITMOSystem.enable'))) {
-        await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
-        if (program.cadtId) {
-          program.currentStage = ProgrammeStage.APPROVED;
-          await this.asyncOperationsInterface.AddAction({
-            actionType: AsyncActionType.CADTUpdateProgramme,
-            actionProps: {
-              programme: program
-            },
-          });
-        }
-      }
-    }
-    else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
-      if(program) {
+      if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
           program.currentStage = ProgrammeStage.APPROVED;
@@ -4342,7 +4328,7 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, programme);
   }
 
-  async approveProgramme(req: ProgrammeApprove, user: User) {
+  async approveProgramme(req: ProgrammeApprove, user: User, auth_letter?:string ) {
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`
     );
@@ -4452,7 +4438,22 @@ export class ProgrammeService {
       let formattedDate = `${date} ${month} ${year}`;
   
       updated.company.forEach(async (company) => {
+        auth_letter?
         await this.emailHelperService.sendEmailToOrganisationAdmins(
+          company.companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: updated.title,
+            authorisedDate: formattedDate,
+            serialNumber: updated.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view/${updated.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'AUTHORISATION_LETTER.pdf',
+            path: auth_letter
+          }
+        ):await this.emailHelperService.sendEmailToOrganisationAdmins(
           company.companyId,
           EmailTemplates.PROGRAMME_AUTHORISATION,
           {
@@ -4974,5 +4975,19 @@ export class ProgrammeService {
     return transferResult;
   }
 
+  async itmoProjectApprove(program: Programme) {
+    if(program) {
+      await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+      if (program.cadtId) {
+        program.currentStage = ProgrammeStage.APPROVED;
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+              programme: program
+          },
+        });
+      }
+    }
+  }
 }
 
