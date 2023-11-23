@@ -43,6 +43,12 @@
         }
       }
       .details-part-one {
+        .space-container {
+          width: 100%;
+          .ant-space-item {
+            width: 100%;
+          }
+        }
       }
       .details-part-two {
         .role-group {
