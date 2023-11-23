@@ -29,7 +29,7 @@ import moment from 'moment';
 import { RcFile } from 'antd/lib/upload';
 
 import { EmissionTypes } from '../emission.types';
-import { EmissionSectors, emissionCsvFieldMap, formFields } from '../emission.mappings';
+import { EmissionSectors, emissionCsvFieldMap, formFields, totalEmissionFields } from '../emission.mappings';
 import { CompanyRole } from '../../../Definitions';
 import { HttpStatusCode } from 'axios';
 import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesConfirmationModel';
@@ -1447,26 +1447,33 @@ export const GHGEmissionsComponent = (props: any) => {
     const headers: any[] = [];
     const contentKeys: any[] = [];
 
-
-      const flattenedObj = flattenObject(dataToDownload);
-      const objKeys: any = Object.keys(flattenedObj);
-      objKeys.map((key: any) => {
-        if (emissionCsvFieldMap[key]) {
-          headers.push(emissionCsvFieldMap[key])
-          contentKeys.push(key);
-        }
-      });
-
+    const flattenedObj = flattenObject(dataToDownload);
+    const objKeys: any = Object.keys(flattenedObj);
+    for (const key in emissionCsvFieldMap) {
+      if (objKeys.includes(key)) {
+        headers.push(emissionCsvFieldMap[key])
+        contentKeys.push(key);
+      }
+    }
 
     const flattenedData = [dataToDownload].map((item) => {
       const flattened: any = flattenObject(item);
       return contentKeys.map((header: any) => flattened[header]);
     });
 
+    const allHeaders = [...headers, ...totalEmissionFields]
+    const totalEmissionValues = [
+      calculateSumEmissionView(dataToDownload, 'co2'),
+      calculateSumEmissionView(dataToDownload, 'ch4'),
+      calculateSumEmissionView(dataToDownload, 'n2o'),
+      calculateSumEmissionView(dataToDownload, 'co2eq')
+    ];
+    const combinedData = [...flattenedData[0], totalEmissionValues];
+
     const csvContent =
-      headers.map((header) => `"${header}"`).join(',') +
+      allHeaders.map((header) => `"${header}"`).join(',') +
       '\n' +
-      flattenedData.map((row) => row.map((value) => (value === undefined || value === null) ? "" : value).join(',')).join('\n');
+      combinedData.map((value) => (value === undefined || value === null) ? "" : value).join(',');
 
     return csvContent;
   };

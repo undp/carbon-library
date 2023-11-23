@@ -26,7 +26,7 @@ import {
 } from '@ant-design/icons';
 import * as XLSX from 'xlsx';
 import moment from 'moment';
-import { EmissionSectors, formFields, projectionsCsvFieldMap } from '../emission.mappings';
+import { EmissionSectors, formFields, projectionsCsvFieldMap, totalProjectionFields } from '../emission.mappings';
 import { ProjectionTypes } from '../projection.types';
 import React from 'react';
 import { CompanyRole } from '../../../Definitions';
@@ -1321,25 +1321,33 @@ export const GHGProjectionsComponent = (props: any) => {
     const contentKeys: any[] = [];
 
 
-      const flattenedObj = flattenObject(dataToDownload);
-      const objKeys: any = Object.keys(flattenedObj);
-      objKeys.map((key: any) => {
-        if (projectionsCsvFieldMap[key]) {
-          headers.push(projectionsCsvFieldMap[key])
-          contentKeys.push(key);
-        }
-      });
+    const flattenedObj = flattenObject(dataToDownload);
+    const objKeys: any = Object.keys(flattenedObj);
 
+    for (const key in projectionsCsvFieldMap) {
+      if (objKeys.includes(key)) {
+        headers.push(projectionsCsvFieldMap[key])
+        contentKeys.push(key);
+      }
+    }
 
     const flattenedData = [dataToDownload].map((item) => {
       const flattened: any = flattenObject(item);
       return contentKeys.map((header: any) => flattened[header]);
     });
 
+    const allHeaders = [...headers, ...totalProjectionFields]
+    const totalEmissionValues = [
+      calculateSumEmissionView(dataToDownload, 'bau'),
+      calculateSumEmissionView(dataToDownload, 'conditionalNdc'),
+      calculateSumEmissionView(dataToDownload, 'unconditionalNdc')
+    ];
+    const combinedData = [...flattenedData[0], totalEmissionValues];
+
     const csvContent =
-      headers.map((header) => `"${header}"`).join(',') +
+      allHeaders.map((header) => `"${header}"`).join(',') +
       '\n' +
-      flattenedData.map((row) => row.map((value) => (value === undefined || value === null) ? "" : value).join(',')).join('\n');
+      combinedData.map((value) => (value === undefined || value === null) ? "" : value).join(',');
 
     return csvContent;
   };
