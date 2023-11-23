@@ -1476,7 +1476,7 @@ export const GHGEmissionsComponent = (props: any) => {
     const encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `GHG-Reporting Emission_${dataToDownload.year}_V${dataToDownload.version}.csv`);
+    link.setAttribute('download', `GHG-Reporting Emissions_${dataToDownload.year}_V${dataToDownload.version}.csv`);
     document.body.appendChild(link);
     link.click();
   };
@@ -1835,7 +1835,7 @@ export const GHGEmissionsComponent = (props: any) => {
                           </Row>
                           <Row>
                             <Col xl={15} md={15} className="view-download-file-name-input">
-                              <Input value={`GHG-Reporting Emission_${tabData.year}_V${tabData.version}.csv`} disabled />
+                              <Input value={`GHG-Reporting Emissions_${tabData.year}_V${tabData.version}.csv`} disabled />
                             </Col>
                             <Col xl={5} md={5} className="view-download-file-inner-col">
                               <Button icon={<DownloadOutlined />} onClick={() => {downloadCSV(tabData)}}>

@@ -1699,7 +1699,7 @@ export const GHGProjectionsComponent = (props: any) => {
                           </Row>
                           <Row>
                             <Col xl={15} md={15} className="view-download-file-name-input">
-                              <Input value={`GHG-Reporting Emission_${tabData.year}_V${tabData.version}.csv`} disabled />
+                              <Input value={`GHG-Reporting Projections_${tabData.year}_V${tabData.version}.csv`} disabled />
                             </Col>
                             <Col xl={5} md={5} className="view-download-file-inner-col">
                               <Button icon={<DownloadOutlined />} onClick={() => {downloadCSV(tabData)}}>
