@@ -5032,26 +5032,14 @@ export class ProgrammeService {
     } 
   }
 
-  async approveNdcDetailsAction(actionId: number,abilityCondition: any, user: User){
-    const ndcAction = await this.ndcDetailsActionRepo.findOne({
-      where: { id: actionId}
-    });
-
-    await this.ndcDetailsActionRepo.save({
-      ...ndcAction,
-      status : NdcDetailsActionStatus.Approved
-    })
+  async approveNdcDetailsAction(id: number,abilityCondition: any, user: User){
+    await this.ndcDetailsActionRepo.update(id,{status : NdcDetailsActionStatus.Approved});
+    return true;
   }
 
-  async rejectNdcDetailsAction(actionId: number,abilityCondition: any, user: User){
-    const ndcAction = await this.ndcDetailsActionRepo.findOne({
-      where: { id: actionId}
-    });
-
-    await this.ndcDetailsActionRepo.save({
-      ...ndcAction,
-      status : NdcDetailsActionStatus.Rejected
-    })
+  async rejectNdcDetailsAction(id: number,abilityCondition: any, user: User){
+    await this.ndcDetailsActionRepo.update(id,{status : NdcDetailsActionStatus.Rejected});
+    return true;
   }
 }
 
