@@ -67,7 +67,7 @@ export default () => ({
     password: process.env.ITMO_PASSWORD,
   },
   CERTIFIER:{
-    image:process.env.CERTIFIER_IMAGE  
+    image:process.env.CERTIFIER_IMAGE
   },
   registry: {
     syncEnable: process.env.SYNC_ENABLE === "true" ? true : false,
@@ -86,7 +86,6 @@ export default () => ({
     endpoint: process.env.CADTRUST_ENDPOINT || "http://44.212.139.61:31310/"
   },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
-  systemName: process.env.SYSTEM_NAME || "SystemX",  
+  systemName: process.env.SYSTEM_NAME || "SystemX",
   environmentalManagementActHyperlink: process.env.ENVIRONMENTAL_MANAGEMENT_ACT_HYPERLINK  || "",
-  new: process.env.ENVIRONMENTAL_MANAGEMENT_ACT
 });

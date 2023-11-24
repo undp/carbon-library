@@ -75,16 +75,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       
-      - if: steps.changes.outputs.enum-config-changes == 'true'
+      - if: steps.changes.outputs.enum-config-changes == 'true' && github.ref == 'refs/heads/main'
         name : Enum or Config Changes
         id : enum_config_change
         run: |
               echo ChangeTime=$(date +"%Y-%m-%d %H:%M:%S") > workflow.txt
+              echo " " >> workflow.txt
               echo "........Enum Changes.........." >> workflow.txt
               echo " " >> workflow.txt
               git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/enum** >> workflow.txt
               echo " " >> workflow.txt
               echo "........Config Changes.........." >> workflow.txt
+              echo " " >> workflow.txt
               git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/configuration.ts >> workflow.txt
               timestamp=$(date "+%Y-%m-%d_%H-%M-%S")
               aws s3 cp workflow.txt s3://${{ secrets.AWS_BUCKET }}/workflow_txts_${timestamp}.txt
