@@ -21,6 +21,15 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
   ) {
     this.emailDisabled = this.configService.get<boolean>("email.disabled");
   }
+  public tx:AsyncAction[]=[]
+
+  public async flushTx(): Promise<boolean>{
+    for (var action of this.tx){
+      //execute action
+    }
+    this.tx=[]
+    return true
+  }
 
   public async AddAction(action: AsyncAction): Promise<boolean> {
     // var params = {};
@@ -34,6 +43,10 @@ export class AsyncOperationsQueueService implements AsyncOperationsInterface {
       if (this.emailDisabled) {
         return false;
       }
+    }
+
+    if (action.actionType === AsyncActionType.CADTProgrammeCreate && !this.configService.get('cadTrust.enable')) {
+      return false;
     }
 
     // params = {

@@ -95,6 +95,9 @@ export class Company implements EntitySubject {
 
   @Column({ type: "bigint", nullable: true})
   omgePercentage: number;
+
+  @Column({ type: "bigint", nullable: true })
+  nationalSopValue: number;
   
   @BeforeInsert()
   setDefaultState() {
@@ -116,6 +119,9 @@ export class Company implements EntitySubject {
     }
     if (this.companyRole === CompanyRole.GOVERNMENT){
       this.omgePercentage=1;
+    }
+    if (this.companyRole === CompanyRole.GOVERNMENT){
+      this.nationalSopValue=0;
     }
   }
 }

@@ -16,13 +16,9 @@ export const uploadDocUserPermission = (
   userInfoState: any,
   docType: DocType,
   programmeOwnerId: any[],
-  ministryLevelPermission?: boolean,
-  programmeStatus?: any
+  ministryLevelPermission?: boolean
 ) => {
   let permission = false;
-  if(programmeStatus && programmeStatus === ProgrammeStageUnified.Rejected){
-    return false;
-  }
   if (docType === DocType.DESIGN_DOCUMENT) {
     if (
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
