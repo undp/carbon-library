@@ -9,7 +9,7 @@ export enum CreditStatType {
   CREDIT_CERTIFIED_TRANSFERRED = "creditTransferred",
   CREDIT_CERTIFIED_RETIRED = "creditRetired",
   CREDIT_CERTIFIED_ISSUED = "creditIssued",
-  CREDIT_CERTIFIED = "creditBalances",
+  CREDIT_CERTIFIED = "creditBalance",
   CREDIT_UNCERTIFIED = "creditBalance",
   CREDIT_REVOKED = "creditBalance",
 }
