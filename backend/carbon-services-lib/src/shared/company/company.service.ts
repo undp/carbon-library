@@ -41,6 +41,7 @@ import {
 import { AsyncActionType } from "../enum/async.action.type.enum";
 import { LocationInterface } from "../location/location.interface";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
+import { InvestmentDto } from "../dto/investment.dto";
 
 @Injectable()
 export class CompanyService {
@@ -167,6 +168,26 @@ export class CompanyService {
       this.helperService.formatReqMessagesString("company.suspendFailed", []),
       HttpStatus.INTERNAL_SERVER_ERROR
     );
+  }
+
+  async addNationalInvestment(req: InvestmentDto, requester: User): Promise<any>{
+    //validations
+    //add to investment table
+    //add sync action to update company ledger
+    this.logger.log(
+      `National investment request by ${requester.companyId}-${
+        requester.id
+      } received ${JSON.stringify(req)}`
+    );
+    if (requester.companyRole!==CompanyRole.GOVERNMENT && requester.companyId!==req.toCompanyId) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "company.cannotAddNationalInvestmentOnOtherCompanies",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
   }
 
   async activate(
