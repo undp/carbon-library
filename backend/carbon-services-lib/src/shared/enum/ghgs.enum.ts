@@ -4,5 +4,6 @@ export enum GHGs {
     N2O,
     HFCs,
     PFCs,
-    SF6
+    SF6 
+    
 }
