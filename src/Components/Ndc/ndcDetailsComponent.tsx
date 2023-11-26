@@ -154,7 +154,12 @@ export const NdcDetailsComponent = (props: any) => {
 
   const handleSave = async (row: NdcDetail) => {
     try {
-      const updatedFields = (await form.validateFields()) as NdcDetail;
+      let updatedFields;
+      try {
+        updatedFields = (await form.validateFields()) as NdcDetail;
+      } catch (exception) {
+        return;
+      }
       const updatedItem = {
         ...row,
         ...updatedFields,
@@ -185,8 +190,15 @@ export const NdcDetailsComponent = (props: any) => {
       }
       fetchNdcDetailActions();
       setEditingKey(-1);
-    } catch (exception) {
-      console.log("error", exception);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } finally {
+      setEditingKey(-1);
     }
   };
 
@@ -606,42 +618,54 @@ export const NdcDetailsComponent = (props: any) => {
   }
 
   const onAddNewPeriod = async () => {
-    if (selectedDateRangeRef && selectedDateRangeRef.current) {
-      const periodItem = {
-        startYear: selectedDateRangeRef.current.startYear,
-        endYear: selectedDateRangeRef.current.endYear,
-        finalized: false,
-      };
+    try {
+      if (selectedDateRangeRef && selectedDateRangeRef.current) {
+        const periodItem = {
+          startYear: selectedDateRangeRef.current.startYear,
+          endYear: selectedDateRangeRef.current.endYear,
+          finalized: false,
+        };
 
-      const existingIndex = periodItems.findIndex(
-        (item: any) =>
-          inRange(periodItem.startYear, item.startYear, item.endYear) ||
-          inRange(periodItem.endYear, item.startYear, item.endYear)
-      );
+        const existingIndex = periodItems.findIndex(
+          (item: any) =>
+            inRange(periodItem.startYear, item.startYear, item.endYear) ||
+            inRange(periodItem.endYear, item.startYear, item.endYear)
+        );
 
-      if (existingIndex === -1) {
-        const response = await post("national/programme/addNdcDetailsPeriod", {
-          ...periodItem,
-        });
+        if (existingIndex === -1) {
+          const response = await post(
+            "national/programme/addNdcDetailsPeriod",
+            {
+              ...periodItem,
+            }
+          );
 
-        if (response && response.data) {
-          const addedPeriodItem = response.data;
-          const updatedPeriodItem = {
-            ...addedPeriodItem,
-            key: addedPeriodItem.id,
-            label: `${addedPeriodItem.startYear}-${addedPeriodItem.endYear}`,
-          };
-          setPeriodItems((items: any) => [...items, updatedPeriodItem]);
-          setSelectedPeriod(updatedPeriodItem);
+          if (response && response.data) {
+            const addedPeriodItem = response.data;
+            const updatedPeriodItem = {
+              ...addedPeriodItem,
+              key: addedPeriodItem.id,
+              label: `${addedPeriodItem.startYear}-${addedPeriodItem.endYear}`,
+            };
+            setPeriodItems((items: any) => [...items, updatedPeriodItem]);
+            setSelectedPeriod(updatedPeriodItem);
+          }
+        } else {
+          message.open({
+            type: "error",
+            content: t("ndc:rangeAlreadyExists"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
         }
-      } else {
-        message.open({
-          type: "error",
-          content: t("ndc:rangeAlreadyExists"),
-          duration: 3,
-          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-        });
       }
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
     }
   };
 
@@ -663,27 +687,42 @@ export const NdcDetailsComponent = (props: any) => {
   const onActionConfirmed = async () => {
     setLoading(true);
     let actionResponse;
-    if (actionInfo.action === "Approve") {
-      actionResponse = await post(
-        "national/programme/approveNdcDetailsAction",
-        {
-          id: actionInfo.recordId,
-        }
-      );
-    } else if (actionInfo.action === "Reject") {
-      actionResponse = await post("national/programme/rejectNdcDetailsAction", {
-        id: actionInfo.recordId,
-      });
-    } else if (actionInfo.action === "Finalize") {
-      actionResponse = await post(
-        "national/programme/finalizeNdcDetailsPeriod",
-        {
-          id: selectedPeriod.key,
-        }
-      );
-    } else if (actionInfo.action === "Delete") {
-      actionResponse = await post("national/programme/deleteNdcDetailsPeriod", {
-        id: selectedPeriod.key,
+    try {
+      if (actionInfo.action === "Approve") {
+        actionResponse = await post(
+          "national/programme/approveNdcDetailsAction",
+          {
+            id: actionInfo.recordId,
+          }
+        );
+      } else if (actionInfo.action === "Reject") {
+        actionResponse = await post(
+          "national/programme/rejectNdcDetailsAction",
+          {
+            id: actionInfo.recordId,
+          }
+        );
+      } else if (actionInfo.action === "Finalize") {
+        actionResponse = await post(
+          "national/programme/finalizeNdcDetailsPeriod",
+          {
+            id: selectedPeriod.key,
+          }
+        );
+      } else if (actionInfo.action === "Delete") {
+        actionResponse = await post(
+          "national/programme/deleteNdcDetailsPeriod",
+          {
+            id: selectedPeriod.key,
+          }
+        );
+      }
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     }
     if (
@@ -707,70 +746,103 @@ export const NdcDetailsComponent = (props: any) => {
 
   const fetchNdcDetailPeriods = async () => {
     setLoading(true);
-    let periods = [];
-    let addNewTab: Period = {
-      key: "add_new",
-      label: "Add New",
-      startYear: 0,
-      endYear: 0,
-      finalized: false,
-      deleted: false,
-    };
-    const response = await get("national/programme/queryNdcDetailsPeriod");
-    if (response && response.data) {
-      periods = response.data.map((period: any) => {
-        return {
-          ...period,
-          key: period.id,
-          label: period.finalized ? (
-            <span>
-              <LockOutlined /> {period.startYear}-{period.endYear}{" "}
-            </span>
-          ) : (
-            `${period.startYear}-${period.endYear}`
-          ),
-        };
-      });
-    }
-    if (isGovernmentUser) {
-      periods.unshift(addNewTab);
-    }
+    try {
+      let periods = [];
+      let addNewTab: Period = {
+        key: "add_new",
+        label: "Add New",
+        startYear: 0,
+        endYear: 0,
+        finalized: false,
+        deleted: false,
+      };
+      const response = await get("national/programme/queryNdcDetailsPeriod");
+      if (response && response.data) {
+        periods = response.data.map((period: any) => {
+          return {
+            ...period,
+            key: period.id,
+            label: period.finalized ? (
+              <span>
+                <LockOutlined /> {period.startYear}-{period.endYear}{" "}
+              </span>
+            ) : (
+              `${period.startYear}-${period.endYear}`
+            ),
+          };
+        });
+      }
+      if (isGovernmentUser) {
+        periods.unshift(addNewTab);
+      }
 
-    setPeriodItems(periods);
-    if (isGovernmentUser) {
-      setSelectedPeriod(addNewTab);
-    } else {
-      setSelectedPeriod(periods[0]);
+      setPeriodItems(periods);
+      if (isGovernmentUser) {
+        setSelectedPeriod(addNewTab);
+      } else {
+        setSelectedPeriod(periods[0]);
+      }
+      setLoading(false);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fetchNdcDetailActions = async () => {
     setLoading(true);
-    const response = await get("national/programme/queryNdcDetailsAction");
-    if (response && response.data) {
-      const maxActionId = Math.max(
-        ...response.data.map((item: NdcDetail) => item.id)
-      );
-      setNextAvailableActionId(maxActionId + 1);
-      setNdcActionsList(response.data);
+    try {
+      const response = await get("national/programme/queryNdcDetailsAction");
+      if (response && response.data) {
+        const maxActionId = Math.max(
+          ...response.data.map((item: NdcDetail) => item.id)
+        );
+        setNextAvailableActionId(maxActionId + 1);
+        setNdcActionsList(response.data);
+      }
+      setLoading(false);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fetchMinistries = async () => {
     setLoading(true);
-    const response = await get("national/organisation/getMinistries");
-    if (response && response.data) {
-      const ministryOrgDetails = response.data.map((value: any) => {
-        return {
-          value: value.company_companyId,
-          label: value.company_name,
-        };
+    try {
+      const response = await get("national/organisation/getMinistries");
+      if (response && response.data) {
+        const ministryOrgDetails = response.data.map((value: any) => {
+          return {
+            value: value.company_companyId,
+            label: value.company_name,
+          };
+        });
+        setMinistryOrgList(ministryOrgDetails);
+      }
+      setLoading(false);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
-      setMinistryOrgList(ministryOrgDetails);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
