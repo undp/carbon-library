@@ -97,5 +97,8 @@
     "govermentOwnershipOfProgramme":"Goverment should be a programme owner.",
     "proponentIsNotAProgrammeDevOrGov": "Proponent is not a programme developer or government",
     "programmeExistsWithAssessmentRegId": "The programme already exists with the given environmental assessment registration number",
-    "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from NDC Action:{} should be less than its estimated credit amount"
+    "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from NDC Action:{} should be less than its estimated credit amount",
+    "ndcActionUpdateFailed":  " Internal error on Ndc Action update",
+    "ndcActionCreateFailed":  " Internal error on Ndc Action create",
+    "ndcActionPeriodCreateFailed":  " Internal error on Period create"
   }

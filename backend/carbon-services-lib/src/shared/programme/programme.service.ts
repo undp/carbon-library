@@ -110,6 +110,7 @@ import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
 import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
 import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
+import { NdcDetailsActionType } from "../enum/ndc.details.action.type.enum";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -4998,28 +4999,78 @@ export class ProgrammeService {
         finalized: true,
       },
       where: {
-        deleted : false
+        deleted: false
       }
     });
   }
 
-  async addNdcDetailsPeriod(ndcDetailsPeriod:NdcDetailsPeriodDto, abilityCondition: any, user: User) {
+  async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
     const addedNdcDetailsPeriod = this.ndcDetailsPeriodRepo.create(ndcDetailsPeriod);
-    await this.ndcDetailsPeriodRepo.save(addedNdcDetailsPeriod);
-    return addedNdcDetailsPeriod;
+    await this.ndcDetailsPeriodRepo.save(addedNdcDetailsPeriod).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionPeriodCreateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return new DataResponseDto(HttpStatus.OK, addedNdcDetailsPeriod);
   }
 
-  async deleteNdcDetailsPeriod(id: number, abilityCondition: any, user: User){
-      await this.ndcDetailsPeriodRepo.update(id,{deleted: true});
-      return true;
+  async deleteNdcDetailsPeriod(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsPeriodRepo.update(id, { deleted: true }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });;
+    return new DataResponseDto(HttpStatus.OK, {});
   }
 
-  async finalizeNdcDetailsPeriod(id: number, abilityCondition: any, user: User){
-      await this.ndcDetailsPeriodRepo.update(id,{finalized: true});
-      return true;
+  async finalizeNdcDetailsPeriod(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsPeriodRepo.update(id, { finalized: true }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return new DataResponseDto(HttpStatus.OK, {});
   }
 
-  async getNdcDetailActions(abilityCondition: any, user: User){
+  async getNdcDetailActions(abilityCondition: any, user: User) {
     return await this.ndcDetailsActionRepo.find({
       select: {
         id: true,
@@ -5034,32 +5085,113 @@ export class ProgrammeService {
     });
   }
 
-  async addNdcDetailAction(ndcDetailsAction:NdcDetailsActionDto, abilityCondition: any, user: User) {
+  async addNdcDetailAction(ndcDetailsAction: NdcDetailsActionDto, abilityCondition: any, user: User) {
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.MainAction && user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.SubAction) {
+      if (user.companyRole !== CompanyRole.GOVERNMENT && user.companyRole !== CompanyRole.MINISTRY) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("programme.unAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
     const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
-    await this.ndcDetailsActionRepo.save(addedNdcDetailsAction);
-    return addedNdcDetailsAction;
+    await this.ndcDetailsActionRepo.save(addedNdcDetailsAction).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionCreateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, addedNdcDetailsAction);
   }
 
-  async updateNdcDetailsAction(ndcDetailsAction:NdcDetailsActionDto, abilityCondition: any, user: User) {
+  async updateNdcDetailsAction(ndcDetailsAction: NdcDetailsActionDto, abilityCondition: any, user: User) {
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.MainAction && user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.SubAction) {
+      if (user.companyRole !== CompanyRole.GOVERNMENT && user.companyRole !== CompanyRole.MINISTRY) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("programme.unAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
     const result = await this.ndcDetailsActionRepo.update({
       id: ndcDetailsAction.id
-    },{
+    }, {
       ...ndcDetailsAction
-    })
+    }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionUpdateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
 
-    if (result.affected > 0){
-      return HttpStatus.OK;
-    } 
+    if (result.affected > 0) {
+      return new DataResponseDto(HttpStatus.OK, {});
+    }
   }
 
-  async approveNdcDetailsAction(id: number,abilityCondition: any, user: User){
-    await this.ndcDetailsActionRepo.update(id,{status : NdcDetailsActionStatus.Approved});
-    return true;
+  async approveNdcDetailsAction(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsActionRepo.update(id, { status: NdcDetailsActionStatus.Approved }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, {});
   }
 
-  async rejectNdcDetailsAction(id: number,abilityCondition: any, user: User){
-    await this.ndcDetailsActionRepo.update(id,{status : NdcDetailsActionStatus.Rejected});
-    return true;
+  async rejectNdcDetailsAction(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+    await this.ndcDetailsActionRepo.update(id, { status: NdcDetailsActionStatus.Rejected }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, {});
   }
 }
 
