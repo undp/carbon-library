@@ -38,6 +38,7 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   index: number;
   children: React.ReactNode;
   onBlurHandler: any;
+  t: any;
 }
 
 export const EditableCell: React.FC<EditableCellProps> = ({
@@ -49,6 +50,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   index,
   children,
   onBlurHandler,
+  t,
   ...restProps
 }) => {
   let inputNode;
@@ -57,14 +59,14 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     inputNode = (
       <Input
         onBlur={() => onBlurHandler(record)}
-        placeholder="Enter National Plan Objective"
+        placeholder={t("ndc:nationalPlanObjectivePlaceHolder")}
       />
     );
   } else if (dataIndex === "kpi") {
     inputNode = (
       <InputNumber
         onBlur={() => onBlurHandler(record)}
-        placeholder="Enter Kpi"
+        placeholder={t("ndc:kpiPlaceHolder")}
       />
     );
   }
@@ -78,7 +80,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           rules={[
             {
               required: true,
-              message: `Please Input ${title}!`,
+              message: `${title} ${t("ndc:isRequired")}`,
             },
           ]}
         >

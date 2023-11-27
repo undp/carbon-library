@@ -381,6 +381,7 @@ export const NdcDetailsComponent = (props: any) => {
               handleSave(record);
             }
           },
+          t: t,
         };
       },
     };
@@ -433,6 +434,16 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const onClickedFinalizePeriod = async () => {
+    if (subNdcActionsForPeriod.length === 0) {
+      message.open({
+        type: "error",
+        content: t("ndc:finalizeNdcEmptyErrorText"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      return;
+    }
+
     const pendingActions = subNdcActionsForPeriod.filter(
       (action: NdcDetail) => {
         return action.status === NdcDetailsActionStatus.Pending;
@@ -512,7 +523,7 @@ export const NdcDetailsComponent = (props: any) => {
                 expandable={{
                   expandedRowRender: (record) =>
                     subNdcActionTableContent(record),
-                  columnWidth: 40
+                  columnWidth: 40,
                 }}
                 onRow={(record: NdcDetail, rowIndex) => {
                   return {
@@ -726,16 +737,40 @@ export const NdcDetailsComponent = (props: any) => {
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
     }
-    if (
-      actionResponse &&
-      (actionInfo.action === "Delete" || actionInfo.action === "Finalize")
-    ) {
-      fetchNdcDetailPeriods();
-    } else if (
-      actionResponse &&
-      (actionInfo.action === "Approve" || actionInfo.action === "Reject")
-    ) {
-      fetchNdcDetailActions();
+    if (actionResponse) {
+      if (actionInfo.action === "Delete") {
+        message.open({
+          type: "success",
+          content: t("ndc:deletePeriodSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailPeriods();
+      } else if (actionInfo.action === "Finalize") {
+        message.open({
+          type: "success",
+          content: t("ndc:finalizeSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailPeriods();
+      } else if (actionInfo.action === "Approve") {
+        message.open({
+          type: "success",
+          content: t("ndc:approveSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailActions();
+      } else if (actionInfo.action === "Reject") {
+        message.open({
+          type: "success",
+          content: t("ndc:rejectSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailActions();
+      }
     }
     setOpenConfirmationModal(false);
     setLoading(false);
