@@ -74,7 +74,7 @@ export const NdcDetailsComponent = (props: any) => {
     userInfoState?.companyRole === CompanyRole.GOVERNMENT
       ? process.env.REACT_APP_GOVERNMENT_MINISTRY
         ? process.env.REACT_APP_GOVERNMENT_MINISTRY
-        : "Test ministryName"
+        : "Ministry Of Environment"
       : userInfoState?.companyRole === CompanyRole.MINISTRY
       ? userInfoState?.companyName
       : undefined;
