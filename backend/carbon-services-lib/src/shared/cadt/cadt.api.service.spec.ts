@@ -23,6 +23,8 @@ import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { LocationModule } from '../location/location.module';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { GHGs } from '../enum/ghgs.enum';
+import { RetireType } from '../enum/retire.type.enum';
+import { TransferStatus } from '../enum/transform.status.enum';
 
 describe('CadtApiService', () => {
   let service: CadtApiService;
@@ -62,36 +64,36 @@ describe('CadtApiService', () => {
   });
 
   let program = {
-        programmeId: '123',
-        serialNo: '	NG-ITMO-15-25511-2023-0-59385508-59388007',
-        title: 'Testing',
-        externalId: '',
+        programmeId: '456',
+        serialNo: '	NA-ITMO-15-123-2023-0-1001-1400',
+        title: 'UNDP_Credit_Transfer',
+        externalId: 'UNDP_Credit_Transfer',
         sectoralScope: SectoralScope.EnergyIndustry,
         sector: Sector.Energy,
-        countryCodeA2: 'NG',
+        countryCodeA2: 'NA',
         currentStage: ProgrammeStage.AWAITING_AUTHORIZATION,
         startTime: new Date().getTime(),
-        endTime: new Date().getTime() + 20000000,
-        creditEst: 100,
+        endTime: new Date().getTime() + 20000000000,
+        creditEst: 400,
         emissionReductionExpected: 0,
         emissionReductionAchieved: 0,
         creditChange: 0,
-        creditIssued: 20,
+        creditIssued: 0,
         creditBalance: 0,
         creditRetired: [],
         creditFrozen: [],
         creditTransferred: [],
         constantVersion: '',
         proponentTaxVatId: [],
-        companyId: [1],
-        proponentPercentage: [],
-        creditOwnerPercentage: [],
+        companyId: [3, 5],
+        proponentPercentage: [40, 60],
+        creditOwnerPercentage: [40, 60],
         certifierId: [],
         revokedCertifierId: [],
-        creditUnit: '',
+        creditUnit: 'ITMO',
         programmeProperties: {
-          geographicalLocation: ["Abia"],
-          greenHouseGasses: [GHGs.CO2]
+          geographicalLocation: ["Abia", "Lagos"],
+          greenHouseGasses: [GHGs.CO2, GHGs.CH4]
         },
         txTime: 0,
         createdTime: 0,
@@ -105,72 +107,111 @@ describe('CadtApiService', () => {
         cadtId: '',
         environmentalAssessmentRegistrationNo: '',
         createdAt: undefined,
-        updatedAt: undefined
+        updatedAt: undefined,
+        blockBounds: {}
       };
 
-    it('should be issue credit', async () => {
-      program.currentStage = ProgrammeStage.AUTHORISED;
-      program.cadtId = 'edb62b6e-260a-423b-a464-8d3192bff99a';
-      await service.issueCredit(program, 50)
-    })
+    // it('should be issue credit', async () => {
+    //   program.currentStage = ProgrammeStage.AUTHORISED;
+    //   program.cadtId = '1294466d-ea52-43e1-a4bf-96ce2719975b';
+    //   program.blockBounds = {
+    //     '3': [
+    //       {
+    //         unitBlockStart: '1001',
+    //         unitBlockEnd: '1040',
+    //         unitId: 'c39f3500-cf33-4c6b-a11a-9e7d5383c96f',
+    //         amount: 40
+    //       },
+    //       {
+    //         unitBlockStart: '1041',
+    //         unitBlockEnd: '1060',
+    //         unitId: 'bffaee9e-334a-4ceb-a693-b1c7c84602fd',
+    //         amount: 20
+    //       }
+    //     ],
+    //     '5': [
+    //       {
+    //         unitBlockStart: '1161',
+    //         unitBlockEnd: '1220',
+    //         unitId: 'd01364bf-72c1-4a15-8682-bff6d33e256d',
+    //         amount: 60
+    //       },
+    //       {
+    //         unitBlockStart: '1221',
+    //         unitBlockEnd: '1250',
+    //         unitId: 'd87c6682-a7a2-4bf1-b001-320b54aeaf9b',
+    //         amount: 30
+    //       }
+    //     ]
+    //   }
+    //   await service.issueCredit(program, 50)
+    // })
 
 
-  // it('create programme', async () => {
-  //   // program.currentStage = ProgrammeStage.AUTHORISED;
-  //   // program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
-  //   await service.createProgramme(program)
-  // })
+    // it('should be transfer credit', async () => {
+    //   program.currentStage = ProgrammeStage.AUTHORISED;
+    //   program.cadtId = '1294466d-ea52-43e1-a4bf-96ce2719975b';
+    //   program.blockBounds = {
+    //     '3': [
+    //       {
+    //         unitBlockStart: '1001',
+    //         unitBlockEnd: '1040',
+    //         unitId: 'c39f3500-cf33-4c6b-a11a-9e7d5383c96f',
+    //         amount: 40
+    //       },
+    //       {
+    //         unitBlockStart: '1041',
+    //         unitBlockEnd: '1060',
+    //         unitId: 'bffaee9e-334a-4ceb-a693-b1c7c84602fd',
+    //         amount: 20
+    //       }
+    //     ],
+    //     '5': [
+    //       {
+    //         unitBlockStart: '1161',
+    //         unitBlockEnd: '1220',
+    //         unitId: 'd01364bf-72c1-4a15-8682-bff6d33e256d',
+    //         amount: 60
+    //       },
+    //       {
+    //         unitBlockStart: '1221',
+    //         unitBlockEnd: '1250',
+    //         unitId: 'd87c6682-a7a2-4bf1-b001-320b54aeaf9b',
+    //         amount: 30
+    //       }
+    //     ]
+    //   }
+    //   await service.transferCredit(program, {
+    //     requestId: 0,
+    //     programmeId: '',
+    //     initiator: 0,
+    //     initiatorCompanyId: 0,
+    //     toCompanyId: 1,
+    //     toAccount: '',
+    //     toCompanyMeta: undefined,
+    //     retirementType: RetireType.CROSS_BORDER,
+    //     fromCompanyId: 3,
+    //     creditAmount: 15,
+    //     comment: '',
+    //     txRef: '',
+    //     txTime: 0,
+    //     createdTime: 0,
+    //     authTime: 0,
+    //     status: TransferStatus.APPROVED,
+    //     isRetirement: false
+    //   })
+    // })
+
+  it('create programme', async () => {
+    // program.currentStage = ProgrammeStage.AUTHORISED;
+    // program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
+    await service.createProgramme(program)
+
+  })
 
   // it('should be update status', async () => {
   //   program.currentStage = ProgrammeStage.AUTHORISED;
-  //   program.cadtId = '45c7573a-3e11-4559-91dc-1c84c70ac0d2';
+  //   program.cadtId = 'b0e14d01-d646-44f9-a1b7-4b9c18385420';
   //   await service.updateProgramme(program)
   // })
-
-  // it('should be create project', async () => {
-  //   expect(service).toBeDefined();
-  //   await service.createProgramme({
-  //     programmeId: '123',
-  //     serialNo: '1223',
-  //     title: 'Testing',
-  //     externalId: '',
-  //     sectoralScope: SectoralScope.EnergyIndustry,
-  //     sector: Sector.Energy,
-  //     countryCodeA2: 'NG',
-  //     currentStage: ProgrammeStage.AWAITING_AUTHORIZATION,
-  //     startTime: new Date().getTime(),
-  //     endTime: new Date().getTime() + 20000000,
-  //     creditEst: 100,
-  //     emissionReductionExpected: 0,
-  //     emissionReductionAchieved: 0,
-  //     creditChange: 0,
-  //     creditIssued: 0,
-  //     creditBalance: 0,
-  //     creditRetired: [],
-  //     creditFrozen: [],
-  //     creditTransferred: [],
-  //     constantVersion: '',
-  //     proponentTaxVatId: [],
-  //     companyId: [1],
-  //     proponentPercentage: [],
-  //     creditOwnerPercentage: [],
-  //     certifierId: [],
-  //     revokedCertifierId: [],
-  //     creditUnit: '',
-  //     programmeProperties: undefined,
-  //     txTime: 0,
-  //     createdTime: 0,
-  //     authTime: 0,
-  //     creditUpdateTime: 0,
-  //     statusUpdateTime: 0,
-  //     certifiedTime: 0,
-  //     txRef: '',
-  //     txType: TxType.CREATE,
-  //     geographicalLocationCordintes: undefined,
-  //     cadtId: '',
-  //     environmentalAssessmentRegistrationNo: '',
-  //     createdAt: undefined,
-  //     updatedAt: undefined
-  //   })
-  // });
 });

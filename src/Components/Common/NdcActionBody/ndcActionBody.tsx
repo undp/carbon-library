@@ -19,7 +19,10 @@ import {
 } from "../../../Definitions";
 import { RejectDocumentationConfirmationModel } from "../Models/rejectDocumenConfirmationModel";
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
-import { linkDocVisible, uploadDocUserPermission } from "../../../Utils/documentsPermission";
+import {
+  linkDocVisible,
+  uploadDocUserPermission,
+} from "../../../Utils/documentsPermission";
 
 export interface NdcActionBodyProps {
   data?: any;
@@ -32,6 +35,8 @@ export interface NdcActionBodyProps {
   useConnection: any;
   translator: any;
   useUserContext: any;
+  onFinish?: any;
+  programme?: any;
 }
 
 export const NdcActionBody: FC<NdcActionBodyProps> = (
@@ -47,6 +52,8 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
     useConnection,
     translator,
     useUserContext,
+    onFinish,
+    programme,
   } = props;
   const t = translator.t;
   const { userInfoState } = useUserContext();
@@ -113,6 +120,33 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
             duration: 4,
             style: { textAlign: "right", marginRight: 15, marginTop: 10 },
           });
+          if (
+            type == DocType.VERIFICATION_REPORT &&
+            response?.data.status == DocumentStatus.ACCEPTED &&
+            response.data.programme.mitigationActions
+          ) {
+            let programmeData = response?.data.programme;
+            let modified = false;
+            programmeData.mitigationActions.map((action: any) => {
+              if (action.actionId == ndcActionId) {
+                modified = true;
+                let docAdded = false;
+                for (var document of action.projectMaterial) {
+                  if (document.includes("VERIFICATION_REPORT")) {
+                    docAdded = true;
+                    break;
+                  }
+                }
+                if (!docAdded) {
+                  action.projectMaterial.push(response?.data.url);
+                }
+              }
+            });
+            if (modified) {
+              programme.mitigationActions = programmeData.mitigationActions;
+              onFinish(programme);
+            }
+          }
         }
       } else {
         message.open({
@@ -159,6 +193,49 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
+      if (
+        type == DocType.VERIFICATION_REPORT &&
+        status == DocumentStatus.ACCEPTED
+      ) {
+        let programmeRes = await post("national/programme/query", {
+          page: 1,
+          size: 2,
+          filterAnd: [
+            {
+              key: "programmeId",
+              operation: "=",
+              value: programmeId,
+            },
+          ],
+        });
+        let programmeData = programmeRes.data[0];
+
+        if (programmeData.mitigationActions) {
+          const docRepoRes: any = await post("national/programme/queryDocs", {
+            page: 1,
+            size: 100,
+            filterAnd: [
+              {
+                key: "id",
+                operation: "=",
+                value: id,
+              },
+            ],
+          });
+          const docUrl = docRepoRes.data[0].url;
+
+          let modified = false;
+          programmeData.mitigationActions.map((action: any) => {
+            if (action.actionId == actionId) {
+              modified = true;
+              if (!action.projectMaterial.includes(docUrl)) {
+                action.projectMaterial.push(docUrl);
+              }
+            }
+          });
+          if (modified) onFinish(programmeData);
+        }
+      }
     } catch (error: any) {
       message.open({
         type: "error",
