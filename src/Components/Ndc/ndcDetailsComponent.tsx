@@ -263,7 +263,7 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "nationalPlanObjective",
       key: "nationalPlanObjective",
       align: "left" as const,
-      width: 300,
+      width: 400,
       editable: true,
       render: (_: any, record: NdcDetail) => (
         <Space size="middle">
@@ -297,7 +297,7 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "ministryName",
       key: "ministryName",
       align: "left" as const,
-      width: 200,
+      width: 300,
       editable: false,
       render: (_: any, record: any) => (
         <>
@@ -306,7 +306,7 @@ export const NdcDetailsComponent = (props: any) => {
             defaultValue={
               record.ministryName ? record.ministryName : loginMinistry
             }
-            style={{ width: 320 }}
+            style={{ width: 220 }}
             onChange={(value: any, option: any) => {
               record.ministryName = option.label;
               handleSave(record);
@@ -321,7 +321,7 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "status",
       key: "status",
       align: "left" as const,
-      width: "15%",
+      width: 200,
       editable: false,
       render: (_: any, record: any) => {
         const menu = actionMenu(record);
@@ -498,6 +498,7 @@ export const NdcDetailsComponent = (props: any) => {
           <Col span={24}>
             <Form form={form} component={false}>
               <Table
+                tableLayout="fixed"
                 key={tableKey}
                 rowKey="id"
                 components={components}
@@ -511,8 +512,7 @@ export const NdcDetailsComponent = (props: any) => {
                 expandable={{
                   expandedRowRender: (record) =>
                     subNdcActionTableContent(record),
-                  indentSize: 30,
-                  columnWidth: 30,
+                  columnWidth: 40
                 }}
                 onRow={(record: NdcDetail, rowIndex) => {
                   return {
@@ -585,6 +585,7 @@ export const NdcDetailsComponent = (props: any) => {
   function subNdcActionTableContent(record: any) {
     return (
       <Table
+        tableLayout="fixed"
         rowKey="id"
         components={components}
         rowClassName={() => "editable-row"}
