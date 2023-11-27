@@ -160,6 +160,7 @@ export const NdcDetailsComponent = (props: any) => {
       } catch (exception) {
         return;
       }
+
       const updatedItem = {
         ...row,
         ...updatedFields,
@@ -191,14 +192,13 @@ export const NdcDetailsComponent = (props: any) => {
       fetchNdcDetailActions();
       setEditingKey(-1);
     } catch (exception: any) {
+      setEditingKey(-1);
       message.open({
         type: "error",
         content: exception.message,
         duration: 3,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
-    } finally {
-      setEditingKey(-1);
     }
   };
 
