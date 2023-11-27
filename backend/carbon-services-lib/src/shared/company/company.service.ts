@@ -42,6 +42,9 @@ import { AsyncActionType } from "../enum/async.action.type.enum";
 import { LocationInterface } from "../location/location.interface";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
 import { InvestmentDto } from "../dto/investment.dto";
+import { plainToClass } from "class-transformer";
+import { Investment } from "../entities/investment.entity";
+import { InvestmentStatus } from "../enum/investment.status";
 
 @Injectable()
 export class CompanyService {
@@ -172,22 +175,50 @@ export class CompanyService {
 
   async addNationalInvestment(req: InvestmentDto, requester: User): Promise<any>{
     //validations
-    //add to investment table
+    //add to investment table 
     //add sync action to update company ledger
     this.logger.log(
       `National investment request by ${requester.companyId}-${
         requester.id
       } received ${JSON.stringify(req)}`
     );
-    if (requester.companyRole!==CompanyRole.GOVERNMENT && requester.companyId!==req.toCompanyId) {
+    //requester validations
+    if (requester.companyRole!==CompanyRole.GOVERNMENT && requester.companyRole != CompanyRole.MINISTRY && requester.companyId!==req.toCompanyId) {
       throw new HttpException(
-        this.helperService.formatReqMessagesString(
+        this.helperService.formatReqMessagesString( 
           "company.cannotAddNationalInvestmentOnOtherCompanies",
           []
         ),
         HttpStatus.BAD_REQUEST
       );
     }
+    //to company validations
+    const companyDetails = await this.findByCompanyId(req.toCompanyId);
+    if(companyDetails && companyDetails.companyRole !== CompanyRole.PROGRAMME_DEVELOPER) {
+      throw new HttpException(
+          this.helperService.formatReqMessagesString("user.investerUserAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+    }
+    //add investment
+    const investment = plainToClass(Investment, req);
+    investment.programmeId = req.programmeId;
+    investment.fromCompanyId = fromCompanyId;
+    investment.toCompanyId = req.toCompanyId;
+    investment.initiator = requester.id;
+    investment.initiatorCompanyId = requester.companyId;
+    investment.txTime = new Date().getTime();
+    investment.createdTime = investment.txTime;
+    investment.percentage = req.percentage[j];
+    investment.shareFromOwner = parseFloat((investment.percentage * 100 / propPerMap[fromCompanyId]).toFixed(6))
+    investment.amount = Math.round(req.amount)
+    investment.status = InvestmentStatus.PENDING;
+    const results = await this.investmentRepo.insert(allInvestmentList);
+    console.log(results);
+    for (const i in allInvestmentList) {
+      allInvestmentList[i].requestId = results.identifiers[i].requestId;
+    }
+    //sync investment
   }
 
   async activate(

@@ -5,7 +5,10 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
+  MIN,
+  Min,
   ValidateIf,
 } from 'class-validator';
 import { Instrument } from '../enum/instrument.enum';
@@ -17,6 +20,7 @@ import { ESGType } from '../enum/esg.type';
 export class InvestmentDto {
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive()
   @ApiProperty()
   amount: number;
 
