@@ -1623,7 +1623,6 @@ export const RegistryDashboardComponent = (props: any) => {
       setCreditBalance(
         parseFloat(response?.data?.stats?.CREDIT_STATS_BALANCE?.sum)
       );
-      
       const creditAuthorized = totalEstCredits - totalIssuedCredits;
       const creditIssued =
         totalIssuedCredits -
