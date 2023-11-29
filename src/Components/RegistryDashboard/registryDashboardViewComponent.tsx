@@ -47,6 +47,7 @@ import {
   SystemNames,
   addCommSep,
   addRoundNumber,
+  getStageEnumVal,
 } from "../../Definitions";
 import {
   optionDonutPieA,
@@ -1562,9 +1563,8 @@ export const RegistryDashboardComponent = (props: any) => {
               programmeByStatusAggregationResponse
             );
             if (
-              [ProgrammeStageR.AwaitingAuthorization].includes(
-                responseItem?.currentStage
-              )
+              ProgrammeStageR.AwaitingAuthorization ===
+              getStageEnumVal(responseItem?.currentStage)
             ) {
               totalProgrammes = totalProgrammes + parseInt(responseItem?.count);
               pendingProgrammesC = parseInt(responseItem?.count);
@@ -1623,7 +1623,6 @@ export const RegistryDashboardComponent = (props: any) => {
       setCreditBalance(
         parseFloat(response?.data?.stats?.CREDIT_STATS_BALANCE?.sum)
       );
-      
       const creditAuthorized = totalEstCredits - totalIssuedCredits;
       const creditIssued =
         totalIssuedCredits -
