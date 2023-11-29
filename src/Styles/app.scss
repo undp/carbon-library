@@ -51,11 +51,11 @@ body {
 
 .ant-tooltip-inner {
   border-radius: 5px !important;
-  background-color: #16b1ff !important;
+  background-color: $primary-color !important;
 }
 
 .ant-tooltip-arrow-content {
-  --antd-arrow-background-color: linear-gradient(to right bottom, #16b1ff, #16b1ff) !important;
+  --antd-arrow-background-color: linear-gradient(to right bottom, $primary-color, $primary-color) !important;
 }
 
 .ant-radio-group {

@@ -48,14 +48,14 @@
 
 .ant-tooltip-inner {
   border-radius: 5px;
-  background-color: $primary-purple;
+  background-color: $primary-color;
 }
 
 .ant-tooltip-arrow-content {
   --antd-arrow-background-color: linear-gradient(
     to right bottom,
-    #9155fd,
-    #9155fd
+    $primary-color,
+    $primary-color
   ) !important;
 }
 
