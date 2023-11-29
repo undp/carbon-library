@@ -677,7 +677,7 @@ export const AddNewCompanyComponent = (props: any) => {
                           >
                             <Tooltip
                               placement="top"
-                              title="Permitted to certify and revoke certifications of programmes"
+                              title="Permitted to certify and revoke certifications of projects"
                             >
                               <Radio.Button
                                 className="certifier"
@@ -702,7 +702,7 @@ export const AddNewCompanyComponent = (props: any) => {
                           >
                             <Tooltip
                               placement="top"
-                              title="Permitted to own programmes and transfer carbon credits"
+                              title="Permitted to own projects and transfer carbon credits"
                             >
                               <Radio.Button
                                 className="dev"
