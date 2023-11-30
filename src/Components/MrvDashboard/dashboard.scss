@@ -62,8 +62,12 @@
 .ant-btn.mrvdefault {
   border-radius: 5px 0px 0px 5px !important;
 }
-.ant-btn.mrvprimary {
+
+.ant-btn.mrvdefault-right {
   border-radius: 0px 5px 5px 0px !important;
+}
+.ant-btn.mrvprimary {
+  border-radius: 0px 0px 0px 0px !important;
 }
 
 .cards-title {

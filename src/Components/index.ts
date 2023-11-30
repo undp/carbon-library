@@ -38,3 +38,4 @@ export * from "./Common/UserRoleIcon/userRoleIcon";
 export * from "./Common/TimelineBody/timelineBody";
 export * from "./GhgInventory/Emissions/emissions";
 export * from "./GhgInventory/Projections/projections";
+export * from "./GhgInventory/Dashboard/ghg.dashboard"

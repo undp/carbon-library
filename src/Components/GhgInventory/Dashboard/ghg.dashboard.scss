@@ -1,4 +1,4 @@
-@import "../../Styles/variables.scss";
+@import "../../../Styles/variables.scss";
 
 .mapboxgl-popup-content {
   background-color: $white !important;
@@ -20,22 +20,26 @@
   flex-direction: column;
   border: 1px solid gray;
 }
-.annual-report{
-  display:flex;
-  margin-top:30px;
-  margin-left:22px;
+
+.annual-report {
+  display: flex;
+  margin-top: 30px;
+  margin-left: 22px;
 }
-.ant-btn.annual-report-downloadbutton{
 
-  border-radius:0px 5px 5px 0px !important;
+.ant-btn.annual-report-downloadbutton {
 
-}
-.ant-btn.annual-report-dropdownbutton{
-
-  margin-left:20px; 
-  border-radius:5px 0px 0px 0px !important;
+  border-radius: 0px 5px 5px 0px !important;
 
 }
+
+.ant-btn.annual-report-dropdownbutton {
+
+  margin-left: 20px;
+  border-radius: 5px 0px 0px 0px !important;
+
+}
+
 .margin-top-6 {
   margin-top: 7.5rem;
 }
@@ -48,17 +52,18 @@
   margin-top: 1rem;
 }
 
-.ant-btn.rgprimary {
-  border-radius: 5px 0px 0px 5px !important;
+.ant-btn.ghg-primary {
+  border-radius: 0px 5px 5px 0px !important;
 }
 
-.ant-btn.rgdefault {
-  border-radius: 0px 5px 5px 0px !important;
+.ant-btn.ghg-default {
+  border-radius: 5px 0px 0px 5px !important;
 }
 
 .ant-btn.mid-default-btn {
   border-radius: 0px 0px 0px 0px !important;
 }
+
 
 .cards-title {
   font-family: "Inter";
@@ -127,9 +132,7 @@
         color: rgba(58, 53, 65, 0.5);
       }
 
-      .ant-radio-button-wrapper-checked:not(
-          .ant-radio-button-wrapper-disabled
-        )::before {
+      .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before {
         background-color: transparent !important;
       }
 
@@ -172,17 +175,48 @@
     height: 510px;
   }
 
-  .stastics-and-charts-container {
+  .statics-and-charts-container {
     display: flex;
     flex-direction: row;
     width: 100%;
     margin-top: 2rem;
     margin-bottom: 2rem;
 
-    .stastic-card-row {
+    .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+      width: 65px !important;
+      height: 32px !important;
+      text-align: center !important;
+      border-radius: 50px !important;
+      background: $primary-color !important;
+      line-height: 30px !important;
+    }
+
+    .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+      width: 65px !important;
+      height: 32px !important;
+      text-align: center !important;
+      border-radius: 50px !important;
+      background: $primary-color !important;
+      line-height: 30px !important;
+    }
+
+    .ant-picker-cell-disabled::before {
+      width: 65px !important;
+      height: 32px !important;
+      text-align: center !important;
+      border-radius: 50px !important;
+      line-height: 30px !important;
+    }
+
+    .ant-picker-cell::before {
+      left: 11px;
+    }
+
+    .statics-card-row {
       width: 100%;
-      .stastic-card-col {
-        .stastics-and-pie-card {
+
+      .statics-card-col {
+        .statics-card {
           display: flex;
           flex-direction: column;
           background-color: $white;
@@ -271,91 +305,6 @@
             }
           }
 
-          .total-programme-extra-details {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: flex-start;
-            height: 100px;
-            width: 100%;
-            margin-top: -1rem;
-            margin-bottom: 0.5rem;
-            padding: 0 0.5rem 0 0.5rem;
-
-            .rejected-details,
-            .transfered-details {
-              display: flex;
-              flex-direction: row;
-              align-items: center;
-              justify-content: space-between;
-              width: 100%;
-
-              .icon {
-                display: flex;
-                flex-direction: row;
-                width: 20%;
-
-                .icon-container {
-                  display: flex;
-                  flex-direction: row;
-                  align-items: center;
-                  justify-content: center;
-                  border-radius: 50px;
-                  width: 2.813rem;
-                  height: 2.813rem;
-                }
-
-                .reject {
-                  background-color: rgba(255, 166, 166, 0.4);
-                }
-
-                .transfer {
-                  background-color: rgba(254, 241, 173, 0.5);
-                }
-
-                .pending {
-                  background-color: rgba(164, 162, 168, 0.5);
-                }
-
-                .authorized {
-                  background-color: rgba(185, 226, 244, 0.4);
-                }
-              }
-
-              .details {
-                display: flex;
-                flex-direction: column;
-                width: 80%;
-                height: 3.438rem;
-
-                .label-and-value {
-                  display: flex;
-                  flex-direction: row;
-                  align-items: flex-start;
-                  justify-content: space-between;
-
-                  .label {
-                    font-family: "Inter";
-                    font-style: normal;
-                    font-weight: 400;
-                    font-size: 0.875rem;
-                    color: $card-labels;
-                  }
-
-                  .value {
-                    font-family: "Inter";
-                    font-style: normal;
-                    font-weight: 400;
-                    height: 30px;
-                    font-size: 1.5rem;
-                    margin-top: -8px;
-                    color: $card-title;
-                  }
-                }
-              }
-            }
-          }
-
           .stage-legends {
             display: flex;
             flex-direction: row;
@@ -383,21 +332,22 @@
             }
           }
 
-          .pie-charts-top {
+          .charts-top {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
             padding: 0 1rem 0 1rem;
-            .pie-charts-title {
+
+            .charts-title {
               display: flex;
               flex-direction: row;
               font-family: "Inter";
               align-items: flex-start;
               justify-content: flex-start;
               font-style: normal;
-              font-weight: 600;
+              font-weight: 400;
               height: 50px;
-              font-size: 1.15rem;
+              font-size: 20px;
               margin-top: 1rem;
               color: $card-title;
 
@@ -418,18 +368,63 @@
             }
           }
 
-          .pie-charts-section {
+          .charts-section {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
+
+            chart {
+              width: 1000px !important;
+            }
           }
         }
       }
     }
   }
 
-  .stastics-and-pie-card:hover {
+  .actual-estimate-btn-grp {
+    padding-right: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    color: #3A354180;
+
+    .ant-btn-default {
+      width: 90px;
+      color: #3A354180;
+      border: 1px solid #3A354180;
+    }
+
+    .ant-btn-primary {
+      width: 90px;
+    }
+
+    .ant-btn span {
+      text-transform: none;
+    }
+
+    .ant-radio-button-wrapper {
+      border: 1px solid #3A354180 !important;
+      color: #3A354180 !important;
+      width: 90px !important;
+    }
+
+    .ant-radio-button-wrapper-checked {
+      background-color: $primary-blue !important;
+      color: $white !important;
+    }
+
+    .actual-btn {
+      border-radius: 4px 0 0 4px !important;
+    }
+
+    .estimate-btn {
+      border-radius: 0 4px 4px 0 !important;
+    }
+  }
+
+  .statics-card:hover {
     box-shadow: rgba(0, 5, 18, 0.2) 0px 8px 24px;
   }
 
@@ -486,6 +481,7 @@
     flex-direction: row;
     width: 98%;
     margin: 5px 10px 25px 15px;
+
     .stastic-charts-row {
       display: flex;
       flex-direction: row;
@@ -533,6 +529,7 @@
     flex-direction: row;
     width: 98%;
     margin: 5px 10px 25px 15px;
+
     .stastic-charts-row {
       display: flex;
       flex-direction: row;
@@ -581,6 +578,7 @@
     border-radius: 10px;
     margin: 25px 20px 25px 15px;
     height: auto;
+
     .maps-container-row {
       display: flex;
       flex-direction: row;
