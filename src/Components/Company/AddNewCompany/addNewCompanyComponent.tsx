@@ -718,7 +718,7 @@ export const AddNewCompanyComponent = (props: any) => {
                             <div className="minister-radio-container">
                               <Tooltip
                                 placement="top"
-                                title="Permitted to perform all programme-related actions within the Ministry"
+                                title="Permitted to perform all project-related actions within the Ministry"
                               >
                                 <Radio.Button
                                   className="minister"
