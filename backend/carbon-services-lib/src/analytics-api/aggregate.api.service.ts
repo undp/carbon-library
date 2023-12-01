@@ -26,6 +26,8 @@ import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
 import { InvestmentStatus } from "../shared/enum/investment.status";
 import { SYSTEM_TYPE } from "../shared/enum/system.names.enum";
+import { Emission } from "src/shared/entities/emission.entity";
+import { Projection } from "src/shared/entities/projection.entity";
 
 @Injectable()
 export class AggregateAPIService {
@@ -50,7 +52,9 @@ export class AggregateAPIService {
     @InjectRepository(InvestmentView) private investmentRepo: Repository<InvestmentView>,
     @InjectRepository(NDCActionViewEntity) private ndcRepo: Repository<NDCActionViewEntity>,
     @InjectRepository(ProgrammeTransferViewEntityQuery)
-    private programmeTransferRepo: Repository<ProgrammeTransferViewEntityQuery>
+    private programmeTransferRepo: Repository<ProgrammeTransferViewEntityQuery>,
+    @InjectRepository(Emission) private emissionRepo: Repository<Emission>,
+    @InjectRepository(Projection) private projectionRepo: Repository<Projection>,
   ) {}
 
   private getFilterAndByStatFilter(
@@ -1970,6 +1974,208 @@ export class AggregateAPIService {
       stat.statFilter?.timeGroup ? "createdAt" : undefined,
       stat.statFilter?.timeGroup ? "day" : undefined
     );
+  }
+
+  calculateSumEmissions(obj: any, gasType: string) {
+    let sum = 0;
+    for (const key in obj) {
+      if (key === gasType) {
+        sum += obj[key];
+      } else if (
+        typeof obj[key] === 'object' &&
+        key !== 'totalCo2WithLand' &&
+        key !== 'totalCo2WithoutLand'
+      ) {
+        sum += this.calculateSumEmissions(obj[key], gasType);
+      }
+    }
+    return sum;
+  }
+
+  calculateSumEmissionsBySector(obj) {
+    let sum = 0;
+    for (const key in obj) {
+      if (
+        typeof obj[key] === 'object' &&
+        key !== 'totalCo2WithLand' &&
+        key !== 'totalCo2WithoutLand'
+      ) {
+        sum += this.calculateSumEmissionsBySector(obj[key]);
+      } else if (['ch4', 'co2', 'n2o', 'co2eq'].includes(key)) {
+        sum += obj[key];
+      }
+    }
+    return sum;
+  }
+
+  async getDataBySector(emissionResult) {
+    console.log('======================================== INSIDE getEmissionsBySector emissions', emissionResult);
+    const xLabels: string[] = [];
+    const agricultureForestryOtherLandUse: number[] = [];
+    const energyEmissions: number[] = [];
+    const industrialProcessesProductUse: number[] = [];
+    const other: number[] = [];
+    const waste: number[] = [];
+    let last = 0;
+
+    emissionResult.forEach(emission => {
+      xLabels.push(emission.year);
+      energyEmissions.push(this.calculateSumEmissionsBySector(emission.energyEmissions));
+      agricultureForestryOtherLandUse.push(this.calculateSumEmissionsBySector(emission.agricultureForestryOtherLandUse));
+      industrialProcessesProductUse.push(this.calculateSumEmissionsBySector(emission.industrialProcessesProductUse));
+      other.push(this.calculateSumEmissionsBySector(emission.other));
+      waste.push(this.calculateSumEmissionsBySector(emission.waste));
+      last = emission.updatedAt;
+    });
+
+    const latestDate = new Date(last).getTime();
+
+    return {
+      data: { xLabels, agricultureForestryOtherLandUse, energyEmissions, industrialProcessesProductUse, other, waste },
+      last: latestDate
+    };
+  }
+
+  async getEmissionByGas(emissionResult) {
+    const xLabels: string[] = [];
+    const co2: number[] = [];
+    const ch4: number[] = [];
+    const n2o: number[] = [];
+    const co2eq: number[] = [];
+    let last = 0;
+
+    emissionResult.forEach(emission => {
+      xLabels.push(emission.year);
+      co2.push(this.calculateSumEmissions(emission, 'co2'));
+      ch4.push(this.calculateSumEmissions(emission, 'ch4'));
+      n2o.push(this.calculateSumEmissions(emission, 'n2o'));
+      co2eq.push(this.calculateSumEmissions(emission, 'co2eq'));
+      last = emission.updatedAt;
+    });
+
+    const latestDate = new Date(last).getTime();
+
+    return {
+      data: { xLabels, co2, ch4, n2o, co2eq },
+      last: latestDate
+    };
+  }
+
+  async getComparisonChartData(emissionResult, projectionResult) {
+    const xLabels: string[] = [];
+    const bau: number[] = [];
+    const conditionalNdc: number[] = [];
+    const unconditionalNdc: number[] = [];
+    const actual: number[] = [];
+    let last = 0;
+
+    projectionResult.forEach(projection => {
+      xLabels.push(projection.year);
+      bau.push(this.calculateSumEmissions(projection, 'bau'));
+      conditionalNdc.push(this.calculateSumEmissions(projection, 'conditionalNdc'));
+      unconditionalNdc.push(this.calculateSumEmissions(projection, 'unconditionalNdc'));
+      last = projection.updatedAt;
+
+      const emissionDataForYear = emissionResult.find(emission => emission.year === projection.year);
+      if (emissionDataForYear) {
+        actual.push(this.calculateSumEmissionsBySector(emissionDataForYear));
+        last = emissionDataForYear.updatedAt;
+      } else {
+        actual.push(0);
+      }
+    });
+
+    const latestDate = new Date(last).getTime();
+
+    return {
+      data: { xLabels, bau, conditionalNdc, unconditionalNdc, actual },
+      last: latestDate
+    };
+  }
+
+  async calculateGhgStat(
+    stat: Stat,
+    results,
+    abilityCondition,
+    lastTimeForWhere,
+    statCache,
+    companyId,
+    companyRole,
+    system: SYSTEM_TYPE
+  ) {
+    const key = stat.key ? stat.key : stat.type;
+    console.log('======================================== INSIDE calculateGhgStat', stat.type);
+
+    const startYear = (stat?.statFilter.startTime && stat?.statFilter.startTime !== 0) ? stat?.statFilter.startTime : new Date().getFullYear() - 10;
+    const endYear = (stat?.statFilter.endTime && stat?.statFilter.endTime !== 0) ? stat?.statFilter.endTime : new Date().getFullYear();
+    const emissionResult = await this.emissionRepo
+      .createQueryBuilder('emission')
+      .where('emission.year BETWEEN :startYear AND :endYear', { startYear, endYear })
+      .andWhere('emission.state = :status', { status: 'FINALIZED' })
+      .orderBy('emission.year', 'ASC')
+      .getMany();
+
+    const projectionResult = await this.projectionRepo
+      .createQueryBuilder('projection')
+      .where('projection.year BETWEEN :startYear AND :endYear', { startYear, endYear })
+      .andWhere('projection.state = :status', { status: 'FINALIZED' })
+      .orderBy('projection.year', 'ASC')
+      .getMany();
+
+    switch (system) {
+      case SYSTEM_TYPE.CARBON_TRANSPARENCY:
+        switch (stat.type) {
+          case StatType.AGG_EMISSIONS_BY_SECTOR:
+            results[key] = await this.getDataBySector(
+              emissionResult
+            );
+            break;
+          case StatType.AGG_EMISSIONS_BY_GAS:
+            results[key] = await this.getEmissionByGas(
+              emissionResult
+            );
+            break;
+          case StatType.AGG_EMISSIONS_MITIGATION_POTENTIAL_BY_SECTOR:
+            results[key] = await this.getDataBySector(
+              emissionResult
+            );
+            break;
+          case StatType.AGG_EMISSIONS_COMPARISON:
+            results[key] = await this.getComparisonChartData(
+              emissionResult,
+              projectionResult
+            );
+            break;
+        }
+    }
+
+    console.log('======================================== INSIDE calculateGhgStat results', results);
+  }
+
+  async getGhgEmissionStats(
+    abilityCondition: string,
+    query: StatList,
+    companyId: any,
+    companyRole: CompanyRole,
+    system: SYSTEM_TYPE
+  ): Promise<DataCountResponseDto> {
+    let results = {};
+    let lastTimeForWhere = {};
+    let statCache = {};
+
+    for (const stat of query.stats) {
+      await this.calculateGhgStat(
+        stat,
+        results,
+        abilityCondition,
+        lastTimeForWhere,
+        statCache,
+        companyId,
+        companyRole,
+        system
+      );
+    }
+    return new DataCountResponseDto(results);
   }
 
   private groupByStatus(key: string, data: any) {

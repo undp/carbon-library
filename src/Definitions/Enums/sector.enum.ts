@@ -20,10 +20,10 @@ export enum EmissionSector {
 }
 
 export enum EmissionGas {
-  'CO2' = 'CO<sub>2</sub>',
-  'CH4' = 'CH<sub>4</sub>',
-  'N2O' = 'N<sub>2</sub>O',
-  'CO2eq' = 'CO<sub>2</sub>-eq',
+  'co2' = 'CO<sub>2</sub>',
+  'ch4' = 'CH<sub>4</sub>',
+  'n2o' = 'N<sub>2</sub>O',
+  'co2eq' = 'CO<sub>2</sub>-eq',
 }
 
 export enum EmissionSubSectors {

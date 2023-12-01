@@ -1,5 +1,5 @@
-import { CompanyRole, EmissionSector, GhgStatCardTypes, WidgetType, EmissionGas, EmissionSubSectors, ProjectionTypes } from '../../../Definitions';
-import { Button, Col, Row, DatePicker, Skeleton } from 'antd';
+import { CompanyRole, EmissionSector, GhgStatCardTypes, WidgetType, EmissionGas, EmissionSubSectors, ProjectionTypes, SystemNames } from '../../../Definitions';
+import { Button, Col, Row, DatePicker, Skeleton, message } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import './ghg.dashboard.scss';
@@ -25,11 +25,10 @@ export const GHGDashboardComponent = (props: any) => {
         Link,
         isMultipleDashboardsVisible,
     } = props;
+    const { get, post, delete: del } = useConnection();
     const { userInfoState } = useUserContext();
-    const [endYear, setEndYear] = useState<number>(Date.parse(String(moment().endOf('year'))));
-    const [startYear, setStartYear] = useState<number>(
-        Date.parse(String(moment().subtract('10', 'years')))
-    );
+    const [endYear, setEndYear] = useState<number>(moment().year());
+    const [startYear, setStartYear] = useState<number>(moment().subtract('10', 'years').year());
     const [loadingCharts, setLoadingCharts] = useState<boolean>(false);
     const [data, setData] = useState<any>({});
     const [estimateData, setEstimateData] = useState<any>({});
@@ -351,6 +350,7 @@ export const GHGDashboardComponent = (props: any) => {
     };
 
     useEffect(() => {
+        getData();
         console.log('****************Date changed*******', startYear, endYear);
     }, [startYear, endYear]);
 
@@ -449,7 +449,6 @@ export const GHGDashboardComponent = (props: any) => {
         const emissionsAggByComparison: any = statData?.data;
         projectionTypesArray?.map((projectionType: any) => {
             if (emissionsAggByComparison[projectionType] !== undefined) {
-                console.log('------------parseEmissionComparisonData-----------------', projectionType);
                 emissionComparisonSeriesData.push({
                     name: ProjectionTypes[projectionType as keyof typeof ProjectionTypes],
                     data: emissionsAggByComparison[projectionType],
@@ -537,39 +536,116 @@ export const GHGDashboardComponent = (props: any) => {
             },
         },
     };
-    useEffect(() => {
-        console.log('Response', response);
-        const newd: any = {};
-        for (const key in response?.data?.stats) {
-            if (response?.data?.stats.hasOwnProperty(key)) {
-                if (key === GhgStatCardTypes.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR) {
-                    setActualData(
-                        response?.data.stats.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR?.data?.actual?.data
-                    );
-                    setEstimateData(
-                        response?.data.stats.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR?.data?.estimate?.data
-                    );
-                }
-                const obj = response?.data?.stats[key];
-                const config = supportedWidgetList[key];
-                if (config) {
-                    const dx = config.callbacks.parseData(
-                        obj,
-                        config.configs.dataLabelField,
-                        config.configs.dataValField
-                    );
-                    newd[key] = {
-                        data: dx,
-                        time:
-                            !obj.last || obj.last === '0' || obj.last === 0
-                                ? '0'
-                                : moment(parseInt(obj.last)).fromNow(),
-                    };
+
+    const genPayload = () => {
+        const stats = [];
+        for (const item in GhgStatCardTypes) {
+            stats.push({
+                type: item,
+                statFilter: {
+                    startTime: startYear !== 0 ? startYear : undefined,
+                    endTime: endYear !== 0 ? endYear : undefined,
+                    onlyMine:
+                        userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER,
+                },
+            });
+        }
+        return {
+            system: SystemNames.CARBON_TRANSPARENCY,
+            stats: stats,
+        };
+    };
+
+
+    const getData = async () => {
+        setLoadingCharts(true);
+        try {
+            const response: any = await post(
+                "stats/ghg/agg",
+                genPayload(),
+                undefined,
+                // process.env.REACT_APP_STAT_URL
+                'http://localhost:3100'
+            );
+            console.log('Response', response);
+            const newd: any = {};
+            for (const key in response?.data?.stats) {
+                if (response?.data?.stats.hasOwnProperty(key)) {
+                    if (key === GhgStatCardTypes.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR) {
+                        setActualData(
+                            response?.data.stats.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR?.data?.actual?.data
+                        );
+                        setEstimateData(
+                            response?.data.stats.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR?.data?.estimate?.data
+                        );
+                    }
+                    const obj = response?.data?.stats[key];
+                    const config = supportedWidgetList[key];
+                    if (config) {
+                        const dx = config.callbacks.parseData(
+                            obj,
+                            config.configs.dataLabelField,
+                            config.configs.dataValField
+                        );
+                        newd[key] = {
+                            data: dx,
+                            time:
+                                !obj.last || obj.last === '0' || obj.last === 0
+                                    ? '0'
+                                    : moment(parseInt(obj.last)).fromNow(),
+                        };
+                    }
                 }
             }
+            console.log('newd', newd);
+            setData(newd);
+        } catch (error: any) {
+            console.log("Error in getting users", error);
+            message.open({
+                type: "error",
+                content: error.message,
+                duration: 3,
+                style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+            });
+        } finally {
+            setLoadingCharts(false);
         }
-        console.log('newd', newd);
-        setData(newd);
+    };
+
+    useEffect(() => {
+        // console.log('Response', response);
+        // const newd: any = {};
+        // for (const key in response?.data?.stats) {
+        //     if (response?.data?.stats.hasOwnProperty(key)) {
+        //         if (key === GhgStatCardTypes.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR) {
+        //             setActualData(
+        //                 response?.data.stats.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR?.data?.actual?.data
+        //             );
+        //             setEstimateData(
+        //                 response?.data.stats.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR?.data?.estimate?.data
+        //             );
+        //         }
+        //         const obj = response?.data?.stats[key];
+        //         const config = supportedWidgetList[key];
+        //         if (config) {
+        //             const dx = config.callbacks.parseData(
+        //                 obj,
+        //                 config.configs.dataLabelField,
+        //                 config.configs.dataValField
+        //             );
+        //             newd[key] = {
+        //                 data: dx,
+        //                 time:
+        //                     !obj.last || obj.last === '0' || obj.last === 0
+        //                         ? '0'
+        //                         : moment(parseInt(obj.last)).fromNow(),
+        //             };
+        //         }
+        //     }
+        // }
+        // console.log('newd', newd);
+        // setData(newd);
+        getData();
     }, []);
 
     const getColorsForPercentageCharts = (percentageData: any) => {
