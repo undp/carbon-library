@@ -612,6 +612,27 @@
           }
         }
       }
+
+      .social-environment-risk-title-section{
+        display: flex; 
+        justify-content: center; 
+        align-items: center;
+        border-top: 1px solid rgba(58, 53, 65, 0.5) !important;
+        margin-bottom: 15px;
+        margin-top: 5px;
+      }
+
+      .social-environment-risk-title-section:first-child {
+        border-bottom: 1px solid rgba(58, 53, 65, 0.5) !important;
+      }
+  
+      .social-environment-risk-title {
+        text-align: center;
+        margin-bottom: 5px;
+        margin-top: 10px;
+        font-weight: 700;
+        color: rgba(58, 53, 65, 0.5);
+      }
     }
   }
 }
