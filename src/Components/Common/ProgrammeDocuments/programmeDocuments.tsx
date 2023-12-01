@@ -370,7 +370,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       download
                     >
                       <BookOutlined
-                        className="common-progress-icon margin-right-1"
+                        className="common-progress-icon"
                         style={{ color: "#3F3A47" }}
                       />
                     </a>
@@ -613,7 +613,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       download
                     >
                       <BookOutlined
-                        className="common-progress-icon margin-right-1"
+                        className="common-progress-icon"
                         style={{ color: "#3F3A47" }}
                       />
                     </a>
@@ -868,7 +868,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                     >
                       <div>
                         <BookOutlined
-                          className="common-progress-icon margin-right-1"
+                          className="common-progress-icon"
                           style={{ color: "#3F3A47" }}
                         />
                       </div>
