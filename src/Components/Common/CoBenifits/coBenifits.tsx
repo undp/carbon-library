@@ -346,7 +346,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (environmentalOverallValidation !== true) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits UNFCCC SD Tool section`,
+        content: `Fill the required fields in Co-benefits UNFCCC SD Tool section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -355,7 +355,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (!isSocialFormValid) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits UNFCCC SD Tool section`,
+        content: `Fill the required fields in Co-benefits UNFCCC SD Tool section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -364,7 +364,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (economicOverallValidation !== true) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits UNFCCC SD Tool section`,
+        content: `Fill the required fields in Co-benefits UNFCCC SD Tool section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -373,7 +373,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (!isAssessmentFormValid) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits Assessment section`,
+        content: `Fill the required fields in Co-benefits Assessment section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
