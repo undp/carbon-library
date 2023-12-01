@@ -134,9 +134,9 @@ export const EmailTemplates = {
     html: `
         Hi {{name}}, <br><br>
 
-        A new programme owned by {{organisationName}} has been created in the Carbon Registry. <br><br>
+        A new project owned by {{organisationName}} has been created in the Carbon Registry. <br><br>
 
-        Click <a href="{{programmePageLink}}">here</a> for more details of the programme.
+        Click <a href="{{programmePageLink}}">here</a> for more details of the project.
         <br><br>
 
         Sincerely,  <br>
@@ -152,7 +152,7 @@ export const EmailTemplates = {
         {{programmeName}}  of your Organisation has been authorised on {{authorisedDate}} with the serial number {{serialNumber}}.
         <br><br>
 
-        Click <a href="{{programmePageLink}}">here</a> for more details of the programme.
+        Click <a href="{{programmePageLink}}">here</a> for more details of the project.
         <br><br>
 
         Sincerely,  <br>
@@ -168,7 +168,7 @@ export const EmailTemplates = {
         {{programmeName}} of your Organisation has been rejected on {{date}} due to the following reason/s: <br>
         {{reason}} <br><br>
 
-        Click <a href="{{pageLink}}">here</a> for more details of the programme.  <br><br>
+        Click <a href="{{pageLink}}">here</a> for more details of the project.  <br><br>
 
         Sincerely, <br>
         The {{countryName}} Carbon Credit Registry Team
@@ -180,9 +180,9 @@ export const EmailTemplates = {
     html: `
         Hi {{name}}, <br><br>
 
-        The {{documentType}} of the programme {{programmeName}} owned by your organisation has been approved. <br><br>
+        The {{documentType}} of the project {{programmeName}} owned by your organisation has been approved. <br><br>
         
-        Click <a href="{{programmePageLink}}">here</a> for more details of the programme. 
+        Click <a href="{{programmePageLink}}">here</a> for more details of the project. 
         <br><br>
          
         Sincerely,  <br>
@@ -197,7 +197,7 @@ export const EmailTemplates = {
 
         {{programmeName}} of your Organisation with the serial number {{serialNumber}} has been issued with {{credits}} credits.<br><br>
 
-        Click <a href="{{pageLink}}">here</a> for more details of the programme.<br><br>
+        Click <a href="{{pageLink}}">here</a> for more details of the project.<br><br>
 
         Sincerely, <br>
         The {{countryName}} Carbon Credit Registry Team
@@ -370,9 +370,9 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        A new programme owned by {{organisationName}} is awaiting authorisation. <br><br>
+        A new project owned by {{organisationName}} is awaiting authorisation. <br><br>
 
-        Click <a href="{{programmePageLink}}">here</a> to access all the programmes that require authorisation. <br><br>
+        Click <a href="{{programmePageLink}}">here</a> to access all the projects that require authorisation. <br><br>
         
         Sincerely, <br>
         The {{countryName}} Carbon Credit Registry Team
@@ -397,7 +397,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        The certification of the programme {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by {{organisationName}}. <br><br>
+        The certification of the project {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by {{organisationName}}. <br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the certification. <br><br>
 
         Sincerely, <br>
@@ -410,7 +410,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        The certification given by {{organisationName}} for the programme {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by the {{government}}. <br><br>
+        The certification given by {{organisationName}} for the project {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by the {{government}}. <br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the certification. <br><br>
 
         Sincerely, <br>
@@ -423,7 +423,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        The certification given by your Organisation for the programme {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by the {{government}}. <br><br>
+        The certification given by your Organisation for the project {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by the {{government}}. <br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the certification. <br><br>
 
         Sincerely, <br>
@@ -436,7 +436,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        The certification given by {{organisationName}} for the programme {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by the system as {{organisationName}} was deactivated. <br><br>
+        The certification given by {{organisationName}} for the project {{programmeName}} containing {{credits}} credits with the serial number {{serialNumber}} has been revoked by the system as {{organisationName}} was deactivated. <br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the certification. <br><br>
 
         Sincerely, <br>
@@ -479,7 +479,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        {{credits}} credits of the programme {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}.<br><br>
+        {{credits}} credits of the project {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the retirement. <br><br>
 
         Sincerely, <br>

@@ -163,6 +163,7 @@ export * from './shared/dto/projection.industrial.processes.product.use';
 export * from './shared/dto/projection.other';
 export * from './shared/dto/projection.waste';
 export * from './shared/dto/projection.properties';
+export * from './shared/dto/programme.mitigation.issue'
 //from transparency
 export * from './shared/dto/adaptation.properties'
 export * from './shared/dto/co.benefits'

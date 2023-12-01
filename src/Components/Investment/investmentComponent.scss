@@ -1,7 +1,33 @@
 @import '../../Styles/variables.scss';
 
 .steps-actions {
-  text-align: right;
+  display: flex;
+  flex-direction: row-reverse;
+  margin-right: 1rem;
+  justify-content: flex-start;
+}
+
+.investment-title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0px 0px 30px 0px;
+
+  .title {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .flex-display {
+    margin-left: 15px;
+  }
 }
 
 .ownership-container {

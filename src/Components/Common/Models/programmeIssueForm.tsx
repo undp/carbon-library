@@ -1,4 +1,15 @@
-import { Alert, Button, Col, Form, Input, InputNumber, Modal, Row } from "antd";
+import {
+  Alert,
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Row,
+  Space,
+} from "antd";
 import react, { FC, useState } from "react";
 import {
   addCommSep,
@@ -6,6 +17,7 @@ import {
 } from "../../../Definitions/Definitions/programme.definitions";
 import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
 import React from "react";
+import { MinusCircleOutlined } from "@ant-design/icons";
 
 export interface ProgrammeIssueFormProps {
   programme: Programme;
@@ -15,7 +27,30 @@ export interface ProgrammeIssueFormProps {
   subText: string;
   enableIssue: boolean;
   translator: any;
+  ndcActions?: any[];
 }
+
+export const getValidNdcActions = (programme: any) => {
+  let actionCreditsArray: any[] = [];
+  programme.mitigationActions?.map((action: any) => {
+    let verfiedAction = false;
+    if (action.projectMaterial) {
+      for (var document of action.projectMaterial) {
+        if (document.includes("VERIFICATION_REPORT") && action.properties?.availableCredits) {
+          verfiedAction = true;
+          break;
+        }
+      }
+    }
+    if (verfiedAction && 0 < action.properties.availableCredits) {
+      actionCreditsArray.push({
+        actionId: action.actionId,
+        availableCredits: action.properties.availableCredits,
+      });
+    }
+  });
+  return actionCreditsArray;
+};
 
 export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
   props: ProgrammeIssueFormProps
@@ -28,6 +63,7 @@ export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
     subText,
     enableIssue,
     translator,
+    ndcActions,
   } = props;
   const t = translator.t;
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
@@ -43,12 +79,24 @@ export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
       <Form
         name="transfer_init_popup"
         layout="vertical"
-        initialValues={{
-          issueAmount: 0,
-        }}
         onChange={() => setPopupError(undefined)}
         onFinish={async (d) => {
-          if (d.issueAmount === 0) {
+          let totalAmount: any;
+          let validIssues: any[] = [];
+          if (enableIssue) {
+            totalAmount = 0;
+            d.issueAmount.map((action: any) => {
+              totalAmount += action.issueCredit;
+              if (action.issueCredit > 0) {
+                validIssues.push({
+                  actionId: action.actionId,
+                  issueCredit: action.issueCredit,
+                });
+              }
+            });
+            d.issueAmount = validIssues;
+          }
+          if (totalAmount === 0) {
             setPopupError("Issue amount should be greater than 0");
             setLoading(false);
             return;
@@ -59,67 +107,99 @@ export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
           setLoading(false);
         }}
       >
-        {enableIssue ? (
-          <Row>
-            <Col lg={11} md={24}>
-              <div className="label">{`${t(
-                "view:issueCreditText"
-              )} (${creditUnit})`}</div>
-            </Col>
-
-            <Col lg={6} md={12}>
-              <Form.Item
-                className="popup-credit-input"
-                name={"issueAmount"}
-                rules={[
-                  {
-                    pattern: new RegExp(/^[+]?([.]\d+|\d+[.]?\d*)$/g),
-                    message: "Credit Should be a positive number",
-                  },
-                  {
-                    required: true,
-                    message: "Required field",
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(rule, value) {
-                      if (
-                        getFieldValue("issueAmount") &&
-                        parseFloat(getFieldValue("issueAmount")) >
-                          programme.creditEst - programme.creditIssued
-                      ) {
-                        // eslint-disable-next-line prefer-promise-reject-errors
-                        return Promise.reject("Amount > Authorised");
-                      }
-                      return Promise.resolve();
-                    },
-                  }),
-                ]}
-              >
-                <InputNumber
-                  placeholder=""
-                  controls={false}
-                  onKeyPress={(event) => {
-                    if (!/[0-9\.]/.test(event.key)) {
-                      event.preventDefault();
-                    }
-                  }}
-                />
-              </Form.Item>
-            </Col>
-            <Col lg={1} md={1} className="seperator">
-              {"/"}
-            </Col>
-            <Col lg={6} md={12}>
-              <Form.Item className="popup-credit-input">
-                <InputNumber
-                  placeholder={addCommSep(
-                    programme.creditEst - programme.creditIssued
-                  )}
-                  disabled
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+        {ndcActions && enableIssue ? (
+          <Form.List name="issueAmount" initialValue={ndcActions}>
+            {(fields, { add, remove }) => {
+              return (
+                <div style={{ width: "100%" }} className="space-container">
+                  {fields.map(({ key, name, ...restField }) => {
+                    return (
+                      <Space
+                        wrap={true}
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="center"
+                        size={"large"}
+                      >
+                        <div style={{ width: "100%" }}>
+                          <Row>
+                            <Col lg={11} md={24}>
+                              <div className="label">{`${t(
+                                "view:issueCreditNdcIdText"
+                              )}: ${ndcActions[name].actionId}`}</div>
+                            </Col>
+                            <Col lg={6} md={12}>
+                              <Form.Item
+                                initialValue={0}
+                                className="popup-credit-input"
+                                name={[name, "issueCredit"]}
+                                rules={[
+                                  {
+                                    pattern: new RegExp(
+                                      /^[+]?([.]\d+|\d+[.]?\d*)$/g
+                                    ),
+                                    message:
+                                      "Credit Should be a positive number",
+                                  },
+                                  {
+                                    required: true,
+                                    message: "Required field",
+                                  },
+                                  ({ getFieldValue }) => ({
+                                    validator(rule, value) {
+                                      if (
+                                        value &&
+                                        parseFloat(value) >
+                                          ndcActions[name].availableCredits
+                                      ) {
+                                        // eslint-disable-next-line prefer-promise-reject-errors
+                                        return Promise.reject(
+                                          "Amount > Authorised"
+                                        );
+                                      }
+                                      return Promise.resolve();
+                                    },
+                                  }),
+                                ]}
+                              >
+                                <InputNumber
+                                  placeholder=""
+                                  controls={false}
+                                  onKeyPress={(event) => {
+                                    if (!/[0-9\.]/.test(event.key)) {
+                                      event.preventDefault();
+                                    }
+                                  }}
+                                />
+                              </Form.Item>
+                            </Col>
+                            <Col lg={1} md={1} className="seperator">
+                              {"/"}
+                            </Col>
+                            <Col lg={6} md={12}>
+                              <Form.Item
+                                className="popup-credit-input"
+                                {...restField}
+                                name={[name, "availableCredits"]}
+                              >
+                                <InputNumber
+                                  formatter={(value) => addCommSep(value)}
+                                  disabled
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </div>
+                      </Space>
+                    );
+                  })}
+                </div>
+              );
+            }}
+          </Form.List>
         ) : (
           <Row>
             <Col lg={18} md={20}>
@@ -139,7 +219,6 @@ export const ProgrammeIssueForm: FC<ProgrammeIssueFormProps> = (
             </Col>
           </Row>
         )}
-
         <Row>
           <Col span={24}>
             <Form.Item
