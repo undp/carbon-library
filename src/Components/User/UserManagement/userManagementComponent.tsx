@@ -63,6 +63,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
 
 const { Search } = Input;
 
@@ -70,7 +71,6 @@ export const UserManagementComponent = (props: any) => {
   const {
     t,
     useAbilityContext,
-    useConnection,
     visibleColumns,
     onNavigateToUpdateUser,
     onClickAddUser,

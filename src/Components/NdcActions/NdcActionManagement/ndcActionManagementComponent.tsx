@@ -26,12 +26,11 @@ import React from "react";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
 
 export const NdcActionManagementComponent = (props: any) => {
   const {
     t,
-    useConnection,
-    useUserContext,
     onNavigateToNdcManagementView,
     onNavigateToProgrammeManagementView,
   } = props;

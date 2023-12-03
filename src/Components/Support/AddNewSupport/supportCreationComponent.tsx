@@ -29,11 +29,11 @@ import {
 } from "../../../Definitions/Enums/investment.enum";
 import { ESGType } from "../../../Definitions/Enums/eSGType.enum";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
 
 export const SupportCreationComponent = (props: any) => {
   const {
     t,
-    useConnection,
     userInfoState,
     useLocation,
     onNavigateToProgrammeManagementView,

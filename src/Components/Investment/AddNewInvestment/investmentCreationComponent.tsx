@@ -30,12 +30,11 @@ import {
 } from "../../../Definitions/Enums/investment.enum";
 import { ESGType } from "../../../Definitions/Enums/eSGType.enum";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
 
 export const InvestmentCreationComponent = (props: any) => {
   const {
     t,
-    useConnection,
-    userInfoState,
     useLocation,
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
@@ -55,6 +54,7 @@ export const InvestmentCreationComponent = (props: any) => {
   const [instrument, setInstrument] = useState<string[]>([]);
   const [stepOneData, setStepOneData] = useState<any>();
   const [govData, setGovData] = useState<any>();
+  const { userInfoState } = useUserContext();
 
   const instrumentOptions = Object.keys(Instrument).map((k, index) => ({
     label: addSpaces(Object.values(Instrument)[index]),

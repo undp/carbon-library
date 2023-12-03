@@ -63,11 +63,10 @@ import { MapComponent } from "../Common/Maps/mapComponent";
 import { LegendItem } from "../Common/LegendItem/legendItem";
 import { RegistryBarChartsStatComponent } from "./registryBarChartStatsComponent";
 const { RangePicker } = DatePicker;
+import { useConnection, useUserContext } from "../../Context";
 
 export const RegistryDashboardComponent = (props: any) => {
   const {
-    useUserContext,
-    useConnection,
     Chart,
     t,
     ButtonGroup,

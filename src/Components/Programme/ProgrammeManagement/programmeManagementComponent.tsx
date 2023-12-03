@@ -36,6 +36,8 @@ import {
   ProgrammeStageMRV,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
+
 const { Search } = Input;
 
 export const ProgrammeManagementComponent = (props: any) => {
@@ -43,7 +45,6 @@ export const ProgrammeManagementComponent = (props: any) => {
     t,
     visibleColumns,
     useUserContext,
-    useConnection,
     onNavigateToProgrammeView,
     onClickAddProgramme,
     enableAddProgramme,

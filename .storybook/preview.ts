@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/react";
+import "./Internationalization/i18n";
 
 const preview: Preview = {
   parameters: {

@@ -19,6 +19,7 @@ import {
 } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
 import { CompanyRole, Role } from "../../Definitions";
+import { useUserContext } from "../../Context";
 
 type Period = {
   start: number;
@@ -40,7 +41,7 @@ enum NdcActionType {
 }
 
 export const NdcDetailsComponent = (props: any) => {
-  const { t, useConnection, useUserContext } = props;
+  const { t } = props;
   const { RangePicker } = DatePicker;
   const [ndcDetailsData, setNdcDetailsData] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);

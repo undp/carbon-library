@@ -8,10 +8,10 @@ import { InfoCircle } from "react-bootstrap-icons";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
 import { Programme, ProgrammeStageR, getBase64 } from "../../../Definitions";
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
+import { useConnection } from "../../../Context";
 
 export const AddNdcActionComponent = (props: any) => {
   const {
-    useConnection,
     useLocation,
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
@@ -196,7 +196,6 @@ export const AddNdcActionComponent = (props: any) => {
             }
             loading={loading}
             sdgGoalImages={sdgGoalImages}
-            useConnection={useConnection}
             translator={translator}
           />
         </div>

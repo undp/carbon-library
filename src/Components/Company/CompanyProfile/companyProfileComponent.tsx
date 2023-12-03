@@ -11,13 +11,13 @@ import * as Icon from "react-bootstrap-icons";
 import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
 import { addCommSep, CompanyState, SectoralScope } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
     t,
     useAbilityContext,
     useLocation,
-    useConnection,
     onNavigateToCompanyManagement,
     onNavigateToCompanyEdit,
     regionField,

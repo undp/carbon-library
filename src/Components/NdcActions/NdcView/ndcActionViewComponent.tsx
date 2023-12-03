@@ -32,11 +32,10 @@ import {
   uploadDocUserPermission,
 } from "../../../Utils/documentsPermission";
 import moment from "moment";
+import { useConnection, useUserContext } from "../../../Context";
 
 export const NdcActionViewComponent = (props: any) => {
   const {
-    useUserContext,
-    useConnection,
     useLocation,
     onNavigateToNdcManagementView,
     translator,
@@ -808,7 +807,6 @@ export const NdcActionViewComponent = (props: any) => {
                     viewOnly={true}
                     coBenifitsViewDetails={state?.record?.coBenefitsProperties}
                     sdgGoalImages={sdgGoalImages}
-                    useConnection={useConnection}
                     translator={translator}
                   />
                 </div>
