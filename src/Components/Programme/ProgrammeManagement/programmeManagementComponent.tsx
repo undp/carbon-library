@@ -36,7 +36,7 @@ import {
   ProgrammeStageMRV,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
-import { useConnection } from "../../../Context";
+import { useConnection, useUserContext } from "../../../Context";
 
 const { Search } = Input;
 
@@ -44,7 +44,6 @@ export const ProgrammeManagementComponent = (props: any) => {
   const {
     t,
     visibleColumns,
-    useUserContext,
     onNavigateToProgrammeView,
     onClickAddProgramme,
     enableAddProgramme,
@@ -489,7 +488,7 @@ export const ProgrammeManagementComponent = (props: any) => {
                 <Checkbox
                   className="label"
                   onChange={(v) => {
-                    if (userInfoState.companyRole === CompanyRole.MINISTRY) {
+                    if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
                       if (v.target.checked) {
                         setMinistryLevelFilter(true);
                       } else {
@@ -508,7 +507,7 @@ export const ProgrammeManagementComponent = (props: any) => {
                     }
                   }}
                 >
-                  {userInfoState.companyRole === CompanyRole.MINISTRY
+                  {userInfoState?.companyRole === CompanyRole.MINISTRY
                     ? t("view:ministryLevel")
                     : t("view:seeMine")}
                 </Checkbox>

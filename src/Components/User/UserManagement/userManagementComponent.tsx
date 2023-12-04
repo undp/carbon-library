@@ -63,7 +63,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
-import { useConnection } from "../../../Context";
+import { useConnection, useUserContext } from "../../../Context";
 
 const { Search } = Input;
 
@@ -73,8 +73,7 @@ export const UserManagementComponent = (props: any) => {
     useAbilityContext,
     visibleColumns,
     onNavigateToUpdateUser,
-    onClickAddUser,
-    userInfoState,
+    onClickAddUser
   } = props;
   const [formModal] = Form.useForm();
   const { post, delete: del } = useConnection();
@@ -99,6 +98,7 @@ export const UserManagementComponent = (props: any) => {
   const [openDeleteConfirmationModal, setOpenDeleteConfirmationModal] =
     useState(false);
   const ability = useAbilityContext();
+  const { userInfoState } = useUserContext();
 
   document.addEventListener("mousedown", (event: any) => {
     const userFilterArea1 = document.querySelector(".filter-bar");
