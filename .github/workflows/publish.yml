@@ -75,21 +75,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       
-      - if: steps.changes.outputs.enum-config-changes == 'true' && github.ref == 'refs/heads/main'
+      - if: steps.changes.outputs.enum-config-changes == 'true'
         name : Enum or Config Changes
         id : enum_config_change
         run: |
-              echo ChangeTime=$(date +"%Y-%m-%d %H:%M:%S") > workflow.txt
-              echo " " >> workflow.txt
-              echo "........Enum Changes.........." >> workflow.txt
-              echo " " >> workflow.txt
-              git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/enum** >> workflow.txt
-              echo " " >> workflow.txt
-              echo "........Config Changes.........." >> workflow.txt
-              echo " " >> workflow.txt
-              git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/configuration.ts >> workflow.txt
-              timestamp=$(date "+%Y-%m-%d_%H-%M-%S")
-              aws s3 cp workflow.txt s3://${{ secrets.AWS_BUCKET }}/workflow_txts_${timestamp}.txt
+              chmod +x workflow.sh
+              AWS_BUCKET=${{ secrets.AWS_BUCKET }} FROM_EMAIL=${{ secrets.FROM_EMAIL }}  TO_EMAILS=${{secrets.TO_EMAILS}} ./workflow.sh             
       
       - run: yarn install --frozen-lockfile
         name: Carbon Service Lib Install
