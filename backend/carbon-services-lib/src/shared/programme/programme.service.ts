@@ -847,6 +847,8 @@ export class ProgrammeService {
       await this.queueDocument(AsyncActionType.ProgrammeAccept, {
         type: this.helperService.enumToString(DocType, d.type),
         data: d.url,
+        txTime: d.txTime,
+        status: d.status,
         externalId: d.externalId,
         creditEst: Number(pr.creditEst)
       }, ndc, d.type, certifierId, pr);
@@ -860,6 +862,8 @@ export class ProgrammeService {
       await this.queueDocument(AsyncActionType.DocumentUpload, {
         type: this.helperService.enumToString(DocType, d.type),
         data: d.url,
+        txTime: d.txTime,
+        status: d.status,
         externalId: d.externalId,
         actionId: d.actionId
       },ndc, d.type, certifierId, pr);
@@ -1021,6 +1025,7 @@ export class ProgrammeService {
           },
         });
       }
+      d.status = DocumentStatus.ACCEPTED;
       program = await this.findById(d.programmeId);
       ndc = await this.approveDocumentPre(d, pr, cid, ndc);
     }
@@ -1184,7 +1189,7 @@ export class ProgrammeService {
     const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
 
     const sqlProgram = await this.findByExternalId(documentDto.externalId);
-    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.type, 0, certifierId);
+    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, certifierId);
 
     console.log('Add document on registry', sqlProgram, resp, documentDto)
 
@@ -1390,6 +1395,8 @@ export class ProgrammeService {
         actionProps: {
           type: this.helperService.enumToString(DocType, dr.type),
           data: dr.url,
+          txTime: dr.txTime,
+          status: dr.status,
           externalId: dr.externalId
         },
       });
@@ -1408,7 +1415,7 @@ export class ProgrammeService {
     ndcAction && ndcAction.typeOfMitigation
     ){
       const certifierId = (await this.companyService.findByTaxId(req.certifierTaxId))?.companyId;
-      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.type, 0, certifierId);
+      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, certifierId);
     }
   }
 
@@ -1709,6 +1716,8 @@ export class ProgrammeService {
             {
             type: this.helperService.enumToString(DocType, dr.type),
             data: dr.url,
+            txTime: dr.txTime,
+            status: dr.status,
             externalId: dr.externalId,
               actionId: dr.actionId,
             },
@@ -1735,6 +1744,8 @@ export class ProgrammeService {
           await this.queueDocument(AsyncActionType.DocumentUpload, {
             type: this.helperService.enumToString(DocType, monitoringReport.type),
             data: monitoringReport.url,
+            txTime: monitoringReport.txTime,
+            status: monitoringReport.status,
             externalId: monitoringReport.externalId,
             actionId: monitoringReport.actionId
           },ndcAc, monitoringReport.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
@@ -1747,6 +1758,8 @@ export class ProgrammeService {
           await this.queueDocument(AsyncActionType.DocumentUpload, {
             type: this.helperService.enumToString(DocType, environmentalImpactAssessmentDoc.type),
             data: environmentalImpactAssessmentDoc.url,
+            txTime: environmentalImpactAssessmentDoc.txTime,
+            status: environmentalImpactAssessmentDoc.status,
             externalId: environmentalImpactAssessmentDoc.externalId,
             actionId: environmentalImpactAssessmentDoc.actionId
           },undefined, environmentalImpactAssessmentDoc.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
@@ -2040,6 +2053,8 @@ export class ProgrammeService {
         await this.queueDocument(AsyncActionType.DocumentUpload, {
           type: this.helperService.enumToString(DocType, dr.type),
           data: dr.url,
+          txTime: dr.txTime,
+          status: dr.status,
           externalId: dr.externalId,
           actionId: dr.actionId
         }, ndcAction, dr.type, certifierId, program);
@@ -3275,7 +3290,7 @@ export class ProgrammeService {
     const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
 
     const sqlProgram = await this.findByExternalId(accept.externalId);
-    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.type, accept.creditEst, certifierId);
+    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, certifierId);
     
     console.log('Add accept on registry', sqlProgram, resp, accept)
 
@@ -4068,8 +4083,10 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, updated);
   }
 
-  isVerfiedMitigationAction(documents:string[]):boolean{
-    for(var document of documents){
+  isVerfiedMitigationAction(documents:any[]):boolean{
+    for(var documentDetails of documents){
+      let document:any
+      documentDetails.url? document = documentDetails.url : document = documentDetails;
       if(document.includes('VERIFICATION_REPORT'))return true
     }
     return false
@@ -4309,6 +4326,8 @@ export class ProgrammeService {
         actionProps: {
           type: this.helperService.enumToString(DocType, dr.type),
           data: dr.url,
+          txTime: dr.txTime,
+          status: dr.status,
           externalId: dr.externalId
         },
       });
