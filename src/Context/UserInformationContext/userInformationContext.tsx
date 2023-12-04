@@ -1,5 +1,5 @@
 import React, { useContext, useState, createContext, useCallback, useEffect } from 'react';
-import { useConnection } from '../ConnectionContext/connectionContext';
+import { useConnection } from '../../Context';
 import jwt_decode from 'jwt-decode';
 import { UserContextProps, UserProps } from '../../Definitions';
 
