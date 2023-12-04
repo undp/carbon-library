@@ -66,22 +66,8 @@ jobs:
           else
             echo "No Enum or Config changes detected."
             echo "enum-config-changes=false" >> $GITHUB_OUTPUT
-          fi
-      
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      
-      - if: steps.changes.outputs.enum-config-changes == 'true'
-        name : Enum or Config Changes
-        id : enum_config_change
-        run: |
-              chmod +x workflow.sh
-              AWS_BUCKET=${{ secrets.AWS_BUCKET }} FROM_EMAIL=${{ secrets.FROM_EMAIL }}  TO_EMAILS=${{secrets.TO_EMAILS}} ./workflow.sh             
-      
+          fi             
+          
       - run: yarn install --frozen-lockfile
         name: Carbon Service Lib Install
         if: steps.changes.outputs.backend-changes == 'true'
@@ -102,12 +88,26 @@ jobs:
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
-          yarn version --prerelease --preid ${{ github.head_ref || github.ref_name }} 
-          git push --follow-tags
+          yarn version --prerelease --preid ${{ github.head_ref || github.ref_name }} > workflow.txt
+          git push --follow-tags > workflow.txt
         env:
           CI_COMMIT_MESSAGE: Carbon Service Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/carbon-services-lib
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - if: steps.changes.outputs.enum-config-changes == 'true'
+        name : Enum or Config Changes
+        id : enum_config_change
+        run: |
+              chmod +x workflow.sh
+              AWS_BUCKET=${{ secrets.AWS_BUCKET }} FROM_EMAIL=${{ secrets.FROM_EMAIL }}  TO_EMAILS=${{secrets.TO_EMAILS}} ./workflow.sh
+              
       - run: yarn run build && cp package.json ./dist/
         name: Carbon Service Lib Build
         if: steps.changes.outputs.backend-changes == 'true'
