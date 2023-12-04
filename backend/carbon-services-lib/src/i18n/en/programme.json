@@ -97,5 +97,7 @@
     "govermentOwnershipOfProgramme":"Goverment should be a programme owner.",
     "proponentIsNotAProgrammeDevOrGov": "Proponent is not a programme developer or government",
     "programmeExistsWithAssessmentRegId": "The programme already exists with the given environmental assessment registration number",
+    "invalidOmgePerc": "Invalid OMGE Percentage",
+    "omgeRetireDesc": " and {} credits as Overall Mitigation in Global Emission",
     "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from NDC Action:{} should be less than its estimated credit amount"
   }

@@ -9,11 +9,17 @@ import {
   Modal,
   Row,
   Select,
+  Tooltip,
 } from "antd";
 import { FC, useState } from "react";
-import { ProgrammeTransfer, addCommSep } from "../../../Definitions";
+import {
+  ProgrammeTransfer,
+  RetireType,
+  addCommSep,
+} from "../../../Definitions";
 import React from "react";
 import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
+import { InfoCircle } from "react-bootstrap-icons";
 
 export interface TransferActionModelProps {
   icon: any;
@@ -206,6 +212,76 @@ export const TransferActionModel: FC<TransferActionModelProps> = (
               </Form.Item>
             </Col>
           </Row>
+          {transfer.retirementType === RetireType.CROSS_BORDER && (
+            <Row>
+              <Col lg={18} md={20}>
+                <div className="label">{`${t(
+                  "view:govInternationalAcc"
+                )}`}</div>
+              </Col>
+              <Col lg={6} md={4}>
+                <Form.Item className="popup-credit-input">
+                  <InputNumber
+                    placeholder={
+                      transfer.creditAmount
+                        ? addCommSep(
+                            transfer.creditAmount -
+                              Number(
+                                (
+                                  (transfer.omgePercentage *
+                                    transfer.creditAmount) /
+                                  100
+                                ).toFixed(2)
+                              )
+                          )
+                        : `-`
+                    }
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          )}
+          {transfer.retirementType === RetireType.CROSS_BORDER && (
+            <Row>
+              <Col lg={18} md={20} style={{ display: "flex" }}>
+                <div className="label">
+                  {`${t("view:omgeAcc")}`}
+                </div>
+                <div className="info-container">
+                  <Tooltip
+                    arrowPointAtCenter
+                    placement="topLeft"
+                    trigger="hover"
+                    title={t("view:omgeDesc")}
+                    overlayClassName="custom-tooltip"
+                  >
+                    <InfoCircle color="#000000" size={15} />
+                  </Tooltip>
+                </div>
+              </Col>
+              <Col lg={6} md={4}>
+                <Form.Item className="popup-credit-input">
+                  <InputNumber
+                    placeholder={
+                      transfer.creditAmount
+                        ? addCommSep(
+                            Number(
+                              (
+                                (transfer.omgePercentage *
+                                  transfer.creditAmount) /
+                                100
+                              ).toFixed(2)
+                            )
+                          )
+                        : `-`
+                    }
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          )}
           <Row>
             <Col span={24}>
               <Form.Item
