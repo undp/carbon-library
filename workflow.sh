@@ -12,20 +12,20 @@ CONTENT=$(base64 -w 0 workflow.txt)
 RAW_MESSAGE="Subject: Libraries Changes
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=NextPart
-              
+
 --NextPart
 Content-Type: text/html
-              
+
 Please find the attachment for latest changes.
-              
+
 --NextPart
 Content-Type: text/plain; name=workflow.txt
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment
-              
+
 $CONTENT
-              
+
 --NextPart--"
-              
+
 ENCODED_MESSAGE=$(echo -n "$RAW_MESSAGE" | base64)
 aws ses send-raw-email --source $FROM_EMAIL --destination $TO_EMAILS --raw-message "Data=$ENCODED_MESSAGE" 
