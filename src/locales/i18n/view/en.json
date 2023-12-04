@@ -140,5 +140,8 @@
     "addInvestment": "ADD INVESTMENT",
     "addAction": "ADD ACTION",
     "ministryLevel": "Ministry Level",
-    "environmentalAssessmentRegistrationNo": "Environmental Assessment Registration Number"
+    "environmentalAssessmentRegistrationNo": "Environmental Assessment Registration Number",
+    "methodology": "Methodology",
+    "verificationEl": "Verification",
+    "monitoringEl": "Monitoring"
   }
