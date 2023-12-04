@@ -89,7 +89,7 @@ jobs:
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "palinda@xeptagon.com"
           yarn version --prerelease --preid ${{ github.head_ref || github.ref_name }} > workflow.txt
-          git push --follow-tags > workflow.txt
+          git push --follow-tags
         env:
           CI_COMMIT_MESSAGE: Carbon Service Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
