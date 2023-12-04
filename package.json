@@ -1,10 +1,6 @@
 {
   "name": "@undp/carbon-library",
-<<<<<<< HEAD
-  "version": "1.0.179-CARBON-339.0",
-=======
   "version": "1.0.180",
->>>>>>> main
   "description": "Shared Library of tools for Carbon Credits applications ecosystem for ExO and and HQ/GEF",
   "type": "module",
   "scripts": {
