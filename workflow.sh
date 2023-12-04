@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo -e "$(date +"%Y-%m-%d %H:%M:%S")\n\n........Enum Changes..........\n\n" >> workflow.txt
-git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/enum** >> workflow.txt
+git diff HEAD~3 -- HEAD -z ./backend/carbon-services-lib/src/shared/enum** >> workflow.txt
 echo -e "\n\n........Config Changes..........\n\n" >> workflow.txt
-git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/configuration.ts >> workflow.txt
+git diff HEAD~3 -- HEAD -z ./backend/carbon-services-lib/src/shared/configuration.ts >> workflow.txt
 
 timestamp=$(date "+%Y-%m-%d_%H-%M-%S")
 aws s3 cp workflow.txt s3://$AWS_BUCKET/workflow_txts_${timestamp}.txt
