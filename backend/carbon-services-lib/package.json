@@ -1,6 +1,10 @@
 {
   "name": "@undp/carbon-services-lib",
+<<<<<<< HEAD
   "version": "0.0.253-carbon-lib-test.0",
+=======
+  "version": "0.0.254-CARBON-339.2",
+>>>>>>> main
   "description": "Backend library",
   "author": "",
   "private": false,
