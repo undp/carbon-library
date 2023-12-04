@@ -1,5 +1,5 @@
 #!/bin/bash
-echo -e "$"Current Version:"$(git log -1 --pretty=%B HEAD)"
+echo -e "Current Version: "$(git log -1 --pretty=%B HEAD)"" > workflow.txt
 echo -e "$(date +"%Y-%m-%d %H:%M:%S")\n\n........Enum Changes..........\n\n" >> workflow.txt
 git diff HEAD~3 -- HEAD -z ./backend/carbon-services-lib/src/shared/enum** >> workflow.txt
 echo -e "\n\n........Config Changes..........\n\n" >> workflow.txt
