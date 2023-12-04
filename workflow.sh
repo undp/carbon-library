@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -e "$(date +"%Y-%m-%d %H:%M:%S")\n\n........Enum Changes..........\n\n" > workflow.txt
+echo -e "$(date +"%Y-%m-%d %H:%M:%S")\n\n........Enum Changes..........\n\n" >> workflow.txt
 git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/enum** >> workflow.txt
 echo -e "\n\n........Config Changes..........\n\n" >> workflow.txt
 git diff HEAD~ -- HEAD -z ./backend/carbon-services-lib/src/shared/configuration.ts >> workflow.txt
