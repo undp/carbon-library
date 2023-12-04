@@ -65,9 +65,14 @@ export default () => ({
     apiKey: process.env.ITMO_API_KEY,
     email: process.env.ITMO_EMAIL,
     password: process.env.ITMO_PASSWORD,
+    enable: process.env.ITMO_SYSTEM === "true" ? true : false,
   },
   CERTIFIER:{
-    image:process.env.CERTIFIER_IMAGE
+    image:process.env.CERTIFIER_IMAGE,
+    enable: process.env.CERTIFIER_SCRAPING === "true" ? true : false,
+  },
+  AnnualReport: {
+    enable: process.env.ANNUAL_REPORT === "true" ? true : false,
   },
   registry: {
     syncEnable: process.env.SYNC_ENABLE === "true" ? true : false,
