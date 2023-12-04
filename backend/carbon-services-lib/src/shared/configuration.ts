@@ -69,11 +69,11 @@ export default () => ({
   },
   CERTIFIER:{
     image:process.env.CERTIFIER_IMAGE,
-    enable: process.env.CERTIFIER_SCRAPING === "true" ? true : false,
-  },
-  AnnualReport: {
-    enable: process.env.ANNUAL_REPORT === "true" ? true : false,
-  },
+  //   enable: process.env.CERTIFIER_SCRAPING === "true" ? true : false,
+  // },
+  // AnnualReport: {
+  //   enable: process.env.ANNUAL_REPORT === "true" ? true : false,
+  // },
   registry: {
     syncEnable: process.env.SYNC_ENABLE === "true" ? true : false,
     endpoint: process.env.SYNC_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
