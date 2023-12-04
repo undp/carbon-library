@@ -14,5 +14,5 @@ export enum CompanyRole {
     PROGRAMME_DEVELOPER = 'ProgrammeDeveloper',
     API = 'API',
     GOVERNMENT = 'Government',
-    MINISTRY = 'Ministry'
+    MINISTRY = 'Ministry',
 }
