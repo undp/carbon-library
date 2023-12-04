@@ -29,6 +29,6 @@ const config: StorybookConfig = {
     });
     return config;
   },
-  staticDirs: ['./public'],
+  staticDirs: ['../src/locales'],
 };
 export default config;

@@ -8,69 +8,9 @@ body {
   .ant-menu {
     background-color: $background-color;
   }
-<<<<<<< HEAD
   
   .ant-layout-header {
     background-color: $background-color;
-=======
-}
-.ant-menu-item {
-  background-color: $background-color;
-}
-
-.ant-menu-sub {
-  background-color: $background-color;
-}
-
-.ant-table-content {
-  font-family: $primary-font-family;
-}
-
-.ant-input {
-  border-radius: 5px !important;
-}
-.ant-btn {
-  border-radius: 5px !important;
-}
-.ant-input-group-addon:first-child {
-  border-radius: 5px !important;
-}
-
-.ant-input-group .ant-input {
-  width: 99% !important;
-}
-
-// .ant-tooltip-inner {
-//   border-radius: 5px !important;
-//   background-color: $primary-color !important;
-// }
-
-// .ant-tooltip-arrow-content {
-//   --antd-arrow-background-color: linear-gradient(to right bottom, $primary-color, $primary-color) !important;
-// }
-
-.ant-radio-group {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.ant-radio-group-large .ant-radio-button-wrapper {
-  font-size: 0.8rem;
-  width: 25%;
-  border-radius: 5px !important;
-}
-
-.ant-upload-list-picture .ant-upload-list-item-error,
-.ant-upload-list-picture-card .ant-upload-list-item-error {
-  border-color: #40a9ff;
-  border-radius: 5px;
-  height: 40px;
-
-  .ant-upload-list-item-name {
-    color: #40a9ff !important;
->>>>>>> main
   }
   
   .ant-layout {
@@ -108,14 +48,14 @@ body {
     width: 99% !important;
   }
   
-  .ant-tooltip-inner {
-    border-radius: 5px !important;
-    background-color: #16b1ff !important;
-  }
+  // .ant-tooltip-inner {
+  //   border-radius: 5px !important;
+  //   background-color: $primary-color !important;
+  // }
   
-  .ant-tooltip-arrow-content {
-    --antd-arrow-background-color: linear-gradient(to right bottom, #16b1ff, #16b1ff) !important;
-  }
+  // .ant-tooltip-arrow-content {
+  //   --antd-arrow-background-color: linear-gradient(to right bottom, $primary-color, $primary-color) !important;
+  // }
   
   .ant-radio-group {
     display: flex;
@@ -782,3 +722,4 @@ body {
     min-width: 400px;
   }
 }
+
