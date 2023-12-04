@@ -70,7 +70,7 @@ export default () => ({
   CERTIFIER:{
     image:process.env.CERTIFIER_IMAGE,
   //   enable: process.env.CERTIFIER_SCRAPING === "true" ? true : false,
-  // },
+  },
   // AnnualReport: {
   //   enable: process.env.ANNUAL_REPORT === "true" ? true : false,
   // },
