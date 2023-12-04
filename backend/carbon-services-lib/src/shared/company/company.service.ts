@@ -45,6 +45,7 @@ import { InvestmentDto } from "../dto/investment.dto";
 import { plainToClass } from "class-transformer";
 import { Investment } from "../entities/investment.entity";
 import { InvestmentStatus } from "../enum/investment.status";
+import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
 
 @Injectable()
 export class CompanyService {
@@ -63,7 +64,9 @@ export class CompanyService {
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private asyncOperationsInterface: AsyncOperationsInterface,
-    private locationService: LocationInterface
+    private locationService: LocationInterface,
+    @InjectRepository(Investment)
+    private investmentRepo: Repository<Investment>,
   ) {}
 
   async suspend(
@@ -175,8 +178,6 @@ export class CompanyService {
 
   async addNationalInvestment(req: InvestmentDto, requester: User): Promise<any>{
     //validations
-    //add to investment table 
-    //add sync action to update company ledger
     this.logger.log(
       `National investment request by ${requester.companyId}-${
         requester.id
@@ -202,23 +203,46 @@ export class CompanyService {
     }
     //add investment
     const investment = plainToClass(Investment, req);
-    investment.programmeId = req.programmeId;
-    investment.fromCompanyId = fromCompanyId;
     investment.toCompanyId = req.toCompanyId;
+    investment.fromCompanyId = req.toCompanyId;
     investment.initiator = requester.id;
     investment.initiatorCompanyId = requester.companyId;
     investment.txTime = new Date().getTime();
     investment.createdTime = investment.txTime;
-    investment.percentage = req.percentage[j];
-    investment.shareFromOwner = parseFloat((investment.percentage * 100 / propPerMap[fromCompanyId]).toFixed(6))
-    investment.amount = Math.round(req.amount)
-    investment.status = InvestmentStatus.PENDING;
-    const results = await this.investmentRepo.insert(allInvestmentList);
-    console.log(results);
-    for (const i in allInvestmentList) {
-      allInvestmentList[i].requestId = results.identifiers[i].requestId;
-    }
+    investment.amount = Math.round(req.amount);
+    investment.status = InvestmentStatus.APPROVED;
+    investment.category = InvestmentCategoryEnum.National;
+    const results = await this.investmentRepo.insert([investment]);
+    investment.requestId=results.identifiers[0].requestId;
+    investment.investmentName = `${companyDetails.name}_${(req.instrument && req.instrument.length)?`${req.instrument.join('&')}_`:''}${investment.requestId}`;
+    const result = await this.investmentRepo
+      .update(
+        {
+          requestId: investment.requestId,
+        },
+        {
+          investmentName: investment.investmentName
+        }
+      )
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+    console.log('Investment',result)
     //sync investment
+    // await this.asyncOperationsInterface.AddAction({
+    //   actionType: AsyncActionType.NationalInvestment,
+    //   actionProps: {
+    //     investorTaxId: companyDetails.taxId,
+    //     amount:investment.amount,
+    //     investmentName:`${companyDetails.name}_${req.instrument?`${req.instrument}_`:''}${investment.requestId}`,
+    //   },
+    // });
+    return result
+  }
+
+  async updateInvestmentOnCompanyLedger(): Promise<any>{
+
   }
 
   async activate(

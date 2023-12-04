@@ -6,6 +6,7 @@ import { InvestmentLevel } from "../enum/investment.level";
 import { InvestmentStream } from "../enum/investment.stream";
 import { ESGType } from "../enum/esg.type";
 import { InvestmentStatus } from "../enum/investment.status";
+import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
 
 @Entity()
 export class Investment implements EntitySubject {
@@ -13,7 +14,7 @@ export class Investment implements EntitySubject {
   @PrimaryGeneratedColumn()
   requestId: number;
 
-  @Column()
+  @Column({nullable: true})
   programmeId: string;
 
   @Column()
@@ -78,10 +79,10 @@ export class Investment implements EntitySubject {
   })
   status: InvestmentStatus;
 
-  @Column()
+  @Column({nullable: true})
   fromCompanyId: number;
 
-  @Column("real")
+  @Column("real",{nullable: true})
   percentage: number;
 
   @Column("real", {nullable: true})
@@ -104,4 +105,21 @@ export class Investment implements EntitySubject {
 
   @Column({nullable: true})
   txRef: string;
+
+  @Column({
+    nullable: true,
+    default: InvestmentCategoryEnum.Project,
+    enum: InvestmentCategoryEnum
+  })
+  category: InvestmentCategoryEnum
+
+  @Column({
+    nullable: true,
+  })
+  investmentName:string
+
+  @Column({
+    nullable: true,
+  })
+  nationalInvestmentId:number
 }

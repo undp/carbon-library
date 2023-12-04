@@ -6,6 +6,7 @@ import { InvestmentLevel } from "../enum/investment.level";
 import { InvestmentStream } from "../enum/investment.stream";
 import { ESGType } from "../enum/esg.type";
 import { InvestmentDto } from "./investment.dto";
+import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
 
 export class InvestmentRequestDto extends InvestmentDto{
   @ApiProperty()
@@ -25,4 +26,8 @@ export class InvestmentRequestDto extends InvestmentDto{
   @Min(0, { each: true })
   percentage: number[];
 
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  nationalInvestmentId: number;
 }

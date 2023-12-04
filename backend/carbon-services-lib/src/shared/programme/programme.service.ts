@@ -105,6 +105,7 @@ import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
+import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -180,7 +181,8 @@ export class ProgrammeService {
     transfer: Investment,
     user: string,
     programme: Programme,
-    investor: Company
+    investor: Company,
+    nationalInvestment?:Investment
   ) {
    
     const companyIndex = programme.companyId.map(e => Number(e)).indexOf(Number(transfer.fromCompanyId));
@@ -236,6 +238,17 @@ export class ProgrammeService {
             txTime: new Date().getTime()
           }
         )
+        if(nationalInvestment){
+          await em.update(
+            Investment,
+            {
+              requestId: nationalInvestment.requestId
+            }, {
+              txTime: new Date().getTime(),
+              amount:(nationalInvestment.amount-transfer.amount),
+            }
+          )
+        }
         if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
           return await em.update(
             Programme,
@@ -483,6 +496,54 @@ export class ProgrammeService {
       );
     }
 
+    let nationalInvestment:any
+    if(req.nationalInvestmentId){
+        nationalInvestment = await this.investmentRepo.findOneBy({
+        requestId: req.nationalInvestmentId,
+      });
+  
+      if (!nationalInvestment) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.nationalInvestmentDoesNotExist",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      if(nationalInvestment.category!==InvestmentCategoryEnum.National){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.investmentNotAnNationalInvestment",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      if(nationalInvestment.fromCompanyId!==requester.companyId && requester.companyRole !== CompanyRole.GOVERNMENT && requester.companyRole !== CompanyRole.MINISTRY){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.cannotInvestOnOthersNationalInvestment",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      
+      if(nationalInvestment.amount<req.amount){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.nationalInvestmentAmount<projectInvestmentAmount",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+    }
+
     if (!req.fromCompanyIds) {
       req.fromCompanyIds = programme.companyId;
     }
@@ -545,7 +606,7 @@ export class ProgrammeService {
         continue;
       }
 
-      if (!propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage) {
+      if (!propPerMap[fromCompanyId] || propPerMap[fromCompanyId] < req.percentage[j]) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
             "programme.invalidCompPercentageForGivenComp",
@@ -567,6 +628,7 @@ export class ProgrammeService {
       investment.shareFromOwner = parseFloat((investment.percentage * 100 / propPerMap[fromCompanyId]).toFixed(6))
       investment.amount = Math.round(req.amount * req.percentage[j]/percSum)
       investment.status = InvestmentStatus.PENDING;
+      investment.nationalInvestmentId = req.nationalInvestmentId? req.nationalInvestmentId : null
       if (requester.companyId == fromCompanyId) {
         autoApproveInvestmentList.push(investment);
       }
@@ -590,7 +652,8 @@ export class ProgrammeService {
           trf,
           `${toCompany.companyId}#${toCompany.name}#${this.getUserRef(requester)}`.split('#',4).join('#'),
           programme,
-          toCompany
+          toCompany,
+          nationalInvestment
         )
       ).data;
     }
@@ -4948,13 +5011,18 @@ export class ProgrammeService {
       investment.initiatorCompanyId
     );
 
+    let nationalInvestment = investment.nationalInvestmentId? await this.investmentRepo.findOneBy({
+      requestId: investment.nationalInvestmentId,
+    }):null
+
     const programme = await this.findById(investment.programmeId);
 
     const transferResult = await this.doInvestment(
       investment,
       `${receiver.companyId}#${receiver.name}#${this.getUserRef(approver)}`.split('#',4).join('#'),
       programme,
-      receiver
+      receiver,
+      nationalInvestment
     );
 
     return transferResult;
