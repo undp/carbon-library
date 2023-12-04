@@ -1340,6 +1340,8 @@ export class ProgrammeLedgerService {
     externalId: string,
     actionId: string,
     documentUrl: string,
+    documentTxtime: number,
+    documentStatus: string,
     type: string,
     creditEst: number,
     certifierId: number
@@ -1432,8 +1434,11 @@ export class ProgrammeLedgerService {
             programme.mitigationActions[actionIndex].projectMaterial = [];
           }
 
-          programme.mitigationActions[actionIndex].projectMaterial.push(
-            documentUrl
+          programme.mitigationActions[actionIndex].projectMaterial.push({
+            url:documentUrl,
+            timestamp:documentTxtime,
+            accept:documentStatus
+          }
           );
 
           console.log(
@@ -1448,7 +1453,11 @@ export class ProgrammeLedgerService {
           if (!programme.programmeProperties.programmeMaterials) {
             programme.programmeProperties.programmeMaterials = [];
           }
-          programme.programmeProperties.programmeMaterials.push(documentUrl);
+          programme.programmeProperties.programmeMaterials.push({
+            url:documentUrl,
+            timestamp:documentTxtime,
+            accept:documentStatus
+          });
           updateMap[this.ledger.tableName]["programmeProperties"] =
             programme.programmeProperties;
         }
