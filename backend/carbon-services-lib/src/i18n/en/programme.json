@@ -97,5 +97,6 @@
     "govermentOwnershipOfProgramme":"Goverment should be a project owner.",
     "proponentIsNotAProgrammeDevOrGov": "Proponent is not a project developer or government",
     "programmeExistsWithAssessmentRegId": "The project already exists with the given environmental assessment registration number",
-    "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from Activity:{} should be less than its estimated credit amount"
+    "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from Activity:{} should be less than its estimated credit amount",
+    "omgeRetireDesc": " and {} credits as Overall Mitigation in Global Emission"
   }

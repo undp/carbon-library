@@ -9,7 +9,12 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
-import { addCommSep, CompanyState, SectoralScope } from "../../../Definitions";
+import {
+  addCommSep,
+  CarbonSystemType,
+  CompanyState,
+  SectoralScope,
+} from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
 export const CompanyProfileComponent = (props: any) => {
@@ -21,6 +26,7 @@ export const CompanyProfileComponent = (props: any) => {
     onNavigateToCompanyManagement,
     onNavigateToCompanyEdit,
     regionField,
+    systemType,
   } = props;
   const { get, put, post } = useConnection();
   const [companyDetails, setCompanyDetails] = useState<any>(undefined);
@@ -313,10 +319,7 @@ export const CompanyProfileComponent = (props: any) => {
             ability.can(Action.Reject, plainToClass(Company, companyDetails)) &&
             !isLoading &&
             companyDetails && (
-              <Button
-                className="btn-danger"
-                onClick={onRejectOrganisation}
-              >
+              <Button className="btn-danger" onClick={onRejectOrganisation}>
                 {t("common:reject")}
               </Button>
             )}
@@ -529,6 +532,21 @@ export const CompanyProfileComponent = (props: any) => {
                     ) : (
                       ""
                     )}
+                    {companyDetails?.companyRole === CompanyRole.GOVERNMENT &&
+                      systemType !== CarbonSystemType.MRV && (
+                        <>
+                          <Row className="field">
+                            <Col span={12} className="field-key">
+                              {t("companyProfile:omgePercentage")}
+                            </Col>
+                            <Col span={12} className="field-value">
+                              {companyDetails.omgePercentage
+                                ? companyDetails.omgePercentage
+                                : "-"}
+                            </Col>
+                          </Row>
+                        </>
+                      )}
                     {companyDetails?.companyRole === CompanyRole.GOVERNMENT && (
                       <>
                         <Row className="field">
@@ -579,12 +597,9 @@ export const CompanyProfileComponent = (props: any) => {
                         {t("companyProfile:adminPhone")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {userDetails?.phoneNo
-                          ? userDetails?.phoneNo
-                          : "-"}
+                        {userDetails?.phoneNo ? userDetails?.phoneNo : "-"}
                       </Col>
                     </Row>
-
                   </div>
                 </Card>
               )}
