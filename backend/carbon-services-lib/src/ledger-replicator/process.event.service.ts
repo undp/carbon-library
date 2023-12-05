@@ -153,9 +153,10 @@ export class ProcessEventService {
             company.secondaryAccountBalance[account]["total"] = overall.credit;
             company.secondaryAccountBalance[account]["count"] += 1;
           } else {
-            company.secondaryAccountBalance = {
-              account: { total: overall.credit, count: 1 },
-            };
+            if(!company.secondaryAccountBalance){
+              company.secondaryAccountBalance={}
+            }
+            company.secondaryAccountBalance[account] ={ total: overall.credit, count: 1 }
           }
 
           updateObj = {
@@ -165,10 +166,7 @@ export class ProcessEventService {
         } else {
           updateObj = {
             creditBalance: overall.credit,
-            programmeCount:
-              company.companyRole === CompanyRole.GOVERNMENT
-                ? null
-                : Number(company.programmeCount) +
+            programmeCount:Number(company.programmeCount) +
                   (overall.txType == TxType.AUTH ? 1 : 0),
             lastUpdateVersion: version,
             creditTxTime: [

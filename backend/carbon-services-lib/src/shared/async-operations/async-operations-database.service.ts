@@ -26,6 +26,16 @@ export class AsyncOperationsDatabaseService
     this.emailDisabled = this.configService.get<boolean>("email.disabled");
   }
 
+  public tx:AsyncAction[]=[]
+
+  public async flushTx(): Promise<boolean>{
+    for (var action of this.tx){
+      //execute action
+    }
+    this.tx=[]
+    return true
+  }
+
   public async AddAction(action: AsyncAction): Promise<boolean> {
 
     if ([AsyncActionType.DocumentUpload, AsyncActionType.IssueCredit, AsyncActionType.RegistryCompanyCreate, AsyncActionType.RejectProgramme,AsyncActionType.AddMitigation,AsyncActionType.ProgrammeAccept,AsyncActionType.ProgrammeCreate,AsyncActionType.OwnershipUpdate].includes(action.actionType) && !this.configService.get("registry.syncEnable")) {

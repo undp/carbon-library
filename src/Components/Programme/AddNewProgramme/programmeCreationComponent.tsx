@@ -91,6 +91,8 @@ export const ProgrammeCreationComponent = (props: any) => {
   const [includedInNDC, setIncludedInNDC] = useState<any>();
   const [countries, setCountries] = useState<[]>([]);
   const [organisationsList, setOrganisationList] = useState<any[]>([]);
+  const [govData, setGovData] = useState<any>();
+  const [initialOrganisationOwnershipValues,setInitialOrganisationOwnershipValues] = useState<any>();
   const [userOrgTaxId, setUserOrgTaxId] = useState<any>("");
   const [regionsList, setRegionsList] = useState<any[]>([]);
   const [programmeDetailsObj, setProgrammeDetailsObj] = useState<any>();
@@ -107,18 +109,18 @@ export const ProgrammeCreationComponent = (props: any) => {
   );
   const [availableSectar, setAvailableSectar] = useState<any[]>([]);
 
-  const initialOrganisationOwnershipValues: any[] = [
-    {
-      organisation:
-        userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
-        userInfoState?.companyRole !== CompanyRole.MINISTRY &&
-        userInfoState?.companyName,
-      proponentPercentage:
-        userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
-        userInfoState?.companyRole !== CompanyRole.MINISTRY &&
-        100,
-    },
-  ];
+  // const initialOrganisationOwnershipValues: any[] = [
+  //   {
+  //     organisation:
+  //       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+  //       userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+  //       userInfoState?.companyName,
+  //     proponentPercentage:
+  //       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+  //       userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+  //       (100-Number(govData.nationalSopValue)),
+  //   },
+  // ];
 
   const selectedSectoralScopes =
     selectedSector !== String(Sector.Health) &&
@@ -171,6 +173,45 @@ export const ProgrammeCreationComponent = (props: any) => {
       console.log("Error in getting regions list", error);
     } finally {
       setLoadingList(false);
+    }
+  };
+
+  const getGovernmentDetails = async () => {
+    setLoading(true);
+    try {
+      console.log("getting government profile");
+      const response = await post("national/organisation/query", {
+        page: 1,
+        size: 100,
+        filterAnd: [
+          {
+            key: "companyRole",
+            operation: "=",
+            value: CompanyRole.GOVERNMENT,
+          },
+        ],
+      });
+      if (response.data) {
+        setInitialOrganisationOwnershipValues([
+          {
+            organisation:
+              userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+              userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+              userInfoState?.companyName,
+            proponentPercentage:
+              userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+              userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+              (100 - Number(response?.data[0].nationalSopValue)),
+          },
+        ]);
+        setGovData(response?.data[0]);
+        console.log("gov profile", response?.data[0]);
+        return response?.data[0];
+      }
+    } catch (error: any) {
+      console.log("Error in getting government data", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -270,6 +311,7 @@ export const ProgrammeCreationComponent = (props: any) => {
     getOrganisationsDetails();
     getCountryList();
     getRegionList();
+    getGovernmentDetails();
     if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
       getUserDetails();
     }
@@ -294,7 +336,14 @@ export const ProgrammeCreationComponent = (props: any) => {
   const onFinishStepOne = async (values: any) => {
     setLoading(true);
     let programmeDetails: any;
-    const ownershipPercentage = values?.ownershipPercentage;
+    const ownershipPercentage =JSON.parse(JSON.stringify(values?.ownershipPercentage))
+    if (Number(govData.nationalSopValue) !== 0) {
+      ownershipPercentage.push({
+        organisation: govData.taxId,
+        proponentPercentage: Number(govData.nationalSopValue),
+      });
+    }
+    console.log("ownershipPercentage", ownershipPercentage);
     const totalPercentage = ownershipPercentage.reduce(
       (sum: any, field: any) => sum + field.proponentPercentage,
       0
@@ -326,7 +375,12 @@ export const ProgrammeCreationComponent = (props: any) => {
         ? [userOrgTaxId, ...proponentTxIds]
         : proponentTxIds;
     const duplicateIds = new Set(propTaxIds).size !== propTaxIds.length;
+    console.log("proponentTxIds", proponentTxIds);
+    console.log("ownershipPercentage", ownershipPercentage);
     if (totalPercentage !== 100) {
+      if (Number(govData.nationalSopValue) !== 0) {
+        ownershipPercentage.pop();
+      }
       message.open({
         type: "error",
         content: t("addProgramme:proponentPercentValidation"),
@@ -335,6 +389,9 @@ export const ProgrammeCreationComponent = (props: any) => {
       });
       setLoading(false);
     } else if (duplicateIds) {
+      if (Number(govData.nationalSopValue) !== 0) {
+        ownershipPercentage.pop();
+      }
       message.open({
         type: "error",
         content: t("addProgramme:duplicateOrg"),
@@ -577,6 +634,10 @@ export const ProgrammeCreationComponent = (props: any) => {
     }
   }, [selectedSector]);
 
+  if (!govData) {
+    console.log("gov data loading");
+    return <></>;
+  }
   return (
     <div className="add-programme-main-container">
       <div className="title-container">
@@ -871,6 +932,64 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   ))}
                                 </Select>
                               </Form.Item>
+
+                              {govData && (Number(govData.nationalSopValue)!==0) && (
+                                <div
+                                  className="space-container"
+                                  style={{ width: "100%" }}
+                                >
+                                  <Space
+                                    wrap={true}
+                                    style={{
+                                      display: "flex",
+                                      marginBottom: 8,
+                                    }}
+                                    align="center"
+                                    size={"large"}
+                                  >
+                                    <div className="ownership-list-item">
+                                      <Form.Item
+                                        label={t("addProgramme:company")}
+                                        name={"governmentName"}
+                                        wrapperCol={{ span: 24 }}
+                                        className="organisation"
+                                        initialValue={
+                                          govData ? govData.name : "Government"
+                                        }
+                                        required={true}
+                                      >
+                                        <Input size="large" disabled={true} />
+                                      </Form.Item>
+                                      <Form.Item
+                                        label={t(
+                                          "addProgramme:proponentPercentage"
+                                        )}
+                                        className="ownership-percent"
+                                        name={"sopPercentage"}
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                        required={true}
+                                        initialValue={
+                                          govData
+                                            ? Number(govData.nationalSopValue)
+                                            : 0
+                                        }
+                                      >
+                                        <InputNumber
+                                          size="large"
+                                          disabled={true}
+                                          min={1}
+                                          max={100}
+                                          formatter={(value) => `${value}%`}
+                                          parser={(value: any) =>
+                                            value.replace("%", "")
+                                          }
+                                        />
+                                      </Form.Item>
+                                    </div>
+                                  </Space>
+                                </div>
+                              )}
                               <Form.List
                                 name="ownershipPercentage"
                                 initialValue={

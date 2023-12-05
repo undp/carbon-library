@@ -2,6 +2,7 @@
 import { AdaptationProperties } from "../dto/adaptation.properties";
 import { AgricultureProperties } from "../dto/agriculture.properties";
 import { CoBenefitsProperties } from "../dto/co.benefits";
+import { CreditCalculationProperties } from "../dto/credit.calculation.properties";
 import { EnablementProperties } from "../dto/enablement.properties";
 import { NdcFinancing } from "../dto/ndc.financing";
 import { NDCReports } from "../dto/ndc.reports";
@@ -9,7 +10,7 @@ import { SolarProperties } from "../dto/solar.properties";
 import { NDCActionType } from "../enum/ndc.action.enum";
 import { NDCStatus } from "../enum/ndc.status";
 import { Sector } from "../enum/sector.enum";
-import { TypeOfMitigation } from "../enum/typeofmitigation.enum";
+import { TypeOfMitigation, SubTypeOfMitigation } from "../enum/typeofmitigation.enum";
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -41,6 +42,13 @@ export class NDCAction {
   })
   typeOfMitigation: TypeOfMitigation;
 
+  @Column({
+    type: "enum",
+    enum: SubTypeOfMitigation,
+    array: false,
+    nullable: true
+  })
+  subTypeOfMitigation: SubTypeOfMitigation;
 
   @Column({
     type: "jsonb",
@@ -55,6 +63,13 @@ export class NDCAction {
     nullable: true
   })
   solarProperties?: SolarProperties;
+
+  @Column({
+    type: "jsonb",
+    array: false,
+    nullable: true
+  })
+  creditCalculationProperties?: CreditCalculationProperties;
 
 
   @Column({

@@ -23,8 +23,7 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
 
   async replicate(event): Promise<any> {
     this.logger.log("Start received", JSON.stringify(event));
-
-    setInterval(async () => {
+    const replicateActions = async()=>{
       const seqObj = await this.counterRepo.findOneBy({
         id: CounterType.REPLICATE_SEQ,
       });
@@ -40,7 +39,6 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
       );
 
       let dbc = this.configService.get<any>("database");
-
       const config = {
         host: dbc['host'],
         port: dbc['port'],
@@ -49,7 +47,7 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
         database: dbc["database"] + "Events"
       }
       const dbCon = new Pool(config);
-      // const client = await dbCon.connect();
+
       const sql = `select data, hash from ${tableName} where hash > $1 order by hash`
       const results = await dbCon.query(
         sql,
@@ -70,8 +68,6 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
           );
           await this.eventProcessor.process(programme, undefined, 0, 0)
           newSeq = row.hash
-        }
-        if (newSeq != 0) {
           await this.counterRepo.save({ id: CounterType.REPLICATE_SEQ, counter:  newSeq})
         }
       }
@@ -100,11 +96,11 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
           );
           newSeq = row.hash
           await this.eventProcessor.process(undefined, creditOverall, row.hash, new Date(row.meta.txTime).getTime())
-        }
-        if (newSeq != 0) {
           await this.counterRepo.save({ id: CounterType.REPLICATE_SEQ_COMP, counter:  newSeq})
         }
       }
-    }, 1000);
+      setTimeout( replicateActions , 1000)
+    }
+    await replicateActions()
   }
 }

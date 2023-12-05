@@ -130,7 +130,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CREATE: {
     id: "PROGRAMME_CREATE",
-    subject: "New Programme Created",
+    subject: "New Project Created",
     html: `
         Hi {{name}}, <br><br>
 
@@ -145,7 +145,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_AUTHORISATION: {
     id: "PROGRAMME_AUTHORISATION",
-    subject: "Programme Authorised",
+    subject: "Project Authorised",
     html: `
         Hi {{name}},  <br><br>
 
@@ -161,7 +161,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_REJECTION: {
     id: "PROGRAMME_REJECTION",
-    subject: "Programme Rejected",
+    subject: "Project Rejected",
     html: `
         Hi {{name}}, <br><br>
 
@@ -366,7 +366,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_APPROVED: {
     id: "PROGRAMME_APPROVED",
-    subject: "New Programme Received for Authorisation",
+    subject: "New Project Received for Authorisation",
     html: `
         Hi {{name}},<br><br>
 
@@ -380,7 +380,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION: {
     id: "PROGRAMME_CERTIFICATION",
-    subject: "Programme Certified by {{organisationName}}",
+    subject: "Project Certified by {{organisationName}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -393,7 +393,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_CERT: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_CERT",
-    subject: "Programme Certificate Revoked by {{organisationName}}",
+    subject: "Project Certificate Revoked by {{organisationName}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -406,7 +406,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_PROGRAMME: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_PROGRAMME",
-    subject: "Programme Certificate Revoked by {{government}}",
+    subject: "Project Certificate Revoked by {{government}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -419,7 +419,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_CERT: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_CERT",
-    subject: "Programme Certificate Revoked by {{government}}",
+    subject: "Project Certificate Revoked by {{government}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -432,7 +432,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_SYSTEM: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_SYSTEM",
-    subject: "Programme Certificate Revoked by the System",
+    subject: "Project Certificate Revoked by the System",
     html: `
         Hi {{name}},<br><br>
 
@@ -479,7 +479,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        {{credits}} credits of the project {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}.<br><br>
+        {{credits}} credits of the project {{programmeName}} with the serial number {{serialNumber}} has been retired by the {{government}} as {{reason}}{{omgeRetireDesc}}.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the retirement. <br><br>
 
         Sincerely, <br>
@@ -492,7 +492,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        {{organisationName}} has requested an international transfer retirement of {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}}. <br><br>
+        {{organisationName}} has requested an international transfer retirement of {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}}. <br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>
@@ -505,7 +505,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled.<br><br>
+        Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>
@@ -517,7 +517,7 @@ export const EmailTemplates = {
     subject: "International Transfer Retire Request Cancelled by the System",
     html: `
       Hi {{name}},<br><br>
-      Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been cancelled by the system due to insufficient credits available. <br><br>
+      Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been cancelled by the system due to insufficient credits available. <br><br>
       Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
       Sincerely,  <br>
@@ -529,7 +529,7 @@ export const EmailTemplates = {
     subject: "International Transfer Retire Request Cancelled by the System",
     html: `
       Hi {{name}},<br><br>
-      Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled by the system due to insufficient credits available. <br><br>
+      Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by {{organisationName}} has been cancelled by the system due to insufficient credits available. <br><br>
       Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
       Sincerely,  <br>
@@ -542,7 +542,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been recognised.<br><br>
+        Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has been recognised.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>
@@ -555,7 +555,7 @@ export const EmailTemplates = {
     html: `
         Hi {{name}},<br><br>
 
-        Request to internationally transfer {{credits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has not been recognised.<br><br>
+        Request to internationally transfer {{credits}} credits and Overall Mitigation in Global Emission of {{omgeCredits}} credits with the serial number {{serialNumber}} from {{programmeName}} to {{country}} made by your Organisation has not been recognised.<br><br>
         Click <a href="{{pageLink}}">here</a> for more details of the international transfer retire request. <br><br>
 
         Sincerely, <br>

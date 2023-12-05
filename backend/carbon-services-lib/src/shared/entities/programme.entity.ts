@@ -148,6 +148,19 @@ export class Programme implements EntitySubject {
   })
   geographicalLocationCordintes: any;
 
+  @Column({ nullable: true })
+  cadtId: string;
+
+  // @Column("string", { array: true, nullable: true  })
+  // cadtUnitId: string[];
+
+  @Column({
+    type: "jsonb",
+    array: false,
+    nullable: true,
+  })
+  blockBounds: any;
+
   @Column({ unique: true, nullable: true })
   environmentalAssessmentRegistrationNo: string;
 
