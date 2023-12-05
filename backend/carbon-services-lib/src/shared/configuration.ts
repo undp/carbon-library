@@ -67,7 +67,7 @@ export default () => ({
     password: process.env.ITMO_PASSWORD,
   },
   CERTIFIER:{
-    image:process.env.CERTIFIER_IMAGE
+    image:process.env.CERTIFIER_IMAGE,
   },
   registry: {
     syncEnable: process.env.SYNC_ENABLE === "true" ? true : false,
