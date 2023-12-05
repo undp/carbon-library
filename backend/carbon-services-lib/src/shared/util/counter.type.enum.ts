@@ -6,8 +6,5 @@ export enum CounterType {
     REPLICATE_SEQ = 4,
     REPLICATE_SEQ_COMP = 5,
     ASYNC_OPERATIONS = 6,
-    NDC_ACTION = 7,
-    ITMO_SYSTEM = 8,
-    ANNUAL_REPORT = 9,
-    CERTIFIER_SCRAPING = 10,
+    NDC_ACTION = 7
 }
