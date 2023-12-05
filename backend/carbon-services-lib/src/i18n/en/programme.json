@@ -38,7 +38,7 @@
     "invalidCompCreditFromGivenComp": "Invalid company credit for given from companies",
     "cantTransferCreditWithinSameComp": "Cannot transfer ownership within the same company",
     "programmeNotInCreditIssuedState": "Project is not in credit issued state",
-    "cantInitiateTransferForOtherComp": "Cannot initiate investments for other companies",
+    "cantInitiateTransferForOtherComp": "Cannot initiate financing for other companies",
     "fromCompInReqIsNotOwnerOfProgramme": "From company mentioned in the request does not own the project",
     "companyHaveNoEnoughBalanceForTransfer": "Company {} does not have enough balance for the transfer. Available: {}",
     "proponentPercMustDefinedForEvryProponentTaxId": "Proponent percentage must defined for each proponent tax id",
