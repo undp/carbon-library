@@ -617,9 +617,12 @@
         display: flex; 
         justify-content: center; 
         align-items: center;
-        border-top: 1px solid rgba(58, 53, 65, 0.5) !important;
         margin-bottom: 15px;
         margin-top: 5px;
+      }
+
+      .social-environment-risk-title-section:not(:first-child){
+        border-top: 1px solid rgba(58, 53, 65, 0.5) !important;
       }
 
       .social-environment-risk-title-section:first-child {
