@@ -9,7 +9,9 @@ timestamp=$(date "+%Y-%m-%d_%H-%M-%S")
 aws s3 cp workflow.txt s3://$AWS_BUCKET/workflow_txts_${timestamp}.txt
 CONTENT=$(base64 -w 0 workflow.txt)
               
-RAW_MESSAGE="Subject: Libraries Changes
+RAW_MESSAGE="From: $FROM_EMAIL
+To: $TO_EMAILS
+Subject: Libraries Changes
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary=NextPart
 
@@ -28,4 +30,4 @@ $CONTENT
 --NextPart--"
 
 ENCODED_MESSAGE=$(echo -n "$RAW_MESSAGE" | base64)
-aws ses send-raw-email --source $FROM_EMAIL --destination $TO_EMAILS --raw-message "Data=$ENCODED_MESSAGE" 
+aws ses send-raw-email --raw-message "Data=$ENCODED_MESSAGE" 
