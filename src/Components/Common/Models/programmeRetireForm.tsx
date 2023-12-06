@@ -12,6 +12,7 @@ import {
   Select,
   SelectProps,
   Space,
+  Tooltip,
 } from "antd";
 import React, { FC, useEffect, useState } from "react";
 import { CompanyState } from "../../../Definitions/Enums/company.state.enum";
@@ -20,6 +21,8 @@ import {
   Programme,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
+import { CompanyRole } from "../../../Definitions";
+import { InfoCircle } from "react-bootstrap-icons";
 
 export interface ProgrammeRetireFormProps {
   programme: Programme;
@@ -58,8 +61,36 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
   const [countryList, setCountryList] = useState<SelectProps["options"]>([]);
   const [value, setValue] = useState<string>();
   const [checked, setChecked] = useState<boolean>(false);
+  const [govData, setGovData] = useState<any>();
 
   const { get, delete: del, post } = useConnection();
+
+  const getGovernmentDetails = async () => {
+    setLoading(true);
+    try {
+      console.log("getting government profile");
+      const response = await post("national/organisation/query", {
+        page: 1,
+        size: 100,
+        filterAnd: [
+          {
+            key: "companyRole",
+            operation: "=",
+            value: CompanyRole.GOVERNMENT,
+          },
+        ],
+      });
+      if (response.data) {
+        setGovData(response?.data[0]);
+        console.log("gov profile", response?.data[0]);
+        return response?.data[0];
+      }
+    } catch (error: any) {
+      console.log("Error in getting government data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async (newValue: string) => {
     if (newValue !== undefined) {
@@ -144,7 +175,12 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
     if (hideType) {
       setType("0");
     }
+    2;
+    getGovernmentDetails();
   }, []);
+  if (!govData) {
+    return <div>Loading</div>;
+  }
 
   return (
     <div className="transfer-form">
@@ -196,6 +232,7 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
               country: d.country,
             };
           }
+          d.omgePercentage = Number(govData.omgePercentage);
           const res = await onFinish(d);
           setPopupError(res);
           setLoading(false);
@@ -403,6 +440,78 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
                 </Col>
               </Row>
             )}
+            <Row>
+              <Col lg={11} md={24}>
+                <div className="label">{`${t(
+                  "view:govInternationalAcc"
+                )}`}</div>
+              </Col>
+              <Col lg={6} md={12}>
+                <Form.Item className="popup-credit-input">
+                  <InputNumber
+                    placeholder={addCommSep(
+                      currentSum -
+                        Number(
+                          ((currentSum * govData.omgePercentage) / 100).toFixed(
+                            2
+                          )
+                        )
+                    )}
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+              <Col lg={1} md={1} className="seperator">
+                {"/"}
+              </Col>
+              <Col lg={6} md={12}>
+                <Form.Item className="popup-credit-input">
+                  <InputNumber
+                    placeholder={addCommSep(totalCredits)}
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg={11} md={24} style={{ display: "flex" }}>
+                <div className="label">{`${t("view:omgeAcc")}`}</div>
+                <div className="info-container">
+                  <Tooltip
+                    arrowPointAtCenter
+                    placement="topLeft"
+                    trigger="hover"
+                    title={t("view:omgeDesc")}
+                    overlayClassName="custom-tooltip"
+                  >
+                    <InfoCircle color="#000000" size={15} />
+                  </Tooltip>
+                </div>
+              </Col>
+              <Col lg={6} md={12}>
+                <Form.Item className="popup-credit-input">
+                  <InputNumber
+                    placeholder={addCommSep(
+                      Number(
+                        ((currentSum * govData.omgePercentage) / 100).toFixed(2)
+                      )
+                    )}
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+              <Col lg={1} md={1} className="seperator">
+                {"/"}
+              </Col>
+              <Col lg={6} md={12}>
+                <Form.Item className="popup-credit-input">
+                  <InputNumber
+                    placeholder={addCommSep(totalCredits)}
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
             {/* {hideType && (
               <Row>
                 <Col lg={11} md={24}>
