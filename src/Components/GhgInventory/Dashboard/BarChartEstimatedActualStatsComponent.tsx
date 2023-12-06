@@ -83,7 +83,7 @@ export const BarChartEstimatedActualStatComponent: FC<BarChartEstimatedActualSta
         </div>
       ) : (
         <>
-          {showActuals && (
+          {(showActuals && actualSeries) && (
             <>
               <div className="charts-section">
                 <Chart
@@ -102,7 +102,7 @@ export const BarChartEstimatedActualStatComponent: FC<BarChartEstimatedActualSta
               </div>
             </>
           )}
-          {showEstimate && (
+          {(showEstimate && estimatedSeries) && (
             <>
               <div className="charts-section">
                 <Chart

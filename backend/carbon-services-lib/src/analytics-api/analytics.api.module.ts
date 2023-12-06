@@ -18,6 +18,7 @@ import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
 import { GHGInventoryController } from "./ghg-inventory.controller";
 import { Emission } from "src/shared/entities/emission.entity";
 import { Projection } from "src/shared/entities/projection.entity";
+import { EventLog } from "src/shared/entities/event.log.entity";
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { Projection } from "src/shared/entities/projection.entity";
       NDCActionViewEntity,
       InvestmentView,
       Emission,
-      Projection
+      Projection,
+      EventLog
     ]),
     AuthModule,
     CaslModule,

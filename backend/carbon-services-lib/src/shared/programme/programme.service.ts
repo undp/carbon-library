@@ -105,6 +105,8 @@ import { LetterSustainableDevSupportLetterGen } from "../util/letter.sustainable
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
+import { EventLog } from "../entities/event.log.entity";
+import { EventLogType } from "../enum/event.log.type.enum";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType
@@ -154,7 +156,8 @@ export class ProgrammeService {
     private letterOfIntentRequestGen: LetterOfIntentRequestGen,
     private letterOfIntentResponseGen: LetterOfIntentResponseGen,
     private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen,
-    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen
+    private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen,
+    @InjectRepository(EventLog) private eventLogRepo: Repository<EventLog>,
   ) {}
 
   private fileExtensionMap = new Map([
@@ -868,6 +871,7 @@ export class ProgrammeService {
   }
 
   async approveDocumentCommit(em: EntityManager, d: ProgrammeDocument, ndc: NDCAction, certifierId: number, program: Programme, certifierUser?:User) {
+    let eventLog: EventLog = new EventLog();
     if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
       const updT = {}    
       if (
@@ -918,6 +922,18 @@ export class ProgrammeService {
           });
         }
       }
+      if(program && d.type == DocType.VERIFICATION_REPORT) {
+        const eventData = {
+          actionId: ndc.id,
+          action: ndc.action,
+          estimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
+          sectoralScope: program.sectoralScope,
+          sector: program.sector
+        }
+        eventLog.eventData = eventData;
+        eventLog.type = EventLogType.ESTIMATED_CREDIT_ISSUE;
+        eventLog.createdTime = new Date().getTime();
+      }
     }
     console.log('NDC COmmit', ndc)
     if (ndc) {
@@ -930,6 +946,9 @@ export class ProgrammeService {
           status: ndc.status,
         }
       );
+      if (eventLog.type !== undefined) {
+        await em.save(eventLog);
+      }
     }
   }
 
@@ -3992,6 +4011,27 @@ export class ProgrammeService {
     await this.asyncOperationsInterface.AddAction(
       issueCReq
     );
+
+    req.issueAmount.map(async (actionDetails: mitigationIssueProperties) => {
+      let eventLog: EventLog = new EventLog();
+      const eventData = {
+        actionId: actionDetails.actionId,
+        issuedCredits: actionDetails.issueCredit,
+        programmeId: req.programmeId,
+        externalId: program.externalId,
+        sectoralScope: program.sectoralScope,
+        sector: program.sector
+      }
+      eventLog.eventData = eventData;
+      eventLog.type = EventLogType.ACTUAL_CREDIT_ISSUE;
+      eventLog.createdTime = new Date().getTime();
+      eventLog.createdBy = user.id;
+      await this.entityManager.transaction(async (em) => {
+        return await em.save(eventLog);
+      });
+      
+    })
+
 
     const sqlProgram = await this.findById(program.programmeId);
     if (sqlProgram.cadtId) {

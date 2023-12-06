@@ -59,7 +59,7 @@ const GHGUserActionConfirmationModel: FC<UserActionProps> = (
       >
         <Form.Item
           className="mg-bottom-0"
-          label={t("userProfile:remarks")}
+          label={t("ghgInventory:remarks")}
           name="remarks"
           required={actionInfo.type === "danger"}
         >

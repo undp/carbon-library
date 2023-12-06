@@ -29,7 +29,7 @@ import moment from 'moment';
 import { EmissionSectors, formFields, projectionsCsvFieldMap, totalProjectionFields } from '../emission.mappings';
 import { ProjectionTypes } from '../projection.types';
 import React from 'react';
-import { CompanyRole } from '../../../Definitions';
+import { CompanyRole, addCommSep } from '../../../Definitions';
 import { RcFile } from 'antd/lib/upload';
 import { HttpStatusCode } from 'axios';
 import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesConfirmationModel';
@@ -1201,13 +1201,13 @@ export const GHGProjectionsComponent = (props: any) => {
       <Col xl={9} md={9} className="panel-header-emission-value-col">
         <Row gutter={16}>
           <Col xl={7}>
-            <div className="co2-total-pill">{getBauSum(panelHeading)}</div>
+            <div className="co2-total-pill">{addCommSep(Number(getBauSum(panelHeading)))}</div>
           </Col>
           <Col xl={7}>
-            <div className="ch4-total-pill">{getConditionalNdcSum(panelHeading)}</div>
+            <div className="ch4-total-pill">{addCommSep(Number(getConditionalNdcSum(panelHeading)))}</div>
           </Col>
           <Col xl={7}>
-            <div className="n2o-total-pill">{getUnconditionalNdcSum(panelHeading)}</div>
+            <div className="n2o-total-pill">{addCommSep(Number(getUnconditionalNdcSum(panelHeading)))}</div>
           </Col>
         </Row>
       </Col>
@@ -1226,17 +1226,17 @@ export const GHGProjectionsComponent = (props: any) => {
           <Row gutter={16} className="panel-header-emission-value-col">
             <Col xl={7}>
               <div className="co2-total-pill">
-                {calculateSumEmissionView(projectionObject, 'bau')}
+                {addCommSep(Number(calculateSumEmissionView(projectionObject, 'bau')))}
               </div>
             </Col>
             <Col xl={7}>
               <div className="ch4-total-pill">
-                {calculateSumEmissionView(projectionObject, 'conditionalNdc')}
+                {addCommSep(Number(calculateSumEmissionView(projectionObject, 'conditionalNdc')))}
               </div>
             </Col>
             <Col xl={7}>
               <div className="n2o-total-pill">
-                {calculateSumEmissionView(projectionObject, 'unconditionalNdc')}
+                {addCommSep(Number(calculateSumEmissionView(projectionObject, 'unconditionalNdc')))}
               </div>
             </Col>
           </Row>
@@ -1289,13 +1289,13 @@ export const GHGProjectionsComponent = (props: any) => {
         <Col xl={9} md={9}>
           <Row gutter={16} className="panel-content-input-box-row">
             <Col xl={7}>
-              <InputNumber value={bau} disabled />
+              <InputNumber value={bau ? addCommSep(Number(bau)) : bau} disabled />
             </Col>
             <Col xl={7}>
-              <InputNumber value={conditionalNdc} disabled />
+              <InputNumber value={conditionalNdc ? addCommSep(Number(conditionalNdc)) : conditionalNdc} disabled />
             </Col>
             <Col xl={7}>
-              <InputNumber value={unconditionalNdc} disabled />
+              <InputNumber value={unconditionalNdc ? addCommSep(Number(unconditionalNdc)) : unconditionalNdc} disabled />
             </Col>
           </Row>
         </Col>
@@ -1454,7 +1454,7 @@ export const GHGProjectionsComponent = (props: any) => {
                         <Col xl={12} md={12} className="add-new-upload-file-col">
                           <Row className="add-new-upload-file-label">{t(`ghgInventory:emissionRemovalDocument`)}</Row>
                           <Row>
-                            <Col xl={5} md={5} className="add-new-upload-file-inner-col">
+                            <Col xxl={5} xl={6} md={6} className="add-new-upload-file-inner-col">
                               <Form.Item
                                 name="emissionsDocument"
                                 valuePropName="fileList"
@@ -1559,13 +1559,13 @@ export const GHGProjectionsComponent = (props: any) => {
                         <Col xl={9} md={9}>
                           <Row gutter={16} className="total-emission-value-col">
                             <Col xl={7}>
-                              <div className="co2-total-pill">{totalNationalBau}</div>
+                              <div className="co2-total-pill">{addCommSep(Number(totalNationalBau))}</div>
                             </Col>
                             <Col xl={7}>
-                              <div className="ch4-total-pill">{totalNationalConditionalNdc}</div>
+                              <div className="ch4-total-pill">{addCommSep(Number(totalNationalConditionalNdc))}</div>
                             </Col>
                             <Col xl={7}>
-                              <div className="n2o-total-pill">{totalNationalUnconditionalNdc}</div>
+                              <div className="n2o-total-pill">{addCommSep(Number(totalNationalUnconditionalNdc))}</div>
                             </Col>
                           </Row>
                         </Col>
@@ -1609,7 +1609,7 @@ export const GHGProjectionsComponent = (props: any) => {
                           </span>
                         </Col>
                         <Col xl={9} md={9}>
-                          <Row gutter={16} className="panel-content-input-box-row">
+                          <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                             <Col xl={7}>
                               <Form.Item name="totalCo2WithoutLand_bau">
                                 <InputNumber />
@@ -1635,7 +1635,7 @@ export const GHGProjectionsComponent = (props: any) => {
                           </span>
                         </Col>
                         <Col xl={9} md={9}>
-                          <Row gutter={16} className="panel-content-input-box-row">
+                          <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                             <Col xl={7}>
                               <Form.Item name="totalCo2WithLand_bau">
                                 <InputNumber />
@@ -1658,7 +1658,7 @@ export const GHGProjectionsComponent = (props: any) => {
                         {userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
                           (<Button className="finalize-btn" type="primary" loading={loading} onClick={onOpenFinalizeFormModel}>
                             {/* {t('addProgramme:submit')} */}
-                            Finalize
+                            Finalise
                           </Button>)}
                         <Button className="submit-btn" type="primary" htmlType="submit" loading={loading}>
                           {/* {t('addProgramme:submit')} */}
@@ -1741,17 +1741,17 @@ export const GHGProjectionsComponent = (props: any) => {
                           <Row gutter={16}>
                             <Col xl={7}>
                               <div className="co2-total-pill">
-                                {calculateSumEmissionView(tabData, 'bau')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'bau')))}
                               </div>
                             </Col>
                             <Col xl={7}>
                               <div className="ch4-total-pill">
-                                {calculateSumEmissionView(tabData, 'conditionalNdc')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'conditionalNdc')))}
                               </div>
                             </Col>
                             <Col xl={7}>
                               <div className="n2o-total-pill">
-                                {calculateSumEmissionView(tabData, 'unconditionalNdc')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'unconditionalNdc')))}
                               </div>
                             </Col>
                           </Row>
@@ -1847,34 +1847,46 @@ export const GHGProjectionsComponent = (props: any) => {
                                 <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
                               </Col>
                               <Col xl={9} md={9}>
-                                <Row gutter={16} className="panel-content-input-box-row">
+                                <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                                   <Col xl={7}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.bau} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.bau
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.bau)) 
+                                    : tabData.totalCo2WithoutLand?.bau} disabled />
                                   </Col>
                                   <Col xl={7}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.conditionalNdc} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.conditionalNdc
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.conditionalNdc)) 
+                                    : tabData.totalCo2WithoutLand?.conditionalNdc } disabled />
                                   </Col>
                                   <Col xl={7}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.unconditionalNdc} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.unconditionalNdc
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.unconditionalNdc)) 
+                                    : tabData.totalCo2WithoutLand?.unconditionalNdc } disabled />
                                   </Col>
                                 </Row>
                               </Col>
                             </Row>)}
                             {(!isRowDataEmpty(tabData.totalCo2WithLand)) && (
-                            <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
+                            <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row total-co2-land-input-box-row">
                               <Col xl={12} md={12} className="total-co2-with-land-title">
                                 <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
                               </Col>
                               <Col xl={9} md={9}>
                                 <Row gutter={16} className="panel-content-input-box-row">
                                   <Col xl={7}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.bau} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.bau 
+                                      ? addCommSep(Number(tabData.totalCo2WithLand?.bau)) 
+                                      : tabData.totalCo2WithLand?.bau} disabled />
                                   </Col>
                                   <Col xl={7}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.conditionalNdc} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.conditionalNdc 
+                                      ? addCommSep(Number(tabData.totalCo2WithLand?.conditionalNdc)) 
+                                      : tabData.totalCo2WithLand?.conditionalNdc} disabled />
                                   </Col>
                                   <Col xl={7}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.unconditionalNdc} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.unconditionalNdc 
+                                      ? addCommSep(Number(tabData.totalCo2WithLand?.unconditionalNdc)) 
+                                      : tabData.totalCo2WithLand?.unconditionalNdc} disabled />
                                   </Col>
                                 </Row>
                               </Col>

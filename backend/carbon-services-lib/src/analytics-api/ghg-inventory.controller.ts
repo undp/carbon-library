@@ -38,10 +38,7 @@ export class GHGInventoryController {
     const companyId =
       req?.user?.companyId !== null ? req?.user?.companyId : null;
     return this.aggService.getGhgEmissionStats(
-      req.abilityCondition,
       query,
-      companyId,
-      req.user?.companyRole,
       query.system
     );
   }

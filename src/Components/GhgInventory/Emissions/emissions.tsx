@@ -30,7 +30,7 @@ import { RcFile } from 'antd/lib/upload';
 
 import { EmissionTypes } from '../emission.types';
 import { EmissionSectors, emissionCsvFieldMap, formFields, totalEmissionFields } from '../emission.mappings';
-import { CompanyRole } from '../../../Definitions';
+import { CompanyRole, addCommSep } from '../../../Definitions';
 import { HttpStatusCode } from 'axios';
 import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesConfirmationModel';
 import { ClipboardCheck } from 'react-bootstrap-icons';
@@ -1314,16 +1314,16 @@ export const GHGEmissionsComponent = (props: any) => {
       <Col xl={9} md={9} className="panel-header-emission-value-col">
         <Row gutter={16}>
           <Col xl={6}>
-            <div className="co2-total-pill">{getCO2Sum(panelHeading)}</div>
+            <div className="co2-total-pill">{addCommSep(Number(getCO2Sum(panelHeading)))}</div>
           </Col>
           <Col xl={6}>
-            <div className="ch4-total-pill">{getCH4Sum(panelHeading)}</div>
+            <div className="ch4-total-pill">{addCommSep(Number(getCH4Sum(panelHeading)))}</div>
           </Col>
           <Col xl={6}>
-            <div className="n2o-total-pill">{getN2OSum(panelHeading)}</div>
+            <div className="n2o-total-pill">{addCommSep(Number(getN2OSum(panelHeading)))}</div>
           </Col>
           <Col xl={6}>
-            <div className="co2eq-total-pill">{getCO2EQSum(panelHeading)}</div>
+            <div className="co2eq-total-pill">{addCommSep(Number(getCO2EQSum(panelHeading)))}</div>
           </Col>
         </Row>
       </Col>
@@ -1342,22 +1342,22 @@ export const GHGEmissionsComponent = (props: any) => {
           <Row gutter={16} className="panel-header-emission-value-col">
             <Col xl={6}>
               <div className="co2-total-pill">
-                {calculateSumEmissionView(emissionsObject, 'co2')}
+                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}
               </div>
             </Col>
             <Col xl={6}>
               <div className="ch4-total-pill">
-                {calculateSumEmissionView(emissionsObject, 'ch4')}
+                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'ch4')))}
               </div>
             </Col>
             <Col xl={6}>
               <div className="n2o-total-pill">
-                {calculateSumEmissionView(emissionsObject, 'n2o')}
+                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'n2o')))}
               </div>
             </Col>
             <Col xl={6}>
               <div className="co2eq-total-pill">
-                {calculateSumEmissionView(emissionsObject, 'co2eq')}
+                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2eq')))}
               </div>
             </Col>
           </Row>
@@ -1414,16 +1414,16 @@ export const GHGEmissionsComponent = (props: any) => {
         <Col xl={9} md={9}>
           <Row gutter={16} className="panel-content-input-box-row">
             <Col xl={6}>
-              <InputNumber value={co2} disabled />
+              <InputNumber value={co2 ? addCommSep(Number(co2)) : co2} disabled />
             </Col>
             <Col xl={6}>
-              <InputNumber value={ch4} disabled />
+              <InputNumber value={ch4 ? addCommSep(Number(ch4)) : ch4} disabled />
             </Col>
             <Col xl={6}>
-              <InputNumber value={n2o} disabled />
+              <InputNumber value={n2o ? addCommSep(Number(n2o)) : n2o} disabled />
             </Col>
             <Col xl={6}>
-              <InputNumber value={co2eq} disabled />
+              <InputNumber value={co2eq ? addCommSep(Number(co2eq)) : co2eq} disabled />
             </Col>
           </Row>
         </Col>
@@ -1579,7 +1579,7 @@ export const GHGEmissionsComponent = (props: any) => {
                             {t(`ghgInventory:emissionRemovalDocument`)}
                           </Row>
                           <Row>
-                            <Col xl={5} md={5} className="add-new-upload-file-inner-col">
+                            <Col xxl={5} xl={6} md={6} className="add-new-upload-file-inner-col">
                               <Form.Item
                                 name="emissionsDocument"
                                 valuePropName="fileList"
@@ -1690,16 +1690,16 @@ export const GHGEmissionsComponent = (props: any) => {
                         <Col xl={9} md={9}>
                           <Row gutter={16} className="total-emission-value-col">
                             <Col xl={6}>
-                              <div className="co2-total-pill">{totalNationalCo2}</div>
+                              <div className="co2-total-pill">{addCommSep(Number(totalNationalCo2))}</div>
                             </Col>
                             <Col xl={6}>
-                              <div className="ch4-total-pill">{totalNationalCh4}</div>
+                              <div className="ch4-total-pill">{addCommSep(Number(totalNationalCh4))}</div>
                             </Col>
                             <Col xl={6}>
-                              <div className="n2o-total-pill">{totalNationalN2o}</div>
+                              <div className="n2o-total-pill">{addCommSep(Number(totalNationalN2o))}</div>
                             </Col>
                             <Col xl={6}>
-                              <div className="co2eq-total-pill">{totalNationalCo2Eq}</div>
+                              <div className="co2eq-total-pill">{addCommSep(Number(totalNationalCo2Eq))}</div>
                             </Col>
                           </Row>
                         </Col>
@@ -1740,7 +1740,7 @@ export const GHGEmissionsComponent = (props: any) => {
                           <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
                         </Col>
                         <Col xl={9} md={9}>
-                          <Row gutter={16} className="panel-content-input-box-row">
+                          <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                             <Col xl={6}>
                               <Form.Item name="totalCo2WithoutLand_co2">
                                 <InputNumber />
@@ -1769,7 +1769,7 @@ export const GHGEmissionsComponent = (props: any) => {
                           <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
                         </Col>
                         <Col xl={9} md={9}>
-                          <Row gutter={16} className="panel-content-input-box-row">
+                          <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                             <Col xl={6}>
                               <Form.Item name="totalCo2WithLand_co2">
                                 <InputNumber />
@@ -1796,7 +1796,7 @@ export const GHGEmissionsComponent = (props: any) => {
                       <div className="steps-actions">
                         {userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
                           (<Button className="finalize-btn" type="primary" loading={loading} onClick={onOpenFinalizeFormModel}>
-                            Finalize
+                            Finalise
                           </Button>)}
                         <Button className="submit-btn" type="primary" htmlType="submit" loading={loading}>
                           Submit
@@ -1879,22 +1879,22 @@ export const GHGEmissionsComponent = (props: any) => {
                           <Row gutter={16}>
                             <Col xl={6}>
                               <div className="co2-total-pill">
-                                {calculateSumEmissionView(tabData, 'co2')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'co2')))}
                               </div>
                             </Col>
                             <Col xl={6}>
                               <div className="ch4-total-pill">
-                                {calculateSumEmissionView(tabData, 'ch4')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'ch4')))}
                               </div>
                             </Col>
                             <Col xl={6}>
                               <div className="n2o-total-pill">
-                                {calculateSumEmissionView(tabData, 'n2o')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'n2o')))}
                               </div>
                             </Col>
                             <Col xl={6}>
                               <div className="co2eq-total-pill">
-                                {calculateSumEmissionView(tabData, 'co2eq')}
+                                {addCommSep(Number(calculateSumEmissionView(tabData, 'co2eq')))}
                               </div>
                             </Col>
                           </Row>
@@ -1994,18 +1994,26 @@ export const GHGEmissionsComponent = (props: any) => {
                                 <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
                               </Col>
                               <Col xl={9} md={9}>
-                                <Row gutter={16} className="panel-content-input-box-row">
+                                <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.co2} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.co2 
+                                      ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2)) 
+                                      : tabData.totalCo2WithoutLand?.co2} disabled />
                                   </Col>
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.ch4} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.ch4 
+                                      ? addCommSep(Number(tabData.totalCo2WithoutLand?.ch4)) 
+                                      : tabData.totalCo2WithoutLand?.ch4} disabled />
                                   </Col>
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.n2o} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.n2o 
+                                      ? addCommSep(Number(tabData.totalCo2WithoutLand?.n2o)) 
+                                      : tabData.totalCo2WithoutLand?.n2o} disabled />
                                   </Col>
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithoutLand?.co2eq} disabled />
+                                    <InputNumber value={tabData.totalCo2WithoutLand?.co2eq 
+                                      ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2eq)) 
+                                      : tabData.totalCo2WithoutLand?.co2eq} disabled />
                                   </Col>
                                 </Row>
                               </Col>
@@ -2016,18 +2024,26 @@ export const GHGEmissionsComponent = (props: any) => {
                                 <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
                               </Col>
                               <Col xl={9} md={9}>
-                                <Row gutter={16} className="panel-content-input-box-row">
+                                <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.co2} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.co2 
+                                      ? addCommSep(Number(tabData.totalCo2WithLand?.co2)) 
+                                      : tabData.totalCo2WithLand?.co2} disabled />
                                   </Col>
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.ch4} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.ch4 
+                                    ? addCommSep(Number(tabData.totalCo2WithLand?.ch4)) 
+                                      : tabData.totalCo2WithLand?.ch4} disabled />
                                   </Col>
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.n2o} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.n2o 
+                                      ? addCommSep(Number(tabData.totalCo2WithLand?.n2o)) 
+                                      : tabData.totalCo2WithLand?.n2o} disabled />
                                   </Col>
                                   <Col xl={6}>
-                                    <InputNumber value={tabData.totalCo2WithLand?.co2eq} disabled />
+                                    <InputNumber value={tabData.totalCo2WithLand?.co2eq 
+                                      ? addCommSep(Number(tabData.totalCo2WithLand?.co2eq)) 
+                                      : tabData.totalCo2WithLand?.co2eq} disabled />
                                   </Col>
                                 </Row>
                               </Col>
