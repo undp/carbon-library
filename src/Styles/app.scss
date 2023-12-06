@@ -685,6 +685,19 @@ body {
   .ant-select-selection-item {
     color: $body-text-color;
   }
+  .info-container {
+    display: flex;
+    flex-direction: row;
+    width: 10%;
+    height: 20px;
+    align-items: center;
+    justify-content: start;
+    margin-left: 5px;
+  }
+
+  .ant-row {
+    align-items: unset;
+   }
   
   .sub-text {
     font-size: 0.9rem;

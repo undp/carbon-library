@@ -2419,6 +2419,7 @@ ${total}
                       ? "tTProgrammesCertifierMine"
                       : "tTProgrammesCertifierOverall"
               )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col pie">
