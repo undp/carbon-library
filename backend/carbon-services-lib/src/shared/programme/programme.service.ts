@@ -204,6 +204,7 @@ export class ProgrammeService {
       programme.creditOwnerPercentage[companyIndex] -= transfer.percentage
       programme.proponentPercentage[companyIndex] -= transfer.percentage
     }
+    nationalInvestment.amount-=transfer.amount
 
     let ownerTaxId;
     if (programme.proponentTaxVatId.length > companyIndex) {
@@ -249,6 +250,17 @@ export class ProgrammeService {
             }
           )
         }
+        (await this.checkPendingInvestmentValidity(programme,transfer,nationalInvestment)).map(async(toRejectId)=>{
+          await em.update(
+            Investment,
+            {
+              requestId: toRejectId
+            }, {
+              txTime: new Date().getTime(),
+              status: InvestmentStatus.CANCELLED,
+            }
+          )
+        })
         if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
           return await em.update(
             Programme,
@@ -2778,6 +2790,42 @@ export class ProgrammeService {
     );
   }
 
+  private async checkPendingInvestmentValidity(programme:Programme,toDoInvestment:Investment,nationalInvestment?:Investment){
+    let invalidInvestments = []
+    const projectInvestments = await this.investmentRepo.find({
+      where: {
+        programmeId: programme.programmeId,
+        category: InvestmentCategoryEnum.Project,
+        status: InvestmentStatus.PENDING,
+      },
+    });
+    for (var investment of projectInvestments){
+      if(toDoInvestment.requestId!==investment.requestId){
+        const ownerIndex = programme.companyId.map(e => Number(e)).indexOf(Number(investment.fromCompanyId))
+        if(investment.percentage>programme.proponentPercentage[ownerIndex]){
+          invalidInvestments.push(investment.requestId)
+        }
+      }
+    }
+    if(nationalInvestment){
+      const investmentsByNational = await this.investmentRepo.find({
+        where: {
+          nationalInvestmentId: nationalInvestment.requestId,
+          category: InvestmentCategoryEnum.Project,
+          status: InvestmentStatus.PENDING,
+        },
+      });
+      for(var investment of investmentsByNational){
+        if(toDoInvestment.requestId!==investment.requestId){
+          if(investment.amount>nationalInvestment.amount){
+            invalidInvestments.push(investment.requestId)
+          }
+        }
+      }
+    }
+    return invalidInvestments.length?[... new Set(invalidInvestments)]:[]
+  }
+
   private checkPendingTransferValidity = async(programme:Programme) => {
     const hostAddress = this.configService.get("host");
     const transfers = await this.programmeTransferRepo.find({
@@ -5000,6 +5048,30 @@ export class ProgrammeService {
       );
     }
 
+    let nationalInvestment = investment.nationalInvestmentId? await this.investmentRepo.findOneBy({
+      requestId: investment.nationalInvestmentId,
+    }):null
+
+    if (investment.nationalInvestmentId && !nationalInvestment) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.nationalInvestmentDoesNotExist",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    if(nationalInvestment && nationalInvestment.category!==InvestmentCategoryEnum.National){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.investmentNotAnNationalInvestment",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     const receiver = await this.companyService.findByCompanyId(
       investment.toCompanyId
     );
@@ -5011,11 +5083,14 @@ export class ProgrammeService {
       investment.initiatorCompanyId
     );
 
-    let nationalInvestment = investment.nationalInvestmentId? await this.investmentRepo.findOneBy({
-      requestId: investment.nationalInvestmentId,
-    }):null
-
     const programme = await this.findById(investment.programmeId);
+    console.log('shareFromOwner prev',investment.shareFromOwner)
+    const propPerMap = {}
+    for (const i in programme.companyId) {
+      propPerMap[programme.companyId[i]] = programme.proponentPercentage[i];
+    }
+    investment.shareFromOwner = parseFloat((investment.percentage * 100 / propPerMap[investment.fromCompanyId]).toFixed(6))
+    console.log('shareFromOwner prev',investment.shareFromOwner)
 
     const transferResult = await this.doInvestment(
       investment,
