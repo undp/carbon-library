@@ -445,10 +445,15 @@ const Safeguards = (props: any) => {
       {((viewOnly && safeGuardViewData) || !viewOnly) && (
         <div className="safeguard-tab-item">
           <div className="undpSesp-section-wrapper">
-            <Row justify="center" align="middle" style={{ width: '100%' }}>
+            <Row justify="center" align="middle" style={{ width: "100%" }}>
               <Col span={24} className="unfcccSdTool-section-title">
                 <span>
-                {t("undpSespTitle")}
+                  <a
+                    target="_blank"
+                    href="https://www4.unfccc.int/sites/sdcmicrosite/Pages/Create-a-report.aspx"
+                  >
+                    {t("undpSespTitle")}
+                  </a>
                 </span>
               </Col>
               <Col span={24}>

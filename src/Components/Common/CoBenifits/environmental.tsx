@@ -4,7 +4,7 @@ import { RadioButtonStatus } from "../../../Definitions";
 
 const Environmental = (props: any) => {
   const { onFormSubmit, environmentalViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace('unfcccSdTool');
+  translator.setDefaultNamespace("unfcccSdTool");
   const t = translator.t;
   const environmentalDetailsInitial: any[] = [
     {
@@ -315,22 +315,28 @@ const Environmental = (props: any) => {
           className={environmentalViewData ? "section view-section" : "section"}
         >
           <div className="unfccSdTool-section-wrapper">
-            <Row justify="center" align="middle" style={{ width: '100%' }}>
+            <Row justify="center" align="middle" style={{ width: "100%" }}>
               <Col span={24} className="unfcccSdTool-section-title">
                 <span>
-                {t("unfcccSdToolTitle")}
+                  <a
+                    target="_blank"
+                    href="https://www4.unfccc.int/sites/sdcmicrosite/Pages/Create-a-report.aspx"
+                  >
+                    {t("unfcccSdToolTitle")}
+                  </a>
                 </span>
               </Col>
               <Col span={24}>
-                <div className="unfccSdTool-section-divider"/>
+                <div className="unfccSdTool-section-divider" />
               </Col>
               <Col span={24} className="unfcccSdTool-section-title">
-                <span>
-                {t("environmental")}
-                </span>
+                <span>{t("environmental")}</span>
               </Col>
               <Col span={24}>
-                <div className="unfccSdTool-section-divider" style={{marginBottom: '20px'}}/>
+                <div
+                  className="unfccSdTool-section-divider"
+                  style={{ marginBottom: "20px" }}
+                />
               </Col>
             </Row>
           </div>
