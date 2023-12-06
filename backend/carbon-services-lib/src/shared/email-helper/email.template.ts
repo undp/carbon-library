@@ -130,7 +130,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CREATE: {
     id: "PROGRAMME_CREATE",
-    subject: "New Programme Created",
+    subject: "New Project Created",
     html: `
         Hi {{name}}, <br><br>
 
@@ -145,7 +145,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_AUTHORISATION: {
     id: "PROGRAMME_AUTHORISATION",
-    subject: "Programme Authorised",
+    subject: "Project Authorised",
     html: `
         Hi {{name}},  <br><br>
 
@@ -161,7 +161,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_REJECTION: {
     id: "PROGRAMME_REJECTION",
-    subject: "Programme Rejected",
+    subject: "Project Rejected",
     html: `
         Hi {{name}}, <br><br>
 
@@ -366,7 +366,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_APPROVED: {
     id: "PROGRAMME_APPROVED",
-    subject: "New Programme Received for Authorisation",
+    subject: "New Project Received for Authorisation",
     html: `
         Hi {{name}},<br><br>
 
@@ -380,7 +380,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION: {
     id: "PROGRAMME_CERTIFICATION",
-    subject: "Programme Certified by {{organisationName}}",
+    subject: "Project Certified by {{organisationName}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -393,7 +393,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_CERT: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_CERT",
-    subject: "Programme Certificate Revoked by {{organisationName}}",
+    subject: "Project Certificate Revoked by {{organisationName}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -406,7 +406,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_PROGRAMME: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_PROGRAMME",
-    subject: "Programme Certificate Revoked by {{government}}",
+    subject: "Project Certificate Revoked by {{government}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -419,7 +419,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_CERT: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_GOVT_TO_CERT",
-    subject: "Programme Certificate Revoked by {{government}}",
+    subject: "Project Certificate Revoked by {{government}}",
     html: `
         Hi {{name}},<br><br>
 
@@ -432,7 +432,7 @@ export const EmailTemplates = {
   },
   PROGRAMME_CERTIFICATION_REVOKE_BY_SYSTEM: {
     id: "PROGRAMME_CERTIFICATION_REVOKE_BY_SYSTEM",
-    subject: "Programme Certificate Revoked by the System",
+    subject: "Project Certificate Revoked by the System",
     html: `
         Hi {{name}},<br><br>
 

@@ -150,7 +150,7 @@ export const AddNdcActionComponent = (props: any) => {
           <div className="step-count">01</div>
           <div className="title">{t("ndcAction:ndcActionDetailsTitle")}</div>
           <div className="info-container">
-            <Tooltip
+            {/* <Tooltip
               arrowPointAtCenter
               placement="right"
               trigger="hover"
@@ -158,7 +158,7 @@ export const AddNdcActionComponent = (props: any) => {
               overlayClassName="custom-tooltip"
             >
               <InfoCircle color="#000000" size={17} />
-            </Tooltip>
+            </Tooltip> */}
           </div>
         </div>
       ),
