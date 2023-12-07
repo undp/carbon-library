@@ -186,6 +186,12 @@
             margin-right: 5px;
           }
         }
+        .space-container {
+          width: 100%;
+          .ant-space-item {
+            width: 100%;
+          }
+        }
       }
     }
   }

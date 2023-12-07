@@ -17,13 +17,12 @@ import { MrvPieChartsStatComponent } from "./mrvPieChartStatComponent";
 import { getChartOptions } from "./mrvChartOptions";
 import { ListWidgetComponent } from "./listWidgetComponent";
 import { MapStatsComponent } from "./mapStatsComponent";
+import { useConnection, useUserContext } from "../../Context";
 
 const { RangePicker } = DatePicker;
 
 export const MrvDashboardComponent = (props: any) => {
   const {
-    useConnection,
-    useUserContext,
     Link,
     Chart,
     t,

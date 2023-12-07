@@ -47,6 +47,7 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { Role } from "../../../Definitions/Enums/role.enum";
 import { PlusOutlined } from "@ant-design/icons";
+import { useConnection, useUserContext, useSettingsContext } from "../../../Context";
 
 type PopupInfo = {
   title: string;
@@ -60,10 +61,7 @@ type PopupInfo = {
 export const InvestmentManagementComponent = (props: any) => {
   const {
     translator,
-    useConnection,
     onNavigateToProgrammeView,
-    useUserContext,
-    useSettingsContext,
     onClickAddOwnership,
     enableAddOwnership
   } = props;

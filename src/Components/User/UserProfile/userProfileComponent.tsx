@@ -8,15 +8,14 @@ import LanguageSelection from "../../Common/LanguageSelection/languageSelection"
 import React from "react";
 import { SectoralScope, addCommSep } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
 
 export const UserProfileComponent = (props: any) => {
   const {
     t,
     i18n,
-    useConnection,
     onNavigateUpdateUser,
-    onNavigateLogin,
-    useUserContext,
+    onNavigateLogin
   } = props;
   const { get } = useConnection();
   const [organisationDetails, setOrganisationDetails] =

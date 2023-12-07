@@ -47,6 +47,7 @@ import {
   SystemNames,
   addCommSep,
   addRoundNumber,
+  getStageEnumVal,
 } from "../../Definitions";
 import {
   optionDonutPieA,
@@ -63,11 +64,10 @@ import { MapComponent } from "../Common/Maps/mapComponent";
 import { LegendItem } from "../Common/LegendItem/legendItem";
 import { RegistryBarChartsStatComponent } from "./registryBarChartStatsComponent";
 const { RangePicker } = DatePicker;
+import { useConnection, useUserContext } from "../../Context";
 
 export const RegistryDashboardComponent = (props: any) => {
   const {
-    useUserContext,
-    useConnection,
     Chart,
     t,
     ButtonGroup,
@@ -1562,9 +1562,8 @@ export const RegistryDashboardComponent = (props: any) => {
               programmeByStatusAggregationResponse
             );
             if (
-              [ProgrammeStageR.AwaitingAuthorization].includes(
-                responseItem?.currentStage
-              )
+              ProgrammeStageR.AwaitingAuthorization ===
+              getStageEnumVal(responseItem?.currentStage)
             ) {
               totalProgrammes = totalProgrammes + parseInt(responseItem?.count);
               pendingProgrammesC = parseInt(responseItem?.count);
@@ -2420,6 +2419,7 @@ ${total}
                       ? "tTProgrammesCertifierMine"
                       : "tTProgrammesCertifierOverall"
               )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col pie">

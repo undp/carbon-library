@@ -75,4 +75,7 @@ export class ProgrammeTransfer implements EntitySubject {
 
     @Column({nullable: true, default: false})
     isRetirement: boolean;
+
+    @Column({type: "bigint", nullable: true})
+    omgePercentage: number;
 }
