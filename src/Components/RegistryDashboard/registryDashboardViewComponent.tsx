@@ -1865,7 +1865,7 @@ export const RegistryDashboardComponent = (props: any) => {
   const rejected = ["all", ["==", ["get", "stage"], "Rejected"]];
   const news = ["all", ["==", ["get", "stage"], "Approved"]];
 
-  const colors = ["#6ACDFF", "#FF8183", "#CDCDCD", "#B7A4FE"];
+  const colors = ["#6ACDFF", "#CDCDCD", "#FF8183", "#B7A4FE"];
 
   const donutSegment = (start: any, end: any, r: any, r0: any, color: any) => {
     if (end - start === 1) end -= 0.00001;
