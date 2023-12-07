@@ -454,30 +454,32 @@ const SocialEnvironmentalRisk = (props: any) => {
                         </div>
                         {subSection.subItems.map((element: any) => {
                           return (
-                            <Form.Item
-                              className="mg-left-2 form-item"
-                              label={element.label}
-                              name={element.name}
-                            >
-                              <Radio.Group size="middle">
-                                <div className="radio-container">
-                                  <Radio.Button
-                                    className="radio"
-                                    value={RadioButtonStatus.YES}
-                                  >
-                                    {t("yes")}
-                                  </Radio.Button>
-                                </div>
-                                <div className="radio-container">
-                                  <Radio.Button
-                                    className="radio"
-                                    value={RadioButtonStatus.NO}
-                                  >
-                                    {t("no")}
-                                  </Radio.Button>
-                                </div>
-                              </Radio.Group>
-                            </Form.Item>
+                            <Row>
+                              <Form.Item
+                                className="mg-left-2 form-item"
+                                label={element.label}
+                                name={element.name}
+                              >
+                                <Radio.Group size="middle">
+                                  <div className="radio-container">
+                                    <Radio.Button
+                                      className="radio"
+                                      value={RadioButtonStatus.YES}
+                                    >
+                                      {t("yes")}
+                                    </Radio.Button>
+                                  </div>
+                                  <div className="radio-container">
+                                    <Radio.Button
+                                      className="radio"
+                                      value={RadioButtonStatus.NO}
+                                    >
+                                      {t("no")}
+                                    </Radio.Button>
+                                  </div>
+                                </Radio.Group>
+                              </Form.Item>
+                            </Row>
                           );
                         })}
                       </>
