@@ -1863,7 +1863,7 @@ export const RegistryDashboardComponent = (props: any) => {
   const pending = ["all", ["==", ["get", "stage"], "AwaitingAuthorization"]];
   const authorised = ["all", ["==", ["get", "stage"], "Authorised"]];
   const rejected = ["all", ["==", ["get", "stage"], "Rejected"]];
-  const news = ["all", ["==", ["get", "stage"], "New"]];
+  const news = ["all", ["==", ["get", "stage"], "Approved"]];
 
   const colors = ["#6ACDFF", "#FF8183", "#CDCDCD", "#B7A4FE"];
 
@@ -2617,9 +2617,9 @@ ${total}
                         categoryType === "mine"
                       ) && (
                           <>
-                            <LegendItem text="Rejected" color="#FF8183" />
-                            <LegendItem text="Pending" color="#CDCDCD" />
-                            <LegendItem text="New" color="#B7A4FE" />
+                            <LegendItem text="Rejected" color="#CDCDCD" />
+                            <LegendItem text="Pending" color="#FF8183" />
+                            <LegendItem text="Approved" color="#B7A4FE" />
                           </>
                         )}
                     </div>
