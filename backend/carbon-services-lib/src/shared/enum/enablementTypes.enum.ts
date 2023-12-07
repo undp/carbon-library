@@ -2,6 +2,7 @@ export enum EnablementTypes {
     CapacityBuilding = 'Capacity Building',
     TechnologyTransfer = 'Technology Transfer',
     Financial = 'Financial',
+    EnhancedTransparency= 'Enhanced Transparency'
   }
   
   export const enablementTypesAndValues = [
