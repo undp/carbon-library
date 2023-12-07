@@ -43,7 +43,7 @@
   "ndcColumnsActionId": "ACTIVITY ID",
   "ndcColumnsDate": "DATE",
   "ndcColumnsNdcAction": "ACTIVITY",
-  "ndcColumnsProgrammeName": "PROGRAMME NAME",
+  "ndcColumnsProgrammeName": "PROJECT NAME",
   "ndcColumnsSector": "SECTOR",
   "ndcColumnsOwners": "OWNERS",
   "ndcColumnsStatus": "STATUS",

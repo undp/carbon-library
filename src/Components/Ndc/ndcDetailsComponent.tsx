@@ -210,7 +210,7 @@ export const NdcDetailsComponent = (props: any) => {
             </Space>
           ) : (
             <input
-              placeholder="Please add the National Plan Objective"
+              placeholder="Please add Programmes"
               className="ant-input"
               type="text"
             ></input>
@@ -242,7 +242,7 @@ export const NdcDetailsComponent = (props: any) => {
       ),
     },
     {
-      title: "Ministry",
+      title: "Government Department",
       dataIndex: "ministry",
       key: "ministry",
       align: "left" as const,
@@ -256,7 +256,7 @@ export const NdcDetailsComponent = (props: any) => {
             </Space>
           ) : (
             <input
-              placeholder="Please add the Ministry name"
+              placeholder="Please add the Government Department"
               className="ant-input"
               type="text"
             ></input>
