@@ -5,6 +5,10 @@
     "externalId": "External Id",
     "sectoralScope": "Sectoral Scope",
     "sector": "Sector",
+    "programmeOwner": "Program Owner",
+    "buyerCountry": "Buyer Country Eligibility",
+    "applicantType": "Applicant Type",
+    "financingType": "Financing Type",
     "countryCodeA2": "Country Code A2",
     "currentStage": "Current Stage",
     "startTime": "Start Time",
@@ -45,5 +49,6 @@
     "environmentalAssessmentRegistrationNo": "Environmental Assessment Registration No",
     "createdAt": "Created At",
     "updatedAt": "Updated At",
-    "certifier": "Certifier"
+    "certifier": "Certifier",
+    "programmeDocuments": "Programme Documents"
 }

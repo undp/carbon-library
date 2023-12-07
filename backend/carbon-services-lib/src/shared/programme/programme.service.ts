@@ -3604,6 +3604,12 @@ export class ProgrammeService {
           "programme"
         )
       )
+      .leftJoinAndMapMany(
+        "programme.documents",
+      ProgrammeDocument,
+      "programmeDocument",
+      "programmeDocument.programmeId = programme.programmeId AND programmeDocument.type IN (:...types)", // Adding the condition for types
+      { types: [DocType.DESIGN_DOCUMENT, DocType.NO_OBJECTION_LETTER, DocType.METHODOLOGY_DOCUMENT, DocType.AUTHORISATION_LETTER, DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT] } )
       .orderBy(
         queryDto?.sort?.key &&
         `"programme".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
@@ -3616,6 +3622,7 @@ export class ProgrammeService {
       )
       .getMany();
 
+      console.log('========================*********************resp', resp);
     if (resp.length > 0) {
       const prepData = this.prepareProgrammeDataForExport(resp)
 
@@ -3652,6 +3659,12 @@ export class ProgrammeService {
       const startTimestamp = programme.startTime * 1000;
       const endTimestamp = programme.endTime * 1000;
 
+      const companies: Company[] = programme.company;
+      const concatenatedNames = companies.map(company => company.name).join(', ');
+
+      const programmeDocuments: ProgrammeDocument[] = programme.documents;
+      const concatenatedDocumentUrls = programmeDocuments.map(document => document.url).join(', ');
+
       const dto = new DataExportProgrammeDto();
       dto.programmeId = programme.programmeId;
       dto.serialNo = programme.serialNo;
@@ -3659,13 +3672,17 @@ export class ProgrammeService {
       dto.externalId = programme.externalId;
       dto.sectoralScope = programme.sectoralScope;
       dto.sector = programme.sector;
+      dto.applicantType = "Programme Developer";
       dto.countryCodeA2 = programme.countryCodeA2;
       dto.currentStage = programme.currentStage;
+      dto.programmeOwner = concatenatedNames;
+      dto.buyerCountry = programme.programmeProperties?.buyerCountryEligibility;
       dto.startTime = this.helperService.formatTimestamp(startTimestamp);
       dto.endTime = this.helperService.formatTimestamp(endTimestamp);
       dto.creditEst = programme.creditEst;
       dto.emissionReductionExpected = programme.emissionReductionExpected;
       dto.emissionReductionAchieved = programme.emissionReductionAchieved;
+      dto.financingType = this.addSpaces(programme.programmeProperties.sourceOfFunding);
       dto.creditChange = programme.creditChange;
       dto.creditIssued = programme.creditIssued;
       dto.creditBalance = programme.creditBalance;
@@ -3699,7 +3716,8 @@ export class ProgrammeService {
       dto.environmentalAssessmentRegistrationNo = programme.environmentalAssessmentRegistrationNo;
       dto.createdAt = this.helperService.formatTimestamp(programme.createdAt);
       dto.updatedAt = this.helperService.formatTimestamp(programme.updatedAt);
-      dto.certifier = programme.certifier;
+      dto.certifier = programme.certifier?.name;
+      dto.programmeDocuments = concatenatedDocumentUrls;
 
       exportData.push(dto);
     }
@@ -3707,6 +3725,16 @@ export class ProgrammeService {
     return exportData;
 
   }
+
+  private addSpaces = (text: string) => {
+    if (!text) {
+      return text;
+    }
+    if (text === text.toUpperCase()) {
+      return text;
+    }
+    return text.replace(/([A-Z])/g, " $1").trim();
+  };
 
   async query(
     query: QueryDto,

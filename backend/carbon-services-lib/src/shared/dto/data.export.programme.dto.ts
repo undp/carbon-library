@@ -6,14 +6,18 @@ export class DataExportProgrammeDto extends DataExportDto{
     title;
     externalId;
     sectoralScope;
+    applicantType;
     sector;
     countryCodeA2;
     currentStage;
+    programmeOwner;
+    buyerCountry;
     startTime;
     endTime;
     creditEst;
     emissionReductionExpected;
     emissionReductionAchieved;
+    financingType;
     creditChange;
     creditIssued;
     creditBalance;
@@ -48,5 +52,6 @@ export class DataExportProgrammeDto extends DataExportDto{
     createdAt;
     updatedAt;
     certifier;
+    programmeDocuments;
 
 }

@@ -13,7 +13,9 @@ export class DataExportCompanyDto extends DataExportDto {
     companyRole;
     state;
     creditBalance;
-    secondaryAccountBalance;
+    secondaryAccountBalanceLocal;
+    secondaryAccountBalanceInternational;
+    secondaryAccountBalanceOmge;
     programmeCount;
     lastUpdateVersion;
     creditTxTime;

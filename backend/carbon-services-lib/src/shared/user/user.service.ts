@@ -941,6 +941,23 @@ export class UserService {
     queryDto.filterOr = queryData.filterOr;
     queryDto.sort = queryData.sort;
 
+    if (queryDto.filterAnd) {
+      queryDto.filterAnd.push({
+          key: "companyRole",
+          operation: "!=",
+          value: 'API',
+        });
+      
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: "companyRole",
+        operation: "!=",
+        value: 'API',
+      });
+      queryDto.filterAnd = filterAnd;
+    }
+
     const resp = await this.userRepo
       .createQueryBuilder("user")
       .where(

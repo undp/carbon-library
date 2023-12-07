@@ -522,6 +522,13 @@ export class CompanyService {
       queryDto.filterAnd = filterAnd;
     }
 
+    queryDto.filterAnd.push({
+      key: "companyRole",
+      operation: "!=",
+      value: 'API',
+    });
+
+
     const resp = await this.companyRepo
       .createQueryBuilder()
       .where(
@@ -586,7 +593,9 @@ export class CompanyService {
       dto.companyRole = company.companyRole;
       dto.state = company.state;
       dto.creditBalance = company.creditBalance;
-      dto.secondaryAccountBalance = company.secondaryAccountBalance;
+      dto.secondaryAccountBalanceLocal = company.secondaryAccountBalance?.local?.total;
+      dto.secondaryAccountBalanceInternational = company.secondaryAccountBalance?.international?.total;
+      dto.secondaryAccountBalanceOmge = company.secondaryAccountBalance?.omge?.total;
       dto.programmeCount = company.programmeCount;
       dto.lastUpdateVersion = company.lastUpdateVersion;
       dto.creditTxTime = this.helperService.formatTimestamp(company.creditTxTime);
