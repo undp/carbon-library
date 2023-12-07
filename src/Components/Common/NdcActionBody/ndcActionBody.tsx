@@ -131,7 +131,11 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
               if (action.actionId == ndcActionId) {
                 modified = true;
                 let docAdded = false;
-                for (var document of action.projectMaterial) {
+                for (var documentDetails of action.projectMaterial) {
+                  let document: any;
+                  documentDetails.url
+                    ? (document = documentDetails.url)
+                    : (document = documentDetails);
                   if (document.includes("VERIFICATION_REPORT")) {
                     docAdded = true;
                     break;
@@ -418,8 +422,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
@@ -500,8 +512,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
@@ -646,8 +666,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
@@ -733,8 +761,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
