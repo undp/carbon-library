@@ -192,7 +192,9 @@ export const UserProfileComponent = (props: any) => {
                         {t("userProfile:taxId")}
                       </Col>
                       <Col span={12} className="field-value">
-                        {organisationDetails.taxId
+                        {organisationDetails.taxId &&
+                        organisationDetails.companyRole !==
+                          CompanyRole.GOVERNMENT
                           ? organisationDetails.taxId
                           : "-"}
                       </Col>

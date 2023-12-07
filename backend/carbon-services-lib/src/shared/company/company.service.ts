@@ -43,11 +43,12 @@ import { LocationInterface } from "../location/location.interface";
 import { DataExportQueryDto } from "../dto/data.export.query.dto";
 import { DataExportService } from "../util/data.export.service";
 import { DataExportCompanyDto } from "../dto/data.export.company.dto";
+import { SYSTEM_TYPE } from "../enum/system.names.enum";
 
 @Injectable()
 export class CompanyService {
   constructor(
-    @InjectRepository(Company) private companyRepo: Repository<Company>,
+  @InjectRepository(Company) private companyRepo: Repository<Company>,
     private logger: Logger,
     private configService: ConfigService,
     private helperService: HelperService,
@@ -145,7 +146,7 @@ export class CompanyService {
                 serialNumber: programme.serialNo,
                 pageLink:
                   hostAddress +
-                  `/programmeManagement/view?id=${programme.programmeId}`,
+                  `/programmeManagement/view/${programme.programmeId}`,
               }
             );
           }
@@ -770,17 +771,16 @@ export class CompanyService {
       });
     }
 
-    const { companyId, ...companyUpdateFields } = companyUpdateDto;
+    const { companyId, nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
     if (!companyUpdateFields.hasOwnProperty("website")) {
       companyUpdateFields["website"] = "";
     }
-
     const result = await this.companyRepo
       .update(
         {
           companyId: company.companyId,
         },
-        companyUpdateFields
+        this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -832,10 +832,7 @@ export class CompanyService {
 
   async increaseProgrammeCount(companyId: any) {
     const companyDetails = await this.findByCompanyId(companyId);
-    const programmeCount =
-      companyDetails.companyRole === CompanyRole.GOVERNMENT
-        ? null
-        : Number(companyDetails.programmeCount) + 1;
+    const programmeCount = Number(companyDetails.programmeCount) + 1;
 
     const response = await this.companyRepo
       .update(

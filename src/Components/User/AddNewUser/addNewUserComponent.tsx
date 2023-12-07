@@ -23,7 +23,6 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import ChangePasswordModel from "../../Common/Models/changePasswordModel";
 import { Role } from "../../../Definitions";
 
-
 export const AddNewUserComponent = (props: any) => {
   const {
     t,

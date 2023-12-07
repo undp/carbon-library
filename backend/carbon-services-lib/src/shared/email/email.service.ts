@@ -22,13 +22,13 @@ export class EmailService {
         user: this.configService.get<string>("email.username"),
         pass: this.configService.get<string>("email.password"),
       },
-      pool: true,
-      maxMessages : 14
+      // pool: true,
+      // maxMessages : 14
     });
   }
 
   async sendEmail(emailDataObj: any): Promise<any> {
-    if (emailDataObj?.sender && !this.emailDisabled && !(emailDataObj.sender.split('@')[1]=='undp.org') && !(emailDataObj.sender.split('@')[1]=='carbon.com')) {
+    if (emailDataObj?.sender && !this.emailDisabled) {
       return new Promise((resolve, reject) => {
         this.transporter.sendMail(
           {

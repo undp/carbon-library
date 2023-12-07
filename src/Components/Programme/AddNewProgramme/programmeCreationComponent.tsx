@@ -91,6 +91,8 @@ export const ProgrammeCreationComponent = (props: any) => {
   const [includedInNDC, setIncludedInNDC] = useState<any>();
   const [countries, setCountries] = useState<[]>([]);
   const [organisationsList, setOrganisationList] = useState<any[]>([]);
+  const [govData, setGovData] = useState<any>();
+  const [initialOrganisationOwnershipValues,setInitialOrganisationOwnershipValues] = useState<any>();
   const [userOrgTaxId, setUserOrgTaxId] = useState<any>("");
   const [regionsList, setRegionsList] = useState<any[]>([]);
   const [programmeDetailsObj, setProgrammeDetailsObj] = useState<any>();
@@ -107,18 +109,18 @@ export const ProgrammeCreationComponent = (props: any) => {
   );
   const [availableSectar, setAvailableSectar] = useState<any[]>([]);
 
-  const initialOrganisationOwnershipValues: any[] = [
-    {
-      organisation:
-        userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
-        userInfoState?.companyRole !== CompanyRole.MINISTRY &&
-        userInfoState?.companyName,
-      proponentPercentage:
-        userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
-        userInfoState?.companyRole !== CompanyRole.MINISTRY &&
-        100,
-    },
-  ];
+  // const initialOrganisationOwnershipValues: any[] = [
+  //   {
+  //     organisation:
+  //       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+  //       userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+  //       userInfoState?.companyName,
+  //     proponentPercentage:
+  //       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+  //       userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+  //       (100-Number(govData.nationalSopValue)),
+  //   },
+  // ];
 
   const selectedSectoralScopes =
     selectedSector !== String(Sector.Health) &&
@@ -171,6 +173,45 @@ export const ProgrammeCreationComponent = (props: any) => {
       console.log("Error in getting regions list", error);
     } finally {
       setLoadingList(false);
+    }
+  };
+
+  const getGovernmentDetails = async () => {
+    setLoading(true);
+    try {
+      console.log("getting government profile");
+      const response = await post("national/organisation/query", {
+        page: 1,
+        size: 100,
+        filterAnd: [
+          {
+            key: "companyRole",
+            operation: "=",
+            value: CompanyRole.GOVERNMENT,
+          },
+        ],
+      });
+      if (response.data) {
+        setInitialOrganisationOwnershipValues([
+          {
+            organisation:
+              userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+              userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+              userInfoState?.companyName,
+            proponentPercentage:
+              userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+              userInfoState?.companyRole !== CompanyRole.MINISTRY &&
+              (100 - Number(response?.data[0].nationalSopValue)),
+          },
+        ]);
+        setGovData(response?.data[0]);
+        console.log("gov profile", response?.data[0]);
+        return response?.data[0];
+      }
+    } catch (error: any) {
+      console.log("Error in getting government data", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -270,6 +311,7 @@ export const ProgrammeCreationComponent = (props: any) => {
     getOrganisationsDetails();
     getCountryList();
     getRegionList();
+    getGovernmentDetails();
     if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
       getUserDetails();
     }
@@ -294,7 +336,14 @@ export const ProgrammeCreationComponent = (props: any) => {
   const onFinishStepOne = async (values: any) => {
     setLoading(true);
     let programmeDetails: any;
-    const ownershipPercentage = values?.ownershipPercentage;
+    const ownershipPercentage =JSON.parse(JSON.stringify(values?.ownershipPercentage))
+    if (Number(govData.nationalSopValue) !== 0) {
+      ownershipPercentage.push({
+        organisation: govData.taxId,
+        proponentPercentage: Number(govData.nationalSopValue),
+      });
+    }
+    console.log("ownershipPercentage", ownershipPercentage);
     const totalPercentage = ownershipPercentage.reduce(
       (sum: any, field: any) => sum + field.proponentPercentage,
       0
@@ -314,19 +363,24 @@ export const ProgrammeCreationComponent = (props: any) => {
       );
     }
     let environmentalImpactAssessmentData = "";
-    if(values?.environmentalImpactAssessment?.length > 0) {
+    if (values?.environmentalImpactAssessment?.length > 0) {
       environmentalImpactAssessmentData = await getBase64(
         values?.environmentalImpactAssessment[0]?.originFileObj as RcFile
       );
     }
-    
+
     const propTaxIds =
       userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
       userInfoState?.companyRole !== CompanyRole.MINISTRY
         ? [userOrgTaxId, ...proponentTxIds]
         : proponentTxIds;
     const duplicateIds = new Set(propTaxIds).size !== propTaxIds.length;
+    console.log("proponentTxIds", proponentTxIds);
+    console.log("ownershipPercentage", ownershipPercentage);
     if (totalPercentage !== 100) {
+      if (Number(govData.nationalSopValue) !== 0) {
+        ownershipPercentage.pop();
+      }
       message.open({
         type: "error",
         content: t("addProgramme:proponentPercentValidation"),
@@ -335,6 +389,9 @@ export const ProgrammeCreationComponent = (props: any) => {
       });
       setLoading(false);
     } else if (duplicateIds) {
+      if (Number(govData.nationalSopValue) !== 0) {
+        ownershipPercentage.pop();
+      }
       message.open({
         type: "error",
         content: t("addProgramme:duplicateOrg"),
@@ -367,13 +424,15 @@ export const ProgrammeCreationComponent = (props: any) => {
           ...(includedInNDC !== undefined &&
             includedInNDC !== null && { includedInNdc: includedInNDC }),
         },
-        environmentalAssessmentRegistrationNo: values?.environmentalAssessmentRegistrationNo
+        environmentalAssessmentRegistrationNo:
+          values?.environmentalAssessmentRegistrationNo,
       };
       if (logoBase64?.length > 0) {
         programmeDetails.designDocument = logoBase64;
       }
-      if(environmentalImpactAssessmentData?.length > 0) {
-        programmeDetails.environmentalImpactAssessment = environmentalImpactAssessmentData;
+      if (environmentalImpactAssessmentData?.length > 0) {
+        programmeDetails.environmentalImpactAssessment =
+          environmentalImpactAssessmentData;
       }
       setLoading(false);
       console.log(programmeDetails);
@@ -575,6 +634,10 @@ export const ProgrammeCreationComponent = (props: any) => {
     }
   }, [selectedSector]);
 
+  if (!govData) {
+    console.log("gov data loading");
+    return <></>;
+  }
   return (
     <div className="add-programme-main-container">
       <div className="title-container">
@@ -762,63 +825,90 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   </Select.Option>
                                 </Select>
                               </Form.Item>
-                              <Form.Item
-                                label={t("addProgramme:designDoc")}
-                                name="designDocument"
-                                valuePropName="fileList"
-                                getValueFromEvent={normFile}
-                                required={true}
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: `${t(
-                                      "addProgramme:designDoc"
-                                    )} ${t("addProgramme:isRequired")}`,
-                                  },
-                                  {
-                                    validator: async (rule, file) => {
-                                      if (file?.length > 0) {
-                                        if (!isValidateFileType(file[0]?.type)) {
-                                          throw new Error(
-                                            `${t(
-                                              "addProgramme:invalidFileFormat"
-                                            )}`
-                                          );
-                                        } else if (
-                                          file[0]?.size > maximumImageSize
-                                        ) {
-                                          // default size format of files would be in bytes -> 1MB = 1000000bytes
-                                          throw new Error(
-                                            `${t("common:maxSizeVal")}`
-                                          );
-                                        }
-                                      }
+                              <div className="add-Document">
+                                <Form.Item
+                                  label={t("addProgramme:designDoc")}
+                                  name="designDocument"
+                                  valuePropName="fileList"
+                                  getValueFromEvent={normFile}
+                                  required={true}
+                                  labelCol={{ span: 30 }}
+                                
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: `${t(
+                                        "addProgramme:designDoc"
+                                      )} ${t("addProgramme:isRequired")}`,
                                     },
-                                  },
-                                ]}
-                              >
-                                <Upload
-                                  accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
-                                  beforeUpload={(file: any) => {
-                                    return false;
-                                  }}
-                                  className="design-upload-section"
-                                  name="design"
-                                  action="/upload.do"
-                                  listType="picture"
-                                  multiple={false}
-                                  // defaultFileList={fileList}
-                                  maxCount={1}
+                                    {
+                                      validator: async (rule, file) => {
+                                        if (file?.length > 0) {
+                                          if (
+                                            !isValidateFileType(file[0]?.type)
+                                          ) {
+                                            throw new Error(
+                                              `${t(
+                                                "addProgramme:invalidFileFormat"
+                                              )}`
+                                            );
+                                          } else if (
+                                            file[0]?.size > maximumImageSize
+                                          ) {
+                                            // default size format of files would be in bytes ->  1MB = 1000000bytes
+                                            throw new Error(
+                                              `${t("common:maxSizeVal")}`
+                                            );
+                                          }
+                                        }
+                                      },
+                                    },
+                                  ]}
                                 >
-                                  <Button
-                                    className="upload-doc"
-                                    size="large"
-                                    icon={<UploadOutlined />}
+                                  <Upload
+                                    accept=".xls, .xlsx, .ppt, .pptx, .csv, .doc, .docx, .pdf, .png, .jpg"
+                                    beforeUpload={(file: any) => {
+                                      return false;
+                                    }}
+                                    className="design-upload-section"
+                                    name="design"
+                                    action="/upload.do"
+                                    listType="picture"
+                                    multiple={false}
+                                    // defaultFileList={fileList}
+                                    maxCount={1}
                                   >
-                                    Upload
-                                  </Button>
-                                </Upload>
-                              </Form.Item>
+                                    <Button
+                                      className="upload-doc"
+                                      size="large"
+                                      icon={<UploadOutlined />}
+                                    >
+                                      Upload
+                                    </Button>
+                                  </Upload>
+                                </Form.Item>
+                                <div className="addDoc-info">
+                                  <Tooltip
+                                    arrowPointAtCenter
+                                    placement="topLeft"
+                                    trigger="hover"
+                                    title={
+                                      <a
+                                        style = {{color:"#fff"}}
+                                        href={
+                                          "https://app-eff78ffabc4efb.app.unfccc.org/tools/cdm/testprodspt3/UNFCCC_CDM/Pages/PDDnew.aspx?t=pdd"
+                                        }
+                                        target="_blank"
+                                      >
+                                        {t("addProgramme:designDocTooltip")}
+                                      </a>
+                                    }
+                                    overlayClassName="custom-tooltip"
+                                  >
+                                    <InfoCircle color="#000000" size={12} />
+                                  </Tooltip>
+                                </div>
+                              </div>
                               <Form.Item
                                 label={t(
                                   "addProgramme:buyerCountryEligibility"
@@ -842,6 +932,64 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   ))}
                                 </Select>
                               </Form.Item>
+
+                              {govData && (Number(govData.nationalSopValue)!==0) && (
+                                <div
+                                  className="space-container"
+                                  style={{ width: "100%" }}
+                                >
+                                  <Space
+                                    wrap={true}
+                                    style={{
+                                      display: "flex",
+                                      marginBottom: 8,
+                                    }}
+                                    align="center"
+                                    size={"large"}
+                                  >
+                                    <div className="ownership-list-item">
+                                      <Form.Item
+                                        label={t("addProgramme:company")}
+                                        name={"governmentName"}
+                                        wrapperCol={{ span: 24 }}
+                                        className="organisation"
+                                        initialValue={
+                                          govData ? govData.name : "Government"
+                                        }
+                                        required={true}
+                                      >
+                                        <Input size="large" disabled={true} />
+                                      </Form.Item>
+                                      <Form.Item
+                                        label={t(
+                                          "addProgramme:proponentPercentage"
+                                        )}
+                                        className="ownership-percent"
+                                        name={"sopPercentage"}
+                                        labelCol={{ span: 24 }}
+                                        wrapperCol={{ span: 24 }}
+                                        required={true}
+                                        initialValue={
+                                          govData
+                                            ? Number(govData.nationalSopValue)
+                                            : 0
+                                        }
+                                      >
+                                        <InputNumber
+                                          size="large"
+                                          disabled={true}
+                                          min={1}
+                                          max={100}
+                                          formatter={(value) => `${value}%`}
+                                          parser={(value: any) =>
+                                            value.replace("%", "")
+                                          }
+                                        />
+                                      </Form.Item>
+                                    </div>
+                                  </Space>
+                                </div>
+                              )}
                               <Form.List
                                 name="ownershipPercentage"
                                 initialValue={
@@ -1012,13 +1160,18 @@ export const ProgrammeCreationComponent = (props: any) => {
                                 }}
                               </Form.List>
                               <Form.Item
-                                label={t("addProgramme:environmentalAssessmentRegistrationNo")}
+                                label={t(
+                                  "addProgramme:environmentalAssessmentRegistrationNo"
+                                )}
                                 name="environmentalAssessmentRegistrationNo"
-                                initialValue={state?.record?.environmentalAssessmentRegistrationNo}
+                                initialValue={
+                                  state?.record
+                                    ?.environmentalAssessmentRegistrationNo
+                                }
                                 rules={[
                                   {
                                     required: true,
-                                    message: "", 
+                                    message: "",
                                   },
                                   {
                                     validator: async (rule, value) => {
@@ -1029,9 +1182,9 @@ export const ProgrammeCreationComponent = (props: any) => {
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t("addProgramme:environmentalAssessmentRegistrationNo")} ${t(
-                                            "isRequired"
-                                          )}`
+                                          `${t(
+                                            "addProgramme:environmentalAssessmentRegistrationNo"
+                                          )} ${t("isRequired")}`
                                         );
                                       }
                                     },
@@ -1041,7 +1194,9 @@ export const ProgrammeCreationComponent = (props: any) => {
                                 <Input size="large" />
                               </Form.Item>
                               <Form.Item
-                                label={t("addProgramme:environmentalImpactAssessment")}
+                                label={t(
+                                  "addProgramme:environmentalImpactAssessment"
+                                )}
                                 name="environmentalImpactAssessment"
                                 valuePropName="fileList"
                                 getValueFromEvent={normFile}
@@ -1050,7 +1205,12 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   {
                                     validator: async (rule, file) => {
                                       if (file?.length > 0) {
-                                        if (!isValidateFileType(file[0]?.type, DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT)) {
+                                        if (
+                                          !isValidateFileType(
+                                            file[0]?.type,
+                                            DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT
+                                          )
+                                        ) {
                                           throw new Error(
                                             `${t(
                                               "addProgramme:invalidFileFormat"

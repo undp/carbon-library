@@ -254,6 +254,8 @@ export const mitigationTypeList = [
   { value: MitigationTypes.N20.valueOf(), label: "N2O" },
   { value: MitigationTypes.TRANSPORT.valueOf(), label: "Transport" },
   { value: MitigationTypes.WIND.valueOf(), label: "Wind" },
+  { value: MitigationTypes.CO2_USAGE.valueOf(), label: "CO2 usage" },
+  { value: MitigationTypes.TIDAL.valueOf(), label: "Tidal" },
 ];
 
 export const sectorMitigationTypesListMapped: any = {
@@ -316,6 +318,8 @@ export const sectorMitigationTypesListMapped: any = {
   Other: [
     { value: MitigationTypes.MARINE.valueOf(), label: "Marine" },
     { value: MitigationTypes.N20.valueOf(), label: "N2O" },
+    { value: MitigationTypes.CO2_USAGE.valueOf(), label: "CO2 usage" },
+    { value: MitigationTypes.TIDAL.valueOf(), label: "Tidal" },
   ],
 };
 
@@ -343,7 +347,7 @@ export const mitigationSubTypeList = [
   { label: "Biodiesel", value: MitigationSubTypes.BIODIESEL.valueOf() },
   { label: "Biodiesel from waste oil", value: MitigationSubTypes.BIODIESEL_FROM_WASTE_OIL.valueOf() },
   { label: "Ethanol", value: MitigationSubTypes.ETHANOL.valueOf() },
-  { label: "Cement", value: MitigationSubTypes.CLINKER_REPLACEMENT.valueOf() },
+  { label: "Clinker replacement", value: MitigationSubTypes.CLINKER_REPLACEMENT.valueOf() },
   { label: "Coal Mine Methane", value: MitigationSubTypes.COAL_MINE_METHANE.valueOf() },
   { label: "Coal Bed Methane", value: MitigationSubTypes.COAL_BED_METHANE.valueOf() },
   { label: "CMM & Ventilation Air Methane", value: MitigationSubTypes.CMM_VENTILATION_AIR_METHANE.valueOf() },
@@ -473,8 +477,8 @@ export const mitigationSubTypeList = [
   { label: "Cars: Green hydrogen", value: MitigationSubTypes.CARS_GREEN_HYDROGEN.valueOf() },
   { label: "Cars: efficient operation", value: MitigationSubTypes.CARS_EFFICIENT_OPERATION.valueOf() },
   { label: "Scrapping old vehicles", value: MitigationSubTypes.SCRAPPING_OLD_VEHICLES.valueOf() },
-  { label: "Biodiesel for transport", value: MitigationSubTypes.CABLE_CARS.valueOf() },
-  { label: "Cable cars", value: MitigationSubTypes.CHEMICALS.valueOf() },
+  { label: "Biodiesel for transport", value: MitigationSubTypes.BIODIESEL_FOR_TRANSPORT.valueOf() },
+  { label: "Cable cars", value: MitigationSubTypes.CABLE_CARS.valueOf() },
   { label: "Wind", value: MitigationSubTypes.WIND.valueOf() },
   { label: "Offshore wind", value: MitigationSubTypes.OFFSHORE_WIND.valueOf() },
   { label: "CO2 recycling", value: MitigationSubTypes.CO2_RECYCLING.valueOf() },
@@ -511,7 +515,7 @@ export const mitigationSubTypesListMapped: any = {
     { label: "Ethanol", value: MitigationSubTypes.ETHANOL.valueOf() },
   ],
   Cement: [
-    { label: "Cement", value: MitigationSubTypes.CLINKER_REPLACEMENT.valueOf() },
+    { label: "Clinker replacement", value: MitigationSubTypes.CLINKER_REPLACEMENT.valueOf() },
   ],  
   "Coal/Mine": [
     { label: "Coal Mine Methane", value: MitigationSubTypes.COAL_MINE_METHANE.valueOf() },
@@ -668,7 +672,7 @@ export const mitigationSubTypesListMapped: any = {
     { label: "Bus Rapid Transit: Green hydrogen", value: MitigationSubTypes.BUS_RAPID_TRANSIT_GREEN_HYDROGEN.valueOf() },
     { label: "Motorbikes", value: MitigationSubTypes.MOTORBIKES.valueOf() },
     { label: "Mode shift: Road to rail", value: MitigationSubTypes.MODE_SHIFT_ROAD_TO_RAIL.valueOf() },
-    { label: "More efficient train system", value: MitigationSubTypes.MORE_EFFICIENT_VEHICLES.valueOf() },
+    { label: "More efficient train system", value: MitigationSubTypes.MORE_EFFICIENT_TRAIN_SYSTEM.valueOf() },
     { label: "More efficient vehicles", value: MitigationSubTypes.MORE_EFFICIENT_VEHICLES.valueOf() },
     { label: "Rail: regenerative braking", value: MitigationSubTypes.RAIL_REGENERATIVE_BRAKING.valueOf() },
     { label: "Rail: Green hydrogen", value: MitigationSubTypes.RAIL_GREEN_HYDROGEN.valueOf() },
@@ -677,8 +681,8 @@ export const mitigationSubTypesListMapped: any = {
     { label: "Cars: Green hydrogen", value: MitigationSubTypes.CARS_GREEN_HYDROGEN.valueOf() },
     { label: "Cars: efficient operation", value: MitigationSubTypes.CARS_EFFICIENT_OPERATION.valueOf() },
     { label: "Scrapping old vehicles", value: MitigationSubTypes.SCRAPPING_OLD_VEHICLES.valueOf() },
-    { label: "Biodiesel for transport", value: MitigationSubTypes.CABLE_CARS.valueOf() },
-    { label: "Cable cars", value: MitigationSubTypes.CHEMICALS.valueOf() },
+    { label: "Biodiesel for transport", value: MitigationSubTypes.BIODIESEL_FOR_TRANSPORT.valueOf() },
+    { label: "Cable cars", value: MitigationSubTypes.CABLE_CARS.valueOf() },
   ],
   Wind: [
     { label: "Wind", value: MitigationSubTypes.WIND.valueOf() },
