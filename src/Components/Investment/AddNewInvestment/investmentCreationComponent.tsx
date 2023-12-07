@@ -13,7 +13,7 @@ import {
   Steps,
   message,
 } from "antd";
-import type { RadioChangeEvent } from 'antd';
+import type { RadioChangeEvent } from "antd";
 import "../investmentComponent.scss";
 import {
   ProgrammeT,
@@ -148,13 +148,13 @@ export const InvestmentCreationComponent = (props: any) => {
     if (state?.record) {
       setData(state?.record);
     } else {
-      setData({ ownership: true })
+      setData({ ownership: true });
     }
   }, []);
 
   useEffect(() => {
     if (data) {
-      const keys = Object.keys(data)
+      const keys = Object.keys(data);
       if (keys[0] !== "ownership") {
         getOrganisationsDetails();
       }
@@ -162,10 +162,10 @@ export const InvestmentCreationComponent = (props: any) => {
     getGovernmentDetails();
   }, [data]);
 
-  if (!data ) {
+  if (!data) {
     return <Loading />;
   }
-  console.log('data',data)
+  console.log("data", data);
 
   const companyName: any = {};
   if (data && Object.keys(data)[0] !== "ownership") {
@@ -243,7 +243,7 @@ export const InvestmentCreationComponent = (props: any) => {
   };
 
   const onChangeTypeCreation = (e: RadioChangeEvent) => {
-    console.log('radio checked', e.target.value);
+    console.log("radio checked", e.target.value);
     setTypeCreation(e.target.value);
   };
 
@@ -295,7 +295,10 @@ export const InvestmentCreationComponent = (props: any) => {
                                 },
                               ]}
                             >
-                              <Radio.Group size="large" defaultValue={typeCreation}>
+                              <Radio.Group
+                                size="large"
+                                defaultValue={typeCreation}
+                              >
                                 {Object.values(InvestmentCreationType).map(
                                   (k, index) => (
                                     <div className="condition-radio-container">
@@ -313,406 +316,412 @@ export const InvestmentCreationComponent = (props: any) => {
                             </Form.Item>
                           </Col>
                         </Row>
-                        <Row className="row" gutter={[16, 16]}>
-                          <Col xl={12} md={24}>
-                            <div className="details-part-one">
-                              <Form.Item
-                                label={t("programme:investorName")}
-                                name="toCompanyId"
-                                wrapperCol={{ span: 24 }}
-                                className="organisation"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: `${t(
-                                      "programme:investorName"
-                                    )} ${t("isRequired")}`,
-                                  },
-                                ]}
-                              >
-                                <Select size="large" loading={loadingList}>
-                                  {organisationsList.map((organisation) => (
-                                    <Select.Option
-                                      key={organisation.companyId}
-                                      value={organisation.companyId}
-                                    >
-                                      {organisation.name}
-                                    </Select.Option>
-                                  ))}
-                                </Select>
-                              </Form.Item>
-                            </div>
-                          </Col>
-                          <Col xl={12} md={24}>
-                            <div className="details-part-two">
-                              <Form.Item
-                                label={t("programme:amountInvested")}
-                                name="amount"
-                                rules={[
-                                  {
-                                    required: true,
-                                    message: "",
-                                  },
-                                  {
-                                    validator: async (rule, value) => {
-                                      if (
-                                        String(value).trim() === "" ||
-                                        String(value).trim() === undefined ||
-                                        value === null ||
-                                        value === undefined
-                                      ) {
-                                        throw new Error(
-                                          `${t("programme:amountInvested")} ${t(
-                                            "isRequired"
-                                          )}`
-                                        );
-                                      } else if (
-                                        !isNaN(value) &&
-                                        Number(value) > 0
-                                      ) {
-                                        return Promise.resolve();
-                                      } else {
-                                        throw new Error(
-                                          `${t("programme:amountInvested")} ${t(
-                                            "isInvalid"
-                                          )}`
-                                        );
-                                      }
-                                    },
-                                  },
-                                ]}
-                              >
-                                <Input size="large" />
-                              </Form.Item>
-                            </div>
-                          </Col>
-                        </Row>
-                        <Row className="row" gutter={[16, 16]}>
-                          <Col xl={24} md={24}>
-                            <Form.Item
-                              label={t("programme:instrument")}
-                              name="instrument"
-                              wrapperCol={{ span: 24 }}
-                              className=""
-                            >
-                              <Checkbox.Group
-                                options={instrumentOptions}
-                                defaultValue={instrumentOptions.map(
-                                  (e) => e.value
-                                )}
-                                onChange={onInstrumentChange}
-                              />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        {instrument &&
-                          instrument.indexOf(Instrument.LOAN) >= 0 && (
+                        {typeCreation == InvestmentCreationType.NEW && (
+                          <div>
                             <Row className="row" gutter={[16, 16]}>
+                              <Col xl={12} md={24}>
+                                <div className="details-part-one">
+                                  <Form.Item
+                                    label={t("programme:investorName")}
+                                    name="toCompanyId"
+                                    wrapperCol={{ span: 24 }}
+                                    className="organisation"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: `${t(
+                                          "programme:investorName"
+                                        )} ${t("isRequired")}`,
+                                      },
+                                    ]}
+                                  >
+                                    <Select size="large" loading={loadingList}>
+                                      {organisationsList.map((organisation) => (
+                                        <Select.Option
+                                          key={organisation.companyId}
+                                          value={organisation.companyId}
+                                        >
+                                          {organisation.name}
+                                        </Select.Option>
+                                      ))}
+                                    </Select>
+                                  </Form.Item>
+                                </div>
+                              </Col>
+                              <Col xl={12} md={24}>
+                                <div className="details-part-two">
+                                  <Form.Item
+                                    label={t("programme:amountInvested")}
+                                    name="amount"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "",
+                                      },
+                                      {
+                                        validator: async (rule, value) => {
+                                          if (
+                                            String(value).trim() === "" ||
+                                            String(value).trim() ===
+                                              undefined ||
+                                            value === null ||
+                                            value === undefined
+                                          ) {
+                                            throw new Error(
+                                              `${t(
+                                                "programme:amountInvested"
+                                              )} ${t("isRequired")}`
+                                            );
+                                          } else if (
+                                            !isNaN(value) &&
+                                            Number(value) > 0
+                                          ) {
+                                            return Promise.resolve();
+                                          } else {
+                                            throw new Error(
+                                              `${t(
+                                                "programme:amountInvested"
+                                              )} ${t("isInvalid")}`
+                                            );
+                                          }
+                                        },
+                                      },
+                                    ]}
+                                  >
+                                    <Input size="large" />
+                                  </Form.Item>
+                                </div>
+                              </Col>
+                            </Row>
+                            <Row className="row" gutter={[16, 16]}>
+                              <Col xl={24} md={24}>
+                                <Form.Item
+                                  label={t("programme:instrument")}
+                                  name="instrument"
+                                  wrapperCol={{ span: 24 }}
+                                  className=""
+                                >
+                                  <Checkbox.Group
+                                    options={instrumentOptions}
+                                    defaultValue={instrumentOptions.map(
+                                      (e) => e.value
+                                    )}
+                                    onChange={onInstrumentChange}
+                                  />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                            {instrument &&
+                              instrument.indexOf(Instrument.LOAN) >= 0 && (
+                                <Row className="row" gutter={[16, 16]}>
+                                  <Col xl={8} md={12}>
+                                    <div className="details-part-two">
+                                      <Form.Item
+                                        label={t("programme:interestRate")}
+                                        name="interestRate"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:interestRate"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              } else if (!isNaN(value)) {
+                                                return Promise.resolve();
+                                              } else {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:interestRate"
+                                                  )} ${t("isInvalid")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </div>
+                                  </Col>
+                                </Row>
+                              )}
+                            {instrument &&
+                              instrument.indexOf(Instrument.RESULT_BASED) >=
+                                0 && (
+                                <Row className="row" gutter={[16, 16]}>
+                                  <Col xl={12} md={24}>
+                                    <div className="details-part-two">
+                                      <Form.Item
+                                        label={t("programme:resultMetric")}
+                                        name="resultMetric"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:resultMetric"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </div>
+                                  </Col>
+                                  <Col xl={12} md={24}>
+                                    <div className="details-part-two">
+                                      <Form.Item
+                                        label={t("programme:paymentPerMetric")}
+                                        name="paymentPerMetric"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:paymentPerMetric"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              } else if (!isNaN(value)) {
+                                                return Promise.resolve();
+                                              } else {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:paymentPerMetric"
+                                                  )} ${t("isInvalid")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </div>
+                                  </Col>
+                                </Row>
+                              )}
+                            {instrument &&
+                              instrument.indexOf(Instrument.INKIND) >= 0 && (
+                                <Row className="row" gutter={[16, 16]}>
+                                  <Col xl={12} md={24}>
+                                    <div className="details-part-two">
+                                      <Form.Item
+                                        label={t("programme:description")}
+                                        name="description"
+                                        rules={[
+                                          {
+                                            required: false,
+                                            message: "",
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </div>
+                                  </Col>
+                                </Row>
+                              )}
+                            {instrument &&
+                              instrument.indexOf(Instrument.OTHER) >= 0 && (
+                                <Row className="row" gutter={[16, 16]}>
+                                  <Col xl={12} md={24}>
+                                    <div className="details-part-two">
+                                      <Form.Item
+                                        label={t("programme:comments")}
+                                        name="comments"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:comments"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </div>
+                                  </Col>
+                                </Row>
+                              )}
+                            <Row className="row" gutter={[4, 4]}>
                               <Col xl={8} md={12}>
-                                <div className="details-part-two">
-                                  <Form.Item
-                                    label={t("programme:interestRate")}
-                                    name="interestRate"
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "",
-                                      },
-                                      {
-                                        validator: async (rule, value) => {
-                                          if (
-                                            String(value).trim() === "" ||
-                                            String(value).trim() ===
-                                            undefined ||
-                                            value === null ||
-                                            value === undefined
-                                          ) {
-                                            throw new Error(
-                                              `${t(
-                                                "programme:interestRate"
-                                              )} ${t("isRequired")}`
-                                            );
-                                          } else if (!isNaN(value)) {
-                                            return Promise.resolve();
-                                          } else {
-                                            throw new Error(
-                                              `${t(
-                                                "programme:interestRate"
-                                              )} ${t("isInvalid")}`
-                                            );
-                                          }
-                                        },
-                                      },
-                                    ]}
-                                  >
-                                    <Input size="large" />
-                                  </Form.Item>
-                                </div>
+                                <Form.Item
+                                  label={t("programme:type")}
+                                  wrapperCol={{ span: 13 }}
+                                  className="role-group"
+                                  name="type"
+                                  rules={[
+                                    {
+                                      required: false,
+                                    },
+                                  ]}
+                                >
+                                  <Radio.Group size="large">
+                                    {Object.values(InvestmentType).map(
+                                      (k, index) => (
+                                        <div className="condition-radio-container">
+                                          <Radio.Button
+                                            className="condition-radio"
+                                            value={k}
+                                            onClick={(e: any) =>
+                                              deselectOnClick(e, "type")
+                                            }
+                                          >
+                                            {t("programme:" + k)}
+                                          </Radio.Button>
+                                        </div>
+                                      )
+                                    )}
+                                  </Radio.Group>
+                                </Form.Item>
+                              </Col>
+                              <Col xl={8} md={12}>
+                                <Form.Item
+                                  label={t("programme:level")}
+                                  wrapperCol={{ span: 13 }}
+                                  className="role-group"
+                                  name="level"
+                                  rules={[
+                                    {
+                                      required: false,
+                                    },
+                                  ]}
+                                >
+                                  <Radio.Group size="large">
+                                    {Object.values(InvestmentLevel).map(
+                                      (k, index) => (
+                                        <div className="condition-radio-container">
+                                          <Radio.Button
+                                            className="condition-radio"
+                                            value={k}
+                                            onClick={(e: any) =>
+                                              deselectOnClick(e, "level")
+                                            }
+                                          >
+                                            {t("programme:" + k)}
+                                          </Radio.Button>
+                                        </div>
+                                      )
+                                    )}
+                                  </Radio.Group>
+                                </Form.Item>
+                              </Col>
+                              <Col xl={8} md={12}>
+                                <Form.Item
+                                  label={t("programme:stream")}
+                                  wrapperCol={{ span: 13 }}
+                                  className="role-group"
+                                  name="stream"
+                                  rules={[
+                                    {
+                                      required: false,
+                                    },
+                                  ]}
+                                >
+                                  <Radio.Group size="large">
+                                    {Object.values(InvestmentStream).map(
+                                      (k, index) => (
+                                        <div className="condition-radio-container">
+                                          <Radio.Button
+                                            className="condition-radio"
+                                            value={k}
+                                            onClick={(e: any) =>
+                                              deselectOnClick(e, "stream")
+                                            }
+                                          >
+                                            {t("programme:" + k)}
+                                          </Radio.Button>
+                                        </div>
+                                      )
+                                    )}
+                                  </Radio.Group>
+                                </Form.Item>
                               </Col>
                             </Row>
-                          )}
-                        {instrument &&
-                          instrument.indexOf(Instrument.RESULT_BASED) >= 0 && (
                             <Row className="row" gutter={[16, 16]}>
                               <Col xl={12} md={24}>
-                                <div className="details-part-two">
-                                  <Form.Item
-                                    label={t("programme:resultMetric")}
-                                    name="resultMetric"
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "",
-                                      },
-                                      {
-                                        validator: async (rule, value) => {
-                                          if (
-                                            String(value).trim() === "" ||
-                                            String(value).trim() ===
-                                            undefined ||
-                                            value === null ||
-                                            value === undefined
-                                          ) {
-                                            throw new Error(
-                                              `${t(
-                                                "programme:resultMetric"
-                                              )} ${t("isRequired")}`
-                                            );
-                                          }
-                                        },
-                                      },
-                                    ]}
-                                  >
-                                    <Input size="large" />
-                                  </Form.Item>
-                                </div>
-                              </Col>
-                              <Col xl={12} md={24}>
-                                <div className="details-part-two">
-                                  <Form.Item
-                                    label={t("programme:paymentPerMetric")}
-                                    name="paymentPerMetric"
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "",
-                                      },
-                                      {
-                                        validator: async (rule, value) => {
-                                          if (
-                                            String(value).trim() === "" ||
-                                            String(value).trim() ===
-                                            undefined ||
-                                            value === null ||
-                                            value === undefined
-                                          ) {
-                                            throw new Error(
-                                              `${t(
-                                                "programme:paymentPerMetric"
-                                              )} ${t("isRequired")}`
-                                            );
-                                          } else if (!isNaN(value)) {
-                                            return Promise.resolve();
-                                          } else {
-                                            throw new Error(
-                                              `${t(
-                                                "programme:paymentPerMetric"
-                                              )} ${t("isInvalid")}`
-                                            );
-                                          }
-                                        },
-                                      },
-                                    ]}
-                                  >
-                                    <Input size="large" />
-                                  </Form.Item>
-                                </div>
+                                <Form.Item
+                                  label={t("programme:esgType")}
+                                  name="esgClassification"
+                                >
+                                  <Select size="large">
+                                    {Object.values(ESGType).map((esg: any) => (
+                                      <Select.Option value={esg}>
+                                        {esg}
+                                      </Select.Option>
+                                    ))}
+                                  </Select>
+                                </Form.Item>
                               </Col>
                             </Row>
-                          )}
-                        {instrument &&
-                          instrument.indexOf(Instrument.INKIND) >= 0 && (
-                            <Row className="row" gutter={[16, 16]}>
-                              <Col xl={12} md={24}>
-                                <div className="details-part-two">
-                                  <Form.Item
-                                    label={t("programme:description")}
-                                    name="description"
-                                    rules={[
-                                      {
-                                        required: false,
-                                        message: "",
-                                      },
-                                    ]}
-                                  >
-                                    <Input size="large" />
-                                  </Form.Item>
-                                </div>
-                              </Col>
-                            </Row>
-                          )}
-                        {instrument &&
-                          instrument.indexOf(Instrument.OTHER) >= 0 && (
-                            <Row className="row" gutter={[16, 16]}>
-                              <Col xl={12} md={24}>
-                                <div className="details-part-two">
-                                  <Form.Item
-                                    label={t("programme:comments")}
-                                    name="comments"
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: "",
-                                      },
-                                      {
-                                        validator: async (rule, value) => {
-                                          if (
-                                            String(value).trim() === "" ||
-                                            String(value).trim() ===
-                                            undefined ||
-                                            value === null ||
-                                            value === undefined
-                                          ) {
-                                            throw new Error(
-                                              `${t("programme:comments")} ${t(
-                                                "isRequired"
-                                              )}`
-                                            );
-                                          }
-                                        },
-                                      },
-                                    ]}
-                                  >
-                                    <Input size="large" />
-                                  </Form.Item>
-                                </div>
-                              </Col>
-                            </Row>
-                          )}
-                        <Row className="row" gutter={[4, 4]}>
-                          <Col xl={8} md={12}>
-                            <Form.Item
-                              label={t("programme:type")}
-                              wrapperCol={{ span: 13 }}
-                              className="role-group"
-                              name="type"
-                              rules={[
-                                {
-                                  required: false,
-                                },
-                              ]}
-                            >
-                              <Radio.Group size="large">
-                                {Object.values(InvestmentType).map(
-                                  (k, index) => (
-                                    <div className="condition-radio-container">
-                                      <Radio.Button
-                                        className="condition-radio"
-                                        value={k}
-                                        onClick={(e: any) =>
-                                          deselectOnClick(e, "type")
-                                        }
-                                      >
-                                        {t("programme:" + k)}
-                                      </Radio.Button>
-                                    </div>
-                                  )
-                                )}
-                              </Radio.Group>
-                            </Form.Item>
-                          </Col>
-                          <Col xl={8} md={12}>
-                            <Form.Item
-                              label={t("programme:level")}
-                              wrapperCol={{ span: 13 }}
-                              className="role-group"
-                              name="level"
-                              rules={[
-                                {
-                                  required: false,
-                                },
-                              ]}
-                            >
-                              <Radio.Group size="large">
-                                {Object.values(InvestmentLevel).map(
-                                  (k, index) => (
-                                    <div className="condition-radio-container">
-                                      <Radio.Button
-                                        className="condition-radio"
-                                        value={k}
-                                        onClick={(e: any) =>
-                                          deselectOnClick(e, "level")
-                                        }
-                                      >
-                                        {t("programme:" + k)}
-                                      </Radio.Button>
-                                    </div>
-                                  )
-                                )}
-                              </Radio.Group>
-                            </Form.Item>
-                          </Col>
-                          <Col xl={8} md={12}>
-                            <Form.Item
-                              label={t("programme:stream")}
-                              wrapperCol={{ span: 13 }}
-                              className="role-group"
-                              name="stream"
-                              rules={[
-                                {
-                                  required: false,
-                                },
-                              ]}
-                            >
-                              <Radio.Group size="large">
-                                {Object.values(InvestmentStream).map(
-                                  (k, index) => (
-                                    <div className="condition-radio-container">
-                                      <Radio.Button
-                                        className="condition-radio"
-                                        value={k}
-                                        onClick={(e: any) =>
-                                          deselectOnClick(e, "stream")
-                                        }
-                                      >
-                                        {t("programme:" + k)}
-                                      </Radio.Button>
-                                    </div>
-                                  )
-                                )}
-                              </Radio.Group>
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                        <Row className="row" gutter={[16, 16]}>
-                          <Col xl={12} md={24}>
-                            <Form.Item
-                              label={t("programme:esgType")}
-                              name="esgClassification"
-                            >
-                              <Select size="large">
-                                {Object.values(ESGType).map((esg: any) => (
-                                  <Select.Option value={esg}>
-                                    {esg}
-                                  </Select.Option>
-                                ))}
-                              </Select>
-                            </Form.Item>
-                          </Col>
-                        </Row>
 
-                        <Form.Item>
-                          <div className="steps-actions">
-                            <Button
-                              type="primary"
-                              htmlType="submit"
-                              loading={loading}
-                              onSubmit={nextOne}
-                            >
-                              {t("programme:next")}
-                            </Button>
+                            <Form.Item>
+                              <div className="steps-actions">
+                                <Button
+                                  type="primary"
+                                  htmlType="submit"
+                                  loading={loading}
+                                  onSubmit={nextOne}
+                                >
+                                  {t("programme:next")}
+                                </Button>
+                              </div>
+                            </Form.Item>
                           </div>
-                        </Form.Item>
+                        )}
                       </Form>
                     </div>
                   </div>
@@ -728,7 +737,7 @@ export const InvestmentCreationComponent = (props: any) => {
                 description: current === 1 && (
                   <div>
                     <div className="programme-sought-form-container ownership-container">
-                      {Object.keys(data).length > 0 &&
+                      {Object.keys(data).length > 0 && (
                         <div className="programme-sought-form">
                           <Form
                             labelCol={{ span: 20 }}
@@ -779,7 +788,8 @@ export const InvestmentCreationComponent = (props: any) => {
                                                   "percentage",
                                                   index,
                                                 ])
-                                              ) > data!.proponentPercentage[index]
+                                              ) >
+                                                data!.proponentPercentage[index]
                                             ) {
                                               // eslint-disable-next-line prefer-promise-reject-errors
                                               return Promise.reject(
@@ -794,8 +804,10 @@ export const InvestmentCreationComponent = (props: any) => {
                                       <InputNumber
                                         placeholder=""
                                         controls={false}
-                                        disabled={govData.companyId==companyId}
-                                      // disabled={userInfoState?.companyId === Number(companyId)}
+                                        disabled={
+                                          govData.companyId == companyId
+                                        }
+                                        // disabled={userInfoState?.companyId === Number(companyId)}
                                         onKeyPress={(event) => {
                                           if (!/[0-9\.]/.test(event.key)) {
                                             event.preventDefault();
@@ -803,7 +815,9 @@ export const InvestmentCreationComponent = (props: any) => {
                                         }}
                                       />
                                     </Form.Item>
-                                    <div className="inline separator">{"/"}</div>
+                                    <div className="inline separator">
+                                      {"/"}
+                                    </div>
 
                                     <Form.Item className="inline">
                                       <InputNumber
@@ -866,7 +880,8 @@ export const InvestmentCreationComponent = (props: any) => {
                               </div>
                             </Form.Item>
                           </Form>
-                        </div>}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ),
