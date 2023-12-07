@@ -458,7 +458,7 @@ export const AddNewCompanyComponent = (props: any) => {
                               ? val.match(reg)
                               : [];
                             if (matches.length === 0) {
-                              throw new Error(`Email ${t("isInvalid")}`);
+                              throw new Error(`${t("addCompany:email")} ${t("isInvalid")}`);
                             }
                           }
                         },
