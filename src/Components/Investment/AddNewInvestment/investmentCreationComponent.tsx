@@ -17,6 +17,7 @@ import type { RadioChangeEvent } from "antd";
 import "../investmentComponent.scss";
 import {
   ProgrammeT,
+  addCommSep,
   addSpaces,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { Instrument } from "../../../Definitions/Enums/instrument.enum";
@@ -707,19 +708,6 @@ export const InvestmentCreationComponent = (props: any) => {
                                 </Form.Item>
                               </Col>
                             </Row>
-
-                            <Form.Item>
-                              <div className="steps-actions">
-                                <Button
-                                  type="primary"
-                                  htmlType="submit"
-                                  loading={loading}
-                                  onSubmit={nextOne}
-                                >
-                                  {t("programme:next")}
-                                </Button>
-                              </div>
-                            </Form.Item>
                           </div>
                         )}
                         {typeCreation == InvestmentCreationType.EXISTING && (
@@ -728,15 +716,16 @@ export const InvestmentCreationComponent = (props: any) => {
                               <Col xl={12} md={24}>
                                 <div className="details-part-one">
                                   <Form.Item
-                                    label={t("programme:investorName")}
-                                    name="toCompanyId"
+                                    label={t(
+                                      "programme:existingInvestmentSource"
+                                    )}
+                                    name="existinngInvestmentId"
                                     wrapperCol={{ span: 24 }}
-                                    className="organisation"
                                     rules={[
                                       {
                                         required: true,
                                         message: `${t(
-                                          "programme:investorName"
+                                          "programme:existingInvestmentSource"
                                         )} ${t("isRequired")}`,
                                       },
                                     ]}
@@ -757,37 +746,81 @@ export const InvestmentCreationComponent = (props: any) => {
                             </Row>
                             <Row className="row" gutter={[16, 16]}>
                               <Col xl={12} md={24}>
-                                <div className="details-part-one">
+                                <div className="details-part-two">
                                   <Form.Item
-                                    label={t("programme:investorName")}
-                                    name="toCompanyId"
-                                    wrapperCol={{ span: 24 }}
-                                    className="organisation"
+                                    label={t("programme:amountInvested")}
+                                    name="amount"
                                     rules={[
                                       {
                                         required: true,
-                                        message: `${t(
-                                          "programme:investorName"
-                                        )} ${t("isRequired")}`,
+                                        message: "",
+                                      },
+                                      {
+                                        validator: async (rule, value) => {
+                                          if (
+                                            String(value).trim() === "" ||
+                                            String(value).trim() ===
+                                              undefined ||
+                                            value === null ||
+                                            value === undefined
+                                          ) {
+                                            throw new Error(
+                                              `${t(
+                                                "programme:amountInvested"
+                                              )} ${t("isRequired")}`
+                                            );
+                                          } else if (
+                                            !isNaN(value) &&
+                                            Number(value) > 0
+                                          ) {
+                                            return Promise.resolve();
+                                          } else {
+                                            throw new Error(
+                                              `${t(
+                                                "programme:amountInvested"
+                                              )} ${t("isInvalid")}`
+                                            );
+                                          }
+                                        },
                                       },
                                     ]}
                                   >
-                                    <Select size="large" loading={loadingList}>
-                                      {organisationsList.map((organisation) => (
-                                        <Select.Option
-                                          key={organisation.companyId}
-                                          value={organisation.companyId}
-                                        >
-                                          {organisation.name}
-                                        </Select.Option>
-                                      ))}
-                                    </Select>
+                                    <Input size="large" />
                                   </Form.Item>
                                 </div>
+                              </Col>
+                              <Col lg={1} md={1} className="seperator">
+                                {"/"}
+                              </Col>
+                              <Col lg={6} md={12}>
+                                <Form.Item
+                                  className="popup-credit-input"
+                                  initialValue={0}
+                                  name="sourceAmount"
+                                >
+                                  <InputNumber
+                                    formatter={(value) =>
+                                      `$${addCommSep(value)}`
+                                    }
+                                    disabled
+                                  />
+                                </Form.Item>
                               </Col>
                             </Row>
                           </div>
                         )}
+                        <Form.Item>
+                          <div className="steps-actions">
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              loading={loading}
+                              onSubmit={nextOne}
+                            >
+                              {t("programme:next")}
+                            </Button>
+                          </div>
+                        </Form.Item>
                       </Form>
                     </div>
                   </div>
