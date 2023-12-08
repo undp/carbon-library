@@ -906,7 +906,7 @@ export const CreditTransferComponent = (props: any) => {
 
                 {userInfoState?.companyRole === CompanyRole.MINISTRY && (
                   <Checkbox
-                    className="label"
+                    className="label ministry-level-filter-checkbox"
                     onChange={(v) => {
                       if (v.target.checked) {
                         setMinistryLevelFilter(true);

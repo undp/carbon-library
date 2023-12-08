@@ -970,12 +970,17 @@ export class UserService {
           '"user"'
         )
       )
+      .leftJoinAndMapOne(
+        "user.company",
+      Company,
+      "company",
+      "company.companyId = user.companyId")
       .orderBy(
         queryDto?.sort?.key ? `"user"."${queryDto?.sort?.key}"` : `"user"."id"`,
         queryDto?.sort?.order ? queryDto?.sort?.order : "DESC"
       )
       .getMany();
-
+      
     if (resp.length > 0) {
       const prepData = this.prepareUserDataForExport(resp)
 
@@ -990,7 +995,10 @@ export class UserService {
         )
       }
 
-      const path = await this.dataExportService.generateCsv(prepData, headers);
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "userExport.users",
+        []
+      ));
       return path;
     }
     throw new HttpException(
@@ -1014,6 +1022,7 @@ export class UserService {
       dto.country = user.country;
       dto.phoneNo = user.phoneNo;
       dto.companyId = user.companyId;
+      dto.companyName = user.company?.name;
       dto.companyRole = user.companyRole;
       dto.createdTime = this.helperService.formatTimestamp(user.createdTime);
       dto.isPending = user.isPending;

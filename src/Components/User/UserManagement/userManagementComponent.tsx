@@ -767,7 +767,7 @@ export const UserManagementComponent = (props: any) => {
                   </a>
                 </Dropdown>
               </div>
-              <div className="download-data-btn">
+              <div className="download-data-btn user-data-download">
                 <a onClick={downloadUserData}>
                   <DownloadOutlined
                     style={{

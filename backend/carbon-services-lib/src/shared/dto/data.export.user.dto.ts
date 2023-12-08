@@ -8,6 +8,7 @@ export class DataExportUserDto extends DataExportDto {
     country;
     phoneNo;
     companyId;
+    companyName;
     companyRole;
     createdTime;
     isPending;

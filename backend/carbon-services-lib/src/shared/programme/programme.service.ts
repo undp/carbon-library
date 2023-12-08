@@ -2439,6 +2439,12 @@ export class ProgrammeService {
         });
     }
 
+    queryBuilder = queryBuilder.leftJoinAndMapMany(
+      "ndcaction.documents",
+    ProgrammeDocument,
+    "programmeDocument",
+    "programmeDocument.actionId = ndcaction.id");
+
     const resp = await queryBuilder.orderBy(
       queryDto?.sort?.key &&
       `"ndcaction".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
@@ -2465,7 +2471,10 @@ export class ProgrammeService {
         )
       }
 
-      const path = await this.dataExportService.generateCsv(prepData, headers);
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "ndcActionExport.activities", 
+        []
+      ));
       return path;
     }
     throw new HttpException(
@@ -2481,6 +2490,10 @@ export class ProgrammeService {
     const exportData: DataExportNdcActionDto[] = [];
 
     for (const ndcAction of ndcActions) {
+
+      const ndcActionReports: ProgrammeDocument[] = ndcAction.documents;
+      const concatenatedReportUrls = ndcActionReports.map(document => document.url).join(', ');
+
       const dto = new DataExportNdcActionDto();
       dto.id = ndcAction.id;
       dto.programmeId = ndcAction.programmeId;
@@ -2693,6 +2706,7 @@ export class ProgrammeService {
       dto.companyId = ndcAction.companyId;
       dto.emissionReductionExpected = ndcAction.emissionReductionExpected;
       dto.emissionReductionAchieved = ndcAction.emissionReductionAchieved;
+      dto.projectReports = concatenatedReportUrls;
       exportData.push(dto);
     }
 
@@ -3072,6 +3086,7 @@ export class ProgrammeService {
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
     queryDto.filterOr = queryData.filterOr;
+    queryDto.filterBy = queryData.filterBy;
     queryDto.sort = queryData.sort;
 
     let queryBuilder = await this.programmeTransferViewRepo
@@ -3118,7 +3133,10 @@ export class ProgrammeService {
         )
       }
 
-      const path = await this.dataExportService.generateCsv(prepData, headers);
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "transferExport.transfers", 
+        []
+      ));
       return path;
     }
 
@@ -3136,6 +3154,14 @@ export class ProgrammeService {
 
 
     for (const transfer of transfers) {
+      const transferSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+        (key) => SectoralScopeDef[key] === transfer.programmeSectoralScope,
+      );
+
+      const transferRetireTypeKey = Object.keys(RetireType).find(
+        (key) => RetireType[key] === transfer.retirementType,
+      );
+
       const dto = new DataExportTransferDto();
       dto.requestId = transfer.requestId;
       dto.programmeId = transfer.programmeId;
@@ -3143,7 +3169,7 @@ export class ProgrammeService {
       dto.initiatorCompanyId = transfer.initiatorCompanyId;
       dto.toCompanyId = transfer.toCompanyId;
       dto.toAccount = transfer.toAccount;
-      dto.retirementType = transfer.retirementType;
+      dto.retirementType = transferRetireTypeKey;
       dto.fromCompanyId = transfer.fromCompanyId;
       dto.creditAmount = transfer.creditAmount;
       dto.comment = transfer.comment;
@@ -3151,14 +3177,14 @@ export class ProgrammeService {
       dto.txTime = this.helperService.formatTimestamp(transfer.txTime);
       dto.createdTime = this.helperService.formatTimestamp(transfer.createdTime);
       dto.authTime = transfer.authTime;
-      dto.status = transfer.status;
+      dto.status = transfer.status === TransferStatus.NOTRECOGNISED ? "Not Recognised" : transfer.status;
       dto.isRetirement = transfer.isRetirement;
       dto.creditBalance = transfer.creditBalance;
       dto.programmeTitle = transfer.programmeTitle;
       dto.programmeCertifierId = transfer.programmeCertifierId;
       dto.serialNo = transfer.serialNo;
       dto.programmeSector = transfer.programmeSector;
-      dto.programmeSectoralScope = transfer.programmeSectoralScope;
+      dto.programmeSectoralScope = transferSectoralScopeKey;
       dto.certifier = (transfer.certifier && Array.isArray(transfer.certifier) && transfer.certifier.length > 0)
         ? transfer.certifier.map((certifier) => certifier ? certifier.companyId : null)
         : [];
@@ -4038,6 +4064,7 @@ export class ProgrammeService {
     queryDto.filterAnd = queryData.filterAnd;
     queryDto.filterOr = queryData.filterOr;
     queryDto.sort = queryData.sort;
+    queryDto.filterBy = queryData.filterBy;
 
     let resp = await this.programmeViewRepo
       .createQueryBuilder("programme")
@@ -4069,7 +4096,6 @@ export class ProgrammeService {
       )
       .getMany();
 
-      console.log('========================*********************resp', resp);
     if (resp.length > 0) {
       const prepData = this.prepareProgrammeDataForExport(resp)
 
@@ -4084,7 +4110,10 @@ export class ProgrammeService {
         )
       }
 
-      const path = await this.dataExportService.generateCsv(prepData, headers);
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "programmeExport.projects", 
+        []
+      ));
       return path;
     }
 
@@ -4112,12 +4141,16 @@ export class ProgrammeService {
       const programmeDocuments: ProgrammeDocument[] = programme.documents;
       const concatenatedDocumentUrls = programmeDocuments.map(document => document.url).join(', ');
 
+      const programmeSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+        (key) => SectoralScopeDef[key] === programme.sectoralScope,
+      );
+
       const dto = new DataExportProgrammeDto();
       dto.programmeId = programme.programmeId;
       dto.serialNo = programme.serialNo;
       dto.title = programme.title;
       dto.externalId = programme.externalId;
-      dto.sectoralScope = programme.sectoralScope;
+      dto.sectoralScope = programmeSectoralScopeKey;
       dto.sector = programme.sector;
       dto.applicantType = "Programme Developer";
       dto.countryCodeA2 = programme.countryCodeA2;
@@ -5724,6 +5757,7 @@ export class ProgrammeService {
     const queryDto = new QueryDto();
     queryDto.filterAnd = queryData.filterAnd;
     queryDto.filterOr = queryData.filterOr;
+    queryDto.filterBy = queryData.filterBy;
     queryDto.sort = queryData.sort;
 
     let queryBuilder = await this.investmentViewRepo
@@ -5776,7 +5810,10 @@ export class ProgrammeService {
         )
       }
 
-      const path = await this.dataExportService.generateCsv(prepData, headers);
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "investmentExport.financing", 
+        []
+      ));
       return path;
     }
 
@@ -5824,8 +5861,8 @@ export class ProgrammeService {
       dto.proponentPercentage = investment.proponentPercentage;
       dto.companyId = investment.companyId;
       dto.creditOwnerPercentage = investment.creditOwnerPercentage;
-      dto.toGeo = "[ " + investment.toGeo +" ]";
-      dto.fromGeo = "[ " + investment.fromGeo +" ]";
+      dto.toGeo = investment.toGeo;
+      dto.fromGeo = investment.fromGeo;
       exportData.push(dto);
     }
 

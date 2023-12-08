@@ -1,10 +1,11 @@
 {
-    "id": "Id",
-    "programmeId": "Programme Id",
-    "programmeName": "Programme Name",
-    "action": "Action",
+    "id": "Activity Id",
+    "programmeId": "Project Id",
+    "programmeName": "Project Name",
+    "action": "Activity",
     "methodology": "Methodology",
     "typeOfMitigation": "Type Of Mitigation",
+    "subTypeOfMitigation": "Sub Type Of Mitigation",
     "agricultureLandArea": "Agriculture Land Area",
     "agricultureLandAreaUnit": "Agriculture Land Area Unit",
     "solarEnergyGeneration": "Solar Energy Generation",
@@ -37,7 +38,7 @@
     "adaptationGhgEmissionsReducedSF6": "Adaptation: SF6 Emissions Reduced",
     "adaptationIncludedInNAP": "Adaptation: Included In Nap",
     "ndcFinancingUserEstimatedCredits": "User Estimated Credits",
-    "ndcFinancingSystemEstimatedCredits": "System Estimated Credits",
+    "ndcFinancingSystemEstimatedCredits": "Methodology Estimated Credits",
     "coBenefitsProperties": "Co benefits Properties",
     "coBenefitsPropertiesSdgGoals": "SDG Goals",
 
@@ -213,8 +214,10 @@
     "createdTime": "Created Time",
     "constantVersion": "Constant Version",
     "sector": "Sector",
-    "status": "Status",
+    "status": "Current Status",
     "companyId": "Company Id",
     "emissionReductionExpected": "Emission Reduction Expected",
-    "emissionReductionAchieved": "Emission Reduction Achieved"
+    "emissionReductionAchieved": "Emission Reduction Achieved",
+    "projectReports" : "Project Reports",
+    "activities": "Activities"
 }

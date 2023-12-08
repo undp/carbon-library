@@ -210,4 +210,5 @@ export class DataExportNdcActionDto extends DataExportDto {
     companyId;
     emissionReductionExpected;
     emissionReductionAchieved;
+    projectReports;
 }

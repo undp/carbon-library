@@ -514,7 +514,7 @@ export const CompanyManagementComponent = (props: any) => {
                   </a>
                 </Dropdown>
               </div>
-              <div className="download-data-btn">
+              <div className="download-data-btn company-data-download">
                 <a onClick={downloadCompanyData}>
                   <DownloadOutlined
                     style={{

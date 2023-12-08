@@ -5,9 +5,12 @@
     "name": "Name",
     "country": "Country",
     "phoneNo": "Phone Number",
-    "companyId": "Company Id",
-    "companyRole": "Company Role",
+    "companyId": "Organization Id",
+    "companyName": "Organization Name",
+    "companyRole": "Organization Type",
     "createdTime": "Created At",
     "isPending": "Pending Approval",
-    "nothingToExport": "Data not found for export"
+    "nothingToExport": "Data not found for export",
+    "users": "Users"
+    
 }

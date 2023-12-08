@@ -44,6 +44,7 @@ import { DataExportQueryDto } from "../dto/data.export.query.dto";
 import { DataExportService } from "../util/data.export.service";
 import { DataExportCompanyDto } from "../dto/data.export.company.dto";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
+import { SectoralScope } from "../enum/sectoral.scope.enum";
 
 @Injectable()
 export class CompanyService {
@@ -562,7 +563,10 @@ export class CompanyService {
           )
         )
       }
-      const path = await this.dataExportService.generateCsv(prepData, headers);
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "companyExport.organisations", 
+        []
+      ));
       return path;
     }
 
@@ -578,10 +582,28 @@ export class CompanyService {
 
   private prepareCompanyDataForExport(companies: any) {
     const exportData: DataExportCompanyDto[] = [];
-  
+
     for (const company of companies) {
       const dto = new DataExportCompanyDto();
-  
+
+      let orgSectoralScopeKey;
+      if (company.sectoralScope && company.sectoralScope.length > 0) {
+        orgSectoralScopeKey = company.sectoralScope.map((sectoralScope) => {
+          return Object.keys(SectoralScope).find(
+            (key) => SectoralScope[key] === sectoralScope,
+          );
+        }).join(', ');
+      }
+
+
+      const orgStateKey = Object.keys(CompanyState).find(
+        (key) => CompanyState[key] === company.state,
+      );
+
+      const secondaryAccountBalanceLocal =
+        (company.secondaryAccountBalance?.local?.total ?? 0) +
+        (company.secondaryAccountBalance?.account?.total ?? 0);
+
       dto.companyId = company.companyId;
       dto.taxId = company.taxId;
       dto.paymentId = company.paymentId;
@@ -592,9 +614,9 @@ export class CompanyService {
       dto.address = company.address;
       dto.country = company.country;
       dto.companyRole = company.companyRole;
-      dto.state = company.state;
+      dto.state = orgStateKey;
       dto.creditBalance = company.creditBalance;
-      dto.secondaryAccountBalanceLocal = company.secondaryAccountBalance?.local?.total;
+      dto.secondaryAccountBalanceLocal = secondaryAccountBalanceLocal ? secondaryAccountBalanceLocal : '';
       dto.secondaryAccountBalanceInternational = company.secondaryAccountBalance?.international?.total;
       dto.secondaryAccountBalanceOmge = company.secondaryAccountBalance?.omge?.total;
       dto.programmeCount = company.programmeCount;
@@ -605,10 +627,10 @@ export class CompanyService {
       dto.geographicalLocationCordintes = company.geographicalLocationCordintes;
       dto.regions = company.regions;
       dto.nameOfMinister = company.nameOfMinister;
-      dto.sectoralScope = company.sectoralScope;
+      dto.sectoralScope = orgSectoralScopeKey;
       exportData.push(dto);
     }
-  
+
     return exportData;
   }
 

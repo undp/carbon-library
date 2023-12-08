@@ -1,20 +1,20 @@
 {
     "companyId": "Company Id",
     "taxId": "Tax Id",
-    "paymentId": "Payment Id",
-    "name": "Name",
+    "paymentId": "Registration Payment Id",
+    "name": "Organization Name",
     "email": "Email",
     "phoneNo": "Phone Number",
     "website": "Website",
     "address": "Address",
     "country": "Country",
-    "companyRole": "Company Role",
-    "state": "State",
+    "companyRole": "Role",
+    "state": "Status",
     "creditBalance": "Credit Balance",
     "secondaryAccountBalanceLocal": "Secondary Account Balance - Local",
     "secondaryAccountBalanceInternational": "Secondary Account Balance - International",
     "secondaryAccountBalanceOmge": "Secondary Account Balance - OMGE",
-    "programmeCount": "Programme Count",
+    "programmeCount": "Number of Projects",
     "lastUpdateVersion": "Last Update Version",
     "creditTxTime": "Credit Tx Time",
     "remarks": "Remarks",
@@ -23,5 +23,6 @@
     "regions": "Regions",
     "nameOfMinister": "Name Of Minister",
     "sectoralScope": "Sectoral Scope",
-    "nothingToExport": "Data not found for export"
+    "nothingToExport": "Data not found for export",
+    "organisations": "Organisations"
 }
