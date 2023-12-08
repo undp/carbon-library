@@ -722,6 +722,72 @@ export const InvestmentCreationComponent = (props: any) => {
                             </Form.Item>
                           </div>
                         )}
+                        {typeCreation == InvestmentCreationType.EXISTING && (
+                          <div>
+                            <Row className="row" gutter={[16, 16]}>
+                              <Col xl={12} md={24}>
+                                <div className="details-part-one">
+                                  <Form.Item
+                                    label={t("programme:investorName")}
+                                    name="toCompanyId"
+                                    wrapperCol={{ span: 24 }}
+                                    className="organisation"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: `${t(
+                                          "programme:investorName"
+                                        )} ${t("isRequired")}`,
+                                      },
+                                    ]}
+                                  >
+                                    <Select size="large" loading={loadingList}>
+                                      {organisationsList.map((organisation) => (
+                                        <Select.Option
+                                          key={organisation.companyId}
+                                          value={organisation.companyId}
+                                        >
+                                          {organisation.name}
+                                        </Select.Option>
+                                      ))}
+                                    </Select>
+                                  </Form.Item>
+                                </div>
+                              </Col>
+                            </Row>
+                            <Row className="row" gutter={[16, 16]}>
+                              <Col xl={12} md={24}>
+                                <div className="details-part-one">
+                                  <Form.Item
+                                    label={t("programme:investorName")}
+                                    name="toCompanyId"
+                                    wrapperCol={{ span: 24 }}
+                                    className="organisation"
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: `${t(
+                                          "programme:investorName"
+                                        )} ${t("isRequired")}`,
+                                      },
+                                    ]}
+                                  >
+                                    <Select size="large" loading={loadingList}>
+                                      {organisationsList.map((organisation) => (
+                                        <Select.Option
+                                          key={organisation.companyId}
+                                          value={organisation.companyId}
+                                        >
+                                          {organisation.name}
+                                        </Select.Option>
+                                      ))}
+                                    </Select>
+                                  </Form.Item>
+                                </div>
+                              </Col>
+                            </Row>
+                          </div>
+                        )}
                       </Form>
                     </div>
                   </div>
