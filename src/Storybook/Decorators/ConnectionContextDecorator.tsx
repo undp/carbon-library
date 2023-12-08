@@ -11,8 +11,9 @@ export default function ConnectionContextDecorator(Story:any, context:any) {
       serverURL={
         process.env.REACT_APP_BACKEND
           ? process.env.REACT_APP_BACKEND
-          : 'http://3.232.219.197:3000'
+          : 'https://transparency-demo.carbreg.org:9000'
       }
+      statServerUrl="https://transparency-demo.carbreg.org:9100"
       t={t}
     >
       <UserInformationContextProvider>

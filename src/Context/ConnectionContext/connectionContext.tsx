@@ -11,7 +11,7 @@ export const ConnectionContextProvider: FC<ConnectionContextProviderProps> = (
   props: ConnectionContextProviderProps
 ) => {
   const [token, setToken] = useState<string>();
-  const { serverURL, t, children } = props;
+  const { serverURL, t, children, statServerUrl } = props;
 
   useEffect(() => {
     const timer = setInterval(async () => {
@@ -38,7 +38,7 @@ export const ConnectionContextProvider: FC<ConnectionContextProviderProps> = (
         } else {
           localStorage.getItem('token');
           headers = {
-            authorization: `Bearer ${localStorage.getItem('token')}`,
+            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbiI6IkFudGFyY3RpYyBSZWdpb24iLCJuIjoiVGVzdCBVc2VyIiwic3ViIjo3LCJyIjoiQWRtaW4iLCJjaWQiOjgsImNyIjoiR292ZXJubWVudCIsInMiOjEsImlhdCI6MTcwMjAyNTgwNSwiZXhwIjoxNzAyMDMzMDA1fQ.vCxyLpdD4F1NDOVpcBoKD6fRt-owUgm0tjnoWhmr-RY`,
           };
         }
         axios({
@@ -179,7 +179,7 @@ export const ConnectionContextProvider: FC<ConnectionContextProviderProps> = (
   return (
     <ConnectionContext.Provider
       value={{
-        connection: { post, put, get, patch, delete: del, updateToken, token, removeToken },
+        connection: { post, put, get, patch, delete: del, updateToken, token, removeToken, statServerUrl },
       }}
     >
       {children}
