@@ -36,10 +36,16 @@ export const ConnectionContextProvider: FC<ConnectionContextProviderProps> = (
         if (token) {
           headers = { authorization: `Bearer ${token.toString()}` };
         } else {
-          localStorage.getItem('token');
-          headers = {
-            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbiI6IkFudGFyY3RpYyBSZWdpb24iLCJuIjoiVGVzdCBVc2VyIiwic3ViIjo3LCJyIjoiQWRtaW4iLCJjaWQiOjgsImNyIjoiR292ZXJubWVudCIsInMiOjEsImlhdCI6MTcwMjAyNTgwNSwiZXhwIjoxNzAyMDMzMDA1fQ.vCxyLpdD4F1NDOVpcBoKD6fRt-owUgm0tjnoWhmr-RY`,
-          };
+          if(localStorage.getItem('token')) {
+            headers = {
+              authorization: `Bearer ${localStorage.getItem('token')}`,
+            };
+          } else {
+            headers = {
+              authorization: `Bearer ${process.env.STORYBOOK_ACCESS_TOKEN}`,
+            };
+          }
+          
         }
         axios({
           method,
