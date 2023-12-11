@@ -101,5 +101,7 @@
     "ndcActionUpdateFailed":  " Internal error on Ndc Action update",
     "omgeRetireDesc": " and {} credits as Overall Mitigation in Global Emission",
     "ndcActionCreateFailed":  " Internal error on Ndc Action create",
-    "ndcActionPeriodCreateFailed":  " Internal error on Period create"
+    "ndcActionPeriodCreateFailed":  " Internal error on Period create",
+    "ndcActionNotExist": "Ndc Action does not exist",
+    "companyNotExist": "User company does not exist"
   }
