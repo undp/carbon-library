@@ -1,10 +1,10 @@
-import { Empty, Form, Radio } from "antd";
+import { Col, Empty, Form, Radio, Row } from "antd";
 import React, { useEffect, useState } from "react";
 import { RadioButtonStatus } from "../../../Definitions";
 
 const Economic = (props: any) => {
   const { onFormSubmit, economicViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace("economic");
+  translator.setDefaultNamespace("unfcccSdTool");
   const t = translator.t;
   const economicDetailsInitial: any[] = [
     {
@@ -276,10 +276,22 @@ const Economic = (props: any) => {
         onFieldsChange={onFieldsChange}
         onValuesChange={onEconomicValuesChanged}
       >
-        {economicDetails?.length === 0 && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
         <div className={economicViewData ? "section view-section" : "section"}>
+          <div className="unfccSdTool-section-wrapper">
+            <Row justify="center" align="middle" style={{ width: '100%' }}>
+              <Col span={24}>
+                <div className="unfccSdTool-section-divider" />
+              </Col>
+              <Col span={24} className="unfcccSdTool-section-title">
+                <span>
+                  {t("economic")}
+                </span>
+              </Col>
+            </Row>
+          </div>
+          {economicDetails?.length === 0 && (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
           {economicDetails?.map((environmentalDetail: any) => (
             <>
               <div className="title">{environmentalDetail?.section}</div>

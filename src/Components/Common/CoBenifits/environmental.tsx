@@ -1,10 +1,10 @@
-import { Empty, Form, Radio } from "antd";
+import { Col, Empty, Form, Radio, Row } from "antd";
 import React, { useEffect, useState } from "react";
 import { RadioButtonStatus } from "../../../Definitions";
 
 const Environmental = (props: any) => {
   const { onFormSubmit, environmentalViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace('environment');
+  translator.setDefaultNamespace("unfcccSdTool");
   const t = translator.t;
   const environmentalDetailsInitial: any[] = [
     {
@@ -311,12 +311,38 @@ const Environmental = (props: any) => {
         onFieldsChange={onFieldsChange}
         onValuesChange={onEnvironmentalValuesChanged}
       >
-        {environmentalDetails?.length === 0 && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
         <div
           className={environmentalViewData ? "section view-section" : "section"}
         >
+          <div className="unfccSdTool-section-wrapper">
+            <Row justify="center" align="middle" style={{ width: "100%" }}>
+              <Col span={24} className="unfcccSdTool-section-title">
+                <span>
+                  <a
+                    target="_blank"
+                    href="https://www4.unfccc.int/sites/sdcmicrosite/Pages/Create-a-report.aspx"
+                  >
+                    {t("unfcccSdToolTitle")}
+                  </a>
+                </span>
+              </Col>
+              <Col span={24}>
+                <div className="unfccSdTool-section-divider" />
+              </Col>
+              <Col span={24} className="unfcccSdTool-section-title">
+                <span>{t("environmental")}</span>
+              </Col>
+              <Col span={24}>
+                <div
+                  className="unfccSdTool-section-divider"
+                  style={{ marginBottom: "20px" }}
+                />
+              </Col>
+            </Row>
+          </div>
+          {environmentalDetails?.length === 0 && (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
           {environmentalDetails?.map((environmentalDetail: any) => (
             <>
               <div className="title">{environmentalDetail?.section}</div>
