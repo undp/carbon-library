@@ -160,8 +160,6 @@ export const NdcDetailsComponent = (props: any) => {
       } catch (exception) {
         return;
       }
-          (item: any) => row.ndcActionId === item.key
-        );
 
       const updatedItem = {
         ...row,
@@ -209,15 +207,6 @@ export const NdcDetailsComponent = (props: any) => {
       record.status === NdcDetailsActionStatus.Pending &&
       isGovernmentUser &&
       !selectedPeriod.finalized
-        ]?.nationalPlanObj.trim() !== "" &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
-          ?.nationalPlanObj &&
-        String(
-          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
-        ).trim() !== "" &&
-        String(
-          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
-        )
     ) {
       return (
         <List
@@ -442,11 +431,6 @@ export const NdcDetailsComponent = (props: any) => {
       recordId: selectedPeriod.key,
     });
     setOpenConfirmationModal(true);
-      selectedPeriod &&
-      selectedPeriod.current &&
-      selectedPeriod.current.start &&
-      selectedPeriod.current.end
-    ) {
   };
 
   const onClickedFinalizePeriod = async () => {
