@@ -568,14 +568,23 @@ export const GHGProjectionsComponent = (props: any) => {
   };
 
   const onOpenFinalizeFormModel = () => {
-      setActionInfo({
-        action: `${t("ghgInventory:finalize")}`,
-        headerText: `${t("ghgInventory:finalizeModelHeader")}`,
-        type: "primary",
-        icon: <ClipboardCheck />,
+    form
+      .validateFields()
+      .then(values => {
+        // Validation successful, set ActionInfo and open the form modal
+        setActionInfo({
+          action: `${t("ghgInventory:finalize")}`,
+          headerText: `${t("ghgInventory:finalizeModelHeader")}`,
+          type: "primary",
+          icon: <ClipboardCheck />,
+        });
+        setErrorMsg('');
+        setOpenFinalizeFormModal(true);
+      })
+      .catch(errorInfo => {
+        // Validation failed
+        console.log('Validation failed:', errorInfo);
       });
-      setErrorMsg('');
-      setOpenFinalizeFormModal(true);
   };
 
   const getProjectionData = async () => {

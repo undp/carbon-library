@@ -2201,7 +2201,7 @@ export class AggregateAPIService {
       ['Electronics', 'Industry'],
       ['Product', 'Uses as', 'Substitutes', 'for', 'Ozone', 'Depleting', 'Substances'],
       ['Other', 'Product', 'Manufacture', 'and', 'Use'],
-      ['Other', '(Other', 'Product', 'Manufacture', 'and', 'Use)'],
+      ['Other', '(Industrial', 'Processes', '&', 'Product', 'Use)'],
       'Livestock',
       'Land',
       ['Aggregate', 'sources', 'and', 'non-CO2', 'emissions', 'sources', 'on land'],

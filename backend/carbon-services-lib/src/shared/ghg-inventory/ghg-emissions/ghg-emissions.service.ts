@@ -105,9 +105,11 @@ export class GhgEmissionsService {
             return { status: HttpStatus.OK, data: savedEmission };
         }
 
+        const createdDate = new Date();
         emission.country = this.configService.get("systemCountryName");
         emission.version = version;
-        emission.createdAt = new Date();
+        emission.createdAt = createdDate;
+        emission.updatedAt = createdDate;
         if (emissionDto.emissionDocument) {
             emission.emissionDocument = await this.uploadDocument(
                 emissionDto.year,

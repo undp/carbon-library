@@ -600,14 +600,23 @@ export const GHGEmissionsComponent = (props: any) => {
   };
 
   const onOpenFinalizeFormModel = () => {
-    setActionInfo({
-      action: `${t("ghgInventory:finalize")}`,
-      headerText: `${t("ghgInventory:finalizeModelHeader")}`,
-      type: "primary",
-      icon: <ClipboardCheck />,
-    });
-    setErrorMsg('');
-    setOpenFinalizeFormModal(true);
+    form
+      .validateFields()
+      .then(values => {
+        // Validation successful, set ActionInfo and open the form modal
+        setActionInfo({
+          action: `${t("ghgInventory:finalize")}`,
+          headerText: `${t("ghgInventory:finalizeModelHeader")}`,
+          type: "primary",
+          icon: <ClipboardCheck />,
+        });
+        setErrorMsg('');
+        setOpenFinalizeFormModal(true);
+      })
+      .catch(errorInfo => {
+        // Validation failed
+        console.log('Validation failed:', errorInfo);
+      });
   };
 
   const onSubmitForm = async (remarks: string, status: GHGRecordState) => {

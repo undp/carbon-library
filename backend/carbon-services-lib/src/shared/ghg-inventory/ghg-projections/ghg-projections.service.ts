@@ -102,10 +102,11 @@ export class GhgProjectionsService {
                 });
             return { status: HttpStatus.OK, data: savedProjection };
         }
-
+        const createdDate = new Date();
         projection.country = this.configService.get("systemCountryName");
         projection.version = version;
-        projection.createdAt = new Date();
+        projection.createdAt = createdDate;
+        projection.updatedAt = createdDate;
         if (projectionDto.emissionDocument) {
             projection.emissionDocument = await this.uploadDocument(
                 projectionDto.year,
