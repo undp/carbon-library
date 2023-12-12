@@ -415,12 +415,13 @@ export class UserService {
           organisationDto.name = company.name;
           organisationDto.email = company.email;
           organisationDto.phoneNo = company.phoneNo;
-          organisationDto.website = company.website;
           organisationDto.address = company.address;
           organisationDto.logo = company.logo;
           organisationDto.companyRole = company.companyRole;
           organisationDto.regions = company.regions;
-
+          if(company.website && company.website.trim().length>0){
+            organisationDto.website = company.website;
+          }
           userDto.company = organisationDto;
 
           if (company && user.user_role !== Role.Root && company.companyRole !== CompanyRole.API) {
