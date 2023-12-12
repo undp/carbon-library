@@ -46,7 +46,10 @@ export const InvestmentCreationComponent = (props: any) => {
 
   const { state } = useLocation();
   const [data, setData] = useState<ProgrammeT>();
+  const [companyNames, setCompanyNames] = useState<any>({});
+  const [investmentNames, setInvestmentNames] = useState<any>({});
   const [projectData, setProjectData] = useState<ProgrammeT>();
+  const [investmentData, setInvestmentData] = useState<any>();
   const [allProjectData, setAllProjectData] = useState<ProgrammeT[]>([]);
   const [formOne] = Form.useForm();
   const [formTwo] = Form.useForm();
@@ -56,10 +59,14 @@ export const InvestmentCreationComponent = (props: any) => {
   const [investmentOwnershipType, setInvestmentOwnershipType] =
     useState<InvestmentOwnershipType>(InvestmentOwnershipType.PROJECT);
   const [loadingList, setLoadingList] = useState<boolean>(false);
+  const [loadingInvestment, setLoadingInvestment] = useState<boolean>(false);
   const [loadingProgData, setLoadingProgData] = useState<boolean>(false);
   const [current, setCurrent] = useState<number>(0);
   const [currentPercTotal, setCurrentPercTotal] = useState<number>(0);
   const [organisationsList, setOrganisationList] = useState<any[]>([]);
+  const [nationalInvestmentList, setNationalInvestmentList] = useState<any[]>(
+    []
+  );
   const [instrument, setInstrument] = useState<string[]>([]);
   const [stepOneData, setStepOneData] = useState<any>();
   const [govData, setGovData] = useState<any>();
@@ -110,39 +117,29 @@ export const InvestmentCreationComponent = (props: any) => {
   const getAllProjectData = async () => {
     setLoadingProgData(true);
     try {
-      if (!data?.programmeId) {
-        console.log("getting all Project data");
-        const response = await post("national/programme/query", {
-          page: 1,
-          size: 100,
-          filterAnd: [
-            {
-              key: "currentStage",
-              operation: "!=",
-              value: ProgrammeStageUnified.Rejected,
-            },
-          ],
-        });
-        if (response.data) {
-          if (
-            userInfoState?.companyRole == CompanyRole.PROGRAMME_DEVELOPER &&
-            stepOneData.toCompanyId != userInfoState.companyId
-          ) {
-            setAllProjectData(
-              response?.data.map((obj: ProgrammeT) => {
-                if (obj.companyId.includes(userInfoState.companyId)) {
-                  return obj;
-                }
-              })
-            );
-          } else {
+      if (data) {
+        if (!data?.programmeId) {
+          console.log("data non existing", data);
+          console.log("getting all Project data");
+          const response = await post("national/programme/query", {
+            page: 1,
+            size: 100,
+            filterAnd: [
+              {
+                key: "currentStage",
+                operation: "!=",
+                value: ProgrammeStageUnified.Rejected,
+              },
+            ],
+          });
+          if (response.data) {
             setAllProjectData(response?.data);
+            console.log("all Project data", response?.data);
           }
-          console.log("all Project data", response?.data);
+        } else {
+          console.log("setting current Project data");
+          setAllProjectData([data]);
         }
-      } else {
-        console.log("setting current Project data");
-        setAllProjectData([data]);
       }
     } catch (error: any) {
       console.log("Error in getting all programme data", error);
@@ -158,6 +155,56 @@ export const InvestmentCreationComponent = (props: any) => {
         setProjectData(obj);
         break;
       }
+    }
+  };
+
+  const setSelectedInvestment = async (value: any) => {
+    console.log("setSelectedInvestment", value);
+    setInvestmentData(investmentNames[value]);
+  };
+
+  const getNationalInvestmentDetails = async () => {
+    setLoadingInvestment(true);
+    try {
+      let filterAnd: any[] = [];
+      filterAnd = [
+        {
+          key: "category",
+          operation: "=",
+          value: InvestmentOwnershipType.NATIONAL.toString(),
+        },
+        {
+          key: "amount",
+          operation: ">",
+          value: 0,
+        },
+      ];
+
+      if (userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER) {
+        filterAnd.push({
+          key: "toCompanyId",
+          operation: "=",
+          value: userInfoState?.companyId,
+        });
+      }
+      const response = await post("national/programme/investmentQuery", {
+        page: 1,
+        size: 100,
+        filterAnd: filterAnd,
+      });
+      if (response.data) {
+        setNationalInvestmentList(response?.data);
+        let investmentData: any = {};
+        for (const investment of response?.data) {
+          investmentData[investment.requestId] = investment;
+        }
+        setInvestmentNames(investmentData);
+        console.log(investmentData);
+      }
+    } catch (error: any) {
+      console.log("Error in getting national Investments list", error);
+    } finally {
+      setLoadingInvestment(false);
     }
   };
 
@@ -181,22 +228,34 @@ export const InvestmentCreationComponent = (props: any) => {
       //     value: userInfoState?.companyId,
       //   });
       // }
-      for (const c of data!?.companyId) {
-        filterOr.push({
-          key: "companyId",
-          operation: "=",
-          value: c,
-        });
+      if (data?.companyId) {
+        for (const c of data?.companyId) {
+          filterOr.push({
+            key: "companyId",
+            operation: "=",
+            value: c,
+          });
+        }
+      }
+      let filters: any;
+      if (filterOr.length) {
+        filters.filterOr = filterOr;
       }
 
       const response = await post("national/organisation/queryNames", {
         page: 1,
         size: 100,
         filterAnd: filterAnd,
-        filterOr: filterOr,
+        ...filters,
       });
       if (response.data) {
         setOrganisationList(response?.data);
+        let companyName: any = {};
+        for (const company of response?.data) {
+          companyName[Number(company.companyId)] = company.name;
+        }
+        setCompanyNames(companyName);
+        console.log(companyName);
       }
     } catch (error: any) {
       console.log("Error in getting organization list", error);
@@ -211,39 +270,46 @@ export const InvestmentCreationComponent = (props: any) => {
       return;
     }
     if (state?.record) {
+      console.log("condition 1 data", state?.record);
       setData(state?.record);
     } else {
+      console.log("condition 2 data", { ownership: true });
       setData({ ownership: true });
     }
   }, []);
 
   useEffect(() => {
-    if (data) {
-      const keys = Object.keys(data);
-      if (keys[0] !== "ownership") {
-        getOrganisationsDetails();
-      }
-    }
+    // if (data) {
+    //   const keys = Object.keys(data);
+    //   if (keys[0] !== "ownership") {
+    //     getOrganisationsDetails();
+    //   }
+    // }
+    getNationalInvestmentDetails();
+    getOrganisationsDetails();
     getGovernmentDetails();
     getAllProjectData();
   }, [data]);
 
-  if (!data || allProjectData.length == 0) {
+  if (!data && allProjectData.length == 0) {
     return <Loading />;
   }
   console.log("data", data);
 
-  const companyName: any = {};
   if (data && Object.keys(data)[0] !== "ownership") {
-    for (const company of data!?.company) {
-      companyName[company?.companyId] = company;
-    }
+    // for (const company of data!?.company) {
+    //   companyName[company?.companyId] = company;
+    // }
     if (!data!.proponentPercentage) {
       data.proponentPercentage = [100];
     }
   }
 
   const nextOne = (val: any) => {
+    console.log("step 1 values", val);
+    if (val.typeCreation == InvestmentCreationType.EXISTING) {
+      val.toCompanyId = investmentData.toCompanyId;
+    }
     setCurrent(current + 1);
     setStepOneData(val);
     if (data?.programmeId) setSelectedProgramme(data.programmeId);
@@ -256,28 +322,32 @@ export const InvestmentCreationComponent = (props: any) => {
   const submitInvestment = async (val: any) => {
     console.log(val);
     console.log(stepOneData);
+    console.log("OwnershipType", investmentOwnershipType);
 
     setLoading(true);
 
     const payload = stepOneData;
-    payload.programmeId = data.programmeId;
     payload.amount = parseFloat(payload.amount);
-
     if (payload.interestRate) {
       payload.interestRate = parseFloat(payload.interestRate);
     }
     if (payload.paymentPerMetric) {
       payload.paymentPerMetric = parseFloat(payload.paymentPerMetric);
     }
-
-    payload.fromCompanyIds = data.companyId.map((e) => Number(e));
-    payload.percentage = val.percentage;
     payload.toCompanyId = Number(payload.toCompanyId);
     try {
-      const response: any = await post(
-        "national/programme/addInvestment",
-        payload
-      );
+      let response: any;
+      if (investmentOwnershipType == InvestmentOwnershipType.PROJECT) {
+        if (typeCreation == InvestmentCreationType.EXISTING) {
+          payload.nationalInvestmentId = investmentData.requestId;
+        }
+        payload.programmeId = projectData?.programmeId;
+        payload.fromCompanyIds = projectData?.companyId.map((e) => Number(e));
+        payload.percentage = val.percentage;
+        response = await post("national/programme/addInvestment", payload);
+      } else {
+        response = await post("national/organisation/addInvestment", payload);
+      }
       console.log("investment creation -> ", response);
       if (response?.statusText === "SUCCESS") {
         message.open({
@@ -287,7 +357,9 @@ export const InvestmentCreationComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
       }
-      onNavigateToProgrammeView(data.programmeId);
+      data?.programmeId
+        ? onNavigateToProgrammeView(data?.programmeId)
+        : onNavigateToProgrammeManagementView();
     } catch (error: any) {
       console.log("Error in investment creation - ", error);
       message.open({
@@ -408,14 +480,35 @@ export const InvestmentCreationComponent = (props: any) => {
                                     ]}
                                   >
                                     <Select size="large" loading={loadingList}>
-                                      {organisationsList.map((organisation) => (
-                                        <Select.Option
-                                          key={organisation.companyId}
-                                          value={organisation.companyId}
-                                        >
-                                          {organisation.name}
-                                        </Select.Option>
-                                      ))}
+                                      {organisationsList.map((organisation) => {
+                                        if (data?.programmeId) {
+                                          if (
+                                            data.companyId
+                                              .map((id) => Number(id))
+                                              .includes(
+                                                Number(organisation.companyId)
+                                              )
+                                          ) {
+                                            return (
+                                              <Select.Option
+                                                key={organisation.companyId}
+                                                value={organisation.companyId}
+                                              >
+                                                {organisation.name}
+                                              </Select.Option>
+                                            );
+                                          }
+                                        } else {
+                                          return (
+                                            <Select.Option
+                                              key={organisation.companyId}
+                                              value={organisation.companyId}
+                                            >
+                                              {organisation.name}
+                                            </Select.Option>
+                                          );
+                                        }
+                                      })}
                                     </Select>
                                   </Form.Item>
                                 </div>
@@ -801,15 +894,21 @@ export const InvestmentCreationComponent = (props: any) => {
                                       },
                                     ]}
                                   >
-                                    <Select size="large" loading={loadingList}>
-                                      {organisationsList.map((organisation) => (
-                                        <Select.Option
-                                          key={organisation.companyId}
-                                          value={organisation.companyId}
-                                        >
-                                          {organisation.name}
-                                        </Select.Option>
-                                      ))}
+                                    <Select
+                                      size="large"
+                                      loading={loadingInvestment}
+                                      onChange={setSelectedInvestment}
+                                    >
+                                      {nationalInvestmentList.map(
+                                        (investment) => (
+                                          <Select.Option
+                                            key={investment.requestId}
+                                            value={investment.requestId}
+                                          >
+                                            {investment.investmentName}
+                                          </Select.Option>
+                                        )
+                                      )}
                                     </Select>
                                   </Form.Item>
                                 </div>
@@ -854,6 +953,24 @@ export const InvestmentCreationComponent = (props: any) => {
                                           }
                                         },
                                       },
+                                      ({ getFieldValue }) => ({
+                                        validator(rule, v) {
+                                          if (
+                                            getFieldValue("amount") &&
+                                            investmentData &&
+                                            investmentData.amount <
+                                              parseFloat(
+                                                getFieldValue("amount")
+                                              )
+                                          ) {
+                                            // eslint-disable-next-line prefer-promise-reject-errors
+                                            return Promise.reject(
+                                              "Amount > Available"
+                                            );
+                                          }
+                                          return Promise.resolve();
+                                        },
+                                      }),
                                     ]}
                                   >
                                     <Input size="large" />
@@ -872,6 +989,11 @@ export const InvestmentCreationComponent = (props: any) => {
                                           `$${addCommSep(value)}`
                                         }
                                         disabled
+                                        value={
+                                          investmentData
+                                            ? investmentData.amount
+                                            : 0
+                                        }
                                       />
                                     </div>
                                   </Form.Item>
@@ -915,6 +1037,7 @@ export const InvestmentCreationComponent = (props: any) => {
                           className="investment-sought-form"
                           layout="vertical"
                           requiredMark={true}
+                          form={formTwo}
                         >
                           <Row className="row" gutter={[4, 4]}>
                             <Col xl={8} md={12}>
@@ -985,20 +1108,20 @@ export const InvestmentCreationComponent = (props: any) => {
                     </div>
 
                     <div className="programme-sought-form-container ownership-container">
-                      {Object.keys(data).length > 0 && (
-                        <div className="programme-sought-form">
-                          <Form
-                            labelCol={{ span: 20 }}
-                            wrapperCol={{ span: 24 }}
-                            form={formTwo}
-                            name="investment-sought"
-                            className="investment-sought-form"
-                            layout="vertical"
-                            requiredMark={true}
-                            onChange={onPercentageChange}
-                            onFinish={submitInvestment}
-                          >
-                            {investmentOwnershipType ==
+                      <div className="programme-sought-form">
+                        <Form
+                          labelCol={{ span: 20 }}
+                          wrapperCol={{ span: 24 }}
+                          form={formTwo}
+                          name="investment-sought"
+                          className="investment-sought-form"
+                          layout="vertical"
+                          requiredMark={true}
+                          onChange={onPercentageChange}
+                          onFinish={submitInvestment}
+                        >
+                          {allProjectData.length > 0 &&
+                            investmentOwnershipType ==
                               InvestmentOwnershipType.PROJECT && (
                               <div>
                                 <Row className="row" gutter={[16, 16]}>
@@ -1008,6 +1131,11 @@ export const InvestmentCreationComponent = (props: any) => {
                                         label={t("programme:title")}
                                         name="projectId"
                                         wrapperCol={{ span: 24 }}
+                                        initialValue={
+                                          allProjectData.length == 1
+                                            ? allProjectData[0].programmeId
+                                            : null
+                                        }
                                         rules={[
                                           {
                                             required: true,
@@ -1020,22 +1148,48 @@ export const InvestmentCreationComponent = (props: any) => {
                                         <Select
                                           size="large"
                                           loading={loadingProgData}
-                                          defaultValue={
-                                            allProjectData.length == 1
-                                              ? allProjectData[0].title
-                                              : null
-                                          }
+                                          // defaultValue={
+                                          //   allProjectData.length == 1
+                                          //     ? allProjectData[0].programmeId
+                                          //     : null
+                                          // }
                                           disabled={allProjectData.length == 1}
                                           onChange={setSelectedProgramme}
                                         >
-                                          {allProjectData.map((project) => (
-                                            <Select.Option
-                                              key={project.programmeId}
-                                              value={project.programmeId}
-                                            >
-                                              {project.title}
-                                            </Select.Option>
-                                          ))}
+                                          {allProjectData.map((project) => {
+                                            if (
+                                              userInfoState?.companyRole ==
+                                                CompanyRole.PROGRAMME_DEVELOPER &&
+                                              Number(stepOneData.toCompanyId) !=
+                                                userInfoState.companyId
+                                            ) {
+                                              if (
+                                                project.companyId
+                                                  .map((id) => Number(id))
+                                                  .includes(
+                                                    userInfoState.companyId
+                                                  )
+                                              ) {
+                                                return (
+                                                  <Select.Option
+                                                    key={project.programmeId}
+                                                    value={project.programmeId}
+                                                  >
+                                                    {project.title}
+                                                  </Select.Option>
+                                                );
+                                              }
+                                            } else {
+                                              return (
+                                                <Select.Option
+                                                  key={project.programmeId}
+                                                  value={project.programmeId}
+                                                >
+                                                  {project.title}
+                                                </Select.Option>
+                                              );
+                                            }
+                                          })}
                                         </Select>
                                       </Form.Item>
                                     </div>
@@ -1058,7 +1212,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                       <Row className="row" gutter={[16, 16]}>
                                         <Col xl={8} md={15}>
                                           <div className="label">
-                                            {companyName[companyId].name}
+                                            {companyNames[Number(companyId)]}
                                             <span className="required-mark">
                                               *
                                             </span>
@@ -1118,7 +1272,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                                 companyId ==
                                                   stepOneData.toCompanyId
                                               }
-                                              // defaultValue={0}
+                                              value={0}
                                               // disabled={userInfoState?.companyId === Number(companyId)}
                                               onKeyPress={(event) => {
                                                 if (
@@ -1183,28 +1337,27 @@ export const InvestmentCreationComponent = (props: any) => {
                                 </Row>
                               </div>
                             )}
-                            <Form.Item>
-                              <div className="steps-actions">
-                                <Button
-                                  type="primary"
-                                  htmlType="submit"
-                                  loading={loading}
-                                  onSubmit={submitInvestment}
-                                >
-                                  {t("programme:submit")}
-                                </Button>
-                                <Button
-                                  className="back-btn"
-                                  onClick={() => prevOne()}
-                                  loading={loading}
-                                >
-                                  {t("programme:back")}
-                                </Button>
-                              </div>
-                            </Form.Item>
-                          </Form>
-                        </div>
-                      )}
+                          <Form.Item>
+                            <div className="steps-actions">
+                              <Button
+                                type="primary"
+                                htmlType="submit"
+                                loading={loading}
+                                onSubmit={submitInvestment}
+                              >
+                                {t("programme:submit")}
+                              </Button>
+                              <Button
+                                className="back-btn"
+                                onClick={() => prevOne()}
+                                loading={loading}
+                              >
+                                {t("programme:back")}
+                              </Button>
+                            </div>
+                          </Form.Item>
+                        </Form>
+                      </div>
                     </div>
                   </div>
                 ),

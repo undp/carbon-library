@@ -214,7 +214,7 @@ export class ProgrammeService {
       programme.creditOwnerPercentage[companyIndex] -= transfer.percentage;
       programme.proponentPercentage[companyIndex] -= transfer.percentage;
     }
-    nationalInvestment.amount-=transfer.amount
+    if(nationalInvestment)nationalInvestment.amount-=transfer.amount
 
     let ownerTaxId;
     if (programme.proponentTaxVatId.length > companyIndex) {
@@ -266,7 +266,7 @@ export class ProgrammeService {
               requestId: nationalInvestment.requestId
             }, {
               txTime: new Date().getTime(),
-              amount:(nationalInvestment.amount-transfer.amount),
+              amount:nationalInvestment.amount,
             }
           )
         }
