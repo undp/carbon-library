@@ -2017,7 +2017,6 @@ export class AggregateAPIService {
     const industrialProcessesProductUse: number[] = [];
     const other: number[] = [];
     const waste: number[] = [];
-    let last = 0;
 
     dataResult.forEach(item => {
       xLabels.push(item.year);
@@ -2026,10 +2025,9 @@ export class AggregateAPIService {
       industrialProcessesProductUse.push(this.calculateSumEmissionsBySector(item.industrialProcessesProductUse));
       other.push(this.calculateSumEmissionsBySector(item.other));
       waste.push(this.calculateSumEmissionsBySector(item.waste));
-      last = item.updatedAt;
     });
 
-    const latestDate = new Date(last).getTime();
+    const latestDate = this.getLatestUpdateTime(dataResult);
 
     return {
       data: { xLabels, agricultureForestryOtherLandUse, energyEmissions, industrialProcessesProductUse, other, waste },
@@ -2043,7 +2041,6 @@ export class AggregateAPIService {
     const ch4: number[] = [];
     const n2o: number[] = [];
     const co2eq: number[] = [];
-    let last = 0;
 
     emissionResult.forEach(emission => {
       xLabels.push(emission.year);
@@ -2051,10 +2048,9 @@ export class AggregateAPIService {
       ch4.push(this.calculateSumEmissions(emission, 'ch4'));
       n2o.push(this.calculateSumEmissions(emission, 'n2o'));
       co2eq.push(this.calculateSumEmissions(emission, 'co2eq'));
-      last = emission.updatedAt;
     });
 
-    const latestDate = new Date(last).getTime();
+    const latestDate = this.getLatestUpdateTime(emissionResult);
 
     return {
       data: { xLabels, co2, ch4, n2o, co2eq },
@@ -2165,7 +2161,8 @@ export class AggregateAPIService {
 
       }
     })
-    return totalBau;
+    const latestDate = this.getLatestUpdateTime(projections);
+    return {totalBau, latestDate};
   }
 
   async getEstimatedSubSectorData(projectionResult, startYear, endYear) {
@@ -2177,8 +2174,8 @@ export class AggregateAPIService {
     const issuePercentage = {};
 
     for (const key in EmissionSubSectorsToSectoralScopeMap) {
-      estimatePercentage[key] = totalEstimatedCreditsPerSubSector?.creditTotals[key] / totalProjectedBauPerSubSector[key];
-      issuePercentage[key] = totalIssuedCreditsPerSubSector?.creditTotals[key] / totalProjectedBauPerSubSector[key];
+      estimatePercentage[key] = totalEstimatedCreditsPerSubSector?.creditTotals[key] / totalProjectedBauPerSubSector?.totalBau[key];
+      issuePercentage[key] = totalIssuedCreditsPerSubSector?.creditTotals[key] / totalProjectedBauPerSubSector?.totalBau[key];
 
     }
 
@@ -2244,11 +2241,11 @@ export class AggregateAPIService {
       data: {
         estimate: {
           data: estimatedResultObject,
-          last: totalEstimatedCreditsPerSubSector.lastUpdate
+          last: totalProjectedBauPerSubSector?.latestDate
         },
         actual : {
           data: issuedResultObject,
-          last: totalIssuedCreditsPerSubSector?.lastUpdate
+          last: totalProjectedBauPerSubSector?.latestDate
         }
       }
     }
@@ -2279,11 +2276,12 @@ export class AggregateAPIService {
       }
     });
 
-    const latestDate = new Date(last).getTime();
+    const latestEmissionDate = this.getLatestUpdateTime(emissionResult);
+    const latestProjectionDate = this.getLatestUpdateTime(projectionResult);
 
     return {
       data: { xLabels, bau, conditionalNdc, unconditionalNdc, actual },
-      last: latestDate
+      last: latestEmissionDate > latestProjectionDate ? latestEmissionDate : latestProjectionDate
     };
   }
 
@@ -2398,4 +2396,12 @@ export class AggregateAPIService {
   
     return firstDayOfYear;
   }
+
+  private getLatestUpdateTime(emissionDataArray) {
+    const updateTimeObjects = emissionDataArray.map(item => new Date(item.updatedAt));
+  
+    updateTimeObjects.sort((a, b) => b - a);
+  
+    return new Date(updateTimeObjects[0]).getTime(); // Return the latest timestamp
+  };
 }
