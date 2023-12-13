@@ -76,8 +76,8 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
           },
           {
             key: "companyRole",
-            operation: "!=",
-            value: "Certifier",
+            operation: "=",
+            value: CompanyRole.PROGRAMME_DEVELOPER,
           },
         ],
         sort: {
@@ -91,13 +91,11 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
             label: d.name,
             value: d.companyId,
             state: d.state,
-            companyRole: d.companyRole,
           }))
           .filter((d: any) => {
             return (
               d.value !== userCompanyId &&
-              parseInt(d.state) === CompanyState.ACTIVE.valueOf() &&
-              d.companyRole === CompanyRole.PROGRAMME_DEVELOPER.valueOf()
+              parseInt(d.state) === CompanyState.ACTIVE.valueOf()
             );
           })
       );

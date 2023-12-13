@@ -505,7 +505,7 @@ export class CompanyService {
 
     const resp = await this.companyRepo
       .createQueryBuilder()
-      .select(['"companyId"', '"name"', '"state"', '"taxId"', '"companyRole"'])
+      .select(['"companyId"', '"name"', '"state"', '"taxId"'])
       .where(
         this.helperService.generateWhereSQL(
           query,
