@@ -14,7 +14,7 @@ export class NdcDetailsActionDto {
 
     @ApiProperty()
     @IsNumber()
-    @MaxLength(10000000, { message: "KPI cannot exceed 10000000" })
+    @MaxLength(10000000, { message: "KPI cannot exceed 1000000" })
     kpi: number;
 
     @ApiProperty()

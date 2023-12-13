@@ -706,14 +706,15 @@ export const NdcDetailsComponent = (props: any) => {
             setPeriodItems((items: any) => [...items, updatedPeriodItem]);
             setSelectedPeriod(updatedPeriodItem);
           }
-        } else {
-          message.open({
-            type: "error",
-            content: t("ndc:rangeAlreadyExists"),
-            duration: 3,
-            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-          });
         }
+        //else {
+        //   message.open({
+        //     type: "error",
+        //     content: t("ndc:rangeAlreadyExists"),
+        //     duration: 3,
+        //     style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        //   });
+        // }
       }
     } catch (exception: any) {
       message.open({
@@ -726,19 +727,21 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const onDateRangeChanged = (range: any) => {
-    const period = {
-      startYear: Number(moment(range[0]).year()),
-      endYear: Number(moment(range[1]).year()),
-    };
-    if (period.startYear === period.endYear) {
-      message.open({
-        type: "error",
-        content: t("ndc:rangeAlreadyExists"),
-        duration: 3,
-        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-      });
-    } else {
-      selectedDateRangeRef.current = period;
+    if (range) {
+      const period = {
+        startYear: Number(moment(range[0]).year()),
+        endYear: Number(moment(range[1]).year()),
+      };
+      if (period.startYear === period.endYear) {
+        message.open({
+          type: "error",
+          content: t("ndc:sameStartEndDates"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+      } else {
+        selectedDateRangeRef.current = period;
+      }
     }
   };
 
