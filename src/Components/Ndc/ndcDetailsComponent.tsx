@@ -52,14 +52,29 @@ export const NdcDetailsComponent = (props: any) => {
   const [actionInfo, setActionInfo] = useState<any>({});
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState<number>(-1);
+  const [editingKey, setEditingKey] = useState<number | null>(null);
   const [nextAvailableActionId, setNextAvailableActionId] = useState(0);
   const [expandedRowKeys, setExpandedRowKeys] = useState([] as any[]);
   const [subNdcActionsForPeriod, setSubNdcActionsForPeriod] = useState(
     [] as NdcDetail[]
   );
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const isEditing = (record: NdcDetail) => record.id === editingKey;
+
+  const isMainActionInEditMode = () => {
+    if (editingKey) {
+      const action = ndcActionsList.find(
+        (item: NdcDetail) => item.id === editingKey
+      );
+      if (action && action.actionType === NdcDetailsActionType.MainAction) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   const { userInfoState } = useUserContext();
 
@@ -95,6 +110,15 @@ export const NdcDetailsComponent = (props: any) => {
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
         (userInfoState?.companyRole === CompanyRole.MINISTRY &&
           userInfoState?.companyName === record.ministryName)) &&
+      userInfoState?.userRole !== Role.ViewOnly
+    );
+  };
+
+  const checkSubNdcActionCreatePermission = () => {
+    return (
+      !selectedPeriod.finalized &&
+      (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+        userInfoState?.companyRole === CompanyRole.MINISTRY) &&
       userInfoState?.userRole !== Role.ViewOnly
     );
   };
@@ -135,7 +159,7 @@ export const NdcDetailsComponent = (props: any) => {
       parentActionId: mainActionId,
     };
 
-    if (!selectedPeriod.finalized) {
+    if (checkSubNdcActionCreatePermission()) {
       subNdcDetails = [...subNdcDetails, emptySubNdcRow];
       setEditingKey(nextAvailableActionId);
       setNextAvailableActionId((value) => value + 1);
@@ -190,9 +214,9 @@ export const NdcDetailsComponent = (props: any) => {
         );
       }
       fetchNdcDetailActions();
-      setEditingKey(-1);
+      setEditingKey(null);
     } catch (exception: any) {
-      setEditingKey(-1);
+      setEditingKey(null);
       message.open({
         type: "error",
         content: exception.message,
@@ -235,7 +259,7 @@ export const NdcDetailsComponent = (props: any) => {
                   action: "Reject",
                   headerText: t("ndc:rejectApproveTitle"),
                   type: "danger",
-                  icon: <Icon.BoxArrowInDown />,
+                  icon: <Icon.XOctagon />,
                   recordId: record.id,
                 });
                 setOpenConfirmationModal(true);
@@ -413,6 +437,10 @@ export const NdcDetailsComponent = (props: any) => {
         newData,
       ]);
       setTableKey((key: any) => key + 1);
+      if (ndcMainDetailsForPeriod.length + 1 > pageSize) {
+        const lastPage = Math.ceil(ndcMainDetailsForPeriod.length / pageSize);
+        setCurrentPage(lastPage);
+      }
     }
   }
 
@@ -485,7 +513,11 @@ export const NdcDetailsComponent = (props: any) => {
       <div>
         <Row justify="start" align="middle" gutter={[16, 16]}>
           <Col flex="340px">
-            <RangePicker onChange={onDateRangeChanged} picker="year" />
+            <RangePicker
+              disabledDate={(current: any) => moment(current).year() < 1900}
+              onChange={onDateRangeChanged}
+              picker="year"
+            />
           </Col>
           <Col flex="auto">
             <Button
@@ -502,6 +534,11 @@ export const NdcDetailsComponent = (props: any) => {
     );
   }
 
+  const onChange: PaginationProps["onChange"] = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
+
   function mainNdcActionTableContent() {
     return (
       <div>
@@ -511,7 +548,16 @@ export const NdcDetailsComponent = (props: any) => {
               <Table
                 tableLayout="fixed"
                 key={tableKey}
+                className="common-table-class"
                 rowKey="id"
+                pagination={{
+                  current: currentPage,
+                  pageSize: pageSize,
+                  total: ndcMainDetailsForPeriod.length,
+                  showQuickJumper: true,
+                  showSizeChanger: true,
+                  onChange: onChange,
+                }}
                 components={components}
                 rowClassName={() => "editable-row"}
                 bordered
@@ -549,12 +595,10 @@ export const NdcDetailsComponent = (props: any) => {
                   !selectedPeriod.finalized && (
                     <Row justify={"center"}>
                       <Button
+                        className="btnAddNewMainAct"
+                        disabled={isMainActionInEditMode()}
                         onClick={onClickedAddNewNdcDetail}
                         type="default"
-                        style={{
-                          marginBottom: 16,
-                          width: "100%",
-                        }}
                       >
                         {t("ndc:addNdcAction")}
                       </Button>
@@ -568,8 +612,7 @@ export const NdcDetailsComponent = (props: any) => {
         {isGovernmentUser && !selectedPeriod.finalized ? (
           <Row justify="end">
             <Button
-              className="mg-left-1"
-              type="primary"
+              className="mg-left-1 btn-danger"
               onClick={onClickedDeletePeriod}
               htmlType="submit"
               loading={loading}
@@ -600,6 +643,7 @@ export const NdcDetailsComponent = (props: any) => {
         rowKey="id"
         components={components}
         rowClassName={() => "editable-row"}
+        className="common-table-class"
         bordered
         dataSource={subNdcActionsForPeriod}
         loading={loading}
@@ -686,7 +730,16 @@ export const NdcDetailsComponent = (props: any) => {
       startYear: Number(moment(range[0]).year()),
       endYear: Number(moment(range[1]).year()),
     };
-    selectedDateRangeRef.current = period;
+    if (period.startYear === period.endYear) {
+      message.open({
+        type: "error",
+        content: t("ndc:rangeAlreadyExists"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } else {
+      selectedDateRangeRef.current = period;
+    }
   };
 
   const onTabChange = (key: string) => {

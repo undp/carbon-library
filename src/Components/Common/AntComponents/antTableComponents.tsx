@@ -53,38 +53,55 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   t,
   ...restProps
 }) => {
-  let inputNode;
-
-  if (dataIndex === "nationalPlanObjective") {
-    inputNode = (
-      <Input
-        onBlur={() => onBlurHandler(record)}
-        placeholder={t("ndc:nationalPlanObjectivePlaceHolder")}
-      />
-    );
-  } else if (dataIndex === "kpi") {
-    inputNode = (
-      <InputNumber
-        onBlur={() => onBlurHandler(record)}
-        placeholder={t("ndc:kpiPlaceHolder")}
-      />
-    );
-  }
-
   return (
     <td {...restProps}>
-      {editing ? (
+      {editing && dataIndex === "nationalPlanObjective" ? (
         <Form.Item
           name={dataIndex}
           style={{ margin: 0 }}
           rules={[
             {
-              required: true,
-              message: `${title} ${t("ndc:isRequired")}`,
+              validator: async (rule: any, value: any) => {
+                const trimValue =
+                  typeof value === "string" ? value.trim() : value;
+                if (!trimValue) {
+                  throw new Error(`${title} ${t("ndc:isRequired")}`);
+                }
+              },
             },
           ]}
         >
-          {inputNode}
+          <Input
+            onBlur={() => onBlurHandler(record)}
+            placeholder={t("ndc:nationalPlanObjectivePlaceHolder")}
+          />
+        </Form.Item>
+      ) : editing && dataIndex === "kpi" ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              validator: async (rule: any, value: any) => {
+                const trimValue =
+                  typeof value === "string" ? value.trim() : value;
+                if (trimValue) {
+                  if (isNaN(+trimValue)) {
+                    throw new Error(t("ndc:kpiInvalidFormat"));
+                  } else if (+trimValue === 0) {
+                    throw new Error(t("ndc:kpiGreaterThanZero"));
+                  }
+                } else {
+                  throw new Error(`${title} ${t("ndc:isRequired")}`);
+                }
+              },
+            },
+          ]}
+        >
+          <Input
+            onBlur={() => onBlurHandler(record)}
+            placeholder={t("ndc:kpiPlaceHolder")}
+          />
         </Form.Item>
       ) : (
         children
