@@ -842,7 +842,7 @@ export const NdcDetailsComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         fetchNdcDetailPeriods();
-        setTableKey((key: any) => key + 1);
+        setExpandedRowKeys([]);
         setEditingKey(null);
       } else if (actionInfo.action === "Approve") {
         message.open({
