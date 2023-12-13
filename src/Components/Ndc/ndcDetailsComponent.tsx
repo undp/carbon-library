@@ -292,7 +292,13 @@ export const NdcDetailsComponent = (props: any) => {
       render: (_: any, record: NdcDetail) => (
         <Space size="middle">
           {record.nationalPlanObjective ? (
-            <span>{record.nationalPlanObjective}</span>
+            <Tooltip
+              title={
+                isNdcActionEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+              }
+            >
+              <span>{record.nationalPlanObjective}</span>
+            </Tooltip>
           ) : (
             <Input placeholder="Enter National Plan Objective" />
           )}
@@ -309,7 +315,13 @@ export const NdcDetailsComponent = (props: any) => {
       render: (_: any, record: NdcDetail) => (
         <Space size="middle">
           {record.kpi ? (
-            <span>{record.kpi}</span>
+            <Tooltip
+              title={
+                isNdcActionEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+              }
+            >
+              <span>{record.kpi}</span>
+            </Tooltip>
           ) : (
             <Input placeholder="Enter Kpi" />
           )}
@@ -324,7 +336,11 @@ export const NdcDetailsComponent = (props: any) => {
       width: 300,
       editable: false,
       render: (_: any, record: any) => (
-        <>
+        <Tooltip
+          title={
+            isSubNdcActionsEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+          }
+        >
           <Select
             disabled={!(isSubNdcActionsEditable(record) && isEditing(record))}
             defaultValue={
@@ -337,7 +353,7 @@ export const NdcDetailsComponent = (props: any) => {
             }}
             options={ministryOrgList}
           />
-        </>
+        </Tooltip>
       ),
     },
     {
@@ -472,13 +488,23 @@ export const NdcDetailsComponent = (props: any) => {
       return;
     }
 
-    const pendingActions = subNdcActionsForPeriod.filter(
-      (action: NdcDetail) => {
-        return action.status === NdcDetailsActionStatus.Pending;
-      }
-    );
+    let isPendingActionAvailable = false;
 
-    if (pendingActions && pendingActions.length > 0) {
+    ndcMainDetailsForPeriod.forEach((mainAction: NdcDetail) => {
+      const pendingActions = ndcActionsList.filter((action: NdcDetail) => {
+        return (
+          action.status === NdcDetailsActionStatus.Pending &&
+          action.actionType === NdcDetailsActionType.SubAction &&
+          action.parentActionId === mainAction.id
+        );
+      });
+      if (pendingActions && pendingActions.length > 0) {
+        isPendingActionAvailable = true;
+        return;
+      }
+    });
+
+    if (isPendingActionAvailable) {
       message.open({
         type: "error",
         content: t("ndc:finalizeErrorText"),
@@ -615,6 +641,7 @@ export const NdcDetailsComponent = (props: any) => {
               className="mg-left-1 btn-danger"
               onClick={onClickedDeletePeriod}
               htmlType="submit"
+              disabled={isMainActionInEditMode()}
               loading={loading}
             >
               {t("ndc:delete")}
@@ -623,6 +650,7 @@ export const NdcDetailsComponent = (props: any) => {
               className="mg-left-1"
               type="primary"
               onClick={onClickedFinalizePeriod}
+              disabled={isMainActionInEditMode()}
               htmlType="submit"
               loading={loading}
             >
@@ -711,8 +739,7 @@ export const NdcDetailsComponent = (props: any) => {
             setPeriodItems((items: any) => [...items, updatedPeriodItem]);
             setSelectedPeriod(updatedPeriodItem);
           }
-        }
-        else {
+        } else {
           message.open({
             type: "error",
             content: t("ndc:rangeAlreadyExists"),
@@ -815,6 +842,8 @@ export const NdcDetailsComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         fetchNdcDetailPeriods();
+        setTableKey((key: any) => key + 1);
+        setEditingKey(null);
       } else if (actionInfo.action === "Approve") {
         message.open({
           type: "success",
