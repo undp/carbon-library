@@ -46,6 +46,7 @@ import { plainToClass } from "class-transformer";
 import { Investment } from "../entities/investment.entity";
 import { InvestmentStatus } from "../enum/investment.status";
 import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
+import { InvestmentSyncDto } from "../dto/investment.sync.dto";
 
 @Injectable()
 export class CompanyService {
@@ -176,7 +177,7 @@ export class CompanyService {
     );
   }
 
-  async addNationalInvestment(req: InvestmentDto, requester: User): Promise<any>{
+  async addNationalInvestment(req: InvestmentDto, requester: User): Promise<any>{ 
     //validations
     this.logger.log(
       `National investment request by ${requester.companyId}-${
@@ -212,7 +213,10 @@ export class CompanyService {
     investment.amount = Math.round(req.amount);
     investment.status = InvestmentStatus.APPROVED;
     investment.category = InvestmentCategoryEnum.National;
-    const results = await this.investmentRepo.insert([investment]);
+    const results = await this.investmentRepo.insert([investment]).catch((err: any) => {
+      this.logger.error(err);
+      return err;
+    });;
     investment.requestId=results.identifiers[0].requestId;
     investment.investmentName = `${companyDetails.name}_${(req.instrument && req.instrument.length)?`${req.instrument.join('&')}_`:''}${investment.requestId}`;
     const result = await this.investmentRepo
@@ -228,21 +232,36 @@ export class CompanyService {
         this.logger.error(err);
         return err;
       });
-    console.log('Investment',result)
+    console.log('Investment',investment)
     //sync investment
-    // await this.asyncOperationsInterface.AddAction({
-    //   actionType: AsyncActionType.NationalInvestment,
-    //   actionProps: {
-    //     investorTaxId: companyDetails.taxId,
-    //     amount:investment.amount,
-    //     investmentName:`${companyDetails.name}_${req.instrument?`${req.instrument}_`:''}${investment.requestId}`,
-    //   },
-    // });
-    return result
+    await this.asyncOperationsInterface.AddAction({
+      actionType: AsyncActionType.NationalInvestment,
+      actionProps: {
+        investorTaxId: companyDetails.taxId,
+        amount:investment.amount,
+        requestId:investment.requestId,
+        txRef:`${investment.requestId}#${investment.investmentName}`
+      },
+    });
+    if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_UNIFIED){
+      await this.programmeLedgerService.addCompanyInvestment(investment.requestId,investment.toCompanyId,investment.amount,`${investment.requestId}#${investment.investmentName}`)
+    }
+    return new DataResponseDto(HttpStatus.OK, investment)
   }
 
-  async updateInvestmentOnCompanyLedger(): Promise<any>{
-
+  async addInvestmentOnLedger(investment:InvestmentSyncDto): Promise<any>{
+    const compo = await this.findByTaxId(investment.investorTaxId);
+      if (!compo) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            'programme.proponentTaxIdNotInSystem',
+            [investment.investorTaxId],
+          ),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    const resp = await this.programmeLedgerService.addCompanyInvestment(investment.requestId,compo.companyId,investment.amount,investment.txRef)
+    return new DataResponseDto(HttpStatus.OK, resp);
   }
 
   async activate(

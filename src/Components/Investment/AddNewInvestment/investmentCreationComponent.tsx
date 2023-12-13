@@ -1206,7 +1206,10 @@ export const InvestmentCreationComponent = (props: any) => {
                                           //     ? allProjectData[0].programmeId
                                           //     : null
                                           // }
-                                          disabled={allProjectData.length == 1}
+                                          disabled={
+                                            allProjectData.length == 1 &&
+                                            data?.programmeId != undefined
+                                          }
                                           onChange={setSelectedProgramme}
                                         >
                                           {allProjectData.map((project) => {

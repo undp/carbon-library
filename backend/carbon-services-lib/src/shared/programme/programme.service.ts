@@ -221,6 +221,10 @@ export class ProgrammeService {
       ownerTaxId = programme.proponentTaxVatId[companyIndex];
     }
 
+    let nationalProps={}
+    if(nationalInvestment){
+      nationalProps['investmentRequestId']=nationalInvestment.requestId
+    }
     await this.asyncOperationsInterface.AddAction({
       actionType: AsyncActionType.OwnershipUpdate,
       actionProps: {
@@ -230,6 +234,8 @@ export class ProgrammeService {
         investorTaxId: investor.taxId,
         shareFromOwner: transfer.shareFromOwner,
         ownerTaxId: ownerTaxId,
+        amount:transfer.amount,
+        ...nationalProps
       },
     });
 
@@ -244,6 +250,8 @@ export class ProgrammeService {
         transfer.fromCompanyId,
         transfer.shareFromOwner,
         user,
+        transfer.amount,
+        nationalInvestment?nationalInvestment.requestId:undefined
       );
     }
 
@@ -415,6 +423,8 @@ export class ProgrammeService {
       ownerCompanyId,
       update.shareFromOwner,
       `${investorCompanyId}#${investorCompanyName}#${ownerCompanyId}#${ownerCompanyName}`,
+      update.amount,
+      update.investmentRequestId?update.investmentRequestId:undefined
     );
 
     if (resp) this.checkPendingTransferValidity(resp);

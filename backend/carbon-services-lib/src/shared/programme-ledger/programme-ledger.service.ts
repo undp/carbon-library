@@ -1589,7 +1589,46 @@ export class ProgrammeLedgerService {
     return updatedProgramme;
   }
 
-  public async updateOwnership(
+  public async addCompanyInvestment(
+    requestId:number,
+    toComapnyId:number,
+    amount:number,
+    txRef:string,
+  ){
+    this.logger.log(`Add national investment ${requestId}`);
+    const getQueries = {};
+    getQueries[this.ledger.companyTableName] = {
+      txId:`${toComapnyId}#investment#${requestId}`,
+    };
+    const resp = await this.ledger.getAndUpdateTx(
+      getQueries,
+      (results: Record<string, dom.Value[]>)=>{
+        const alreadyProcessed = results[this.ledger.companyTableName];
+        if (alreadyProcessed.length > 0) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "programme.investmentRequestALreadyProcessed",
+              []
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        }
+        let updateMap={}
+        let updateWhereMap={}
+        let insertMap={}
+        insertMap[this.ledger.companyTableName + "#" + `${toComapnyId}#investment#${requestId}`] = {
+          amount: this.round2Precision(amount),
+          txRef: txRef,
+          txType: TxType.ADD_INVESTMENT,
+          requestId:requestId,
+          txId: `${toComapnyId}#investment#${requestId}`,
+        };
+        return [updateMap, updateWhereMap, insertMap];
+      })
+    return resp[this.ledger.companyTableName]
+  }
+
+  public async updateOwnership( 
     externalId: string,
     companyIds: number[],
     taxIds: string[],
@@ -1597,12 +1636,19 @@ export class ProgrammeLedgerService {
     investor: number,
     owner: number,
     shareFromOwner: number,
-    user: string
+    user: string,
+    amount:number,
+    investmentRequestId?:number,
   ) {
     const getQueries = {};
     getQueries[this.ledger.tableName] = {
       externalId: externalId,
     };
+    if(investmentRequestId){
+      getQueries[this.ledger.companyTableName] = {
+        txId:`${investor}#investment#${investmentRequestId}`,
+      };
+    }
 
     let updatedProgramme = undefined;
     const resp = await this.ledger.getAndUpdateTx(
@@ -1626,6 +1672,29 @@ export class ProgrammeLedgerService {
             HttpStatus.BAD_REQUEST
           );
         }
+        let investment:any
+        if(investmentRequestId){
+          if (results[this.ledger.companyTableName].length<1) {
+            throw new HttpException(
+              this.helperService.formatReqMessagesString(
+                "programme.nationalInvestmentNotExist",
+                []
+              ),
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          investment=results[this.ledger.companyTableName][0]
+          if (investment.amount<amount) {
+            throw new HttpException(
+              this.helperService.formatReqMessagesString(
+                "programme.nationalInvestmentAmountNotEnough",
+                []
+              ),
+              HttpStatus.BAD_REQUEST
+            );
+          }
+        }
+        
 
         let programme: Programme = programmes[0];
 
@@ -1716,6 +1785,17 @@ export class ProgrammeLedgerService {
         updateWhereMap[this.ledger.tableName] = {
           programmeId: programme.programmeId,
         };
+
+        if(investmentRequestId){
+          updateMap[this.ledger.companyTableName] = {
+            amount: this.round2Precision(investment.amount-amount),
+            txRef: programme.txRef,
+            txType: programme.txType,
+          }
+          updateWhereMap[this.ledger.companyTableName] = {
+            txId: `${investor}#investment#${investmentRequestId}`,
+          };
+        }
 
         return [updateMap, updateWhereMap, {}];
       }
