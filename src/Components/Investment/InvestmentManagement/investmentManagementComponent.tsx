@@ -47,7 +47,11 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { Role } from "../../../Definitions/Enums/role.enum";
 import { PlusOutlined } from "@ant-design/icons";
-import { useConnection, useUserContext, useSettingsContext } from "../../../Context";
+import {
+  useConnection,
+  useUserContext,
+  useSettingsContext,
+} from "../../../Context";
 
 type PopupInfo = {
   title: string;
@@ -63,7 +67,7 @@ export const InvestmentManagementComponent = (props: any) => {
     translator,
     onNavigateToProgrammeView,
     onClickAddOwnership,
-    enableAddOwnership
+    enableAddOwnership,
   } = props;
 
   const t = translator.t;
@@ -449,7 +453,10 @@ export const InvestmentManagementComponent = (props: any) => {
       sorter: true,
       align: "left" as const,
       render: (item: any) => {
-        return <span className="clickable">{item}</span>;
+        if (item) {
+          return <span className="clickable">{item}</span>;
+        }
+        return <span>-</span>;
       },
       onCell: (record: any, rowIndex: any) => {
         return {
@@ -561,6 +568,12 @@ export const InvestmentManagementComponent = (props: any) => {
       key: "programmeSector",
       sorter: true,
       align: "left" as const,
+      render: (item: any) => {
+        if (item) {
+          return <span>{item}</span>;
+        }
+        return <span>-</span>;
+      },
     },
     {
       title: t("programme:investor"),
@@ -680,8 +693,8 @@ export const InvestmentManagementComponent = (props: any) => {
       sorter.order === "ascend"
         ? "ASC"
         : sorter.order === "descend"
-          ? "DESC"
-          : undefined
+        ? "DESC"
+        : undefined
     );
     setSortField(sorter.columnKey);
     // setCurrentPage(1);
@@ -692,24 +705,26 @@ export const InvestmentManagementComponent = (props: any) => {
       <div className="investment-title-bar">
         <div className="title-bar">
           <div className="body-title">{t("programme:investmentTitle")}</div>
-          <div className="body-sub-title">
-            {t("programme:investmentDesc")}
-          </div>
+          <div className="body-sub-title">{t("programme:investmentDesc")}</div>
         </div>
         <div className="actions">
-          {enableAddOwnership && (
-            <div className="action-bar">
-              <Button
-                type="primary"
-                size="large"
-                block
-                icon={<PlusOutlined />}
-                onClick={onClickAddOwnership}
-              >
-                {t("programme:addOwnership")}
-              </Button>
-            </div>
-          )}
+          {enableAddOwnership &&
+            (userInfoState?.companyRole == CompanyRole.MINISTRY ||
+              userInfoState?.companyRole == CompanyRole.GOVERNMENT ||
+              userInfoState?.companyRole == CompanyRole.PROGRAMME_DEVELOPER) &&
+            userInfoState.userRole != Role.ViewOnly && (
+              <div className="action-bar">
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  icon={<PlusOutlined />}
+                  onClick={onClickAddOwnership}
+                >
+                  {t("programme:addOwnership")}
+                </Button>
+              </div>
+            )}
         </div>
       </div>
       <div className="content-card">
@@ -795,7 +810,7 @@ export const InvestmentManagementComponent = (props: any) => {
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description={
                         tableData.length === 0
-                          ? t("creditTransfer:noTransfer")
+                          ? t("programme:noInvestmentData")
                           : null
                       }
                     />

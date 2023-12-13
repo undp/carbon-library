@@ -11,6 +11,7 @@ import {
   Select,
   Space,
   Steps,
+  Tooltip,
   message,
 } from "antd";
 import type { RadioChangeEvent } from "antd";
@@ -34,7 +35,8 @@ import { ESGType } from "../../../Definitions/Enums/eSGType.enum";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { useConnection, useUserContext } from "../../../Context";
 import TextArea from "antd/lib/input/TextArea";
-import { ProgrammeStageUnified } from "../../../Definitions";
+import { ProgrammeStageUnified, Role } from "../../../Definitions";
+import { TooltipColor } from "../../../Styles";
 
 export const InvestmentCreationComponent = (props: any) => {
   const {
@@ -42,11 +44,14 @@ export const InvestmentCreationComponent = (props: any) => {
     useLocation,
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
+    onNavigateToInvestmentManagementView,
   } = props;
 
   const { state } = useLocation();
   const [data, setData] = useState<ProgrammeT>();
   const [companyNames, setCompanyNames] = useState<any>({});
+
+  const [userOrganization, setUserOrganization] = useState<any>({});
   const [investmentNames, setInvestmentNames] = useState<any>({});
   const [projectData, setProjectData] = useState<ProgrammeT>();
   const [investmentData, setInvestmentData] = useState<any>();
@@ -71,6 +76,9 @@ export const InvestmentCreationComponent = (props: any) => {
   const [stepOneData, setStepOneData] = useState<any>();
   const [govData, setGovData] = useState<any>();
   const { userInfoState } = useUserContext();
+  const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
+
+  const [prevInvestor, setPrevInvestor] = useState<any>({});
 
   const instrumentOptions = Object.keys(Instrument).map((k, index) => ({
     label: addSpaces(Object.values(Instrument)[index]),
@@ -208,6 +216,23 @@ export const InvestmentCreationComponent = (props: any) => {
     }
   };
 
+  const getUserOrganization = async () => {
+    try {
+      const response = await post("national/organisation/query", {
+        page: 1,
+        size: 100,
+        filterAnd: [
+          { key: "companyId", operation: "=", value: userInfoState?.companyId },
+        ],
+      });
+      console.log("getUserOrganization", response.data[0]);
+      setUserOrganization(response.data[0]);
+      setMinistrySectoralScope(response.data[0].sectoralScope);
+    } catch (error) {
+      console.log("Error in getting user organization", error);
+    }
+  };
+
   const getOrganisationsDetails = async () => {
     setLoadingList(true);
     try {
@@ -289,6 +314,7 @@ export const InvestmentCreationComponent = (props: any) => {
     getOrganisationsDetails();
     getGovernmentDetails();
     getAllProjectData();
+    getUserOrganization();
   }, [data]);
 
   if (!data && allProjectData.length == 0) {
@@ -313,10 +339,19 @@ export const InvestmentCreationComponent = (props: any) => {
     setCurrent(current + 1);
     setStepOneData(val);
     if (data?.programmeId) setSelectedProgramme(data.programmeId);
+    if (prevInvestor && prevInvestor != val.toCompanyId && !data?.programmeId) {
+      formTwo.resetFields();
+      setCurrentPercTotal(0);
+      setProjectData(undefined);
+    }
   };
 
   const prevOne = () => {
     setCurrent(current - 1);
+    setPrevInvestor(stepOneData.toCompanyId);
+    // formTwo.resetFields();
+    // setCurrentPercTotal(0);
+    // setProjectData(undefined);
   };
 
   const submitInvestment = async (val: any) => {
@@ -359,7 +394,7 @@ export const InvestmentCreationComponent = (props: any) => {
       }
       data?.programmeId
         ? onNavigateToProgrammeView(data?.programmeId)
-        : onNavigateToProgrammeManagementView();
+        : onNavigateToInvestmentManagementView();
     } catch (error: any) {
       console.log("Error in investment creation - ", error);
       message.open({
@@ -384,6 +419,10 @@ export const InvestmentCreationComponent = (props: any) => {
   const onChangeTypeCreation = (e: RadioChangeEvent) => {
     console.log("radio checked", e.target.value);
     setTypeCreation(e.target.value);
+    formOne.resetFields();
+    formTwo.resetFields();
+    setCurrentPercTotal(0);
+    setProjectData(undefined);
   };
 
   const onChangeInvestmentOwnershipType = (e: RadioChangeEvent) => {
@@ -1037,7 +1076,6 @@ export const InvestmentCreationComponent = (props: any) => {
                           className="investment-sought-form"
                           layout="vertical"
                           requiredMark={true}
-                          form={formTwo}
                         >
                           <Row className="row" gutter={[4, 4]}>
                             <Col xl={8} md={12}>
@@ -1077,23 +1115,38 @@ export const InvestmentCreationComponent = (props: any) => {
                                       ) {
                                         return (
                                           <div className="condition-radio-container">
-                                            <Radio.Button
-                                              className="condition-radio"
-                                              value={k}
-                                              onChange={
-                                                onChangeInvestmentOwnershipType
-                                              }
-                                              disabled={
+                                            <Tooltip
+                                              title={
                                                 userInfoState?.companyRole ==
                                                   CompanyRole.PROGRAMME_DEVELOPER &&
                                                 stepOneData.toCompanyId !=
                                                   userInfoState.companyId &&
                                                 k ==
                                                   InvestmentOwnershipType.NATIONAL
+                                                  ? "This action is unauthorized due to the selected investor name."
+                                                  : ""
                                               }
+                                              color={TooltipColor}
+                                              key={TooltipColor}
                                             >
-                                              {t("programme:" + k)}
-                                            </Radio.Button>
+                                              <Radio.Button
+                                                className="condition-radio"
+                                                value={k}
+                                                onChange={
+                                                  onChangeInvestmentOwnershipType
+                                                }
+                                                disabled={
+                                                  userInfoState?.companyRole ==
+                                                    CompanyRole.PROGRAMME_DEVELOPER &&
+                                                  stepOneData.toCompanyId !=
+                                                    userInfoState.companyId &&
+                                                  k ==
+                                                    InvestmentOwnershipType.NATIONAL
+                                                }
+                                              >
+                                                {t("programme:" + k)}
+                                              </Radio.Button>
+                                            </Tooltip>
                                           </div>
                                         );
                                       }
@@ -1169,6 +1222,24 @@ export const InvestmentCreationComponent = (props: any) => {
                                                   .includes(
                                                     userInfoState.companyId
                                                   )
+                                              ) {
+                                                return (
+                                                  <Select.Option
+                                                    key={project.programmeId}
+                                                    value={project.programmeId}
+                                                  >
+                                                    {project.title}
+                                                  </Select.Option>
+                                                );
+                                              }
+                                            } else if (
+                                              userInfoState?.companyRole ===
+                                              CompanyRole.MINISTRY
+                                            ) {
+                                              if (
+                                                ministrySectoralScope.includes(
+                                                  project.sectoralScope
+                                                )
                                               ) {
                                                 return (
                                                   <Select.Option
