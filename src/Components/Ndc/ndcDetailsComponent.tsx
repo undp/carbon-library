@@ -462,7 +462,7 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const onClickedFinalizePeriod = async () => {
-    if (subNdcActionsForPeriod.length === 0) {
+    if (ndcMainDetailsForPeriod.length === 0) {
       message.open({
         type: "error",
         content: t("ndc:finalizeNdcEmptyErrorText"),
@@ -675,7 +675,12 @@ export const NdcDetailsComponent = (props: any) => {
 
   const onAddNewPeriod = async () => {
     try {
-      if (selectedDateRangeRef && selectedDateRangeRef.current) {
+      if (
+        selectedDateRangeRef &&
+        selectedDateRangeRef.current &&
+        selectedDateRangeRef.current.startYear &&
+        selectedDateRangeRef.current.endYear
+      ) {
         const periodItem = {
           startYear: selectedDateRangeRef.current.startYear,
           endYear: selectedDateRangeRef.current.endYear,
@@ -707,14 +712,14 @@ export const NdcDetailsComponent = (props: any) => {
             setSelectedPeriod(updatedPeriodItem);
           }
         }
-        //else {
-        //   message.open({
-        //     type: "error",
-        //     content: t("ndc:rangeAlreadyExists"),
-        //     duration: 3,
-        //     style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-        //   });
-        // }
+        else {
+          message.open({
+            type: "error",
+            content: t("ndc:rangeAlreadyExists"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
+        }
       }
     } catch (exception: any) {
       message.open({
