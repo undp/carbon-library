@@ -90,6 +90,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
                     throw new Error(t("ndc:kpiInvalidFormat"));
                   } else if (+trimValue === 0) {
                     throw new Error(t("ndc:kpiGreaterThanZero"));
+                  }else if (trimValue.toString().length > 8){
+                    throw new Error(t("ndc:kpiMaxLength"));
                   }
                 } else {
                   throw new Error(`${title} ${t("ndc:isRequired")}`);

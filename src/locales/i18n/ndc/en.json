@@ -30,5 +30,6 @@
     "finalizeSuccessMsg": "NDC Actions for the period has been finalised successfully",
     "deletePeriodSuccessMsg": "The period has been deleted successfully ",
     "kpiInvalidFormat": "Allow only numeric value",
-    "kpiGreaterThanZero": "Kpi value should be greater than 0"
+    "kpiGreaterThanZero": "Kpi value should be greater than 0",
+    "kpiMaxLength": "KPI cannot exceed 10000000"
 }
