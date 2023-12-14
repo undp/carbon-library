@@ -735,7 +735,7 @@ export const AddNewCompanyComponent = (props: any) => {
                         <Select size="large" onChange={onChangeMinistry}>
                           {Object.values(Ministry).map((ministry: any) => (
                             <Select.Option value={ministry}>
-                              {ministry}
+                              {(ministry==="ScienceAndTechnology")?"Science And Technology":(ministry==="WaterResources")?"Water Resources":ministry}
                             </Select.Option>
                           ))}
                         </Select>
@@ -745,10 +745,6 @@ export const AddNewCompanyComponent = (props: any) => {
                         name="nameOfMinister"
                         initialValue={state?.record?.nameOfMinister}
                         rules={[
-                          {
-                            required: true,
-                            message: "Minister Name is required",
-                          },
                           {
                             validator: async (rule, value) => {
                               if (
