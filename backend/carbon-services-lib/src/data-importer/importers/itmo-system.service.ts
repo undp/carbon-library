@@ -156,6 +156,8 @@ export class ITMOSystemImporter implements ImporterInterface {
                       phoneNo: "00",
                       nameOfMinister:undefined,
                       sectoralScope:undefined,
+                      govDep:undefined,
+                      ministry:undefined,
                       website: undefined,
                       address: this.configService.get("systemCountryName"),
                       logo: undefined,

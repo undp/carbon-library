@@ -604,6 +604,21 @@ export class UserService {
         }
       }
 
+      if (company.companyRole == CompanyRole.MINISTRY) {
+        const ministry = await this.companyService.findMinistryByDepartment(
+          company.govDep
+        );
+        if (ministry) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "user.MinistryDepartmentAlreadyExist",
+              []
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        }
+      }
+
       company.createdTime = new Date().getTime();
     }
 

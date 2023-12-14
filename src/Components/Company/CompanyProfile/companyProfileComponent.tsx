@@ -13,6 +13,7 @@ import {
   addCommSep,
   CarbonSystemType,
   CompanyState,
+  GovDepartment,
   SectoralScope,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
@@ -431,6 +432,30 @@ export const CompanyProfileComponent = (props: any) => {
                           <Col span={12} className="field-value">
                             {companyDetails.nameOfMinister
                               ? companyDetails.nameOfMinister
+                              : "-"}
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:ministryName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.ministry
+                              ? companyDetails.ministry
+                              : "-"}
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:govDepName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {companyDetails.govDep
+                              ? Object.keys(GovDepartment)[
+                                  Object.values(GovDepartment).indexOf(
+                                    companyDetails.govDep as GovDepartment
+                                  )
+                                ]
                               : "-"}
                           </Col>
                         </Row>

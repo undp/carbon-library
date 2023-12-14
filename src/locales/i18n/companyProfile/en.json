@@ -12,6 +12,8 @@
     "companyRole": "Role",
     "email" : "Email",
     "phoneNo" : "Phone",
+    "ministryName": "Ministry",
+    "govDepName": "Government Department",
     "website" : "Website",
     "address" : "Address",
     "creditBalance":"Credit Balance",

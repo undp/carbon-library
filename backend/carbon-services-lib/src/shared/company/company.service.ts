@@ -41,6 +41,7 @@ import {
 import { AsyncActionType } from "../enum/async.action.type.enum";
 import { LocationInterface } from "../location/location.interface";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
+import { GovDepartment } from "../enum/govDep.enum";
 
 @Injectable()
 export class CompanyService {
@@ -509,6 +510,18 @@ export class CompanyService {
     const companies = await this.companyRepo.find({
       where: {
         taxId: taxId,
+      },
+    });
+    return companies && companies.length > 0 ? companies[0] : undefined;
+  }
+
+  async findMinistryByDepartment(govDep: GovDepartment): Promise<Company | undefined> {
+    if (!govDep) {
+      return null;
+    }
+    const companies = await this.companyRepo.find({
+      where: {
+        govDep: govDep,
       },
     });
     return companies && companies.length > 0 ? companies[0] : undefined;

@@ -1,6 +1,7 @@
 {
     "rootCreatesRoot": "There can be only one root user",
     "createUserSuccess": "The user has been created successfully",
+    "MinistryDepartmentAlreadyExist": "Government Department Already Exist",
     "createOrganisationSuccess": "The organisation has been created successfully",
     "createExistingUser": "This user already exists",
     "addUserToUnRegisteredCompany": "The Organisation has not been registered with the Carbon Registry",

@@ -3,6 +3,8 @@ import { CompanyRole } from "../enum/company.role.enum";
 import { CompanyState } from "../enum/company.state.enum";
 import { EntitySubject } from "./entity.subject";
 import { SectoralScope } from "@undp/serial-number-gen";
+import { Ministry } from "../enum/ministry.enum";
+import { GovDepartment } from "../enum/govDep.enum";
 
 @Entity()
 export class Company implements EntitySubject {
@@ -99,6 +101,23 @@ export class Company implements EntitySubject {
   @Column({ type: "bigint", nullable: true })
   nationalSopValue: number;
   
+  @Column({
+    nullable: true,
+    type: "enum",
+    enum: Ministry,
+    array: false, 
+  })
+  ministry: Ministry;
+
+  @Column({
+    unique: true,
+    nullable: true,
+    type: "enum",
+    enum: GovDepartment,
+    array: false,
+  })
+  govDep: GovDepartment;
+
   @BeforeInsert()
   setDefaultState() {
     if (
