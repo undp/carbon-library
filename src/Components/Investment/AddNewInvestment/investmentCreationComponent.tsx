@@ -1185,7 +1185,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                         name="projectId"
                                         wrapperCol={{ span: 24 }}
                                         initialValue={
-                                          allProjectData.length == 1
+                                          data?.programmeId != undefined
                                             ? allProjectData[0].programmeId
                                             : null
                                         }
