@@ -290,7 +290,7 @@ export class ProgrammeLedgerService {
           else if (programme.creditTransferred.length!==programme.creditOwnerPercentage.length && programme.creditTransferred.length<programme.creditOwnerPercentage.length){
             programme.creditTransferred.push(...new Array(programme.creditOwnerPercentage.length-programme.creditTransferred.length).fill(0))
           }
-          programme.creditTransferred[compIndex] += transfer.creditAmount;
+          programme.creditTransferred[compIndex] = this.helperService.halfUpToPrecision(programme.creditTransferred[compIndex]+transfer.creditAmount);
         }
         programme.creditChange = transfer.creditAmount;
         programme.creditBalance = this.helperService.halfUpToPrecision(programme.creditBalance - transfer.creditAmount);

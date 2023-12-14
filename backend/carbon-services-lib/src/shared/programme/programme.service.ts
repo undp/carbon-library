@@ -3124,7 +3124,7 @@ export class ProgrammeService {
       if (req.fromCompanyIds.length == 1 && !req.companyCredit) {
         transferCompanyCredit = companyAvailableCredit;
       } else {
-        transferCompanyCredit = req.companyCredit[j];
+        transferCompanyCredit = this.helperService.halfUpToPrecision(req.companyCredit[j]);
       }
 
       if (companyAvailableCredit < transferCompanyCredit) {
