@@ -416,7 +416,12 @@ export const AddNewCompanyComponent = (props: any) => {
       requestData.company.logo = logoUrls[1];
       if (companyRole === CompanyRole.MINISTRY) {
         requestData.company.name =
-          "Ministry of " + requestData.company.ministry;
+          "Ministry of " +
+          (requestData.company.ministry === "ScienceAndTechnology")
+            ? "Science And Technology"
+            : requestData.company.ministry === "WaterResources"
+            ? "Water Resources"
+            : requestData.company.ministry;
       }
       if (isGuest) {
         const response = await post("national/user/register", requestData);
@@ -507,7 +512,12 @@ export const AddNewCompanyComponent = (props: any) => {
         } else {
           values.govDep = formOneValues.govDep;
         }
-        values.name = "Ministry of " + formOneValues.ministry;
+        values.name =
+          "Ministry of " + (formOneValues.ministry === "ScienceAndTechnology")
+            ? "Science And Technology"
+            : formOneValues.ministry === "WaterResources"
+            ? "Water Resources"
+            : formOneValues.ministry;
       }
       if (state?.record?.companyRole === CompanyRole.GOVERNMENT) {
         values.omgePercentage = Math.round(
@@ -735,7 +745,11 @@ export const AddNewCompanyComponent = (props: any) => {
                         <Select size="large" onChange={onChangeMinistry}>
                           {Object.values(Ministry).map((ministry: any) => (
                             <Select.Option value={ministry}>
-                              {(ministry==="ScienceAndTechnology")?"Science And Technology":(ministry==="WaterResources")?"Water Resources":ministry}
+                              {ministry === "ScienceAndTechnology"
+                                ? "Science And Technology"
+                                : ministry === "WaterResources"
+                                ? "Water Resources"
+                                : ministry}
                             </Select.Option>
                           ))}
                         </Select>
