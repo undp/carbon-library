@@ -5606,6 +5606,7 @@ export class ProgrammeService {
   }
 
   async rejectNdcDetailsAction(id: number, abilityCondition: any, user: User) {
+    console.log('rejectNdcDetailsAction', id);
     const ndcAction = await this.ndcDetailsActionRepo.findOne({
       where: {
         id: id
