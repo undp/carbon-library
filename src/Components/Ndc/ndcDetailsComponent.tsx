@@ -80,7 +80,7 @@ export const NdcDetailsComponent = (props: any) => {
     num >= min && num <= max;
 
   function onAddNewSubNdcDetail() {
-    const range = selectedTab.split('-');
+    const range = selectedTab.split("-");
     const ndcDetail = ndcDetailsData.find(
       (item: NdcDetail) => item.key === selectedNdcDetail.current.key
     );
@@ -95,9 +95,9 @@ export const NdcDetailsComponent = (props: any) => {
         startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
         endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
         ndcActionId: ndcDetail?.key,
-        nationalPlanObj: '',
-        kpi: '',
-        ministry: '',
+        nationalPlanObj: "",
+        kpi: "",
+        ministry: "",
       };
       if (!ndcDetail.subNdcDetails) {
         ndcDetail.subNdcDetails = [];
@@ -119,7 +119,9 @@ export const NdcDetailsComponent = (props: any) => {
           newData[index] = { ...newData[index], ...row };
         }
       } else {
-        const parentIndex = newData.findIndex((item: any) => row.ndcActionId === item.key);
+        const parentIndex = newData.findIndex(
+          (item: any) => row.ndcActionId === item.key
+        );
         const parentItem = newData[parentIndex];
 
         if (parentItem) {
@@ -167,13 +169,22 @@ export const NdcDetailsComponent = (props: any) => {
     );
     if (ndcDetail) {
       if (
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry.trim() !== '' &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.ministry &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj.trim() !==
-        '' &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.nationalPlanObj &&
-        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi).trim() !== '' &&
-        String(ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi)
+        ndcDetail?.subNdcDetails[
+          ndcDetail?.subNdcDetails?.length - 1
+        ]?.ministry.trim() !== "" &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
+          ?.ministry &&
+        ndcDetail?.subNdcDetails[
+          ndcDetail?.subNdcDetails?.length - 1
+        ]?.nationalPlanObj.trim() !== "" &&
+        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
+          ?.nationalPlanObj &&
+        String(
+          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
+        ).trim() !== "" &&
+        String(
+          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
+        )
       ) {
         onAddNewSubNdcDetail();
       }
@@ -199,7 +210,7 @@ export const NdcDetailsComponent = (props: any) => {
             </Space>
           ) : (
             <input
-              placeholder="Please add the National Plan Objective"
+              placeholder="Please add Programmes"
               className="ant-input"
               type="text"
             ></input>
@@ -231,7 +242,7 @@ export const NdcDetailsComponent = (props: any) => {
       ),
     },
     {
-      title: "Ministry",
+      title: "Government Department",
       dataIndex: "ministry",
       key: "ministry",
       align: "left" as const,
@@ -245,7 +256,7 @@ export const NdcDetailsComponent = (props: any) => {
             </Space>
           ) : (
             <input
-              placeholder="Please add the Ministry name"
+              placeholder="Please add the Government Department"
               className="ant-input"
               type="text"
             ></input>
@@ -331,10 +342,15 @@ export const NdcDetailsComponent = (props: any) => {
     );
   }
 
-  const onCancelPeriod = () => { };
+  const onCancelPeriod = () => {};
 
   const onAddNewPeriod = () => {
-    if (selectedPeriod && selectedPeriod.current) {
+    if (
+      selectedPeriod &&
+      selectedPeriod.current &&
+      selectedPeriod.current.start &&
+      selectedPeriod.current.end
+    ) {
       const newPeriodItem = {
         key: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
         label: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
@@ -417,22 +433,22 @@ export const NdcDetailsComponent = (props: any) => {
         columns={columns}
         showHeader={false}
         pagination={false}
-      // footer={() =>
-      //   isAddSubNdcActionVisible() && (
-      //     <Row justify={"center"}>
-      //       <Button
-      //         onClick={onAddNewSubNdcDetail}
-      //         type="default"
-      //         style={{
-      //           marginBottom: 16,
-      //           width: "100%",
-      //         }}
-      //       >
-      //         {t("ndc:addSubNdcAction")}
-      //       </Button>
-      //     </Row>
-      //   )
-      // }
+        // footer={() =>
+        //   isAddSubNdcActionVisible() && (
+        //     <Row justify={"center"}>
+        //       <Button
+        //         onClick={onAddNewSubNdcDetail}
+        //         type="default"
+        //         style={{
+        //           marginBottom: 16,
+        //           width: "100%",
+        //         }}
+        //       >
+        //         {t("ndc:addSubNdcAction")}
+        //       </Button>
+        //     </Row>
+        //   )
+        // }
       />
     );
   }
@@ -651,7 +667,7 @@ export const NdcDetailsComponent = (props: any) => {
         startDate: new Date("2022-03-25"),
         endDate: new Date("2023-03-25"),
         nationalPlanObj: "Other",
-        kpi: '',
+        kpi: "",
         ministry: "Ministry of Environment",
         subNdcDetails: [
           {

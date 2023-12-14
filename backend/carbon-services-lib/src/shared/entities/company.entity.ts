@@ -93,6 +93,9 @@ export class Company implements EntitySubject {
   @Column("varchar", { array: true, nullable: true })
   sectoralScope: SectoralScope[];
 
+  @Column({ type: "bigint", nullable: true})
+  omgePercentage: number;
+
   @Column({ type: "bigint", nullable: true })
   nationalSopValue: number;
   
@@ -113,6 +116,9 @@ export class Company implements EntitySubject {
       this.creditBalance = 0;
     } else if (this.companyRole === CompanyRole.CERTIFIER) {
       this.creditBalance = null;
+    }
+    if (this.companyRole === CompanyRole.GOVERNMENT){
+      this.omgePercentage=1;
     }
     if (this.companyRole === CompanyRole.GOVERNMENT){
       this.nationalSopValue=0;

@@ -260,6 +260,11 @@ export const AddNewCompanyComponent = (props: any) => {
         values.nameOfMinister = formOneValues.nameOfMinister;
       }
       if (state?.record?.companyRole === CompanyRole.GOVERNMENT) {
+        values.omgePercentage = Math.round(
+          Number(formOneValues.omgePercentage)
+        );
+      }
+      if (state?.record?.companyRole === CompanyRole.GOVERNMENT) {
         values.nationalSopValue = Math.floor(
           Number(formOneValues.nationalSopValue)
         );
@@ -677,7 +682,7 @@ export const AddNewCompanyComponent = (props: any) => {
                           >
                             <Tooltip
                               placement="top"
-                              title="Permitted to certify and revoke certifications of programmes"
+                              title="Permitted to certify and revoke certifications of projects"
                             >
                               <Radio.Button
                                 className="certifier"
@@ -695,14 +700,14 @@ export const AddNewCompanyComponent = (props: any) => {
                               CompanyRole.MINISTRY
                                 ? {
                                     width: "45%",
-                                    marginLeft: isGuest ?  "30px" : 0,
+                                    marginLeft: isGuest ? "30px" : 0,
                                   }
-                                : {marginLeft: isGuest ? "30px" : 0,}
+                                : { marginLeft: isGuest ? "30px" : 0 }
                             }
                           >
                             <Tooltip
                               placement="top"
-                              title="Permitted to own programmes and transfer carbon credits"
+                              title="Permitted to own projects and transfer carbon credits"
                             >
                               <Radio.Button
                                 className="dev"
@@ -713,23 +718,24 @@ export const AddNewCompanyComponent = (props: any) => {
                               </Radio.Button>
                             </Tooltip>
                           </div>
-                          {(userInfoState?.companyRole !==
-                            CompanyRole.MINISTRY) && !isGuest && (
-                            <div className="minister-radio-container">
-                              <Tooltip
-                                placement="top"
-                                title="Permitted to perform all programme-related actions within the Ministry"
-                              >
-                                <Radio.Button
-                                  className="minister"
-                                  value="Ministry"
+                          {userInfoState?.companyRole !==
+                            CompanyRole.MINISTRY &&
+                            !isGuest && (
+                              <div className="minister-radio-container">
+                                <Tooltip
+                                  placement="top"
+                                title="Permitted to perform all project-related actions within the Ministry"
                                 >
-                                  <AuditOutlined className="role-icons" />
-                                  Ministry
-                                </Radio.Button>
-                              </Tooltip>
-                            </div>
-                          )}
+                                  <Radio.Button
+                                    className="minister"
+                                    value="Ministry"
+                                  >
+                                    <AuditOutlined className="role-icons" />
+                                    Ministry
+                                  </Radio.Button>
+                                </Tooltip>
+                              </div>
+                            )}
                         </>
                       )}
                     </Radio.Group>
@@ -885,6 +891,58 @@ export const AddNewCompanyComponent = (props: any) => {
                       <Input.TextArea rows={3} maxLength={100} />
                     </Form.Item>
                   )}
+                  {companyRole === CompanyRole.GOVERNMENT &&
+                    systemType !== CarbonSystemType.MRV && (
+                      <div
+                        className="space-container"
+                        style={{ width: "100%" }}
+                      >
+                        <Space
+                          wrap={true}
+                          style={{
+                            display: "flex",
+                            marginBottom: 8,
+                          }}
+                          align="center"
+                          size={"large"}
+                        >
+                          <Form.Item
+                            style={{ width: "100%" }}
+                            name="omgePercentage"
+                            label="Overall Mitigation in Global Emissions (OMGE) Account"
+                            initialValue={state?.record?.omgePercentage}
+                            rules={[
+                              { required: true, message: "" },
+                              {
+                                validator: async (rule, value) => {
+                                  if (
+                                    String(value).trim() === "" ||
+                                    String(value).trim() === undefined ||
+                                    value === null ||
+                                    value === undefined
+                                  ) {
+                                    throw new Error(
+                                      `Overall Mitigation in Global Emissions (OMGE) Account  ${t(
+                                        "isRequired"
+                                      )}`
+                                    );
+                                  }
+                                },
+                              },
+                            ]}
+                          >
+                            <InputNumber
+                              style={{ width: "100%" }}
+                              size="large"
+                              min={1}
+                              max={99}
+                              formatter={(value) => `${Math.round(value)}%`}
+                              parser={(value: any) => value.replace("%", "")}
+                            />
+                          </Form.Item>
+                        </Space>
+                      </div>
+                    )}
                 </div>
               </Col>
             </Row>

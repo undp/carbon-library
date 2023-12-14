@@ -49,14 +49,14 @@ body {
   width: 99% !important;
 }
 
-.ant-tooltip-inner {
-  border-radius: 5px !important;
-  background-color: #16b1ff !important;
-}
+// .ant-tooltip-inner {
+//   border-radius: 5px !important;
+//   background-color: $primary-color !important;
+// }
 
-.ant-tooltip-arrow-content {
-  --antd-arrow-background-color: linear-gradient(to right bottom, #16b1ff, #16b1ff) !important;
-}
+// .ant-tooltip-arrow-content {
+//   --antd-arrow-background-color: linear-gradient(to right bottom, $primary-color, $primary-color) !important;
+// }
 
 .ant-radio-group {
   display: flex;
@@ -553,6 +553,15 @@ body {
     .ant-form-item-explain-error {
       width: 200px;
     }
+  }
+  .info-container {
+    display: flex;
+    flex-direction: row;
+    width: 10%;
+    height: 20px;
+    align-items: center;
+    justify-content: start;
+    margin-left: 5px;
   }
 
   .ant-row {

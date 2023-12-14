@@ -22,6 +22,8 @@ import { Company } from "../entities/company.entity";
 import { url } from "inspector";
 import { CompanyRole } from "../enum/company.role.enum";
 import { MitigationProperties } from "../dto/mitigation.properties";
+import { RetireType } from "../enum/retire.type.enum";
+import { GovernmentCreditAccounts } from "../enum/government.credit.accounts.enum";
 
 @Injectable()
 export class ProgrammeLedgerService {
@@ -122,9 +124,10 @@ export class ProgrammeLedgerService {
     const toAccountID = transfer.toAccount
       ? transfer.toCompanyId + "#" + transfer.toAccount
       : transfer.toCompanyId + "";
+    const omgeAccount = transfer.retirementType===RetireType.CROSS_BORDER? transfer.toCompanyId + "#" + GovernmentCreditAccounts.OMGE:undefined
     const fromAccount = String(transfer.fromCompanyId);
     getQueries[this.ledger.companyTableName] = {
-      txId: [fromAccount, toAccountID],
+      txId: transfer.retirementType===RetireType.CROSS_BORDER?[fromAccount, toAccountID,omgeAccount]:[fromAccount, toAccountID]
     };
     let updatedProgramme = undefined;
     const resp = await this.ledger.getAndUpdateTx(
@@ -135,6 +138,15 @@ export class ProgrammeLedgerService {
           throw new HttpException(
             this.helperService.formatReqMessagesString(
               "programme.transferRequestALreadyProcessed",
+              []
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        }
+        if(transfer.retirementType===RetireType.CROSS_BORDER && !transfer.omgePercentage){
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "programme.invalidOmgePerc",
               []
             ),
             HttpStatus.BAD_REQUEST
@@ -253,13 +265,17 @@ export class ProgrammeLedgerService {
           programme.creditOwnerPercentage = percentages;
           this.logger.verbose("Updated owner percentages", percentages);
         }
-
+        let omgeCredits=0
+        if(transfer.retirementType===RetireType.CROSS_BORDER){
+          omgeCredits = transfer.creditAmount*transfer.omgePercentage/100
+          companyCreditDistribution[omgeAccount] = omgeCredits;
+        }
         companyCreditDistribution[fromAccount] = -transfer.creditAmount;
-        companyCreditDistribution[toAccountID] = transfer.creditAmount;
+        companyCreditDistribution[toAccountID] = transfer.creditAmount-omgeCredits;
 
         const prvTxTime = programme.txTime;
         programme.txTime = new Date().getTime();
-        programme.txRef = `${name}#${transfer.requestId}#${transfer.retirementType}#${reason}`;
+        programme.txRef = `${name}#${transfer.requestId}#${transfer.retirementType}#${reason}#${transfer.omgePercentage}`;
 
         const compIndex = programme.companyId.indexOf(transfer.fromCompanyId);
         if (compIndex < 0) {
@@ -335,14 +351,15 @@ export class ProgrammeLedgerService {
           txTime: prvTxTime,
         };
 
-        for (const com of [fromAccount, toAccountID]) {
+        const involvedCompanies=transfer.retirementType===RetireType.CROSS_BORDER?[fromAccount, toAccountID,omgeAccount]:[fromAccount, toAccountID]
+        for (const com of involvedCompanies) {
           if (companyCreditBalances[com] != undefined) {
             updateMap[this.ledger.companyTableName + "#" + com] = {
               credit: this.round2Precision(
                 companyCreditBalances[com] + companyCreditDistribution[com]
               ),
               txRef: transfer.requestId + "#" + programme.serialNo,
-              txType: TxType.TRANSFER,
+              txType: isRetirement?TxType.RETIRE:TxType.TRANSFER,
             };
             updateWhereMap[this.ledger.companyTableName + "#" + com] = {
               txId: com,
@@ -351,7 +368,7 @@ export class ProgrammeLedgerService {
             insertMap[this.ledger.companyTableName + "#" + com] = {
               credit: this.round2Precision(companyCreditDistribution[com]),
               txRef: transfer.requestId + "#" + programme.serialNo,
-              txType: TxType.TRANSFER,
+              txType: isRetirement?TxType.RETIRE:TxType.TRANSFER,
               txId: com,
             };
           }
@@ -1340,6 +1357,8 @@ export class ProgrammeLedgerService {
     externalId: string,
     actionId: string,
     documentUrl: string,
+    documentTxtime: number,
+    documentStatus: string,
     type: string,
     creditEst: number,
     certifierId: number
@@ -1432,8 +1451,11 @@ export class ProgrammeLedgerService {
             programme.mitigationActions[actionIndex].projectMaterial = [];
           }
 
-          programme.mitigationActions[actionIndex].projectMaterial.push(
-            documentUrl
+          programme.mitigationActions[actionIndex].projectMaterial.push({
+            url:documentUrl,
+            timestamp:documentTxtime,
+            accept:documentStatus
+          }
           );
 
           console.log(
@@ -1448,7 +1470,11 @@ export class ProgrammeLedgerService {
           if (!programme.programmeProperties.programmeMaterials) {
             programme.programmeProperties.programmeMaterials = [];
           }
-          programme.programmeProperties.programmeMaterials.push(documentUrl);
+          programme.programmeProperties.programmeMaterials.push({
+            url:documentUrl,
+            timestamp:documentTxtime,
+            accept:documentStatus
+          });
           updateMap[this.ledger.tableName]["programmeProperties"] =
             programme.programmeProperties;
         }

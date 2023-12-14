@@ -9,6 +9,7 @@ import Environmental from "./environmental";
 import Economic from "./economic";
 import Social from "./social";
 import { RadioButtonStatus } from "../../../Definitions";
+import SocialEnvironmentalRisk from "./socialEnvironmentalRisk";
 
 export interface CoBenefitProps {
   onClickedBackBtn?: any;
@@ -39,7 +40,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
   const [coBenefitDetails, setCoBenefitDetails] = useState<any>();
   const [isSocialFormValid, setIsSocialFormValid] = useState<any>(true);
   const [isAssessmentFormValid, setIsAssessmentFormValid] = useState<any>(true);
-  translator.setDefaultNamespace('coBenifits');
+  translator.setDefaultNamespace("coBenifits");
   const t = translator.t;
 
   const onSdgGoalsFormSubmit = (sdgGoalsDetails: any) => {
@@ -93,6 +94,13 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     setIsSocialFormValid(isFormValid);
   };
 
+  const onSocialEnvironmentalFormSubmit = (socialEnvironmentDetails: any) => {
+    setCoBenefitDetails((pre: any) => ({
+      ...pre,
+      socialEnvironmentDetails: socialEnvironmentDetails,
+    }));
+  };
+
   const tabItems = [
     {
       label: t("coBenifits:sdgGoals"),
@@ -125,7 +133,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       ),
     },
     {
-      label: t("coBenifits:safeguards"),
+      label: t("coBenifits:undpSesp"),
       key: "3",
       children: (
         <Safeguards
@@ -140,54 +148,38 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       ),
     },
     {
-      label: t("coBenifits:environmental"),
+      label: t("coBenifits:unfcccSdTool"),
       key: "4",
       children: (
-        <Environmental
+        <><Environmental
           onFormSubmit={onEnvironmentalFormSubmit}
-          environmentalViewData={
-            viewOnly
+          environmentalViewData={viewOnly
+            ? coBenifitsViewDetails?.environmental
               ? coBenifitsViewDetails?.environmental
-                ? coBenifitsViewDetails?.environmental
-                : {}
-              : undefined
-          }
+              : {}
+            : undefined}
           viewOnly={viewOnly || false}
-          translator={translator}
-        />
-      ),
-    },
-    {
-      label: t("coBenifits:social"),
-      key: "5",
-      children: (
-        <Social
-          onFormSubmit={onSocialFormSubmit}
-          socialViewData={
-            (viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
-            (!viewOnly && coBenefitsDetails?.socialValueDetails)
-          }
-          viewOnly={viewOnly || false}
-          translator={translator}
-        />
-      ),
-    },
-    {
-      label: t("coBenifits:economic"),
-      key: "6",
-      children: (
-        <Economic
-          onFormSubmit={onEconomicFormSubmit}
-          economicViewData={
-            viewOnly
-              ? coBenifitsViewDetails?.economic
+          translator={translator} />
+          <Social
+            onFormSubmit={onSocialFormSubmit}
+            socialViewData={(viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
+              (!viewOnly && coBenefitsDetails?.socialValueDetails)}
+            viewOnly={viewOnly || false}
+            translator={translator} />
+
+          <Economic
+            onFormSubmit={onEconomicFormSubmit}
+            economicViewData={
+              viewOnly
                 ? coBenifitsViewDetails?.economic
-                : {}
-              : undefined
-          }
-          viewOnly={viewOnly || false}
-          translator={translator}
-        />
+                  ? coBenifitsViewDetails?.economic
+                  : {}
+                : undefined
+            }
+            viewOnly={viewOnly || false}
+            translator={translator}
+          />
+        </>
       ),
     },
     {
@@ -202,6 +194,21 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
           }
           viewOnly={viewOnly || false}
           useConnection={useConnection}
+          translator={translator}
+        />
+      ),
+    },
+    {
+      label: t("coBenifits:socialEnvironmentalRisk"),
+      key: "8",
+      children: (
+        <SocialEnvironmentalRisk
+          onFormSubmit={onSocialEnvironmentalFormSubmit}
+          SocialEnvironmentalRiskData={
+            (viewOnly && coBenifitsViewDetails?.socialEnvironmentDetails) ||
+            (!viewOnly && coBenefitsDetails?.socialEnvironmentDetails)
+          }
+          viewOnly={viewOnly || false}
           translator={translator}
         />
       ),
@@ -339,7 +346,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (environmentalOverallValidation !== true) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits Environmental section`,
+        content: `Fill the required fields in Co-benefits UNFCCC SD Tool section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -348,7 +355,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (!isSocialFormValid) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits Social section`,
+        content: `Fill the required fields in Co-benefits UNFCCC SD Tool section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -357,7 +364,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (economicOverallValidation !== true) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits Economic section`,
+        content: `Fill the required fields in Co-benefits UNFCCC SD Tool section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -366,7 +373,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (!isAssessmentFormValid) {
       message.open({
         type: "error",
-        content: `Fill the required fields in Co-benifits Assessment section`,
+        content: `Fill the required fields in Co-benefits Assessment section`,
         duration: 4,
         style: { textAlign: "right", marginRight: 15, marginTop: 10 },
       });
@@ -407,4 +414,3 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     </div>
   );
 };
-
