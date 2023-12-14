@@ -185,6 +185,17 @@ export const NdcDetailsComponent = (props: any) => {
         return;
       }
 
+      if (!updatedFields) {
+        setEditingKey(null);
+        return;
+      } else if (
+        updatedFields.kpi === row.kpi &&
+        updatedFields.nationalPlanObjective === row.nationalPlanObjective
+      ) {
+        setEditingKey(null);
+        return;
+      }
+
       const updatedItem = {
         ...row,
         ...updatedFields,
@@ -240,6 +251,7 @@ export const NdcDetailsComponent = (props: any) => {
             {
               text: t("ndc:approve"),
               icon: <Icon.BoxArrowInDown />,
+              style: "color-primary",
               click: () => {
                 setActionInfo({
                   action: "Approve",
@@ -254,6 +266,7 @@ export const NdcDetailsComponent = (props: any) => {
             {
               text: t("ndc:reject"),
               icon: <Icon.XOctagon />,
+              style: "color-error",
               click: () => {
                 setActionInfo({
                   action: "Reject",
@@ -268,7 +281,7 @@ export const NdcDetailsComponent = (props: any) => {
           ]}
           renderItem={(item: any) => (
             <List.Item onClick={item.click}>
-              <Typography.Text className="action-icon color-error">
+              <Typography.Text className={`action-icon ${item.style}`}>
                 {item.icon}
               </Typography.Text>
               <span>{item.text}</span>
