@@ -141,6 +141,7 @@ export * from './shared/dto/user.update.dto'
 export * from './shared/dto/ndc.details.period.dto'
 export * from './shared/dto/programme.mitigation.issue'
 export * from './shared/dto/ndc.details.action.dto'
+export * from './shared/dto/base.id.dto'
 
 //from transparency
 export * from './shared/dto/adaptation.properties'

@@ -119,6 +119,7 @@ import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
 import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
 import { NdcDetailsActionType } from "../enum/ndc.details.action.type.enum";
 import { Role } from '../casl/role.enum';
+import { BaseIdDto } from '../dto/base.id.dto';
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType,
@@ -5568,10 +5569,10 @@ export class ProgrammeService {
     }
   }
 
-  async approveNdcDetailsAction(id: number, abilityCondition: any, user: User) {
+  async approveNdcDetailsAction(idDto: BaseIdDto, abilityCondition: any, user: User) {
     const ndcAction = await this.ndcDetailsActionRepo.findOne({
       where: {
-        id: id
+        id: idDto.id
       }
     })
 
@@ -5592,7 +5593,7 @@ export class ProgrammeService {
       );
     }
 
-    await this.ndcDetailsActionRepo.update(id, { status: NdcDetailsActionStatus.Approved }).catch(error => {
+    await this.ndcDetailsActionRepo.update(idDto.id, { status: NdcDetailsActionStatus.Approved }).catch(error => {
       this.logger.error(error);
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -5605,11 +5606,10 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, {});
   }
 
-  async rejectNdcDetailsAction(id: number, abilityCondition: any, user: User) {
-    console.log('rejectNdcDetailsAction', id);
+  async rejectNdcDetailsAction(idDto: BaseIdDto, abilityCondition: any, user: User) {
     const ndcAction = await this.ndcDetailsActionRepo.findOne({
       where: {
-        id: id
+        id: idDto.id
       }
     })
 
@@ -5629,7 +5629,7 @@ export class ProgrammeService {
         HttpStatus.FORBIDDEN
       );
     }
-    await this.ndcDetailsActionRepo.update(id, { status: NdcDetailsActionStatus.Rejected }).catch(error => {
+    await this.ndcDetailsActionRepo.update(idDto.id, { status: NdcDetailsActionStatus.Rejected }).catch(error => {
       this.logger.error(error);
       throw new HttpException(
         this.helperService.formatReqMessagesString(
