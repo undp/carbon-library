@@ -651,7 +651,7 @@ export const NdcDetailsComponent = (props: any) => {
         {isGovernmentUser && !selectedPeriod.finalized ? (
           <Row justify="end">
             <Button
-              className="mg-left-1 btn-danger"
+              className="mg-left-1 btn-danger footer-btns"
               onClick={onClickedDeletePeriod}
               htmlType="submit"
               disabled={isMainActionInEditMode()}
@@ -660,7 +660,7 @@ export const NdcDetailsComponent = (props: any) => {
               {t("ndc:delete")}
             </Button>
             <Button
-              className="mg-left-1"
+              className="mg-left-1 footer-btns"
               type="primary"
               onClick={onClickedFinalizePeriod}
               disabled={isMainActionInEditMode()}
