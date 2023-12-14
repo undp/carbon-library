@@ -475,7 +475,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                     download
                   >
                     <BookOutlined
-                      className="common-progress-icon margin-right-1"
+                      className="common-progress-icon"
                       style={{ color: "#3F3A47", paddingTop: '3px' }}
                     />
                   </a>
@@ -724,7 +724,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                     download
                   >
                     <BookOutlined
-                      className="common-progress-icon margin-right-1"
+                      className="common-progress-icon"
                       style={{ color: "#3F3A47", paddingTop: '3px' }}
                     />
                   </a>
