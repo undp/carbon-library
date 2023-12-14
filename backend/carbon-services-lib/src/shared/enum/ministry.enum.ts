@@ -11,7 +11,7 @@ export enum Ministry {
     Judiciary = "Judiciary",
     Maritime = "Maritime",
     Media = "Media",
-    ScienceAndTechnology = "ScienceAndTechnology",
-    WaterResources = "WaterResources",
+    ScienceAndTechnology = "Science And Technology",
+    WaterResources = "Water Resources",
     Other = "Other",
 }
