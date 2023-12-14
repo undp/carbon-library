@@ -1065,6 +1065,8 @@ export const AddNewCompanyComponent = (props: any) => {
                                 )
                               ];
                             if (
+                              val &&
+                              val.length > 0 &&
                               selectedGovDepatments &&
                               !selectedGovDepatments.includes(val)
                             ) {
