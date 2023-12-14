@@ -16,23 +16,23 @@ export const UserInformationContextProvider = ({ children }: React.PropsWithChil
   
   const [isTokenExpired, setIsTokenExpired] = useState<boolean>(false);
   const initialUserProps: UserProps = {
-    id: localStorage.getItem('userId') ? (localStorage.getItem('userId') as string) : '',
-    userRole: localStorage.getItem('userRole') ? (localStorage.getItem('userRole') as string) : '',
+    id: localStorage.getItem('userId') ? (localStorage.getItem('userId') as string) : process.env.STORYBOOK_USER_ID ? process.env.STORYBOOK_USER_ID : '',
+    userRole: localStorage.getItem('userRole') ? (localStorage.getItem('userRole') as string) : process.env.STORYBOOK_USER_ROLE ? process.env.STORYBOOK_USER_ROLE : '',
     companyRole: localStorage.getItem('companyRole')
       ? (localStorage.getItem('companyRole') as string)
-      : '',
+      : process.env.STORYBOOK_COMPANY_ROLE ? process.env.STORYBOOK_COMPANY_ROLE : '',
     companyId: localStorage.getItem('companyId')
       ? parseInt(localStorage.getItem('companyId') as string)
-      : -1,
+      : process.env.STORYBOOK_COMPANY_ID ? parseInt(process.env.STORYBOOK_COMPANY_ID) : -1,
     companyLogo: localStorage.getItem('companyLogo')
       ? (localStorage.getItem('companyLogo') as string)
-      : '',
+      : process.env.STORYBOOK_COMPANY_LOGO ? process.env.STORYBOOK_COMPANY_LOGO : '',
     companyName: localStorage.getItem('companyName')
       ? (localStorage.getItem('companyName') as string)
-      : '',
+      : process.env.STORYBOOK_COMPANY_NAME ? process.env.STORYBOOK_COMPANY_NAME : '',
     companyState: localStorage.getItem('companyState')
       ? parseInt(localStorage.getItem('companyState') as string)
-      : 0,
+      : process.env.STORYBOOK_COMPANY_STATE ? parseInt(process.env.STORYBOOK_COMPANY_STATE) : 0,
   };
   const [userInfoState, setUserInfoState] = useState<UserProps>(initialUserProps);
 

@@ -29,7 +29,7 @@ export const MrvDashboardComponent = (props: any) => {
     ButtonGroup,
     isMultipleDashboardsVisible = false,
   } = props;
-  const { get, post, delete: del } = useConnection();
+  const { get, post, delete: del, statServerUrl } = useConnection();
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
   const { userInfoState } = useUserContext();
@@ -596,7 +596,7 @@ export const MrvDashboardComponent = (props: any) => {
         "stats/programme/agg",
         genPayload(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       console.log("Response", response);
       const newd: any = {};

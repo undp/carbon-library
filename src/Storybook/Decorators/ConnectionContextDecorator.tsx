@@ -1,5 +1,5 @@
 import React from "react";
-import { ConnectionContextProvider } from "../../Context";
+import { ConnectionContextProvider, UserInformationContextProvider } from "../../Context";
 import { useTranslation } from 'react-i18next';
 
 export default function ConnectionContextDecorator(Story:any, context:any) {
@@ -13,9 +13,12 @@ export default function ConnectionContextDecorator(Story:any, context:any) {
           ? process.env.REACT_APP_BACKEND
           : 'http://localhost:3000'
       }
+      statServerUrl="http://localhost:3100"
       t={t}
     >
-      <Story/>
+      <UserInformationContextProvider>
+        <Story/>
+      </UserInformationContextProvider>
     </ConnectionContextProvider>
   )
 }

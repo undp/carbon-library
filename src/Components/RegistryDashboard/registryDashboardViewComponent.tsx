@@ -74,7 +74,7 @@ export const RegistryDashboardComponent = (props: any) => {
     Link,
     isMultipleDashboardsVisible = false,
   } = props;
-  const { get, post, delete: del } = useConnection();
+  const { get, post, delete: del, statServerUrl } = useConnection();
   const { userInfoState } = useUserContext();
   const [loadingWithoutTimeRange, setLoadingWithoutTimeRange] =
     useState<boolean>(false);
@@ -628,7 +628,7 @@ export const RegistryDashboardComponent = (props: any) => {
         "stats/programme/agg",
         getAllChartsParams(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       let programmesAggByStatus: any;
       let programmesAggBySector: any;
@@ -1096,7 +1096,7 @@ export const RegistryDashboardComponent = (props: any) => {
         "stats/programme/agg",
         getAllProgrammeAnalyticsStatsParamsWithoutTimeRange(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       const programmeByStatusAggregationResponse =
         response?.data?.stats?.AGG_PROGRAMME_BY_STATUS?.data;
@@ -1252,7 +1252,7 @@ export const RegistryDashboardComponent = (props: any) => {
         "stats/programme/agg",
         getAllProgrammeAnalyticsStatsParams(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       let programmeByStatusAggregationResponse: any;
       let programmeByStatusAuthAggregationResponse: any;
