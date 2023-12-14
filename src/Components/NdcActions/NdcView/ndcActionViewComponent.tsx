@@ -597,7 +597,8 @@ export const NdcActionViewComponent = (props: any) => {
                           </div>
                         )}
                       </div>
-                      <div className="icon">
+                    </div>
+                    <div className="icon">
                         {!monitoringReportData?.url && (
                           <Tooltip
                             arrowPointAtCenter
@@ -621,7 +622,6 @@ export const NdcActionViewComponent = (props: any) => {
                           </Tooltip>
                         )}
                       </div>
-                    </div>
                     {monitoringReportData?.url && (
                       <Row>
                         <div className="icon">
