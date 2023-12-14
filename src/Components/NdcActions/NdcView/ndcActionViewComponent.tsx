@@ -122,7 +122,7 @@ export const NdcActionViewComponent = (props: any) => {
               download
             >
               <BookOutlined
-                className="common-progress-icon margin-right-1"
+                className="common-progress-icon"
                 style={{ color: "#3F3A47" }}
               />
             </a>
@@ -657,7 +657,7 @@ export const NdcActionViewComponent = (props: any) => {
                                   download
                                 >
                                   <BookOutlined
-                                    className="common-progress-icon margin-right-1"
+                                    className="common-progress-icon"
                                     style={{ color: "#3F3A47" }}
                                   />
                                 </a>
@@ -744,7 +744,7 @@ export const NdcActionViewComponent = (props: any) => {
                                   download
                                 >
                                   <BookOutlined
-                                    className="common-progress-icon margin-right-1"
+                                    className="common-progress-icon"
                                     style={{ color: "#3F3A47" }}
                                   />
                                 </a>
