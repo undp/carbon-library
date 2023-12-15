@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-services-lib",
-  "version": "0.0.293-gayanath8-patch-2.0",
+  "version": "0.0.293",
   "description": "Backend library",
   "author": "",
   "private": false,
