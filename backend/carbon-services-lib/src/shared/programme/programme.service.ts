@@ -1415,6 +1415,7 @@ export class ProgrammeService {
   async create(programmeDto: ProgrammeDto, user: User): Promise<Programme | undefined> {
     this.logger.verbose("ProgrammeDTO received", JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
+    if(programme.creditEst)programme.creditEst=this.helperService.halfUpToPrecision(programme.creditEst)
     this.logger.verbose("Programme  create", JSON.stringify(programme));
 
     const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
