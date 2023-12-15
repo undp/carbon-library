@@ -1957,6 +1957,9 @@ export class ProgrammeService {
     }
 
     ndcAction.coBenefitsProperties = ndcActionDto.coBenefitsProperties;
+    if(ndcAction.ndcFinancing.userEstimatedCredits){
+      ndcAction.ndcFinancing.userEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.userEstimatedCredits)
+    }
     await this.checkTotalUserEstimatedCredits(ndcAction, program);
     await this.calcCreditNDCAction(ndcAction, program);
     console.log("testing ndcAction", ndcAction);
@@ -3915,9 +3918,9 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
-      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
-      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
-      totalCreditIssuance+=action.issueCredit
+      verfiedMitigationMap[action.actionId].availableCredits=this.helperService.halfUpToPrecision(verfiedMitigationMap[action.actionId].availableCredits-action.issueCredit)
+      verfiedMitigationMap[action.actionId].issuedCredits=this.helperService.halfUpToPrecision(verfiedMitigationMap[action.actionId].issuedCredits+action.issueCredit)
+      totalCreditIssuance=this.helperService.halfUpToPrecision(totalCreditIssuance+action.issueCredit)
       this.updateMitigationProps(program.mitigationActions,action.actionId,verfiedMitigationMap[action.actionId])
     })
     if ((program.creditEst - program.creditIssued )< totalCreditIssuance) {
