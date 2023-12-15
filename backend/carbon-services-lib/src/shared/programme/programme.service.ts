@@ -4690,7 +4690,7 @@ export class ProgrammeService {
   private getNdcCreditIssuanceRef = (issueAmount: mitigationIssueProperties[]) =>{
     let ref =""
     issueAmount.map(action=>{
-      ref+=`${action.actionId}?${action.issueCredit}&`
+      ref+=`${action.actionId}?${this.helperService.halfUpToPrecision(action.issueCredit)}&`
     })
     return ref.slice(0,-1)
   }
