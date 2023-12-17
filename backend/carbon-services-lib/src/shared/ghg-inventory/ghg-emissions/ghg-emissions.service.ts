@@ -35,6 +35,7 @@ export class GhgEmissionsService {
         this.logger.verbose("ProgrammeDTO received", JSON.stringify(emissionDto));
         const emission: Emission = this.toEmission(emissionDto);
         this.logger.verbose("Emission  create", JSON.stringify(emission));
+        this.verifyEmissionValues(emission);
 
         let savedEmission: Emission;
         const result = await this.getEmissionByYear(emission.year);
@@ -146,7 +147,15 @@ export class GhgEmissionsService {
         });
     }
 
-    async getAllEmissions(){
+    async getAllEmissions(user: User) {
+        if (user.companyRole !== CompanyRole.MINISTRY && user.companyRole !== CompanyRole.GOVERNMENT) {
+            return await this.emissionRepo.find({
+                where: {
+                    state: GHGRecordState.FINALIZED,
+                },
+                order: { state: 'ASC', year: "DESC", }
+            });
+        }
         return await this.emissionRepo.find({ order: { state: 'ASC', year: "DESC", } });
     }
 
@@ -209,6 +218,29 @@ export class GhgEmissionsService {
             );
         }
     }
+
+    private verifyEmissionValues(emissionData: any) {
+        const gasTypes = ['co2', 'ch4', 'n2o', 'co2eq'];
+        for (let key in emissionData) {
+          if (typeof emissionData[key] === 'object') {
+            if (!this.verifyEmissionValues(emissionData[key])) {
+              return false;
+            }
+          } else {
+            // Check if the value is a number and positive
+            if (gasTypes.includes(key)) {
+              if (typeof emissionData[key] === 'string') {
+                throw new HttpException(this.helperService.formatReqMessagesString("ghgInventory.invalidDataType", []), HttpStatus.BAD_REQUEST);
+              }
+              if (typeof emissionData[key] === 'number' && emissionData[key] < 0) {
+                throw new HttpException(this.helperService.formatReqMessagesString("ghgInventory.negativeValuesNotAllowed", []), HttpStatus.BAD_REQUEST);
+              }
+            }
+      
+          }
+        }
+        return true;
+      }
 
     private toEmissionEvent(emission: Emission, user: User): EmissionEvent {
         let emissionEvent = new EmissionEvent();

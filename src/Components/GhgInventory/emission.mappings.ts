@@ -71,12 +71,12 @@ export const formFields = {
 
 export const emissionCsvFieldMap: any = {
   "year": "Year",
-  
+
   "energyEmissions_fuelCombustionActivities_energyIndustries_co2": "Energy Industries - CO2",
   "energyEmissions_fuelCombustionActivities_energyIndustries_ch4": "Energy Industries - CH4",
   "energyEmissions_fuelCombustionActivities_energyIndustries_n2o": "Energy Industries - N2O",
   "energyEmissions_fuelCombustionActivities_energyIndustries_co2eq": "Energy Industries - CO2-eq",
-  
+
   "energyEmissions_fuelCombustionActivities_manufacturingIndustriesConstruction_co2": "Manufacturing Industries and Construction - CO2",
   "energyEmissions_fuelCombustionActivities_manufacturingIndustriesConstruction_ch4": "Manufacturing Industries and Construction - CH4",
   "energyEmissions_fuelCombustionActivities_manufacturingIndustriesConstruction_n2o": "Manufacturing Industries and Construction - N2O",
@@ -376,4 +376,49 @@ export const totalProjectionFields = [
   'Total National Emission and Removals - BAU',
   'Total National Emission and Removals - Conditional NDC',
   'Total National Emission and Removals - Unconditional NDC',
+]
+
+export const excelFields = [
+  "Energy",
+  "Fuel Combustion Activities",
+  "Energy Industries",
+  "Manufacturing Industries and Construction",
+  "Transport",
+  "Other Sectors",
+  "Non-Specified",
+  "Fugitive emissions from fuels",
+  "Solid Fuels",
+  "Oil and Natural Gas",
+  "Other emissions from Energy Production",
+  "Carbon dioxide Transport and Storage",
+  "Transport of CO2",
+  "Injection and Storage",
+  "Other (Carbon dioxide Transport and Storage)",
+  "Industrial Processes & Product Use",
+  "Mineral Industry",
+  "Chemical Industry",
+  "Metal Industry",
+  "Non-Energy Products from Fuels and Solvent Use",
+  "Electronics Industry",
+  "Product Uses as Substitutes for Ozone Depleting Substances",
+  "Other Product Manufacture and Use",
+  "Other (Industrial Processes & Product Use)",
+  "Agriculture, Forestry, and Other Land Use",
+  "Livestock",
+  "Land",
+  "Aggregate sources and non-CO2 emissions sources on land",
+  "Other (Agriculture, Forestry, and Other Land Use)",
+  "Waste",
+  "Solid Waste Disposal",
+  "Biological Treatment of Solid Waste",
+  "Incineration and Open Burning of Waste",
+  "Wastewater Treatment and Discharge",
+  "Other (Waste)",
+  "Other",
+  "Indirect N2O emissions from the atmospheric deposition of nitrogen in NOx and NH3",
+  "Other",
+
+  "Total CO2 equivalent emissions without land use, land-use change and forestry",
+  "Total CO2 equivalent emissions with land use, land-use change and forestry",
+
 ]

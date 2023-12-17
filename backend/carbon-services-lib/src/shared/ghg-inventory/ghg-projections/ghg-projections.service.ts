@@ -34,6 +34,7 @@ export class GhgProjectionsService {
         this.logger.verbose("ProgrammeDTO received", JSON.stringify(projectionDto));
         const projection: Projection = this.toProjection(projectionDto);
         this.logger.verbose("Projection  create", JSON.stringify(projection));
+        this.verifyProjectionValues(projection);
 
         let savedProjection: Projection;
         const result = await this.getEmissionByYear(projection.year);
@@ -134,7 +135,15 @@ export class GhgProjectionsService {
         return { status: HttpStatus.CREATED, data: savedProjection };
     }
 
-    async getAllProjections(){
+    async getAllProjections(user: User){
+        if (user.companyRole !== CompanyRole.MINISTRY && user.companyRole !== CompanyRole.GOVERNMENT) {
+            return await this.projectionRepo.find({
+                where: {
+                    state: GHGRecordState.FINALIZED,
+                },
+                order: { state: 'ASC', year: "DESC", }
+            });
+        }
         return await this.projectionRepo.find({ order: { state: 'ASC', year: "DESC", } });
     }
 
@@ -216,4 +225,27 @@ export class GhgProjectionsService {
         projectionEvent.createdAt = new Date();
         return projectionEvent;
     }
+
+    private verifyProjectionValues(projectionData: any) {
+        const gasTypes = ['bau', 'conditionalNdc', 'unconditionalNdc'];
+        for (let key in projectionData) {
+          if (typeof projectionData[key] === 'object') {
+            if (!this.verifyProjectionValues(projectionData[key])) {
+              return false;
+            }
+          } else {
+            // Check if the value is a number and positive
+            if (gasTypes.includes(key)) {
+              if (typeof projectionData[key] === 'string') {
+                throw new HttpException(this.helperService.formatReqMessagesString("ghgInventory.invalidDataType", []), HttpStatus.BAD_REQUEST);
+              }
+              if (typeof projectionData[key] === 'number' && projectionData[key] < 0) {
+                throw new HttpException(this.helperService.formatReqMessagesString("ghgInventory.negativeValuesNotAllowed", []), HttpStatus.BAD_REQUEST);
+              }
+            }
+      
+          }
+        }
+        return true;
+      }
 }
