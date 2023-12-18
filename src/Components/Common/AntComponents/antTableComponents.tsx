@@ -88,7 +88,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
                 if (trimValue) {
                   if (isNaN(+trimValue)) {
                     throw new Error(t("ndc:kpiInvalidFormat"));
-                  } else if (+trimValue === 0) {
+                  } else if (+trimValue <= 0) {
                     throw new Error(t("ndc:kpiGreaterThanZero"));
                   }else if (trimValue.toString().length > 7){
                     throw new Error(t("ndc:kpiMaxLength"));

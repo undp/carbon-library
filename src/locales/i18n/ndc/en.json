@@ -20,7 +20,7 @@
     "finalizeApproveTitle": "Are you sure you want to finalize the NDC Actions for this period?",
     "finalizeApproveSubTitle": "You can’t undo this action",
     "periodDeleteConfirmTitle" : "Are you sure you want to delete the NDC Actions for this period?",
-    "finalizeErrorText": "Cannot Finalise Period due to pending Sub NDC Actions",
+    "finalizeErrorText": "Cannot finalise the period due to pending Sub NDC Actions",
     "nationalPlanObjectivePlaceHolder": "Enter Programmes",
     "kpiPlaceHolder": "Enter Kpi",
     "isRequired": "is required!",

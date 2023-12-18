@@ -176,6 +176,22 @@ export const NdcDetailsComponent = (props: any) => {
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
 
+  const ClearEditMode = () => {
+    const unsavedMainActions = ndcActionsList.filter(
+      (item: NdcDetail) =>
+        item.status === NdcDetailsActionStatus.New &&
+        item.actionType === NdcDetailsActionType.MainAction
+    );
+
+    if (unsavedMainActions && unsavedMainActions.length) {
+      const updatedActions = ndcActionsList.filter(
+        (item: NdcDetail) => !unsavedMainActions.includes(item)
+      );
+      setNdcActionsList(updatedActions);
+    }
+    setEditingKey(null);
+  };
+
   const handleSave = async (row: NdcDetail) => {
     try {
       let updatedFields;
@@ -186,13 +202,13 @@ export const NdcDetailsComponent = (props: any) => {
       }
 
       if (!updatedFields) {
-        setEditingKey(null);
+        ClearEditMode();
         return;
       } else if (
         updatedFields.kpi === row.kpi &&
         updatedFields.nationalPlanObjective === row.nationalPlanObjective
       ) {
-        setEditingKey(null);
+        ClearEditMode();
         return;
       }
 
@@ -225,9 +241,9 @@ export const NdcDetailsComponent = (props: any) => {
         );
       }
       fetchNdcDetailActions();
-      setEditingKey(null);
+      ClearEditMode();
     } catch (exception: any) {
-      setEditingKey(null);
+      ClearEditMode();
       message.open({
         type: "error",
         content: exception.message,
@@ -313,7 +329,7 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.nationalPlanObjective}</span>
             </Tooltip>
           ) : (
-            <Input placeholder="Enter National Plan Objective" />
+            <Input placeholder={t("ndc:nationalPlanObjectivePlaceHolder")} />
           )}
         </Space>
       ),
@@ -651,7 +667,7 @@ export const NdcDetailsComponent = (props: any) => {
         {isGovernmentUser && !selectedPeriod.finalized ? (
           <Row justify="end">
             <Button
-              className="mg-left-1 btn-danger footer-btns"
+              className="mg-left-1 btn-danger"
               onClick={onClickedDeletePeriod}
               htmlType="submit"
               disabled={isMainActionInEditMode()}
@@ -856,7 +872,7 @@ export const NdcDetailsComponent = (props: any) => {
         });
         fetchNdcDetailPeriods();
         setExpandedRowKeys([]);
-        setEditingKey(null);
+        ClearEditMode();
       } else if (actionInfo.action === "Approve") {
         message.open({
           type: "success",
