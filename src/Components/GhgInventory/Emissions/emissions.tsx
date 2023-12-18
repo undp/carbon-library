@@ -1463,14 +1463,11 @@ export const GHGEmissionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
-              <InputNumber onChange={(event) => calculateSumCo2(event, panelHeading)} />
+              <InputNumber onChange={(event) => calculateSumCo2(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
             </Form.Item>
           </Col>
           <Col xl={6}>
@@ -1481,14 +1478,11 @@ export const GHGEmissionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
-              <InputNumber onChange={(event) => calculateSumCh4(event, panelHeading)} />
+              <InputNumber onChange={(event) => calculateSumCh4(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
             </Form.Item>
           </Col>
           <Col xl={6}>
@@ -1499,14 +1493,11 @@ export const GHGEmissionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
-              <InputNumber onChange={(event) => calculateSumN2o(event, panelHeading)} />
+              <InputNumber onChange={(event) => calculateSumN2o(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
             </Form.Item>
           </Col>
           <Col xl={6}>
@@ -1517,14 +1508,11 @@ export const GHGEmissionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
-              <InputNumber onChange={(event) => calculateSumCo2Eq(event, panelHeading)} />
+              <InputNumber onChange={(event) => calculateSumCo2Eq(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
             </Form.Item>
           </Col>
         </Row>
@@ -1779,7 +1767,7 @@ export const GHGEmissionsComponent = (props: any) => {
                                   return false;
                                 }}
                               >
-                                <Button icon={<UploadOutlined />}>
+                                <Button icon={<UploadOutlined />} disabled={userInfoState?.userRole === Role.ViewOnly}>
                                   {t(`ghgInventory:upload`)}
                                 </Button>
                               </Upload>
@@ -1788,6 +1776,7 @@ export const GHGEmissionsComponent = (props: any) => {
                           <Col xl={16} md={16} className="add-new-upload-file-name-input">
                             <Input
                               value={uploadedFileName}
+                              disabled={userInfoState?.userRole === Role.ViewOnly}
                               readOnly
                               suffix={
                                 uploadedFileName && (
@@ -1889,14 +1878,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly}/>
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -1907,14 +1893,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -1925,14 +1908,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -1943,14 +1923,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                         </Row>
@@ -1970,14 +1947,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -1988,14 +1962,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -2006,14 +1977,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={6}>
@@ -2024,14 +1992,11 @@ export const GHGEmissionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                         </Row>

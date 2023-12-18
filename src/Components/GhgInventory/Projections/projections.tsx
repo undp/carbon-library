@@ -1340,14 +1340,12 @@ export const GHGProjectionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
-              <InputNumber onChange={(event) => calculateSumBau(event, panelHeading)} />
+              <InputNumber onChange={(event) => calculateSumBau(event, panelHeading)}
+                disabled={userInfoState?.userRole === Role.ViewOnly} />
             </Form.Item>
           </Col>
           <Col xl={7}>
@@ -1359,14 +1357,13 @@ export const GHGProjectionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
-              <InputNumber onChange={(event) => calculateSumConditionalNdc(event, panelHeading)} />
+              <InputNumber onChange={(event) => calculateSumConditionalNdc(event, panelHeading)}
+                disabled={userInfoState?.userRole === Role.ViewOnly}
+              />
             </Form.Item>
           </Col>
           <Col xl={7}>
@@ -1378,15 +1375,13 @@ export const GHGProjectionsComponent = (props: any) => {
                     if (value && value < 0) {
                       throw new Error();
                     }
-                    if (value && !Number.isInteger(value)) {
-                      throw new Error();
-                    }
                   },
                 },
               ]}
             >
               <InputNumber
                 onChange={(event) => calculateSumUnconditionalNdc(event, panelHeading)}
+                disabled={userInfoState?.userRole === Role.ViewOnly}
               />
             </Form.Item>
           </Col>
@@ -1640,13 +1635,16 @@ export const GHGProjectionsComponent = (props: any) => {
                                   return false;
                                 }}
                               >
-                                <Button icon={<UploadOutlined />}>{t(`ghgInventory:upload`)}</Button>
+                                <Button icon={<UploadOutlined />} disabled={userInfoState?.userRole === Role.ViewOnly} >
+                                  {t(`ghgInventory:upload`)}
+                                </Button>
                               </Upload>
                             </Form.Item>
                           </Col>
                           <Col xl={16} md={16} className="add-new-upload-file-name-input">
                             <Input
                               value={uploadedFileName}
+                              disabled={userInfoState?.userRole === Role.ViewOnly}
                               readOnly
                               suffix={
                                 uploadedFileName && (
@@ -1745,14 +1743,11 @@ export const GHGProjectionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={7}>
@@ -1763,14 +1758,11 @@ export const GHGProjectionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={7}>
@@ -1781,14 +1773,11 @@ export const GHGProjectionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                         </Row>
@@ -1810,14 +1799,11 @@ export const GHGProjectionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={7}>
@@ -1828,14 +1814,11 @@ export const GHGProjectionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                           <Col xl={7}>
@@ -1846,14 +1829,11 @@ export const GHGProjectionsComponent = (props: any) => {
                                     if (value && value < 0) {
                                       throw new Error();
                                     }
-                                    if (value && !Number.isInteger(value)) {
-                                      throw new Error();
-                                    }
                                   },
                                 },
                               ]}
                             >
-                              <InputNumber />
+                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
                             </Form.Item>
                           </Col>
                         </Row>
