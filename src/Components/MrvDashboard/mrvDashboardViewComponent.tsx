@@ -58,7 +58,7 @@ export const MrvDashboardComponent = (props: any) => {
     "#ff9900",
   ];
 
-  const colorsStatus = ["#C6A7FE", "#FF8183", "#CDCDCD", "#7FEABF", "#B7A4FE"];
+  const colorsStatus = ["#6ACDFF", "#CDCDCD", "#FF8183", "#B7A4FE", "#B7A4FE"];
 
   const TTSuffix =
     userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER ? "My" : "";
