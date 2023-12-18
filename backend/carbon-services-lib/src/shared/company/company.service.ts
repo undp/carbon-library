@@ -491,14 +491,14 @@ export class CompanyService {
       query.filterAnd.push({
         key: "state",
         operation: "in",
-        value: [0, 1],
+        value: [1],
       });
     } else {
       const filterAnd: FilterEntry[] = [];
       filterAnd.push({
         key: "state",
         operation: "in",
-        value: [0, 1],
+        value: [1],
       });
       query.filterAnd = filterAnd;
     }
