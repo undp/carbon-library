@@ -4138,6 +4138,9 @@ export class ProgrammeService {
       const companies: Company[] = programme.company;
       const concatenatedNames = companies.map(company => company.name).join(', ');
 
+      const certifiers: Company[] = programme.certifier;
+      const concatenatedCertifiersNames = certifiers.map(company => company?.name).join(', ');
+
       const programmeDocuments: ProgrammeDocument[] = programme.documents;
       const concatenatedDocumentUrls = programmeDocuments.map(document => document.url).join(', ');
 
@@ -4196,7 +4199,7 @@ export class ProgrammeService {
       dto.environmentalAssessmentRegistrationNo = programme.environmentalAssessmentRegistrationNo;
       dto.createdAt = this.helperService.formatTimestamp(programme.createdAt);
       dto.updatedAt = this.helperService.formatTimestamp(programme.updatedAt);
-      dto.certifier = programme.certifier?.name;
+      dto.certifier = concatenatedCertifiersNames;
       dto.programmeDocuments = concatenatedDocumentUrls;
 
       exportData.push(dto);
