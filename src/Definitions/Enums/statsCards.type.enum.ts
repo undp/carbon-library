@@ -1,9 +1,9 @@
 export enum StatsCardsTypes {
-  PROGRAMMES_PENDING = "Programmes Pending",
+  PROGRAMMES_PENDING = "Projects Pending",
   TRANSFER_REQUEST_RECEIVED = "Pending Transfers Received",
-  PROGRAMMES_UNCERTIFIED = "Programmes Certifiable",
+  PROGRAMMES_UNCERTIFIED = "Projects Certifiable",
   TRANSFER_REQUEST_SENT = "Pending Transfers Sent",
-  PROGRAMMES_CERTIFIED = "Programmes Certified",
+  PROGRAMMES_CERTIFIED = "Projects Certified",
   CREDIT_BALANCE = "Credit Balance",
   CREDIT_CERTIFIED = "Credits Certified",
   PROGRAMMES = "Programmes",
