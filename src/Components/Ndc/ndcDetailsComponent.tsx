@@ -64,16 +64,13 @@ export const NdcDetailsComponent = (props: any) => {
   const isEditing = (record: NdcDetail) => record.id === editingKey;
 
   const isMainActionInEditMode = () => {
-    if (editingKey) {
-      const action = ndcActionsList.find(
-        (item: NdcDetail) => item.id === editingKey
-      );
-      if (action && action.actionType === NdcDetailsActionType.MainAction) {
-        return true;
-      }
-    }
+    const unsavedMainActions = ndcMainDetailsForPeriod.filter(
+      (item: NdcDetail) =>
+        item.status === NdcDetailsActionStatus.New &&
+        item.actionType === NdcDetailsActionType.MainAction
+    );
 
-    return false;
+    return unsavedMainActions.length > 0 ? true : false;
   };
 
   const { userInfoState } = useUserContext();
@@ -666,25 +663,36 @@ export const NdcDetailsComponent = (props: any) => {
         </Row>
         {isGovernmentUser && !selectedPeriod.finalized ? (
           <Row justify="end">
-            <Button
-              className="mg-left-1 btn-danger"
-              onClick={onClickedDeletePeriod}
-              htmlType="submit"
-              disabled={isMainActionInEditMode()}
-              loading={loading}
-            >
-              {t("ndc:delete")}
-            </Button>
-            <Button
-              className="mg-left-1 footer-btns"
-              type="primary"
-              onClick={onClickedFinalizePeriod}
-              disabled={isMainActionInEditMode()}
-              htmlType="submit"
-              loading={loading}
-            >
-              {t("ndc:finalize")}
-            </Button>
+            {isMainActionInEditMode() ? (
+              <>
+                <Button className="mg-left-1" disabled>
+                  {t("ndc:delete")}
+                </Button>
+                <Button className="mg-left-1" disabled>
+                  {t("ndc:finalize")}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className="mg-left-1 btn-danger"
+                  onClick={onClickedDeletePeriod}
+                  htmlType="submit"
+                  loading={loading}
+                >
+                  {t("ndc:delete")}
+                </Button>
+                <Button
+                  className="mg-left-1"
+                  type="primary"
+                  onClick={onClickedFinalizePeriod}
+                  htmlType="submit"
+                  loading={loading}
+                >
+                  {t("ndc:finalize")}
+                </Button>
+              </>
+            )}
           </Row>
         ) : (
           ""
