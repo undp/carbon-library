@@ -372,7 +372,7 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpiUnit}</span>
             </Tooltip>
           ) : (
-            <Input placeholder={t("ndc:kpiUnitPlaceHolder")} />
+            <Input placeholder= {t("ndc:kpiUnitPlaceHolder")} />
           )}
         </Space>
       ),
