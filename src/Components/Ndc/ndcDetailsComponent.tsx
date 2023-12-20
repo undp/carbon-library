@@ -151,6 +151,7 @@ export const NdcDetailsComponent = (props: any) => {
       actionType: NdcDetailsActionType.SubAction,
       nationalPlanObjective: "",
       kpi: "",
+      kpiUnit: "",
       ministryName: loginMinistry,
       status: NdcDetailsActionStatus.New,
       parentActionId: mainActionId,
@@ -164,6 +165,7 @@ export const NdcDetailsComponent = (props: any) => {
       form.setFieldsValue({
         nationalPlanObjective: "",
         kpi: "",
+        kpiUnit: "",
       });
     }
 
@@ -202,7 +204,8 @@ export const NdcDetailsComponent = (props: any) => {
         ClearEditMode();
         return;
       } else if (
-        updatedFields.kpi === row.kpi && updatedFields.kpiUnit === row.kpiUnit &&
+        updatedFields.kpi === row.kpi &&
+        updatedFields.kpiUnit === row.kpiUnit &&
         updatedFields.nationalPlanObjective === row.nationalPlanObjective
       ) {
         ClearEditMode();
@@ -372,7 +375,7 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpiUnit}</span>
             </Tooltip>
           ) : (
-            <Input placeholder= {t("ndc:kpiUnitPlaceHolder")} />
+            <Input placeholder={t("ndc:kpiUnitPlaceHolder")} />
           )}
         </Space>
       ),
@@ -481,6 +484,7 @@ export const NdcDetailsComponent = (props: any) => {
       form.setFieldsValue({
         nationalPlanObjective: "",
         kpi: "",
+        kpiUnit: "",
       });
       const periodId: number = parseInt(selectedPeriod.key);
       const newData: NdcDetail = {
