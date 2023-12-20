@@ -46,7 +46,7 @@ import { EventLog } from '../entities/event.log.entity';
       InvestmentView,
       ProgrammeDocumentViewEntity,
       NdcDetailsPeriod,
-      NdcDetailsAction
+      NdcDetailsAction,
       EventLog
     ]),
     UtilModule,
