@@ -1,9 +1,9 @@
 export enum GuaranteePayback{
     UPFORNT='Upfront',
-    ANNUAL="Anual"
+    ANNUAL="Annual"
 }
 
 export enum InsurancePayback{
-    LUMPSUM='LumpSum',
+    LUMPSUM='Lump Sum',
     ANNUAL='Annual'
 }
