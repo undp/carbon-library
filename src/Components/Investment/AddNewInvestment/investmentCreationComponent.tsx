@@ -704,7 +704,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                 </Col>
                                 <Col xl={8} md={12}>
                                   <Form.Item
-                                    label={t("programme:guaranteePayback")}
+                                    label={t("programme:payback")}
                                     wrapperCol={{ span: 13 }}
                                     className="role-group"
                                     name="guaranteePayback"
@@ -723,9 +723,9 @@ export const InvestmentCreationComponent = (props: any) => {
                                             value === undefined
                                           ) {
                                             throw new Error(
-                                              `${t(
-                                                "programme:guaranteePayback"
-                                              )} ${t("isRequired")}`
+                                              `${t("programme:payback")} ${t(
+                                                "isRequired"
+                                              )}`
                                             );
                                           }
                                         },
@@ -857,7 +857,7 @@ export const InvestmentCreationComponent = (props: any) => {
                               <Col xl={8} md={12}>
                                 <div className="details-part-two">
                                   <Form.Item
-                                    label={t("programme:insurancePayback")}
+                                    label={t("programme:payback")}
                                     wrapperCol={{ span: 13 }}
                                     className="role-group"
                                     name="insurancePayback"
@@ -876,9 +876,9 @@ export const InvestmentCreationComponent = (props: any) => {
                                             value === undefined
                                           ) {
                                             throw new Error(
-                                              `${t(
-                                                "programme:insurancePayback"
-                                              )} ${t("isRequired")}`
+                                              `${t("programme:payback")} ${t(
+                                                "isRequired"
+                                              )}`
                                             );
                                           }
                                         },
