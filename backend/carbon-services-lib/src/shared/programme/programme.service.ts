@@ -417,7 +417,7 @@ export class ProgrammeService {
       );
     }
 
-    const todaySart = (new Date().getTime()) - 24*60*60
+    const todaySart = (new Date().getTime())/1000 - 24*60*60
     if(req.startOfPayback && req.startOfPayback<todaySart){
       throw new HttpException(
         this.helperService.formatReqMessagesString(
