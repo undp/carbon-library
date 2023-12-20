@@ -87,6 +87,9 @@
     "period":"Period",
     "payback":"Payback",
     "loanPeriod":"Loan Period",
-    "startOfPayback":"Start of Payback"
+    "startOfPayback":"Start of Payback", 
+    "LumpSum":"LUMP SUM",
+    "Upfront":"UPFRONT",
+    "Annual":"ANNUAL"
 
 }

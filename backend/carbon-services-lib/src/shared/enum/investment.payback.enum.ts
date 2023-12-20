@@ -4,6 +4,6 @@ export enum GuaranteePayback{
 }
 
 export enum InsurancePayback{
-    LUMPSUM='Lump Sum',
+    LUMPSUM='LumpSum',
     ANNUAL='Annual'
 }
