@@ -26,6 +26,7 @@ import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
 import { CadtModule } from '../cadt/cadt.module';
 import { NdcDetailsPeriod } from '../entities/ndc.details.period.entity';
 import { NdcDetailsAction } from '../entities/ndc.details.action.entity';
+import { EventLog } from '../entities/event.log.entity';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { NdcDetailsAction } from '../entities/ndc.details.action.entity';
       ProgrammeDocumentViewEntity,
       NdcDetailsPeriod,
       NdcDetailsAction
+      EventLog
     ]),
     UtilModule,
     CompanyModule,
