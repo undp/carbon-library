@@ -14,6 +14,9 @@ export class NdcDetailsAction {
     kpi: number;
 
     @Column()
+    kpiUnit: string;
+
+    @Column()
     ministryName: string;
 
     @Column({nullable: true})

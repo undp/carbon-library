@@ -202,7 +202,7 @@ export const NdcDetailsComponent = (props: any) => {
         ClearEditMode();
         return;
       } else if (
-        updatedFields.kpi === row.kpi &&
+        updatedFields.kpi === row.kpi && updatedFields.kpiUnit === row.kpiUnit &&
         updatedFields.nationalPlanObjective === row.nationalPlanObjective
       ) {
         ClearEditMode();
@@ -488,6 +488,7 @@ export const NdcDetailsComponent = (props: any) => {
         actionType: NdcDetailsActionType.MainAction,
         nationalPlanObjective: "",
         kpi: "",
+        kpiUnit: "",
         ministryName: loginMinistry,
         periodId: periodId,
         status: NdcDetailsActionStatus.New,

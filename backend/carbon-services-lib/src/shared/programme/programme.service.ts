@@ -5488,6 +5488,7 @@ export class ProgrammeService {
         id: true,
         nationalPlanObjective: true,
         kpi: true,
+        kpiUnit: true,
         ministryName: true,
         periodId: true,
         parentActionId: true,
