@@ -3,219 +3,332 @@ import {
   Col,
   DatePicker,
   Empty,
+  Form,
+  Input,
+  List,
   PaginationProps,
+  Popover,
   Row,
+  Select,
   Space,
   Table,
   Tabs,
   TabsProps,
+  Tag,
+  Tooltip,
+  Typography,
   message,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  EditableRow,
-  EditableCell,
-} from "../Common/AntComponents/antTableComponents";
+import { EditableCell } from "../Common/AntComponents/antTableComponents";
 import "./ndcDetailsComponent.scss";
-import { CompanyRole, Role } from "../../Definitions";
-
-type Period = {
-  start: number;
-  end: number;
-};
-
-type NdcDetail = {
-  key: number;
-  startDate: Date;
-  endDate: Date;
-  nationalPlanObj: string;
-  kpi: number;
-  subNdcDetails?: [];
-};
-
-enum NdcActionType {
-  main,
-  sub,
-}
+import { CompanyRole, Role, addSpaces } from "../../Definitions";
+import {
+  DateRange,
+  NdcDetailsActionType,
+  NdcDetail,
+  NdcDetailsActionStatus,
+  Period,
+  getNdcActionStatusTagType,
+  PopupInfo,
+} from "../../Definitions/Definitions/ndcDetails.definitions";
+import { TooltipColor } from "../../Styles";
+import { EllipsisOutlined, LockOutlined } from "@ant-design/icons";
+import * as Icon from "react-bootstrap-icons";
+import UserActionConfirmationModel from "../Common/Models/userActionConfirmationModel";
 
 export const NdcDetailsComponent = (props: any) => {
   const { t, useConnection, useUserContext } = props;
   const { RangePicker } = DatePicker;
-  const [ndcDetailsData, setNdcDetailsData] = useState<any>([]);
+  const [ndcActionsList, setNdcActionsList] = useState([] as NdcDetail[]);
   const [loading, setLoading] = useState<boolean>(false);
-  const periodItemsRef = useRef([] as any[]);
-  const [periodItems, setPeriodItems] = useState([] as any[]);
-  const [selectedTab, setSelectedTab] = useState("add_new");
-  const selectedPeriod = useRef({} as Period);
-  const addedNdcDetailId = useRef(0);
-  const selectedNdcDetail = useRef({} as NdcDetail);
+  const [periodItems, setPeriodItems] = useState([] as Period[]);
+  const [selectedPeriod, setSelectedPeriod] = useState({} as Period);
+  const selectedDateRangeRef = useRef({} as DateRange);
   const [tableKey, setTableKey] = useState(0);
+  const { get, post, put } = useConnection();
+  const [ministryOrgList, setMinistryOrgList] = useState([] as any);
+  const [actionInfo, setActionInfo] = useState<any>({});
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [form] = Form.useForm();
+  const [editingKey, setEditingKey] = useState<number | null>(null);
+  const [nextAvailableActionId, setNextAvailableActionId] = useState(0);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([] as any[]);
+  const [subNdcActionsForPeriod, setSubNdcActionsForPeriod] = useState(
+    [] as NdcDetail[]
+  );
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
+  const isEditing = (record: NdcDetail) => record.id === editingKey;
+
+  const isMainActionInEditMode = () => {
+    const unsavedMainActions = ndcMainDetailsForPeriod.filter(
+      (item: NdcDetail) =>
+        item.status === NdcDetailsActionStatus.New &&
+        item.actionType === NdcDetailsActionType.MainAction
+    );
+
+    return unsavedMainActions.length > 0 ? true : false;
+  };
 
   const { userInfoState } = useUserContext();
 
-  const isAddRangeVisible = () => {
+  useEffect(() => {
+    if (expandedRowKeys && expandedRowKeys.length > 0) {
+      const expandedKey = expandedRowKeys[0];
+      setNdcSubActionsForMainAction(expandedKey);
+    }
+  }, ndcActionsList);
+
+  const loginMinistry =
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT
+      ? process.env.REACT_APP_GOVERNMENT_MINISTRY
+        ? process.env.REACT_APP_GOVERNMENT_MINISTRY
+        : "Ministry Of Environment"
+      : userInfoState?.companyRole === CompanyRole.MINISTRY
+      ? userInfoState?.companyName
+      : undefined;
+
+  const isGovernmentUser =
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+    userInfoState?.userRole !== Role.ViewOnly;
+
+  const isMainNdcActionsEditable =
+    !selectedPeriod.finalized &&
+    userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+    userInfoState?.userRole !== Role.ViewOnly;
+
+  const isSubNdcActionsEditable = (record: NdcDetail) => {
     return (
-      (userInfoState?.companyRole === CompanyRole.MINISTRY ||
-        userInfoState?.companyRole === CompanyRole.GOVERNMENT) &&
+      !selectedPeriod.finalized &&
+      record.status !== NdcDetailsActionStatus.Approved &&
+      (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+        (userInfoState?.companyRole === CompanyRole.MINISTRY &&
+          userInfoState?.companyName === record.ministryName)) &&
       userInfoState?.userRole !== Role.ViewOnly
     );
   };
 
-  const isAddNdcActionVisible = () => {
+  const checkSubNdcActionCreatePermission = () => {
     return (
-      userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+      !selectedPeriod.finalized &&
+      (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+        userInfoState?.companyRole === CompanyRole.MINISTRY) &&
       userInfoState?.userRole !== Role.ViewOnly
     );
   };
 
-  const isAddSubNdcActionVisible = () => {
-    return (
-      userInfoState?.companyRole === CompanyRole.MINISTRY &&
-      userInfoState?.userRole !== Role.ViewOnly
-    );
+  const isNdcActionEditable = (record: NdcDetail) => {
+    if (record.actionType === NdcDetailsActionType.MainAction) {
+      return isMainNdcActionsEditable;
+    } else if (record.actionType === NdcDetailsActionType.SubAction) {
+      return isSubNdcActionsEditable(record);
+    }
+  };
+
+  const ndcMainDetailsForPeriod =
+    selectedPeriod.key !== "add_new"
+      ? ndcActionsList.filter((ndcDetail: NdcDetail) => {
+          return (
+            ndcDetail.periodId === parseInt(selectedPeriod.key) &&
+            ndcDetail.actionType === NdcDetailsActionType.MainAction
+          );
+        })
+      : [];
+
+  const setNdcSubActionsForMainAction = (mainActionId: number) => {
+    let subNdcDetails = ndcActionsList.filter((ndcDetail: NdcDetail) => {
+      return (
+        ndcDetail.parentActionId === mainActionId &&
+        ndcDetail.actionType === NdcDetailsActionType.SubAction
+      );
+    });
+
+    const emptySubNdcRow = {
+      id: nextAvailableActionId,
+      actionType: NdcDetailsActionType.SubAction,
+      nationalPlanObjective: "",
+      kpi: "",
+      ministryName: loginMinistry,
+      status: NdcDetailsActionStatus.New,
+      parentActionId: mainActionId,
+    };
+
+    if (checkSubNdcActionCreatePermission()) {
+      subNdcDetails = [...subNdcDetails, emptySubNdcRow];
+      setEditingKey(nextAvailableActionId);
+      setNextAvailableActionId((value) => value + 1);
+
+      form.setFieldsValue({
+        nationalPlanObjective: "",
+        kpi: "",
+      });
+    }
+
+    setSubNdcActionsForPeriod(subNdcDetails);
   };
 
   const inRange = (num: number, min: number, max: number) =>
     num >= min && num <= max;
 
-  function onAddNewSubNdcDetail() {
-    const range = selectedTab.split("-");
-    const ndcDetail = ndcDetailsData.find(
-      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
-    );
-    const ndcDetailItemIndex = ndcDetailsData.findIndex(
-      (item: NdcDetail) => item.key === selectedNdcDetail.current.key
+  const ClearEditMode = () => {
+    const unsavedMainActions = ndcActionsList.filter(
+      (item: NdcDetail) =>
+        item.status === NdcDetailsActionStatus.New &&
+        item.actionType === NdcDetailsActionType.MainAction
     );
 
-    if (ndcDetail) {
-      addedNdcDetailId.current = addedNdcDetailId.current + 1;
-      const newData = {
-        key: addedNdcDetailId.current,
-        startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
-        endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-        ndcActionId: ndcDetail?.key,
-        nationalPlanObj: "",
-        kpi: "",
-        ministry: "",
-      };
-      if (!ndcDetail.subNdcDetails) {
-        ndcDetail.subNdcDetails = [];
-      }
-      ndcDetail.subNdcDetails.push(newData);
+    if (unsavedMainActions && unsavedMainActions.length) {
+      const updatedActions = ndcActionsList.filter(
+        (item: NdcDetail) => !unsavedMainActions.includes(item)
+      );
+      setNdcActionsList(updatedActions);
     }
-
-    ndcDetailsData[ndcDetailItemIndex] = ndcDetail;
-    setNdcDetailsData(ndcDetailsData);
-    setTableKey((key: any) => key + 1);
-  }
-
-  const handleSave = (row: any) => {
-    setNdcDetailsData((prevData: any) => {
-      const newData = JSON.parse(JSON.stringify(prevData));
-      if (row.type === NdcActionType.main) {
-        const index = newData.findIndex((item: any) => row.key === item.key);
-        if (index !== -1) {
-          newData[index] = { ...newData[index], ...row };
-        }
-      } else {
-        const parentIndex = newData.findIndex(
-          (item: any) => row.ndcActionId === item.key
-        );
-        const parentItem = newData[parentIndex];
-
-        if (parentItem) {
-          if (parentItem.subNdcDetails) {
-            const itemIndex = parentItem.subNdcDetails.findIndex(
-              (item: any) => row.key === item.key
-            );
-
-            if (itemIndex === -1) {
-              parentItem.subNdcDetails.push(row);
-            } else {
-              parentItem.subNdcDetails[itemIndex] = { ...row };
-            }
-          } else {
-            parentItem.subNdcDetails = [row];
-          }
-        }
-
-        newData[parentIndex] = { ...parentItem };
-        setTableKey((key: any) => key + 1);
-      }
-      return newData;
-    });
+    setEditingKey(null);
   };
 
-  const getNdcDetailsForPeriod = () => {
-    const range = selectedTab.split("-");
-    if (range.length > 1) {
-      const filteredData = ndcDetailsData.filter((item: NdcDetail) => {
-        return inRange(
-          Number(moment(item.startDate).year()),
-          Number(range[0]),
-          Number(range[1])
-        );
-      });
-      return filteredData;
-    } else {
-      return [];
-    }
-  };
+  const handleSave = async (row: NdcDetail) => {
+    try {
+      let updatedFields;
+      try {
+        updatedFields = (await form.validateFields()) as NdcDetail;
+      } catch (exception) {
+        return;
+      }
 
-  const getSubNdcDetails = (key: number) => {
-    const ndcDetail = ndcDetailsData.find(
-      (item: NdcDetail) => item.key === key
-    );
-    if (ndcDetail) {
-      if (
-        ndcDetail?.subNdcDetails[
-          ndcDetail?.subNdcDetails?.length - 1
-        ]?.ministry.trim() !== "" &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
-          ?.ministry &&
-        ndcDetail?.subNdcDetails[
-          ndcDetail?.subNdcDetails?.length - 1
-        ]?.nationalPlanObj.trim() !== "" &&
-        ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]
-          ?.nationalPlanObj &&
-        String(
-          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
-        ).trim() !== "" &&
-        String(
-          ndcDetail?.subNdcDetails[ndcDetail?.subNdcDetails?.length - 1]?.kpi
-        )
+      if (!updatedFields) {
+        ClearEditMode();
+        return;
+      } else if (
+        updatedFields.kpi === row.kpi &&
+        updatedFields.nationalPlanObjective === row.nationalPlanObjective
       ) {
-        onAddNewSubNdcDetail();
+        ClearEditMode();
+        return;
       }
-      return ndcDetail.subNdcDetails;
+
+      const updatedItem = {
+        ...row,
+        ...updatedFields,
+      };
+
+      if (updatedItem.status === NdcDetailsActionStatus.New) {
+        if (
+          isGovernmentUser &&
+          updatedItem.actionType === NdcDetailsActionType.SubAction
+        ) {
+          updatedItem.status = NdcDetailsActionStatus.Approved;
+        } else {
+          updatedItem.status = NdcDetailsActionStatus.Pending;
+        }
+        const response = await post("national/programme/addNdcDetailsAction", {
+          ...updatedItem,
+          kpi: parseInt(updatedItem.kpi.toString()),
+        });
+      } else {
+        updatedItem.status = NdcDetailsActionStatus.Pending;
+        const response = await put(
+          "national/programme/updateNdcDetailsAction",
+          {
+            ...updatedItem,
+            kpi: parseInt(updatedItem.kpi.toString()),
+          }
+        );
+      }
+      fetchNdcDetailActions();
+      ClearEditMode();
+    } catch (exception: any) {
+      ClearEditMode();
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    }
+  };
+
+  const actionMenu = (record: NdcDetail) => {
+    if (
+      record.status === NdcDetailsActionStatus.Pending &&
+      isGovernmentUser &&
+      !selectedPeriod.finalized
+    ) {
+      return (
+        <List
+          className="action-menu"
+          size="small"
+          dataSource={[
+            {
+              text: t("ndc:approve"),
+              icon: <Icon.BoxArrowInDown />,
+              style: "color-primary",
+              click: () => {
+                setActionInfo({
+                  action: "Approve",
+                  headerText: t("ndc:actionApproveTitle"),
+                  type: "primary",
+                  icon: <Icon.BoxArrowInDown />,
+                  recordId: record.id,
+                });
+                setOpenConfirmationModal(true);
+              },
+            },
+            {
+              text: t("ndc:reject"),
+              icon: <Icon.XOctagon />,
+              style: "color-error",
+              click: () => {
+                setActionInfo({
+                  action: "Reject",
+                  headerText: t("ndc:rejectApproveTitle"),
+                  type: "danger",
+                  icon: <Icon.XOctagon />,
+                  recordId: record.id,
+                });
+                setOpenConfirmationModal(true);
+              },
+            },
+          ]}
+          renderItem={(item: any) => (
+            <List.Item onClick={item.click}>
+              <Typography.Text className={`action-icon ${item.style}`}>
+                {item.icon}
+              </Typography.Text>
+              <span>{item.text}</span>
+            </List.Item>
+          )}
+        ></List>
+      );
     } else {
-      return [];
+      return null;
     }
   };
 
   const defaultColumns: any = [
     {
       title: t("ndc:ndcColumnsNationalPlanObj"),
-      dataIndex: "nationalPlanObj",
-      key: "nationalPlanObj",
+      dataIndex: "nationalPlanObjective",
+      key: "nationalPlanObjective",
       align: "left" as const,
+      width: 400,
       editable: true,
-      width: "50%",
-      render: (_: any, record: any) => (
-        <>
-          {record.nationalPlanObj ? (
-            <Space size="middle">
-              <span>{record.nationalPlanObj}</span>
-            </Space>
+      render: (_: any, record: NdcDetail) => (
+        <Space size="middle">
+          {record.nationalPlanObjective ? (
+            <Tooltip
+              title={
+                isNdcActionEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+              }
+            >
+              <span>{record.nationalPlanObjective}</span>
+            </Tooltip>
           ) : (
-            <input
-              placeholder="Please add Programmes"
-              className="ant-input"
-              type="text"
-            ></input>
+            <Input placeholder={t("ndc:nationalPlanObjectivePlaceHolder")} />
           )}
-        </>
+        </Space>
       ),
     },
     {
@@ -223,46 +336,97 @@ export const NdcDetailsComponent = (props: any) => {
       dataIndex: "kpi",
       key: "kpi",
       align: "left" as const,
+      width: 100,
       editable: true,
-      width: "10%",
-      render: (_: any, record: any) => (
-        <>
-          {record.nationalPlanObj ? (
-            <Space size="middle">
+      render: (_: any, record: NdcDetail) => (
+        <Space size="middle">
+          {record.kpi ? (
+            <Tooltip
+              title={
+                isNdcActionEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+              }
+            >
               <span>{record.kpi}</span>
-            </Space>
+            </Tooltip>
           ) : (
-            <input
-              placeholder="Enter Kpi"
-              className="ant-input"
-              type="text"
-            ></input>
+            <Input placeholder="Enter Kpi" />
           )}
-        </>
+        </Space>
       ),
     },
     {
-      title: "Government Department",
-      dataIndex: "ministry",
-      key: "ministry",
+      title: t("ndc:ndcColumnsMinistry"),
+      dataIndex: "ministryName",
+      key: "ministryName",
       align: "left" as const,
-      editable: true,
-      width: "40%",
+      width: 300,
+      editable: false,
       render: (_: any, record: any) => (
-        <>
-          {record.nationalPlanObj ? (
-            <Space size="middle">
-              <span>{record.ministry}</span>
-            </Space>
-          ) : (
-            <input
-              placeholder="Please add the Government Department"
-              className="ant-input"
-              type="text"
-            ></input>
-          )}
-        </>
+        <Tooltip
+          title={
+            isSubNdcActionsEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+          }
+        >
+          <Select
+            disabled={!(isSubNdcActionsEditable(record) && isEditing(record))}
+            defaultValue={
+              record.ministryName ? record.ministryName : loginMinistry
+            }
+            style={{ width: 220 }}
+            onChange={(value: any, option: any) => {
+              record.ministryName = option.label;
+              handleSave(record);
+            }}
+            options={ministryOrgList}
+          />
+        </Tooltip>
       ),
+    },
+    {
+      title: t("ndc:ndcColumnsStatus"),
+      dataIndex: "status",
+      key: "status",
+      align: "left" as const,
+      width: 200,
+      editable: false,
+      render: (_: any, record: any) => {
+        const menu = actionMenu(record);
+        return (
+          <div onClick={(event: any) => event.stopPropagation()}>
+            {record.actionType === NdcDetailsActionType.SubAction &&
+            record.status !== NdcDetailsActionStatus.New ? (
+              <Tooltip
+                title={record.status}
+                color={TooltipColor}
+                key={TooltipColor}
+              >
+                <Tag
+                  className="clickable"
+                  color={getNdcActionStatusTagType(record.status)}
+                >
+                  {addSpaces(record.status)}
+                </Tag>
+              </Tooltip>
+            ) : (
+              ""
+            )}
+            {record.actionType === NdcDetailsActionType.SubAction && menu ? (
+              <Popover placement="bottomRight" content={menu} trigger="click">
+                <EllipsisOutlined
+                  rotate={90}
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    cursor: "pointer",
+                  }}
+                />
+              </Popover>
+            ) : (
+              <span></span>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -272,135 +436,142 @@ export const NdcDetailsComponent = (props: any) => {
     }
     return {
       ...col,
-      onCell: (record: any) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
+      onCell: (record: NdcDetail) => {
+        return {
+          record,
+          editing: isEditing(record),
+          dataIndex: col.dataIndex,
+          title: col.title,
+          onBlurHandler: (record: NdcDetail) => {
+            if (isEditing(record)) {
+              handleSave(record);
+            }
+          },
+          t: t,
+        };
+      },
     };
   });
 
-  function onAddNewNdcDetail() {
-    const range = selectedTab.split("-");
-    const ndcActionId = ++addedNdcDetailId.current;
-    const newData = {
-      key: ndcActionId,
-      type: NdcActionType.main,
-      startDate: new Date(`${Number(range[0])}-01-24 23:12:00`),
-      endDate: new Date(`${Number(range[0])}-12-24 23:12:00`),
-      nationalPlanObj: "",
-      kpi: "",
-      ministry: "",
-      subNdcDetails: [
-        {
-          key: ++addedNdcDetailId.current,
-          ndcActionId: ndcActionId,
-          type: NdcActionType.sub,
-          startDate: new Date("2019-03-25"),
-          endDate: new Date("2020-03-25"),
-          nationalPlanObj: "",
-          kpi: "",
-          ministry: "",
-        },
-      ],
-    };
+  async function onClickedAddNewNdcDetail() {
+    if (selectedPeriod.key !== "add_new") {
+      form.setFieldsValue({
+        nationalPlanObjective: "",
+        kpi: "",
+      });
+      const periodId: number = parseInt(selectedPeriod.key);
+      const newData: NdcDetail = {
+        id: nextAvailableActionId,
+        actionType: NdcDetailsActionType.MainAction,
+        nationalPlanObjective: "",
+        kpi: "",
+        ministryName: loginMinistry,
+        periodId: periodId,
+        status: NdcDetailsActionStatus.New,
+      };
 
-    setNdcDetailsData([...ndcDetailsData, newData]);
+      setEditingKey(nextAvailableActionId);
+
+      setNextAvailableActionId((value) => value + 1);
+
+      setNdcActionsList((ndcActionsList: NdcDetail[]) => [
+        ...ndcActionsList,
+        newData,
+      ]);
+      setTableKey((key: any) => key + 1);
+      if (ndcMainDetailsForPeriod.length + 1 > pageSize) {
+        const lastPage = Math.ceil(ndcMainDetailsForPeriod.length / pageSize);
+        setCurrentPage(lastPage);
+      }
+    }
   }
 
   const components = {
     body: {
-      row: EditableRow,
       cell: EditableCell,
     },
   };
 
-  //commented because rendering issue
-  function ndcDetailsTableContent() {
-    return (
-      <div></div>
-      // <div>
-      //   <Button
-      //     onClick={onAddNewNdcDetail}
-      //     type="primary"
-      //     style={{
-      //       marginBottom: 16,
-      //     }}
-      //   >
-      //     Add a row
-      //   </Button>
-      //   <Table
-      //     components={components}
-      //     rowClassName={() => 'editable-row'}
-      //     bordered
-      //     dataSource={ndcDetailsData}
-      //     columns={columns}
-      //   />
-      // </div>
-    );
-  }
+  const onClickedDeletePeriod = async () => {
+    setActionInfo({
+      action: "Delete",
+      headerText: t("ndc:periodDeleteConfirmTitle"),
+      type: "danger",
+      icon: <Icon.XCircle />,
+      recordId: selectedPeriod.key,
+    });
+    setOpenConfirmationModal(true);
+  };
 
-  const onCancelPeriod = () => {};
+  const onClickedFinalizePeriod = async () => {
+    if (ndcMainDetailsForPeriod.length === 0) {
+      message.open({
+        type: "error",
+        content: t("ndc:finalizeNdcEmptyErrorText"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      return;
+    }
 
-  const onAddNewPeriod = () => {
-    if (
-      selectedPeriod &&
-      selectedPeriod.current &&
-      selectedPeriod.current.start &&
-      selectedPeriod.current.end
-    ) {
-      const newPeriodItem = {
-        key: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
-        label: `${selectedPeriod.current.start}-${selectedPeriod.current.end}`,
-        start: selectedPeriod.current.start,
-        end: selectedPeriod.current.end,
-        children: ndcDetailsTableContent(),
-      };
+    let isPendingActionAvailable = false;
 
-      const existingIndex = periodItemsRef.current.findIndex(
-        (item: any) =>
-          inRange(newPeriodItem.start, item.start, item.end) ||
-          inRange(newPeriodItem.end, item.start, item.end)
-      );
-
-      if (existingIndex === -1) {
-        setPeriodItems((items: any) => [...items, newPeriodItem]);
-        periodItemsRef.current = [...periodItemsRef.current, newPeriodItem];
-      } else {
-        message.open({
-          type: "error",
-          content: t("ndc:rangeAlreadyExists"),
-          duration: 3,
-          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-        });
+    ndcMainDetailsForPeriod.forEach((mainAction: NdcDetail) => {
+      const pendingActions = ndcActionsList.filter((action: NdcDetail) => {
+        return (
+          action.status === NdcDetailsActionStatus.Pending &&
+          action.actionType === NdcDetailsActionType.SubAction &&
+          action.parentActionId === mainAction.id
+        );
+      });
+      if (pendingActions && pendingActions.length > 0) {
+        isPendingActionAvailable = true;
+        return;
       }
+    });
+
+    if (isPendingActionAvailable) {
+      message.open({
+        type: "error",
+        content: t("ndc:finalizeErrorText"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } else {
+      setActionInfo({
+        action: "Finalize",
+        headerText: t("ndc:finalizeApproveTitle"),
+        text: t("ndc:finalizeApproveSubTitle"),
+        type: "primary",
+        icon: <Icon.Clipboard2Check />,
+        recordId: selectedPeriod.key,
+      });
+      setOpenConfirmationModal(true);
     }
   };
 
-  useEffect(() => {
-    if (periodItems && periodItems.length > 3) {
-      setSelectedTab(periodItems[periodItems.length - 1].key);
+  const onMainTableRowExpand = (expanded: any, record: any) => {
+    const keys = [];
+    if (expanded) {
+      keys.push(record.id);
     }
-  }, [periodItems]);
 
-  const onDateRangeChanged = (range: any) => {
-    const period = {
-      start: Number(moment(range[0]).year()),
-      end: Number(moment(range[1]).year()),
-    };
-    selectedPeriod.current = period;
+    setExpandedRowKeys(keys);
+    setNdcSubActionsForMainAction(record.id);
   };
 
   function addNewPeriodContent() {
     return (
       <div>
-        <Row>
-          <RangePicker onChange={onDateRangeChanged} picker="year" />
-        </Row>
-        <Row className="mg-top-1">
-          <div className="ndc-steps-actions">
+        <Row justify="start" align="middle" gutter={[16, 16]}>
+          <Col flex="340px">
+            <RangePicker
+              disabledDate={(current: any) => moment(current).year() < 1900}
+              onChange={onDateRangeChanged}
+              picker="year"
+            />
+          </Col>
+          <Col flex="auto">
             <Button
               type="primary"
               onClick={onAddNewPeriod}
@@ -409,325 +580,442 @@ export const NdcDetailsComponent = (props: any) => {
             >
               {t("ndc:submit")}
             </Button>
-            <Button
-              className="back-btn"
-              onClick={onCancelPeriod}
-              loading={loading}
-            >
-              {t("ndc:back")}
-            </Button>
-          </div>
+          </Col>
         </Row>
       </div>
     );
   }
 
-  function getSubNdcActionContent(record: any) {
-    selectedNdcDetail.current = record;
+  const onChange: PaginationProps["onChange"] = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
+
+  function mainNdcActionTableContent() {
+    return (
+      <div>
+        <Row>
+          <Col span={24}>
+            <Form form={form} component={false}>
+              <Table
+                tableLayout="fixed"
+                key={tableKey}
+                className="common-table-class"
+                rowKey="id"
+                pagination={{
+                  current: currentPage,
+                  pageSize: pageSize,
+                  total: ndcMainDetailsForPeriod.length,
+                  showQuickJumper: true,
+                  showSizeChanger: true,
+                  onChange: onChange,
+                }}
+                components={components}
+                rowClassName={() => "editable-row"}
+                bordered
+                loading={loading}
+                dataSource={ndcMainDetailsForPeriod}
+                columns={columns}
+                expandedRowKeys={expandedRowKeys}
+                onExpand={onMainTableRowExpand}
+                expandable={{
+                  expandedRowRender: (record) =>
+                    subNdcActionTableContent(record),
+                  columnWidth: 40,
+                }}
+                onRow={(record: NdcDetail, rowIndex) => {
+                  return {
+                    onClick: (event: any) => {
+                      if (
+                        record.id &&
+                        isNdcActionEditable(record) &&
+                        !isEditing(record)
+                      ) {
+                        form.setFieldsValue({ ...record });
+                        setEditingKey(record.id);
+                      }
+                    },
+                    onMouseLeave: () => {
+                      if (isEditing(record)) {
+                        handleSave(record);
+                      }
+                    },
+                  };
+                }}
+                footer={() =>
+                  isGovernmentUser &&
+                  !selectedPeriod.finalized && (
+                    <Row justify={"center"}>
+                      <Button
+                        className="btnAddNewMainAct"
+                        disabled={isMainActionInEditMode()}
+                        onClick={onClickedAddNewNdcDetail}
+                        type="default"
+                      >
+                        {t("ndc:addNdcAction")}
+                      </Button>
+                    </Row>
+                  )
+                }
+              />
+            </Form>
+          </Col>
+        </Row>
+        {isGovernmentUser && !selectedPeriod.finalized ? (
+          <Row justify="end">
+            {isMainActionInEditMode() ? (
+              <>
+                <Button className="mg-left-1" disabled>
+                  {t("ndc:delete")}
+                </Button>
+                <Button className="mg-left-1" disabled>
+                  {t("ndc:finalize")}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className="mg-left-1 btn-danger"
+                  onClick={onClickedDeletePeriod}
+                  htmlType="submit"
+                  loading={loading}
+                >
+                  {t("ndc:delete")}
+                </Button>
+                <Button
+                  className="mg-left-1"
+                  type="primary"
+                  onClick={onClickedFinalizePeriod}
+                  htmlType="submit"
+                  loading={loading}
+                >
+                  {t("ndc:finalize")}
+                </Button>
+              </>
+            )}
+          </Row>
+        ) : (
+          ""
+        )}
+      </div>
+    );
+  }
+
+  function subNdcActionTableContent(record: any) {
     return (
       <Table
+        tableLayout="fixed"
+        rowKey="id"
         components={components}
         rowClassName={() => "editable-row"}
+        className="common-table-class"
         bordered
-        dataSource={getSubNdcDetails(record.key)}
+        dataSource={subNdcActionsForPeriod}
+        loading={loading}
+        onRow={(record: NdcDetail, rowIndex) => {
+          return {
+            onClick: (event: any) => {
+              if (
+                record.id &&
+                isNdcActionEditable(record) &&
+                !isEditing(record)
+              ) {
+                form.setFieldsValue({ ...record });
+                setEditingKey(record.id);
+              }
+            },
+            onMouseLeave: () => {
+              if (isEditing(record)) {
+                handleSave(record);
+              }
+            },
+          };
+        }}
         columns={columns}
         showHeader={false}
         pagination={false}
-        // footer={() =>
-        //   isAddSubNdcActionVisible() && (
-        //     <Row justify={"center"}>
-        //       <Button
-        //         onClick={onAddNewSubNdcDetail}
-        //         type="default"
-        //         style={{
-        //           marginBottom: 16,
-        //           width: "100%",
-        //         }}
-        //       >
-        //         {t("ndc:addSubNdcAction")}
-        //       </Button>
-        //     </Row>
-        //   )
-        // }
       />
     );
   }
 
+  const onAddNewPeriod = async () => {
+    try {
+      if (
+        selectedDateRangeRef &&
+        selectedDateRangeRef.current &&
+        selectedDateRangeRef.current.startYear &&
+        selectedDateRangeRef.current.endYear
+      ) {
+        const periodItem = {
+          startYear: selectedDateRangeRef.current.startYear,
+          endYear: selectedDateRangeRef.current.endYear,
+          finalized: false,
+        };
+
+        const existingIndex = periodItems.findIndex(
+          (item: any) =>
+            inRange(periodItem.startYear, item.startYear, item.endYear) ||
+            inRange(periodItem.endYear, item.startYear, item.endYear)
+        );
+
+        if (existingIndex === -1) {
+          const response = await post(
+            "national/programme/addNdcDetailsPeriod",
+            {
+              ...periodItem,
+            }
+          );
+
+          if (response && response.data) {
+            const addedPeriodItem = response.data;
+            const updatedPeriodItem = {
+              ...addedPeriodItem,
+              key: addedPeriodItem.id,
+              label: `${addedPeriodItem.startYear}-${addedPeriodItem.endYear}`,
+            };
+            setPeriodItems((items: any) => [...items, updatedPeriodItem]);
+            setSelectedPeriod(updatedPeriodItem);
+          }
+        } else {
+          message.open({
+            type: "error",
+            content: t("ndc:rangeAlreadyExists"),
+            duration: 3,
+            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+          });
+        }
+      }
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    }
+  };
+
+  const onDateRangeChanged = (range: any) => {
+    if (range) {
+      const period = {
+        startYear: Number(moment(range[0]).year()),
+        endYear: Number(moment(range[1]).year()),
+      };
+      if (period.startYear === period.endYear) {
+        message.open({
+          type: "error",
+          content: t("ndc:sameStartEndDates"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+      } else {
+        selectedDateRangeRef.current = period;
+      }
+    }
+  };
+
   const onTabChange = (key: string) => {
-    setSelectedTab(key);
+    const selectedPeriod = periodItems.find((item: any) => item.key === key);
+    if (selectedPeriod) {
+      setSelectedPeriod(selectedPeriod);
+    }
+  };
+
+  const onActionConfirmed = async () => {
+    setLoading(true);
+    let actionResponse;
+    try {
+      if (actionInfo.action === "Approve") {
+        actionResponse = await post(
+          "national/programme/approveNdcDetailsAction",
+          {
+            id: actionInfo.recordId,
+          }
+        );
+      } else if (actionInfo.action === "Reject") {
+        actionResponse = await post(
+          "national/programme/rejectNdcDetailsAction",
+          {
+            id: actionInfo.recordId,
+          }
+        );
+      } else if (actionInfo.action === "Finalize") {
+        actionResponse = await post(
+          "national/programme/finalizeNdcDetailsPeriod",
+          {
+            id: selectedPeriod.key,
+          }
+        );
+      } else if (actionInfo.action === "Delete") {
+        actionResponse = await post(
+          "national/programme/deleteNdcDetailsPeriod",
+          {
+            id: selectedPeriod.key,
+          }
+        );
+      }
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    }
+    if (actionResponse) {
+      if (actionInfo.action === "Delete") {
+        message.open({
+          type: "success",
+          content: t("ndc:deletePeriodSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailPeriods();
+      } else if (actionInfo.action === "Finalize") {
+        message.open({
+          type: "success",
+          content: t("ndc:finalizeSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailPeriods();
+        setExpandedRowKeys([]);
+        ClearEditMode();
+      } else if (actionInfo.action === "Approve") {
+        message.open({
+          type: "success",
+          content: t("ndc:approveSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailActions();
+      } else if (actionInfo.action === "Reject") {
+        message.open({
+          type: "success",
+          content: t("ndc:rejectSuccessMsg"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
+        fetchNdcDetailActions();
+      }
+    }
+    setOpenConfirmationModal(false);
+    setLoading(false);
+  };
+
+  const onActionCanceled = () => {
+    setOpenConfirmationModal(false);
+  };
+
+  const fetchNdcDetailPeriods = async () => {
+    setLoading(true);
+    try {
+      let periods = [];
+      let addNewTab: Period = {
+        key: "add_new",
+        label: "Add New",
+        startYear: 0,
+        endYear: 0,
+        finalized: false,
+        deleted: false,
+      };
+      const response = await get("national/programme/queryNdcDetailsPeriod");
+      if (response && response.data) {
+        periods = response.data.map((period: any) => {
+          return {
+            ...period,
+            key: period.id,
+            label: period.finalized ? (
+              <span>
+                <LockOutlined /> {period.startYear}-{period.endYear}{" "}
+              </span>
+            ) : (
+              `${period.startYear}-${period.endYear}`
+            ),
+          };
+        });
+      }
+      if (isGovernmentUser) {
+        periods.unshift(addNewTab);
+      }
+
+      setPeriodItems(periods);
+      if (isGovernmentUser) {
+        setSelectedPeriod(addNewTab);
+      } else {
+        setSelectedPeriod(periods[0]);
+      }
+      setLoading(false);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchNdcDetailActions = async () => {
+    setLoading(true);
+    try {
+      const response = await get("national/programme/queryNdcDetailsAction");
+      if (response && response.data) {
+        const maxActionId = Math.max(
+          ...response.data.map((item: NdcDetail) => item.id)
+        );
+        setNextAvailableActionId(maxActionId + 1);
+        setNdcActionsList(response.data);
+      }
+      setLoading(false);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMinistries = async () => {
+    setLoading(true);
+    try {
+      const response = await get("national/organisation/getMinistries");
+      if (response && response.data) {
+        const ministryOrgDetails = response.data.map((value: any) => {
+          return {
+            value: value.company_companyId,
+            label: value.company_name,
+          };
+        });
+        setMinistryOrgList(ministryOrgDetails);
+      }
+      setLoading(false);
+    } catch (exception: any) {
+      message.open({
+        type: "error",
+        content: exception.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const defaultNdcDetails = [
-      {
-        key: 1,
-        type: NdcActionType.main,
-        startDate: new Date("2019-03-25"),
-        endDate: new Date("2020-03-25"),
-        nationalPlanObj: "Enhance value addition in key growth opportunities",
-        kpi: 25,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 6,
-            ndcActionId: 1,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj:
-              "Enhance value addition in key growth opportunities sub details",
-            kpi: 25,
-            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
-          },
-          {
-            key: 7,
-            ndcActionId: 1,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 2,
-        type: NdcActionType.main,
-        startDate: new Date("2019-03-25"),
-        endDate: new Date("2019-08-25"),
-        nationalPlanObj: "Strengthen the private sector to create 10,000 jobs",
-        kpi: 10500,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 8,
-            ndcActionId: 2,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 12,
-        type: NdcActionType.main,
-        startDate: new Date("2019-03-25"),
-        endDate: new Date("2019-08-25"),
-        nationalPlanObj: "Other",
-        kpi: 10500,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 8,
-            ndcActionId: 12,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 3,
-        type: NdcActionType.main,
-        startDate: new Date("2021-03-25"),
-        endDate: new Date("2022-03-25"),
-        nationalPlanObj:
-          "Consolidate and increase the stock and quality of productive infrastructure by 50%",
-        kpi: 48,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 9,
-            ndcActionId: 3,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 4,
-        type: NdcActionType.main,
-        startDate: new Date("2022-03-25"),
-        endDate: new Date("2022-05-25"),
-        nationalPlanObj:
-          "Enhance the productivity and social wellbeing of the population",
-        kpi: 20,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 10,
-            ndcActionId: 4,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 5,
-        type: NdcActionType.main,
-        startDate: new Date("2022-03-25"),
-        endDate: new Date("2023-03-25"),
-        nationalPlanObj:
-          "Strengthen the role of the state in guiding and facilitating development",
-        kpi: 10,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 11,
-            ndcActionId: 5,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 13,
-        type: NdcActionType.main,
-        startDate: new Date("2022-03-25"),
-        endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Convert to solar energy",
-        kpi: 50000,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 11,
-            ndcActionId: 13,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "Convert to solar energy",
-            kpi: "3000",
-            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
-          },
-          {
-            key: 14,
-            ndcActionId: 13,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 15,
-        type: NdcActionType.main,
-        startDate: new Date("2022-03-25"),
-        endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Strengthen the private sector to create jobs",
-        kpi: 10000,
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 16,
-            ndcActionId: 15,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "Strengthen the private sector to create jobs",
-            kpi: "7200",
-            ministry: "Ministry of Tourism (MoT)",
-          },
-          {
-            key: 17,
-            ndcActionId: 15,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-      {
-        key: 18,
-        type: NdcActionType.main,
-        startDate: new Date("2022-03-25"),
-        endDate: new Date("2023-03-25"),
-        nationalPlanObj: "Other",
-        kpi: "",
-        ministry: "Ministry of Environment",
-        subNdcDetails: [
-          {
-            key: 19,
-            ndcActionId: 18,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "Strengthen the private sector to create jobs",
-            kpi: "",
-            ministry: "Ministry of Agriculture, Water and Forestry (MAWF)",
-          },
-          {
-            key: 20,
-            ndcActionId: 18,
-            type: NdcActionType.sub,
-            startDate: new Date("2019-03-25"),
-            endDate: new Date("2020-03-25"),
-            nationalPlanObj: "",
-            kpi: "",
-            ministry: "",
-          },
-        ],
-      },
-    ];
-    const initialPeriods = [
-      {
-        key: `2019-2020`,
-        label: `2019-2020`,
-        start: 2019,
-        end: 2020,
-        children: ndcDetailsTableContent(),
-      },
-      {
-        key: `2021-2023`,
-        label: `2021-2023`,
-        start: 2021,
-        end: 2021,
-        children: ndcDetailsTableContent(),
-      },
-    ];
-
-    if (isAddRangeVisible()) {
-      initialPeriods.unshift({
-        key: "add_new",
-        label: "Add New",
-        start: 0,
-        end: 0,
-        children: addNewPeriodContent(),
-      });
-    }
-
-    addedNdcDetailId.current = 20;
-    setPeriodItems(initialPeriods);
-    periodItemsRef.current = initialPeriods;
-    setNdcDetailsData(defaultNdcDetails);
+    fetchNdcDetailPeriods();
+    fetchNdcDetailActions();
+    fetchMinistries();
   }, []);
 
   return (
-    <div className="ndc-management content-container">
+    <div className="ndc-details content-container">
       <div className="title-bar">
         <Row justify="space-between" align="middle">
           <Col span={20}>
@@ -741,45 +1029,24 @@ export const NdcDetailsComponent = (props: any) => {
           centered={false}
           defaultActiveKey="1"
           items={periodItems}
-          activeKey={selectedTab}
+          activeKey={selectedPeriod.key}
           onChange={onTabChange}
         />
       </div>
-      {selectedTab !== "add_new" && (
-        <div>
-          <div>
-            <Table
-              key={tableKey}
-              components={components}
-              rowClassName={() => "editable-row"}
-              bordered
-              dataSource={getNdcDetailsForPeriod()}
-              columns={columns}
-              expandable={{
-                expandedRowRender: (record) => getSubNdcActionContent(record),
-                indentSize: 0,
-                defaultExpandedRowKeys: [selectedNdcDetail.current.key],
-              }}
-              footer={() =>
-                isAddNdcActionVisible() && (
-                  <Row justify={"center"}>
-                    <Button
-                      onClick={onAddNewNdcDetail}
-                      type="default"
-                      style={{
-                        marginBottom: 16,
-                        width: "100%",
-                      }}
-                    >
-                      {t("ndc:addNdcAction")}
-                    </Button>
-                  </Row>
-                )
-              }
-            />
-          </div>
-        </div>
-      )}
+      <div>
+        {selectedPeriod.key === "add_new"
+          ? addNewPeriodContent()
+          : mainNdcActionTableContent()}
+      </div>
+      <UserActionConfirmationModel
+        t={t}
+        actionInfo={actionInfo}
+        onActionConfirmed={onActionConfirmed}
+        onActionCanceled={onActionCanceled}
+        openModal={openConfirmationModal}
+        errorMsg=""
+        loading={loading}
+      />
     </div>
   );
 };

@@ -142,6 +142,7 @@ export * from './shared/dto/stat.filter'
 export * from './shared/dto/stat.list.dto'
 export * from './shared/dto/user.dto'
 export * from './shared/dto/user.update.dto'
+export * from './shared/dto/ndc.details.period.dto'
 export * from './shared/dto/emission.dto';
 export * from './shared/dto/emission.agriculture.forestry.other.land.use';
 export * from './shared/dto/emission.carbon.dioxide.transport.storage';
@@ -163,7 +164,11 @@ export * from './shared/dto/projection.industrial.processes.product.use';
 export * from './shared/dto/projection.other';
 export * from './shared/dto/projection.waste';
 export * from './shared/dto/projection.properties';
+
 export * from './shared/dto/programme.mitigation.issue'
+export * from './shared/dto/ndc.details.action.dto'
+export * from './shared/dto/base.id.dto'
+
 //from transparency
 export * from './shared/dto/adaptation.properties'
 export * from './shared/dto/co.benefits'
@@ -229,6 +234,8 @@ export * from './shared/entities/programmeTransfer.view.entity'
 export * from './shared/entities/region.entity'
 export * from './shared/entities/user.entity'
 export * from './shared/entities/userPasswordResetToken.entity'
+export * from './shared/entities/ndc.details.period.entity'
+export * from './shared/entities/ndc.details.action.entity'
 //from transparency
 export * from './shared/entities/document.view.entity'
 export * from './shared/entities/investment.entity'

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Form, Input, Table, InputRef } from "antd";
+import { Form, Input, Table, InputRef, InputNumber } from "antd";
 import type { FormInstance } from "antd/es/form";
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
@@ -29,78 +29,87 @@ export const EditableRow: React.FC<EditableRowProps> = ({
   );
 };
 
-interface EditableCellProps {
-  title: React.ReactNode;
-  editable: boolean;
-  children: React.ReactNode;
-  dataIndex: keyof Item;
+interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+  editing: boolean;
+  dataIndex: string;
+  title: any;
+  inputType: "number" | "text";
   record: Item;
-  handleSave: (record: Item) => void;
+  index: number;
+  children: React.ReactNode;
+  onBlurHandler: any;
+  t: any;
 }
 
 export const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
+  editing,
   dataIndex,
+  title,
+  inputType,
   record,
-  handleSave,
+  index,
+  children,
+  onBlurHandler,
+  t,
   ...restProps
 }) => {
-  const [editing, setEditing] = useState(false);
-  const inputRef = useRef<InputRef>(null);
-  const form = useContext(EditableContext)!;
-
-  useEffect(() => {
-    if (editing) {
-      inputRef.current!.focus();
-    }
-  }, [editing]);
-
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  };
-
-  const save = async () => {
-    try {
-      const values = await form.validateFields();
-
-      toggleEdit();
-      handleSave({ ...record, ...values });
-    } catch (errInfo) {
-      console.log("Save failed:", errInfo);
-    }
-  };
-
-  let childNode = children;
-
-  if (editable) {
-    childNode = editing ? (
-      <Form.Item
-        style={{ margin: 0 }}
-        name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`,
-          },
-        ]}
-      >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-      </Form.Item>
-    ) : (
-      <div
-        className="editable-cell-value-wrap"
-        style={{ paddingRight: 24, minWidth: "100px", minHeight: "20px" }}
-        onClick={toggleEdit}
-      >
-        {children}
-      </div>
-    );
-  }
-
-  return <td {...restProps}>{childNode}</td>;
+  return (
+    <td {...restProps}>
+      {editing && dataIndex === "nationalPlanObjective" ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              validator: async (rule: any, value: any) => {
+                const trimValue =
+                  typeof value === "string" ? value.trim() : value;
+                if (!trimValue) {
+                  throw new Error(`${title} ${t("ndc:isRequired")}`);
+                }
+              },
+            },
+          ]}
+        >
+          <Input
+            onBlur={() => onBlurHandler(record)}
+            placeholder={t("ndc:nationalPlanObjectivePlaceHolder")}
+          />
+        </Form.Item>
+      ) : editing && dataIndex === "kpi" ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              validator: async (rule: any, value: any) => {
+                const trimValue =
+                  typeof value === "string" ? value.trim() : value;
+                if (trimValue) {
+                  if (isNaN(+trimValue)) {
+                    throw new Error(t("ndc:kpiInvalidFormat"));
+                  } else if (+trimValue <= 0) {
+                    throw new Error(t("ndc:kpiGreaterThanZero"));
+                  }else if (trimValue.toString().length > 7){
+                    throw new Error(t("ndc:kpiMaxLength"));
+                  }
+                } else {
+                  throw new Error(`${title} ${t("ndc:isRequired")}`);
+                }
+              },
+            },
+          ]}
+        >
+          <Input
+            onBlur={() => onBlurHandler(record)}
+            placeholder={t("ndc:kpiPlaceHolder")}
+          />
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
 };
 
 type EditableTableProps = Parameters<typeof Table>[0];
