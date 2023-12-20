@@ -56,6 +56,9 @@ export * from './shared/validation/trim-pipe.transform'
 export * from './shared/validation/validation-exception.filter'
 export * from './shared/programme/programme.module'
 export * from './shared/programme/programme.service'
+export * from './shared/ghg-inventory/ghg-inventory.module'
+export * from './shared/ghg-inventory/ghg-emissions/ghg-emissions.service'
+export * from './shared/ghg-inventory/ghg-projections/ghg-projections.service'
 export * as configuration from './shared/configuration';
 export * from './shared/constants';
 export * from './shared/server';
@@ -76,7 +79,8 @@ export * from './ledger-replicator/qldb-kinesis-replicator.service'
 export * from './ledger-replicator/replicator-interface.service'
 export * from './analytics-api/aggregate.api.service';
 export * from './analytics-api/analytics.api.module';
-export * from './analytics-api/programme.controller'
+export * from './analytics-api/programme.controller';
+export * from './analytics-api/ghg-inventory.controller';
 
 //DTOs
 export * from './shared/dto/aggr.entry'
@@ -138,6 +142,27 @@ export * from './shared/dto/stat.filter'
 export * from './shared/dto/stat.list.dto'
 export * from './shared/dto/user.dto'
 export * from './shared/dto/user.update.dto'
+export * from './shared/dto/emission.dto';
+export * from './shared/dto/emission.agriculture.forestry.other.land.use';
+export * from './shared/dto/emission.carbon.dioxide.transport.storage';
+export * from './shared/dto/emission.energy.emissions';
+export * from './shared/dto/emission.fuel.combustion.activities';
+export * from './shared/dto/emission.fugitive.emissions.from.fuels';
+export * from './shared/dto/emission.industrial.processes.product.use';
+export * from './shared/dto/emission.other';
+export * from './shared/dto/emission.waste';
+export * from './shared/dto/emission.properties';
+
+export * from './shared/dto/projection.dto';
+export * from './shared/dto/projection.agriculture.forestry.other.land.use';
+export * from './shared/dto/projection.carbon.dioxide.transport.storage';
+export * from './shared/dto/projection.energy.emissions';
+export * from './shared/dto/projection.fuel.combustion.activities';
+export * from './shared/dto/projection.fugitive.emissions.from.fuels';
+export * from './shared/dto/projection.industrial.processes.product.use';
+export * from './shared/dto/projection.other';
+export * from './shared/dto/projection.waste';
+export * from './shared/dto/projection.properties';
 export * from './shared/dto/programme.mitigation.issue'
 //from transparency
 export * from './shared/dto/adaptation.properties'
@@ -189,6 +214,8 @@ export * from './shared/enum/sectoral.scope.enum'
 //ENTITIES
 export * from './shared/entities/async.action.entity'
 export * from './shared/entities/company.entity'
+export * from './shared/entities/emission.entity'
+export * from './shared/entities/projection.entity'
 export * from './shared/entities/configuration.settings'
 export * from './shared/entities/constants.entity'
 export * from './shared/entities/counter.entity'

@@ -15,6 +15,10 @@ import { TypeOrmConfigService } from "../shared/typeorm.config.service";
 import { ProgrammeController } from "./programme.controller";
 import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
+import { GHGInventoryController } from "./ghg-inventory.controller";
+import { Emission } from "src/shared/entities/emission.entity";
+import { Projection } from "src/shared/entities/projection.entity";
+import { EventLog } from "src/shared/entities/event.log.entity";
 
 @Module({
   imports: [
@@ -33,14 +37,17 @@ import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
       ProgrammeTransferViewEntityQuery,
       Company,
       NDCActionViewEntity,
-      InvestmentView
+      InvestmentView,
+      Emission,
+      Projection,
+      EventLog
     ]),
     AuthModule,
     CaslModule,
     UtilModule,
     ProgrammeLedgerModule,
   ],
-  controllers: [ProgrammeController],
+  controllers: [ProgrammeController, GHGInventoryController],
   providers: [Logger, AggregateAPIService],
 })
 export class AnalyticsAPIModule {}

@@ -24,6 +24,7 @@ import { NDCAction } from '../entities/ndc.action.entity';
 import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
 import { CadtModule } from '../cadt/cadt.module';
+import { EventLog } from '../entities/event.log.entity';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { CadtModule } from '../cadt/cadt.module';
       Investment,
       InvestmentView,
       ProgrammeDocumentViewEntity,
+      EventLog
     ]),
     UtilModule,
     CompanyModule,
