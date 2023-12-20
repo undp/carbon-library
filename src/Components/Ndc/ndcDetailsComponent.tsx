@@ -349,7 +349,30 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpi}</span>
             </Tooltip>
           ) : (
-            <Input placeholder="Enter Kpi" />
+            <Input placeholder={t("ndc:kpiPlaceHolder")} />
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: t("ndc:ndcColumnsKpiUnit"),
+      dataIndex: "kpiUnit",
+      key: "kpiUnit",
+      align: "left" as const,
+      width: 100,
+      editable: true,
+      render: (_: any, record: NdcDetail) => (
+        <Space size="middle">
+          {record.kpiUnit ? (
+            <Tooltip
+              title={
+                isNdcActionEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+              }
+            >
+              <span>{record.kpiUnit}</span>
+            </Tooltip>
+          ) : (
+            <Input placeholder={t("ndc:kpiUnitPlaceHolder")} />
           )}
         </Space>
       ),
