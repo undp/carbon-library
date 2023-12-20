@@ -44,6 +44,14 @@
     line-height: 22px;
   }
 
+  .co-sub-header-text {
+    color: rgba(58, 53, 65, 0.5);
+    font-size: 16px;
+    font-family: Inter;
+    font-weight: 600;
+    line-height: 22px;
+  }
+
   .co-view-label-text {
     color: rgba(58, 53, 65, 0.5);
     font-size: 14px;
@@ -54,6 +62,51 @@
 
   .benifits-tabs {
     width: 100%;
+
+    .unfcccSdTool-section-title {
+      text-align: center;
+      margin-bottom: 5px;
+      margin-top: 10px;
+      font-weight: 700;
+      color: rgba(58, 53, 65, 0.5);
+
+      a {
+        color: rgba(58, 53, 65, 0.5);
+      }
+    }
+
+    .unfccSdTool-section-wrapper { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+    }
+    .unfccSdTool-section-divider { 
+      border-bottom: 1px solid rgba(58, 53, 65, 0.5) !important;
+      width: 100% !important;
+    }
+
+    .undpSesp-section-title {
+      text-align: center;
+      margin-bottom: 5px;
+      margin-top: 5px;
+      font-weight: 700;
+      color: rgba(58, 53, 65, 0.5);
+    }
+
+    .undpSesp-section-wrapper { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+    }
+
+    .undpSesp-section-divider { 
+      border-bottom: 1px solid rgba(58, 53, 65, 0.5) !important ;
+      width: 100% !important;
+      margin-bottom: 20px;
+    }
+
+    
+
 
     .co-benifits-tab-item {
       width: 100%;
@@ -479,6 +532,44 @@
             border-color: $primary-purple !important;
             box-shadow: none;
           }
+          .ant-radio-button-wrapper {
+            border: 1px solid $common-form-input-border;
+          }
+        }
+
+        .radio-container-view {
+          margin-right: 2rem;
+          width: 35%;
+          max-width: 90px;
+          text-align: center;
+          .ant-radio-button-wrapper-checked:not(
+              .ant-radio-button-wrapper-disabled
+            ) {
+            color: $dark-text-color !important;
+            border-color: $primary-purple !important;
+            box-shadow: none;
+          }
+          .ant-radio-button-wrapper {
+            border: 1px solid $common-form-input-border;
+          }
+        }
+
+        .radio-container-view-child {
+          margin-right: 2rem;
+          width: 28%;
+          max-width: 90px;
+          text-align: center;
+          .ant-radio-button-wrapper-checked:not(
+              .ant-radio-button-wrapper-disabled
+            ) {
+            color: $dark-text-color !important;
+            border-color: $primary-purple !important;
+            box-shadow: none;
+          }
+          .ant-radio-button-wrapper {
+            border: 1px solid $common-form-input-border;
+          }
+
         }
 
         .radio {
@@ -492,6 +583,66 @@
 
       Input {
         height: 40px;
+      }
+    }
+
+    .social-environment-tab-item {
+      width: 95%;
+      margin-left: 3rem;
+      .ant-radio-group {
+        text-align: center;
+        align-items: center;
+        justify-content: flex-end;
+
+        .radio-container {
+          margin-right: 1rem;
+          width: 35%;
+          max-width: 90px;
+          text-align: center;
+          .ant-radio-button-wrapper-checked:not(
+              .ant-radio-button-wrapper-disabled
+            ) {
+            color: $dark-text-color !important;
+            border-color: $primary-purple !important;
+            box-shadow: none;
+          }
+        }
+
+        .radio {
+          width: 100%;
+          .ant-radio-button-checked {
+            background: $primary-purple;
+            color: #ffffff;
+          }
+        }
+      }
+
+      .social-environment-risk-title-section{
+        display: flex; 
+        justify-content: center; 
+        align-items: center;
+        margin-bottom: 15px;
+        margin-top: 5px;
+      }
+
+      .social-environment-risk-title-section:not(:first-child){
+        border-top: 1px solid rgba(58, 53, 65, 0.5) !important;
+      }
+
+      .social-environment-risk-title-section:first-child {
+        border-bottom: 1px solid rgba(58, 53, 65, 0.5) !important;
+      }
+  
+      .social-environment-risk-title {
+        text-align: center;
+        margin-bottom: 5px;
+        margin-top: 10px;
+        font-weight: 700;
+        color: rgba(58, 53, 65, 0.5);
+      }
+
+      .ant-form-item-label > label {
+        height: auto;
       }
     }
   }

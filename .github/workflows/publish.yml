@@ -59,7 +59,15 @@ jobs:
             echo "No calculator changes detected."
             echo "calculator-changes=false" >> $GITHUB_OUTPUT
           fi
-      
+
+          if echo "$CHANGED_FILES" | grep -q "backend/carbon-services-lib/src/shared/enum**" || echo "$CHANGED_FILES" | grep -q "backend/carbon-services-lib/src/shared/configuration.ts"; then
+            echo "Enum or Config changes detected."
+            echo "enum-config-changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "No Enum or Config changes detected."
+            echo "enum-config-changes=false" >> $GITHUB_OUTPUT
+          fi             
+          
       - run: yarn install --frozen-lockfile
         name: Carbon Service Lib Install
         if: steps.changes.outputs.backend-changes == 'true'
@@ -86,6 +94,20 @@ jobs:
           CI_COMMIT_MESSAGE: Carbon Service Lib Version Update
           CI_COMMIT_AUTHOR: Continuous Integration
         working-directory: backend/carbon-services-lib
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - if: github.ref == 'refs/heads/main' && steps.changes.outputs.enum-config-changes == 'true'
+        name : Enum or Config Changes
+        id : enum_config_change
+        run: |
+              chmod +x workflow.sh
+              AWS_BUCKET=${{ secrets.AWS_BUCKET }} FROM_EMAIL=${{ secrets.FROM_EMAIL }}  TO_EMAILS=${{secrets.TO_EMAILS}} ./workflow.sh
+              
       - run: yarn run build && cp package.json ./dist/
         name: Carbon Service Lib Build
         if: steps.changes.outputs.backend-changes == 'true'
@@ -225,3 +247,4 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.serial-changes == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          

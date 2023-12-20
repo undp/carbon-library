@@ -40,4 +40,6 @@ export class ProgrammeTransfer implements BaseEntity {
   retirementType?: RetireType;
 
   toCompanyMeta?: any;
+
+  omgePercentage?:any
 }

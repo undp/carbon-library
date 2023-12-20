@@ -35,8 +35,10 @@ export const getValidNdcActions = (programme: any) => {
   programme.mitigationActions?.map((action: any) => {
     let verfiedAction = false;
     if (action.projectMaterial) {
-      for (var document of action.projectMaterial) {
-        if (document.includes("VERIFICATION_REPORT")) {
+      for (var documentDetails of action.projectMaterial) {
+        let document:any
+        documentDetails.url? document = documentDetails.url : document = documentDetails;
+        if (document.includes("VERIFICATION_REPORT") && action.properties?.availableCredits) {
           verfiedAction = true;
           break;
         }

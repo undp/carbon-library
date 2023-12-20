@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsOptional, IsPositive, IsString, Length, Min, ValidateIf, ValidateNested } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsOptional, IsPositive, IsString, Length, Max, Min, ValidateIf, ValidateNested } from "class-validator";
 import { RetireType } from "../enum/retire.type.enum";
 import { BasicOrgInfo } from "./basic.organisation.dto";
 
@@ -47,4 +47,13 @@ export class ProgrammeRetire {
         message: 'Invalid retire type. Supported following sector:' + Object.values(RetireType)
     })
     type: RetireType;
+
+    @ApiPropertyOptional()
+    @ValidateIf(o => o.type === RetireType.CROSS_BORDER)
+    @IsNotEmpty()
+    @IsNumber()
+    @IsInt()
+    @Min(1)
+    @Max(99)
+    omgePercentage: number;
 }

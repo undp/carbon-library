@@ -47,6 +47,7 @@ import {
   SystemNames,
   addCommSep,
   addRoundNumber,
+  getStageEnumVal,
 } from "../../Definitions";
 import {
   optionDonutPieA,
@@ -1562,9 +1563,8 @@ export const RegistryDashboardComponent = (props: any) => {
               programmeByStatusAggregationResponse
             );
             if (
-              [ProgrammeStageR.AwaitingAuthorization].includes(
-                responseItem?.currentStage
-              )
+              ProgrammeStageR.AwaitingAuthorization ===
+              getStageEnumVal(responseItem?.currentStage)
             ) {
               totalProgrammes = totalProgrammes + parseInt(responseItem?.count);
               pendingProgrammesC = parseInt(responseItem?.count);
@@ -1863,9 +1863,9 @@ export const RegistryDashboardComponent = (props: any) => {
   const pending = ["all", ["==", ["get", "stage"], "AwaitingAuthorization"]];
   const authorised = ["all", ["==", ["get", "stage"], "Authorised"]];
   const rejected = ["all", ["==", ["get", "stage"], "Rejected"]];
-  const news = ["all", ["==", ["get", "stage"], "New"]];
+  const news = ["all", ["==", ["get", "stage"], "Approved"]];
 
-  const colors = ["#6ACDFF", "#FF8183", "#CDCDCD", "#B7A4FE"];
+  const colors = ["#6ACDFF", "#CDCDCD", "#FF8183", "#B7A4FE"];
 
   const donutSegment = (start: any, end: any, r: any, r0: any, color: any) => {
     if (end - start === 1) end -= 0.00001;
@@ -2200,7 +2200,10 @@ ${total}
               Carbon Registry
             </Button>
             <Link to="/dashboard/mrv">
-              <Button className="rgdefault">Transparency System</Button>
+              <Button className="mid-default-btn">Transparency System</Button>
+            </Link>
+            <Link to="/dashboard/ghg">
+              <Button className="rgdefault">GHG Inventory</Button>
             </Link>
           </ButtonGroup>
         </div>
@@ -2420,6 +2423,7 @@ ${total}
                       ? "tTProgrammesCertifierMine"
                       : "tTProgrammesCertifierOverall"
               )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col pie">
@@ -2616,9 +2620,9 @@ ${total}
                         categoryType === "mine"
                       ) && (
                           <>
-                            <LegendItem text="Rejected" color="#FF8183" />
-                            <LegendItem text="Pending" color="#CDCDCD" />
-                            <LegendItem text="New" color="#B7A4FE" />
+                            <LegendItem text="Rejected" color="#CDCDCD" />
+                            <LegendItem text="Pending" color="#FF8183" />
+                            <LegendItem text="Approved" color="#B7A4FE" />
                           </>
                         )}
                     </div>
