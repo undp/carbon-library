@@ -108,10 +108,20 @@ import { SolarWaterPumpOnGridProperties } from "../dto/solar.water.pump.on.grid.
 import { StovesHousesInNamibiaProperties } from "../dto/stoves.houses.in.namibia.properties";
 import { SoilEnhancementBiocharProperties } from "../dto/soil.enhancement.biochar.properties";
 import { LetterSustainableDevSupportLetterGen } from '../util/letter.sustainable.dev.support';
+import { NdcDetailsPeriod } from "../entities/ndc.details.period.entity";
 import { GovernmentCreditAccounts } from '../enum/government.credit.accounts.enum';
+import { NdcDetailsAction } from "../entities/ndc.details.action.entity";
+import { NdcDetailsPeriodDto } from "../dto/ndc.details.period.dto";
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
+import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
+import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
+import { NdcDetailsActionType } from "../enum/ndc.details.action.type.enum";
+import { Role } from '../casl/role.enum';
+import { BaseIdDto } from '../dto/base.id.dto';
+import { EventLog } from "../entities/event.log.entity";
+import { EventLogType } from "../enum/event.log.type.enum";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType,
@@ -162,6 +172,11 @@ export class ProgrammeService {
     private letterOfIntentResponseGen: LetterOfIntentResponseGen,
     private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen,
     private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen,
+    @InjectRepository(NdcDetailsPeriod) 
+    private ndcDetailsPeriodRepo: Repository<NdcDetailsPeriod>,
+    @InjectRepository(NdcDetailsAction) 
+    private ndcDetailsActionRepo: Repository<NdcDetailsAction>,
+    @InjectRepository(EventLog) private eventLogRepo: Repository<EventLog>,
   ) {}
 
   private fileExtensionMap = new Map([
@@ -963,6 +978,7 @@ export class ProgrammeService {
     program: Programme,
     certifierUser?: User,
   ) {
+    let eventLog: EventLog = new EventLog();
     if (
       this.configService.get('systemType') == SYSTEM_TYPE.CARBON_TRANSPARENCY
     ) {
@@ -1030,6 +1046,18 @@ export class ProgrammeService {
           });
         }
       }
+      if(program && d.type == DocType.VERIFICATION_REPORT) {
+        const eventData = {
+          actionId: ndc.id,
+          action: ndc.action,
+          estimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
+          sectoralScope: program.sectoralScope,
+          sector: program.sector
+        }
+        eventLog.eventData = eventData;
+        eventLog.type = EventLogType.ESTIMATED_CREDIT_ISSUE;
+        eventLog.createdTime = new Date().getTime();
+      }
     }
     console.log('NDC COmmit', ndc);
     if (ndc) {
@@ -1042,6 +1070,9 @@ export class ProgrammeService {
           status: ndc.status,
         },
       );
+      if (eventLog.type !== undefined) {
+        await em.save(eventLog);
+      }
     }
   }
 
@@ -4350,6 +4381,27 @@ export class ProgrammeService {
     };
     await this.asyncOperationsInterface.AddAction(issueCReq);
 
+    req.issueAmount.map(async (actionDetails: mitigationIssueProperties) => {
+      let eventLog: EventLog = new EventLog();
+      const eventData = {
+        actionId: actionDetails.actionId,
+        issuedCredits: actionDetails.issueCredit,
+        programmeId: req.programmeId,
+        externalId: program.externalId,
+        sectoralScope: program.sectoralScope,
+        sector: program.sector
+      }
+      eventLog.eventData = eventData;
+      eventLog.type = EventLogType.ACTUAL_CREDIT_ISSUE;
+      eventLog.createdTime = new Date().getTime();
+      eventLog.createdBy = user.id;
+      await this.entityManager.transaction(async (em) => {
+        return await em.save(eventLog);
+      });
+      
+    })
+
+
     const sqlProgram = await this.findById(program.programmeId);
     if (sqlProgram.cadtId) {
       program.cadtId = sqlProgram.cadtId;
@@ -5370,5 +5422,284 @@ export class ProgrammeService {
     );
 
     return transferResult;
+  }
+  async getNdcDetailsPeriods(abilityCondition: any, user: User) {
+    return await this.ndcDetailsPeriodRepo.find({
+      select: {
+        id: true,
+        startYear: true,
+        endYear: true,
+        finalized: true,
+      },
+      where: {
+        deleted: false
+      }
+    });
+  }
+
+  async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    const addedNdcDetailsPeriod = this.ndcDetailsPeriodRepo.create(ndcDetailsPeriod);
+    await this.ndcDetailsPeriodRepo.save(addedNdcDetailsPeriod).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionPeriodCreateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return new DataResponseDto(HttpStatus.OK, addedNdcDetailsPeriod);
+  }
+
+  async deleteNdcDetailsPeriod(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsPeriodRepo.update(id, { deleted: true }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });;
+    return new DataResponseDto(HttpStatus.OK, {});
+  }
+
+  async finalizeNdcDetailsPeriod(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsPeriodRepo.update(id, { finalized: true }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return new DataResponseDto(HttpStatus.OK, {});
+  }
+
+  async getNdcDetailActions(abilityCondition: any, user: User) {
+    return await this.ndcDetailsActionRepo.find({
+      select: {
+        id: true,
+        nationalPlanObjective: true,
+        kpi: true,
+        ministryName: true,
+        periodId: true,
+        parentActionId: true,
+        actionType: true,
+        status: true
+      }
+    });
+  }
+
+  async addNdcDetailAction(ndcDetailsAction: NdcDetailsActionDto, abilityCondition: any, user: User) {
+    if (user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.MainAction && user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.SubAction) {
+      if (user.companyRole !== CompanyRole.GOVERNMENT && user.companyRole !== CompanyRole.MINISTRY) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("programme.unAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
+    const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
+    await this.ndcDetailsActionRepo.save(addedNdcDetailsAction).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionCreateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, addedNdcDetailsAction);
+  }
+
+  async updateNdcDetailsAction(ndcDetailsAction: NdcDetailsActionDto, abilityCondition: any, user: User) {
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: {
+        id: ndcDetailsAction.id
+      }
+    })
+
+    if (!ndcAction) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.ndcActionNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const company = await this.companyRepo.findOne({
+      where: { companyId: user.companyId }
+    });
+
+    if (!company) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.companyNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (ndcAction.status === NdcDetailsActionStatus.Approved || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.MainAction && user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.SubAction) {
+      if (!(user.companyRole === CompanyRole.GOVERNMENT || (user.companyRole === CompanyRole.MINISTRY && company.name === ndcAction.ministryName))) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("programme.unAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
+    const result = await this.ndcDetailsActionRepo.update({
+      id: ndcDetailsAction.id
+    }, {
+      ...ndcDetailsAction
+    }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionUpdateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    if (result.affected > 0) {
+      return new DataResponseDto(HttpStatus.OK, {});
+    }
+  }
+
+  async approveNdcDetailsAction(idDto: BaseIdDto, abilityCondition: any, user: User) {
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: {
+        id: idDto.id
+      }
+    })
+
+    if (!ndcAction) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.ndcActionNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly || ndcAction.status === NdcDetailsActionStatus.Approved) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsActionRepo.update(idDto.id, { status: NdcDetailsActionStatus.Approved }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, {});
+  }
+
+  async rejectNdcDetailsAction(idDto: BaseIdDto, abilityCondition: any, user: User) {
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: {
+        id: idDto.id
+      }
+    })
+
+    if (!ndcAction) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.ndcActionNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly || ndcAction.status === NdcDetailsActionStatus.Approved) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+    await this.ndcDetailsActionRepo.update(idDto.id, { status: NdcDetailsActionStatus.Rejected }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, {});
   }
 }

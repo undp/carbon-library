@@ -100,5 +100,11 @@
     "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from Activity:{} should be less than its estimated credit amount",
     "omgeRetireDesc": " and {} credits as Overall Mitigation in Global Emission",
     "paybackStartDate<currentDate":"Start of Payback cannot be older than the current date",
-    "invalidPeriod":"Invalid time period"
+    "invalidPeriod":"Invalid time period",
+    "ndcActionCreateFailed":  " Internal error on Ndc Action create",
+    "ndcActionPeriodCreateFailed":  " Internal error on Period create",
+    "ndcActionNotExist": "Ndc Action does not exist",
+    "companyNotExist": "User company does not exist",
+    "ndcActionUpdateFailed":  " Internal error on Ndc Action update"
+
   }
