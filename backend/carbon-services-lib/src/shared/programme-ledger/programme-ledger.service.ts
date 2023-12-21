@@ -144,13 +144,7 @@ export class ProgrammeLedgerService {
           );
         }
         if(transfer.retirementType===RetireType.CROSS_BORDER && !transfer.omgePercentage){
-          throw new HttpException(
-            this.helperService.formatReqMessagesString(
-              "programme.invalidOmgePerc",
-              []
-            ),
-            HttpStatus.BAD_REQUEST
-          );
+          transfer.omgePercentage=0
         }
         const programmes: Programme[] = results[this.ledger.tableName].map(
           (domValue) => {
