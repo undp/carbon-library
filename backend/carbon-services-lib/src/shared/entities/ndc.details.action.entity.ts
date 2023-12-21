@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { NdcDetailsActionType } from "../enum/ndc.details.action.type.enum";
 import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
+import { PRECISION } from "@undp/carbon-credit-calculator/dist/esm/calculator";
 
 @Entity()
 export class NdcDetailsAction {
@@ -10,7 +11,7 @@ export class NdcDetailsAction {
     @Column()
     nationalPlanObjective: string;
 
-    @Column({ type: "decimal", precision: 10, nullable: false })
+    @Column({ type: "decimal", precision: 10, scale: PRECISION, nullable: true })
     kpi: number;
 
     @Column()
