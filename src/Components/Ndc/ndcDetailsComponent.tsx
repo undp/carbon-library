@@ -228,7 +228,7 @@ export const NdcDetailsComponent = (props: any) => {
         }
         const response = await post("national/programme/addNdcDetailsAction", {
           ...updatedItem,
-          kpi: parseInt(updatedItem.kpi.toString()),
+          kpi: parseFloat(updatedItem.kpi.toString()),
         });
       } else {
         updatedItem.status = NdcDetailsActionStatus.Pending;
@@ -236,7 +236,7 @@ export const NdcDetailsComponent = (props: any) => {
           "national/programme/updateNdcDetailsAction",
           {
             ...updatedItem,
-            kpi: parseInt(updatedItem.kpi.toString()),
+            kpi: parseFloat(updatedItem.kpi.toString()),
           }
         );
       }

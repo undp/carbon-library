@@ -10,7 +10,7 @@ export class NdcDetailsAction {
     @Column()
     nationalPlanObjective: string;
 
-    @Column()
+    @Column({ type: "decimal", precision: 10, nullable: false })
     kpi: number;
 
     @Column()
