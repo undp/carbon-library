@@ -966,7 +966,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               size="large"
                               min={0}
                               max={99}
-                              formatter={(value) => `${Math.round(value)}%`}
+                              formatter={(value) =>
+                                `${value ? Math.round(value) : ""}%`
+                              }
                               parser={(value: any) => value.replace("%", "")}
                             />
                           </Form.Item>
