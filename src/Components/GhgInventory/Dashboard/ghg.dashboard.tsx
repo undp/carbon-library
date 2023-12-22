@@ -466,7 +466,7 @@ export const GHGDashboardComponent = (props: any) => {
     };
 
     return (
-        <div className="dashboard-main-container">
+        <div className="ghg-dashboard-main-container">
             {isMultipleDashboardsVisible && (
                 <div className="systemchange-container" style={{ marginLeft: `20px` }}>
                     <ButtonGroup aria-label="outlined button group">
