@@ -41,7 +41,8 @@ import {
 import { AsyncActionType } from "../enum/async.action.type.enum";
 import { LocationInterface } from "../location/location.interface";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
-import { GovDepartment } from "../enum/govDep.enum";
+import { GovDepartment, ministryOrgs } from "../enum/govDep.enum";
+import { Ministry } from "../enum/ministry.enum";
 
 @Injectable()
 export class CompanyService {
@@ -626,7 +627,38 @@ export class CompanyService {
         HttpStatus.BAD_REQUEST
       );
     }
-
+    const ministrykey = Object.keys(Ministry)[Object.values(Ministry).indexOf(companyUpdateDto.ministry as Ministry)];
+    if ((company.companyRole == CompanyRole.MINISTRY || (company.companyRole == CompanyRole.GOVERNMENT)) &&
+      !ministryOrgs[ministrykey].includes(
+        Object.keys(GovDepartment)[
+          Object.values(GovDepartment).indexOf(
+            companyUpdateDto.govDep as GovDepartment
+          )
+        ],
+      )
+    ) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'company.wrongMinistryAndGovDep',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (company.companyRole == CompanyRole.MINISTRY || company.companyRole == CompanyRole.GOVERNMENT){
+      const ministry = await this.findMinistryByDepartment(
+        companyUpdateDto.govDep
+      );
+      if (ministry.ministry==companyUpdateDto.ministry && ministry.govDep==companyUpdateDto.govDep) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "company.MinistryDepartmentAlreadyExist",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
     if (companyUpdateDto.logo) {
       const response: any = await this.fileHandler.uploadFile(
         `profile_images/${
@@ -656,7 +688,9 @@ export class CompanyService {
         return  [...response];
       });
     }
-
+    if ((company.companyRole == CompanyRole.MINISTRY)){
+      companyUpdateDto.taxId = "00000"+this.configService.get("systemCountry")+"-"+companyUpdateDto.ministry+"-"+companyUpdateDto.govDep
+    }
     const { companyId, nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
     if (!companyUpdateFields.hasOwnProperty("website")) {
       companyUpdateFields["website"] = "";

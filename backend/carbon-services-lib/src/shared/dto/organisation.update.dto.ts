@@ -76,7 +76,7 @@ export class OrganisationUpdateDto {
   @ApiPropertyOptional()
   address: string;
 
-  @ValidateIf((c) => c.companyRole === CompanyRole.MINISTRY)
+  @ValidateIf((c) => [CompanyRole.GOVERNMENT, CompanyRole.MINISTRY].includes(c.companyRole))
   @ApiProperty({ enum: GovDepartment })
   @IsNotEmpty()
   @IsEnum(GovDepartment, {
@@ -84,7 +84,7 @@ export class OrganisationUpdateDto {
   })
   govDep: GovDepartment;
   
-  @ValidateIf((c) => c.companyRole === CompanyRole.MINISTRY)
+  @ValidateIf((c) => [CompanyRole.GOVERNMENT, CompanyRole.MINISTRY].includes(c.companyRole))
   @ApiProperty({ enum: Ministry })
   @IsNotEmpty()
   @IsEnum(Ministry, {

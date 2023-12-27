@@ -7,6 +7,7 @@
     "addUserToUnRegisteredCompany": "The Organisation has not been registered with the Carbon Registry",
     "createManagerOrViewerAsInitialUserOfACompany": "The initial user must be an admin",
     "createUserUnAuthorized": "This action is unauthorised",
+    "wrongMinistryAndGovDep": "Invalid Government Department Selected",
     "createUserToOtherCompaniesUnAuth": "This action is unauthorised",
     "companyCreateUserShouldbeAdmin": "The initial user must be an admin",
     "governmentUserAlreadyExist": "Government already exist for the country code {}",

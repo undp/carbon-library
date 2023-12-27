@@ -198,6 +198,9 @@ export class ITMOSystemImporter implements ImporterInterface {
                 ),
                 proponentTaxVatId: [taxId],
                 proponentPercentage: [100],
+                article6trade: true,
+                supportingowners:undefined,
+                implementinguser:undefined,
                 creditUnit: this.configService.get("defaultCreditUnit"),
                 programmeProperties: {
                   geographicalLocation: [projectDetails.country.name],

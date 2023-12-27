@@ -423,54 +423,64 @@ export const CompanyProfileComponent = (props: any) => {
                         <CompanyRoleIcon role={companyDetails.companyRole} />
                       </Col>
                     </Row>
-                    {companyDetails?.companyRole === CompanyRole.MINISTRY && (
+                    {(companyRole === CompanyRole.MINISTRY ||
+                      companyRole === CompanyRole.GOVERNMENT) && (
                       <>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("companyProfile:ministerName")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {companyDetails.nameOfMinister
-                              ? companyDetails.nameOfMinister
-                              : "-"}
-                          </Col>
-                        </Row>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("companyProfile:ministryName")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {companyDetails.ministry
-                              ? companyDetails.ministry
-                              : "-"}
-                          </Col>
-                        </Row>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("companyProfile:govDepName")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {companyDetails.govDep
-                              ? Object.keys(GovDepartment)[
-                                  Object.values(GovDepartment).indexOf(
-                                    companyDetails.govDep as GovDepartment
-                                  )
-                                ]
-                              : "-"}
-                          </Col>
-                        </Row>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("companyProfile:sectoralScope")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {companyDetails.sectoralScope
-                              ? getEnumKeysFromValues(
-                                  companyDetails.sectoralScope
-                                ).join(", ")
-                              : "-"}
-                          </Col>
-                        </Row>
+                        {companyRole === CompanyRole.MINISTRY && (
+                          <Row className="field">
+                            <Col span={12} className="field-key">
+                              {t("companyProfile:ministerName")}
+                            </Col>
+                            <Col span={12} className="field-value">
+                              {companyDetails.nameOfMinister
+                                ? companyDetails.nameOfMinister
+                                : "-"}
+                            </Col>
+                          </Row>
+                        )}
+                        {(companyRole === CompanyRole.MINISTRY ||
+                          companyRole === CompanyRole.GOVERNMENT) && (
+                          <>
+                            <Row className="field">
+                              <Col span={12} className="field-key">
+                                {t("companyProfile:ministryName")}
+                              </Col>
+                              <Col span={12} className="field-value">
+                                {companyDetails.ministry
+                                  ? companyDetails.ministry
+                                  : "-"}
+                              </Col>
+                            </Row>
+                            <Row className="field">
+                              <Col span={12} className="field-key">
+                                {t("companyProfile:govDepName")}
+                              </Col>
+                              <Col span={12} className="field-value">
+                                {companyDetails.govDep
+                                  ? Object.keys(GovDepartment)[
+                                      Object.values(GovDepartment).indexOf(
+                                        companyDetails.govDep as GovDepartment
+                                      )
+                                    ]
+                                  : "-"}
+                              </Col>
+                            </Row>
+                          </>
+                        )}
+                        {companyRole === CompanyRole.MINISTRY && (
+                          <Row className="field">
+                            <Col span={12} className="field-key">
+                              {t("companyProfile:sectoralScope")}
+                            </Col>
+                            <Col span={12} className="field-value">
+                              {companyDetails.sectoralScope
+                                ? getEnumKeysFromValues(
+                                    companyDetails.sectoralScope
+                                  ).join(", ")
+                                : "-"}
+                            </Col>
+                          </Row>
+                        )}
                       </>
                     )}
                     <Row className="field">

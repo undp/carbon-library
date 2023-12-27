@@ -8,6 +8,7 @@ import LanguageSelection from "../../Common/LanguageSelection/languageSelection"
 import React from "react";
 import { SectoralScope, addCommSep } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { GovDepartment } from "../../../Definitions";
 
 export const UserProfileComponent = (props: any) => {
   const {
@@ -219,6 +220,37 @@ export const UserProfileComponent = (props: any) => {
                         />
                       </Col>
                     </Row>
+                    {(organisationDetails?.companyRole ===
+                      CompanyRole.MINISTRY ||
+                      organisationDetails?.companyRole ===
+                        CompanyRole.GOVERNMENT) && (
+                      <>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:ministryName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {organisationDetails?.ministry
+                              ? organisationDetails?.ministry
+                              : "-"}
+                          </Col>
+                        </Row>
+                        <Row className="field">
+                          <Col span={12} className="field-key">
+                            {t("companyProfile:govDepName")}
+                          </Col>
+                          <Col span={12} className="field-value">
+                            {organisationDetails?.govDep
+                              ? Object.keys(GovDepartment)[
+                                  Object.values(GovDepartment).indexOf(
+                                    organisationDetails?.govDep as GovDepartment
+                                  )
+                                ]
+                              : "-"}
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                     {organisationDetails?.companyRole ===
                       CompanyRole.MINISTRY && (
                       <>

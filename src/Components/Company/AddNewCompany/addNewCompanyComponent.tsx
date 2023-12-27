@@ -39,7 +39,25 @@ import {
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 
-const sectoralScopes: any = {
+const ministries: any = [
+  "Agriculture",
+  "Aviation",
+  "Communications",
+  "Economy",
+  "Education",
+  "Energy",
+  "Environment",
+  "Health",
+  "Intelligence",
+  "Judiciary",
+  "Maritime",
+  "Media",
+  "Science And Technology",
+  "Water Resources",
+  "Other",
+];
+
+const ministryOrgs: any = {
   Agriculture: [
     "Cocoa Research Institute",
     "National Agricultural Extension, Research and Liaison Services",
@@ -62,9 +80,9 @@ const sectoralScopes: any = {
   ],
   Communications: [
     "National Information Technology Development Agency",
-    "Communications Satellite Limited",
+    "Satellite Limited",
     "Broadcasting Commission",
-    "Communications Commission",
+    "Commission",
     "Postal Service",
     "National Frequency Management Council",
     "Television Authority",
@@ -263,8 +281,9 @@ export const AddNewCompanyComponent = (props: any) => {
   );
   const [selectedMinistry, setSelectedMinistry] = useState<string>("");
   const [existgovDep, setexistGovdep] = useState<string[]>([]);
-
-  let selectedGovDepatments = sectoralScopes[selectedMinistry];
+  const [ministryDropdown, setMinistryDropdown] =
+    useState<string[]>(ministries);
+  let selectedGovDepatments = ministryOrgs[selectedMinistry];
   if (existgovDep && existgovDep.length > 0) {
     selectedGovDepatments = selectedGovDepatments.filter(
       (x: string) => !existgovDep.includes(x)
@@ -277,13 +296,8 @@ export const AddNewCompanyComponent = (props: any) => {
     setSelectedMinistry(String(key));
     const response: any = await post("national/organisation/query", {
       page: 1,
-      size: 10,
+      size: 200,
       filterAnd: [
-        {
-          key: "companyRole",
-          operation: "=",
-          value: "Ministry",
-        },
         {
           key: "ministry",
           operation: "=",
@@ -308,6 +322,41 @@ export const AddNewCompanyComponent = (props: any) => {
       setexistGovdep(existDep);
     }
   };
+
+  const getMinistryList = async () => {
+    setLoadingList(true);
+    try {
+      let leftmins: string[] = [];
+      const excludingmin: string[] = [];
+      for (const min of ministries) {
+        const response: any = await post("national/organisation/query", {
+          page: 1,
+          size: 100,
+          filterAnd: [
+            {
+              key: "ministry",
+              operation: "=",
+              value: min,
+            },
+          ],
+        });
+        const minkey =
+          Object.keys(Ministry)[
+            Object.values(Ministry).indexOf(min as Ministry)
+          ];
+        if (response.data.length === ministryOrgs[minkey].length) {
+          excludingmin.push(min);
+        }
+      }
+      leftmins = ministries.filter((x: string) => !excludingmin.includes(x));
+      setMinistryDropdown(leftmins);
+    } catch (error: any) {
+      console.log("Error in getting min list", error);
+    } finally {
+      setLoadingList(false);
+    }
+  };
+
   const getCountryList = async () => {
     const response = await get("national/organisation/countries");
     if (response.data) {
@@ -347,6 +396,7 @@ export const AddNewCompanyComponent = (props: any) => {
     setIsUpdate(state?.record ? true : false);
     getCountryList();
     getRegionList();
+    getMinistryList();
     if (state?.record?.logo) {
       setFileList([
         {
@@ -498,17 +548,21 @@ export const AddNewCompanyComponent = (props: any) => {
         values.paymentId = formOneValues.paymentId;
       }
 
-      if (state?.record?.companyRole === CompanyRole.MINISTRY) {
-        values.sectoralScope = formOneValues.sectoralScope;
-        values.nameOfMinister = formOneValues.nameOfMinister;
-        values.ministry = formOneValues.ministry;
-        const enumKeys = Object.keys(GovDepartment);
+      if (
+        state?.record?.companyRole === CompanyRole.MINISTRY ||
+        state?.record?.companyRole === CompanyRole.GOVERNMENT
+      ) {
         if (formOneValues.govDep in GovDepartment) {
           const key = formOneValues.govDep as keyof typeof GovDepartment;
           values.govDep = GovDepartment[key];
         } else {
           values.govDep = formOneValues.govDep;
         }
+        values.ministry = formOneValues.ministry;
+      }
+      if (state?.record?.companyRole === CompanyRole.MINISTRY) {
+        values.sectoralScope = formOneValues.sectoralScope;
+        values.nameOfMinister = formOneValues.nameOfMinister;
         values.name = "Ministry of " + formOneValues.ministry;
       }
       if (state?.record?.companyRole === CompanyRole.GOVERNMENT) {
@@ -686,42 +740,45 @@ export const AddNewCompanyComponent = (props: any) => {
                         </Form.Item>
                       )
                     : null}
-                  <Form.Item
-                    label="Email"
-                    name="email"
-                    initialValue={state?.record?.email}
-                    rules={[
-                      {
-                        required: true,
-                        message: "",
-                      },
-                      {
-                        validator: async (rule, value) => {
-                          if (
-                            String(value).trim() === "" ||
-                            String(value).trim() === undefined ||
-                            value === null ||
-                            value === undefined
-                          ) {
-                            throw new Error(`Email ${t("isRequired")}`);
-                          } else {
-                            const val = value.trim();
-                            const reg =
-                              /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                            const matches = val.match(reg)
-                              ? val.match(reg)
-                              : [];
-                            if (matches.length === 0) {
-                              throw new Error(`Email ${t("isInvalid")}`);
-                            }
-                          }
+                  {companyRole !== CompanyRole.GOVERNMENT && (
+                    <Form.Item
+                      label="Email"
+                      name="email"
+                      initialValue={state?.record?.email}
+                      rules={[
+                        {
+                          required: true,
+                          message: "",
                         },
-                      },
-                    ]}
-                  >
-                    <Input size="large" />
-                  </Form.Item>
-                  {companyRole === CompanyRole.MINISTRY && (
+                        {
+                          validator: async (rule, value) => {
+                            if (
+                              String(value).trim() === "" ||
+                              String(value).trim() === undefined ||
+                              value === null ||
+                              value === undefined
+                            ) {
+                              throw new Error(`Email ${t("isRequired")}`);
+                            } else {
+                              const val = value.trim();
+                              const reg =
+                                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                              const matches = val.match(reg)
+                                ? val.match(reg)
+                                : [];
+                              if (matches.length === 0) {
+                                throw new Error(`Email ${t("isInvalid")}`);
+                              }
+                            }
+                          },
+                        },
+                      ]}
+                    >
+                      <Input size="large" />
+                    </Form.Item>
+                  )}
+                  {(companyRole === CompanyRole.MINISTRY ||
+                    companyRole === CompanyRole.GOVERNMENT) && (
                     <div className="space-container" style={{ width: "100%" }}>
                       <Form.Item
                         label="Ministry Name"
@@ -735,36 +792,75 @@ export const AddNewCompanyComponent = (props: any) => {
                         ]}
                       >
                         <Select size="large" onChange={onChangeMinistry}>
-                          {Object.values(Ministry).map((ministry: any) => (
+                          {ministryDropdown.map((ministry: any) => (
                             <Select.Option value={ministry}>
                               {ministry}
                             </Select.Option>
                           ))}
                         </Select>
                       </Form.Item>
-                      <Form.Item
-                        label="Name of the Minister"
-                        name="nameOfMinister"
-                        initialValue={state?.record?.nameOfMinister}
-                        rules={[
-                          {
-                            validator: async (rule, value) => {
-                              if (
-                                String(value).trim() === "" ||
-                                String(value).trim() === undefined ||
-                                value === null ||
-                                value === undefined
-                              ) {
-                                throw new Error(
-                                  `Name of the Minister ${t("isRequired")}`
-                                );
-                              }
+                      {companyRole === CompanyRole.GOVERNMENT && (
+                        <Form.Item
+                          label="Email"
+                          name="email"
+                          initialValue={state?.record?.email}
+                          rules={[
+                            {
+                              required: true,
+                              message: "",
                             },
-                          },
-                        ]}
-                      >
-                        <Input size="large" />
-                      </Form.Item>
+                            {
+                              validator: async (rule, value) => {
+                                if (
+                                  String(value).trim() === "" ||
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
+                                  throw new Error(`Email ${t("isRequired")}`);
+                                } else {
+                                  const val = value.trim();
+                                  const reg =
+                                    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                  const matches = val.match(reg)
+                                    ? val.match(reg)
+                                    : [];
+                                  if (matches.length === 0) {
+                                    throw new Error(`Email ${t("isInvalid")}`);
+                                  }
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <Input size="large" />
+                        </Form.Item>
+                      )}
+                      {companyRole === CompanyRole.MINISTRY && (
+                        <Form.Item
+                          label="Name of the Minister"
+                          name="nameOfMinister"
+                          initialValue={state?.record?.nameOfMinister}
+                          rules={[
+                            {
+                              validator: async (rule, value) => {
+                                if (
+                                  String(value).trim() === "" ||
+                                  String(value).trim() === undefined ||
+                                  value === null ||
+                                  value === undefined
+                                ) {
+                                  throw new Error(
+                                    `Name of the Minister ${t("isRequired")}`
+                                  );
+                                }
+                              },
+                            },
+                          ]}
+                        >
+                          <Input size="large" />
+                        </Form.Item>
+                      )}
                     </div>
                   )}
                   <Form.Item
@@ -1026,13 +1122,24 @@ export const AddNewCompanyComponent = (props: any) => {
                                   placement="top"
                                   title="Permitted to perform all project-related actions within the Ministry"
                                 >
-                                  <Radio.Button
-                                    className="minister"
-                                    value="Ministry"
-                                  >
-                                    <AuditOutlined className="role-icons" />
-                                    Ministry
-                                  </Radio.Button>
+                                  {ministryDropdown.length > 0 ? (
+                                    <Radio.Button
+                                      className="minister"
+                                      value="Ministry"
+                                    >
+                                      <AuditOutlined className="role-icons" />
+                                      Ministry
+                                    </Radio.Button>
+                                  ) : (
+                                    <Radio.Button
+                                      className="minister"
+                                      value="Ministry"
+                                      disabled
+                                    >
+                                      <AuditOutlined className="role-icons" />
+                                      Ministry
+                                    </Radio.Button>
+                                  )}
                                 </Tooltip>
                               </div>
                             )}
@@ -1040,17 +1147,11 @@ export const AddNewCompanyComponent = (props: any) => {
                       )}
                     </Radio.Group>
                   </Form.Item>
-                  {companyRole === CompanyRole.MINISTRY && (
+                  {(companyRole === CompanyRole.MINISTRY ||
+                    companyRole === CompanyRole.GOVERNMENT) && (
                     <Form.Item
                       label="Government Department"
                       name="govDep"
-                      initialValue={
-                        Object.keys(GovDepartment)[
-                          Object.values(GovDepartment).indexOf(
-                            state?.record?.govDep as GovDepartment
-                          )
-                        ]
-                      }
                       rules={[
                         {
                           required: true,
@@ -1071,7 +1172,7 @@ export const AddNewCompanyComponent = (props: any) => {
                               !selectedGovDepatments.includes(val)
                             ) {
                               throw new Error(
-                                `Department not exist in Ministry`
+                                `Department not exist in Selected Ministry`
                               );
                             }
                           },

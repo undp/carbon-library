@@ -30,6 +30,7 @@ import {
   Sector,
   SectoralScope,
   addCommSepRound,
+  GovDepartment,
 } from "../../../Definitions";
 
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
@@ -92,7 +93,10 @@ export const ProgrammeCreationComponent = (props: any) => {
   const [countries, setCountries] = useState<[]>([]);
   const [organisationsList, setOrganisationList] = useState<any[]>([]);
   const [govData, setGovData] = useState<any>();
-  const [initialOrganisationOwnershipValues,setInitialOrganisationOwnershipValues] = useState<any>();
+  const [
+    initialOrganisationOwnershipValues,
+    setInitialOrganisationOwnershipValues,
+  ] = useState<any>();
   const [userOrgTaxId, setUserOrgTaxId] = useState<any>("");
   const [regionsList, setRegionsList] = useState<any[]>([]);
   const [programmeDetailsObj, setProgrammeDetailsObj] = useState<any>();
@@ -108,7 +112,11 @@ export const ProgrammeCreationComponent = (props: any) => {
     []
   );
   const [availableSectar, setAvailableSectar] = useState<any[]>([]);
-
+  const [article6trade, setArticletrade] = useState<boolean>(true);
+  const [ministryList, setMinistryList] = useState<any[]>([]);
+  const [userGovernmentDepartmentValues, setUserGovernmentDepartmentValues] =
+    useState<any>();
+  const [implementOwner, setimplementOwner] = useState<any>();
   // const initialOrganisationOwnershipValues: any[] = [
   //   {
   //     organisation:
@@ -201,7 +209,7 @@ export const ProgrammeCreationComponent = (props: any) => {
             proponentPercentage:
               userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
               userInfoState?.companyRole !== CompanyRole.MINISTRY &&
-              (100 - Number(response?.data[0].nationalSopValue)),
+              100 - Number(response?.data[0].nationalSopValue),
           },
         ]);
         setGovData(response?.data[0]);
@@ -211,6 +219,68 @@ export const ProgrammeCreationComponent = (props: any) => {
     } catch (error: any) {
       console.log("Error in getting government data", error);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const getMinistryDetails = async () => {
+    setLoading(true);
+    try {
+      console.log("getting Ministry profile");
+      const response = await post("national/organisation/query", {
+        page: 1,
+        size: 100,
+        filterOr: [
+          {
+            key: "companyRole",
+            operation: "=",
+            value: CompanyRole.MINISTRY,
+          },
+          {
+            key: "companyRole",
+            operation: "=",
+            value: CompanyRole.GOVERNMENT,
+          },
+        ],
+      });
+      if (response.data) {
+        setMinistryList(response?.data);
+      }
+    } catch (error: any) {
+      console.log("Error in getting ministry data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getImplementOwnerDetails = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/user/query", {
+        page: 1,
+        size: 10,
+        filterAnd: [
+          {
+            key: "id",
+            operation: "=",
+            value: userInfoState?.id,
+          },
+        ],
+      });
+      if (response && response.data) {
+        if (response?.data[0]?.company) {
+          setimplementOwner(response?.data[0]?.company);
+        }
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in getting users", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };
@@ -312,8 +382,10 @@ export const ProgrammeCreationComponent = (props: any) => {
     getCountryList();
     getRegionList();
     getGovernmentDetails();
+    getMinistryDetails();
     if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
       getUserDetails();
+      getImplementOwnerDetails();
     }
   }, []);
 
@@ -336,31 +408,73 @@ export const ProgrammeCreationComponent = (props: any) => {
   const onFinishStepOne = async (values: any) => {
     setLoading(true);
     let programmeDetails: any;
-    const ownershipPercentage =JSON.parse(JSON.stringify(values?.ownershipPercentage))
-    if (Number(govData.nationalSopValue) !== 0) {
-      ownershipPercentage.push({
-        organisation: govData.taxId,
-        proponentPercentage: Number(govData.nationalSopValue),
-      });
-    }
-    console.log("ownershipPercentage", ownershipPercentage);
-    const totalPercentage = ownershipPercentage.reduce(
-      (sum: any, field: any) => sum + field.proponentPercentage,
-      0
-    );
-    const proponentPercentages = ownershipPercentage.map(
-      (item: any) => item.proponentPercentage
-    );
-    const proponentTxIds =
-      userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
-      userInfoState?.companyRole !== CompanyRole.MINISTRY
-        ? ownershipPercentage?.slice(1).map((item: any) => item.organisation)
-        : ownershipPercentage?.map((item: any) => item.organisation);
-    let logoBase64 = "";
-    if (values?.designDocument?.length > 0) {
-      logoBase64 = await getBase64(
-        values?.designDocument[0]?.originFileObj as RcFile
+    let totalPercentage: any;
+    let ownershipPercentage: any;
+    let duplicateIds: any;
+    let proponentTxIds: any;
+    let proponentPercentages: any;
+    let finalImplementingOwner: any;
+    let supportingOwners: any;
+    if (article6trade) {
+      ownershipPercentage = JSON.parse(
+        JSON.stringify(values?.ownershipPercentage)
       );
+      if (Number(govData.nationalSopValue) !== 0) {
+        ownershipPercentage.push({
+          organisation: govData.taxId,
+          proponentPercentage: Number(govData.nationalSopValue),
+        });
+      }
+      totalPercentage = ownershipPercentage.reduce(
+        (sum: any, field: any) => sum + field.proponentPercentage,
+        0
+      );
+      proponentPercentages = ownershipPercentage.map(
+        (item: any) => item.proponentPercentage
+      );
+      proponentTxIds =
+        userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+        userInfoState?.companyRole !== CompanyRole.MINISTRY
+          ? ownershipPercentage?.slice(1).map((item: any) => item.organisation)
+          : ownershipPercentage?.map((item: any) => item.organisation);
+      const propTaxIds =
+        userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
+        userInfoState?.companyRole !== CompanyRole.MINISTRY
+          ? [userOrgTaxId, ...proponentTxIds]
+          : proponentTxIds;
+      duplicateIds = new Set(propTaxIds).size !== propTaxIds.length;
+      console.log("proponentTxIds", proponentTxIds);
+      console.log("ownershipPercentage", ownershipPercentage);
+    }
+    if (!article6trade) {
+      ownershipPercentage = values?.article6Percentage
+        ? JSON.parse(JSON.stringify(values?.article6Percentage))
+        : [];
+      totalPercentage = 100;
+      if (values?.implementingOwner && values?.implementingOwner.length > 0) {
+        ownershipPercentage.push({
+          organisation: implementOwner
+            ? implementOwner.taxId
+            : values?.implementingOwner,
+          proponentPercentage: 100,
+        });
+      }
+      proponentPercentages = ownershipPercentage.map((item: any) =>
+        item.proponentPercentage === "Supporting" ? 0 : 100
+      );
+      proponentTxIds = ownershipPercentage?.map(
+        (item: any) => item.organisation
+      );
+      const propTaxIds = proponentTxIds;
+      duplicateIds = new Set(propTaxIds).size !== propTaxIds.length;
+      finalImplementingOwner = implementOwner
+        ? implementOwner.taxId
+        : values?.implementingOwner;
+      supportingOwners = values?.article6Percentage?.map(
+        (item: any) => item.organisation
+      );
+      console.log("implementingOwner", finalImplementingOwner);
+      console.log("supportingOwners", supportingOwners);
     }
     let environmentalImpactAssessmentData = "";
     if (values?.environmentalImpactAssessment?.length > 0) {
@@ -368,15 +482,12 @@ export const ProgrammeCreationComponent = (props: any) => {
         values?.environmentalImpactAssessment[0]?.originFileObj as RcFile
       );
     }
-
-    const propTaxIds =
-      userInfoState?.companyRole !== CompanyRole.GOVERNMENT &&
-      userInfoState?.companyRole !== CompanyRole.MINISTRY
-        ? [userOrgTaxId, ...proponentTxIds]
-        : proponentTxIds;
-    const duplicateIds = new Set(propTaxIds).size !== propTaxIds.length;
-    console.log("proponentTxIds", proponentTxIds);
-    console.log("ownershipPercentage", ownershipPercentage);
+    let logoBase64 = "";
+    if (values?.designDocument?.length > 0) {
+      logoBase64 = await getBase64(
+        values?.designDocument[0]?.originFileObj as RcFile
+      );
+    }
     if (totalPercentage !== 100) {
       if (Number(govData.nationalSopValue) !== 0) {
         ownershipPercentage.pop();
@@ -413,8 +524,13 @@ export const ProgrammeCreationComponent = (props: any) => {
             ? [userOrgTaxId, ...proponentTxIds]
             : proponentTxIds,
         proponentPercentage: proponentPercentages,
+        article6trade: article6trade,
+        supportingowners: !article6trade ? supportingOwners : undefined,
+        implementinguser: !article6trade ? finalImplementingOwner : undefined,
         programmeProperties: {
-          buyerCountryEligibility: values?.buyerCountryEligibility,
+          buyerCountryEligibility: article6trade
+            ? values?.buyerCountryEligibility
+            : undefined,
           geographicalLocation: values?.geographicalLocation,
           greenHouseGasses: values?.greenHouseGasses,
           ...(values?.ndcScope !== undefined &&
@@ -499,9 +615,9 @@ export const ProgrammeCreationComponent = (props: any) => {
     programmeDetails.programmeProperties.estimatedProgrammeCostUSD = Number(
       values?.estimatedProgrammeCostUSD
     );
-    programmeDetails.programmeProperties.carbonPriceUSDPerTon = Number(
-      values?.minViableCarbonPrice
-    );
+    programmeDetails.programmeProperties.carbonPriceUSDPerTon = article6trade
+      ? Number(values?.minViableCarbonPrice)
+      : 0;
     setProgrammeDetailsObj(programmeDetails);
     return programmeDetails;
   };
@@ -519,6 +635,7 @@ export const ProgrammeCreationComponent = (props: any) => {
 
   const onFormTwoValuesChane = (changedValues: any, allValues: any) => {
     if (
+      article6trade &&
       allValues?.creditEst !== undefined &&
       allValues?.creditEst !== null &&
       allValues?.creditEst > 0 &&
@@ -566,6 +683,13 @@ export const ProgrammeCreationComponent = (props: any) => {
     }
   };
 
+  const onArticle6Trading = (event: any) => {
+    setArticletrade(event.target.value);
+    formOne.resetFields(["ownershipPercentage"]);
+    formOne.resetFields(["article6Percentage"]);
+    formOne.resetFields(["implementingOwner"]);
+  };
+
   const onChangeGeoLocation = (values: any[]) => {
     if (values.includes("National")) {
       const buyerCountryValues = regionsList;
@@ -585,14 +709,22 @@ export const ProgrammeCreationComponent = (props: any) => {
   };
 
   const onChangeStepOne = (changedValues: any, allValues: any) => {
-    const selectedCompanies = allValues?.ownershipPercentage?.map(
-      (org: any) => org?.organisation
-    );
-    const orgPercentValidation =
-      allValues?.ownershipPercentage[0]?.proponentPercentage === false
-        ? true
-        : false;
-    setOwnershipPercentageValidation(orgPercentValidation);
+    let selectedCompanies;
+    if (article6trade) {
+      selectedCompanies = allValues?.ownershipPercentage?.map(
+        (org: any) => org?.organisation
+      );
+      const orgPercentValidation =
+        allValues?.ownershipPercentage[0]?.proponentPercentage === false
+          ? true
+          : false;
+      setOwnershipPercentageValidation(orgPercentValidation);
+    } else {
+      selectedCompanies = allValues?.article6Percentage?.map(
+        (org: any) => org?.organisation
+      );
+    }
+
     const uniqueOrgs: any = new Set(selectedCompanies);
     setSelectedOrgs([...uniqueOrgs]);
   };
@@ -833,7 +965,6 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   getValueFromEvent={normFile}
                                   required={true}
                                   labelCol={{ span: 30 }}
-                                
                                   rules={[
                                     {
                                       required: true,
@@ -894,7 +1025,7 @@ export const ProgrammeCreationComponent = (props: any) => {
                                     trigger="hover"
                                     title={
                                       <a
-                                        style = {{color:"#fff"}}
+                                        style={{ color: "#fff" }}
                                         href={
                                           "https://app-eff78ffabc4efb.app.unfccc.org/tools/cdm/testprodspt3/UNFCCC_CDM/Pages/PDDnew.aspx?t=pdd"
                                         }
@@ -909,256 +1040,621 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   </Tooltip>
                                 </div>
                               </div>
-                              <Form.Item
-                                label={t(
-                                  "addProgramme:buyerCountryEligibility"
-                                )}
-                                name="buyerCountryEligibility"
-                                initialValue={state?.record?.name}
-                                rules={[
-                                  {
-                                    required: false,
-                                  },
-                                ]}
+                              <Row
+                                className="selection-details-row"
+                                gutter={[16, 16]}
                               >
-                                <Select size="large" loading={loadingList}>
-                                  {countries.map((country: any) => (
-                                    <Select.Option
-                                      key={country.alpha2}
-                                      value={country.alpha2}
+                                <Col md={24} xl={12} className="in-ndc-col">
+                                  <Row className="in-ndc-row">
+                                    <Col md={16} lg={18} xl={18}>
+                                      <div className="included-label">
+                                        <div>
+                                          {t("addProgramme:article6trading")}
+                                        </div>
+                                      </div>
+                                    </Col>
+                                    <Col
+                                      md={8}
+                                      lg={6}
+                                      xl={6}
+                                      className="included-val"
                                     >
-                                      {country.name}
-                                    </Select.Option>
-                                  ))}
-                                </Select>
-                              </Form.Item>
-
-                              {govData && (Number(govData.nationalSopValue)!==0) && (
-                                <div
-                                  className="space-container"
-                                  style={{ width: "100%" }}
-                                >
-                                  <Space
-                                    wrap={true}
-                                    style={{
-                                      display: "flex",
-                                      marginBottom: 8,
-                                    }}
-                                    align="center"
-                                    size={"large"}
+                                      <Radio.Group
+                                        size="middle"
+                                        value={article6trade}
+                                        onChange={onArticle6Trading}
+                                        disabled={
+                                          userInfoState?.companyRole ===
+                                          CompanyRole.PROGRAMME_DEVELOPER
+                                        }
+                                      >
+                                        <div className="yes-no-radio-container">
+                                          <Radio.Button
+                                            className="yes-no-radio"
+                                            value={true}
+                                          >
+                                            {t("addProgramme:yes")}
+                                          </Radio.Button>
+                                        </div>
+                                        <div className="yes-no-radio-container">
+                                          <Radio.Button
+                                            className="yes-no-radio"
+                                            value={false}
+                                          >
+                                            {t("addProgramme:no")}
+                                          </Radio.Button>
+                                        </div>
+                                      </Radio.Group>
+                                    </Col>
+                                  </Row>
+                                </Col>
+                              </Row>
+                              {article6trade && (
+                                <>
+                                  <Form.Item
+                                    label={t(
+                                      "addProgramme:buyerCountryEligibility"
+                                    )}
+                                    name="buyerCountryEligibility"
+                                    initialValue={state?.record?.name}
+                                    rules={[
+                                      {
+                                        required: false,
+                                      },
+                                    ]}
                                   >
-                                    <div className="ownership-list-item">
-                                      <Form.Item
-                                        label={t("addProgramme:company")}
-                                        name={"governmentName"}
-                                        wrapperCol={{ span: 24 }}
-                                        className="organisation"
-                                        initialValue={
-                                          govData ? govData.name : "Government"
-                                        }
-                                        required={true}
+                                    <Select size="large" loading={loadingList}>
+                                      {countries.map((country: any) => (
+                                        <Select.Option
+                                          key={country.alpha2}
+                                          value={country.alpha2}
+                                        >
+                                          {country.name}
+                                        </Select.Option>
+                                      ))}
+                                    </Select>
+                                  </Form.Item>
+
+                                  {govData &&
+                                    Number(govData.nationalSopValue) !== 0 && (
+                                      <div
+                                        className="space-container"
+                                        style={{ width: "100%" }}
                                       >
-                                        <Input size="large" disabled={true} />
-                                      </Form.Item>
-                                      <Form.Item
-                                        label={t(
-                                          "addProgramme:proponentPercentage"
-                                        )}
-                                        className="ownership-percent"
-                                        name={"sopPercentage"}
-                                        labelCol={{ span: 24 }}
-                                        wrapperCol={{ span: 24 }}
-                                        required={true}
-                                        initialValue={
-                                          govData
-                                            ? Number(govData.nationalSopValue)
-                                            : 0
-                                        }
-                                      >
-                                        <InputNumber
-                                          size="large"
-                                          disabled={true}
-                                          min={1}
-                                          max={100}
-                                          formatter={(value) => `${value}%`}
-                                          parser={(value: any) =>
-                                            value.replace("%", "")
-                                          }
-                                        />
-                                      </Form.Item>
-                                    </div>
-                                  </Space>
-                                </div>
+                                        <Space
+                                          wrap={true}
+                                          style={{
+                                            display: "flex",
+                                            marginBottom: 8,
+                                          }}
+                                          align="center"
+                                          size={"large"}
+                                        >
+                                          <div className="ownership-list-item">
+                                            <Form.Item
+                                              label={t("addProgramme:company")}
+                                              name={"governmentName"}
+                                              wrapperCol={{ span: 24 }}
+                                              className="organisation"
+                                              initialValue={
+                                                govData
+                                                  ? govData.name
+                                                  : "Government"
+                                              }
+                                              required={true}
+                                            >
+                                              <Input
+                                                size="large"
+                                                disabled={true}
+                                              />
+                                            </Form.Item>
+                                            <Form.Item
+                                              label={t(
+                                                "addProgramme:proponentPercentage"
+                                              )}
+                                              className="ownership-percent"
+                                              name={"sopPercentage"}
+                                              labelCol={{ span: 24 }}
+                                              wrapperCol={{ span: 24 }}
+                                              required={true}
+                                              initialValue={
+                                                govData
+                                                  ? Number(
+                                                      govData.nationalSopValue
+                                                    )
+                                                  : 0
+                                              }
+                                            >
+                                              <InputNumber
+                                                size="large"
+                                                disabled={true}
+                                                min={1}
+                                                max={100}
+                                                formatter={(value) =>
+                                                  `${value}%`
+                                                }
+                                                parser={(value: any) =>
+                                                  value.replace("%", "")
+                                                }
+                                              />
+                                            </Form.Item>
+                                          </div>
+                                        </Space>
+                                      </div>
+                                    )}
+                                  <Form.List
+                                    name="ownershipPercentage"
+                                    initialValue={
+                                      initialOrganisationOwnershipValues
+                                    }
+                                  >
+                                    {(fields, { add, remove }) => {
+                                      return (
+                                        <div
+                                          className="space-container"
+                                          style={{ width: "100%" }}
+                                        >
+                                          {fields.map(
+                                            ({ key, name, ...restField }) => {
+                                              return (
+                                                <Space
+                                                  wrap={true}
+                                                  key={key}
+                                                  style={{
+                                                    display: "flex",
+                                                    marginBottom: 8,
+                                                  }}
+                                                  align="center"
+                                                  size={"large"}
+                                                >
+                                                  <div className="ownership-list-item">
+                                                    <Form.Item
+                                                      {...restField}
+                                                      label={t(
+                                                        "addProgramme:company"
+                                                      )}
+                                                      name={[
+                                                        name,
+                                                        "organisation",
+                                                      ]}
+                                                      wrapperCol={{ span: 24 }}
+                                                      className="organisation"
+                                                      rules={[
+                                                        {
+                                                          required: true,
+                                                          message: `${t(
+                                                            "addProgramme:company"
+                                                          )} ${t(
+                                                            "isRequired"
+                                                          )}`,
+                                                          validateTrigger:
+                                                            "onBlur",
+                                                        },
+                                                      ]}
+                                                      shouldUpdate
+                                                    >
+                                                      <Select
+                                                        size="large"
+                                                        loading={loadingList}
+                                                        disabled={
+                                                          name === 0 &&
+                                                          userInfoState?.companyRole !==
+                                                            CompanyRole.GOVERNMENT &&
+                                                          userInfoState?.companyRole !==
+                                                            CompanyRole.MINISTRY
+                                                        }
+                                                      >
+                                                        {organisationsList.map(
+                                                          (organisation) => (
+                                                            <Select.Option
+                                                              key={
+                                                                organisation.companyId
+                                                              }
+                                                              value={
+                                                                organisation.taxId
+                                                              }
+                                                              disabled={
+                                                                selectedOrgs?.includes(
+                                                                  organisation.taxId
+                                                                ) ||
+                                                                (userInfoState?.companyRole !==
+                                                                  CompanyRole.GOVERNMENT &&
+                                                                  userInfoState?.companyRole !==
+                                                                    CompanyRole.MINISTRY &&
+                                                                  userOrgTaxId ===
+                                                                    organisation?.taxId)
+                                                              }
+                                                            >
+                                                              {
+                                                                organisation.name
+                                                              }
+                                                            </Select.Option>
+                                                          )
+                                                        )}
+                                                      </Select>
+                                                    </Form.Item>
+                                                    <Form.Item
+                                                      {...restField}
+                                                      label={t(
+                                                        "addProgramme:proponentPercentage"
+                                                      )}
+                                                      className="ownership-percent"
+                                                      name={[
+                                                        name,
+                                                        "proponentPercentage",
+                                                      ]}
+                                                      labelCol={{ span: 24 }}
+                                                      wrapperCol={{ span: 24 }}
+                                                      required={true}
+                                                      rules={[
+                                                        {
+                                                          required: true,
+                                                          message: `${t(
+                                                            "addProgramme:proponentPercentage"
+                                                          )} ${t(
+                                                            "isRequired"
+                                                          )}`,
+                                                        },
+                                                        {
+                                                          validator: async (
+                                                            rule,
+                                                            value
+                                                          ) => {
+                                                            if (
+                                                              ownershipPercentageValidation &&
+                                                              name === 0
+                                                            ) {
+                                                              throw new Error(
+                                                                `${t(
+                                                                  "addProgramme:proponentPercentage"
+                                                                )} ${t(
+                                                                  "isRequired"
+                                                                )}`
+                                                              );
+                                                            }
+                                                          },
+                                                        },
+                                                      ]}
+                                                      shouldUpdate
+                                                    >
+                                                      <InputNumber
+                                                        size="large"
+                                                        min={1}
+                                                        max={100}
+                                                        formatter={(value) =>
+                                                          `${value}%`
+                                                        }
+                                                        parser={(value: any) =>
+                                                          value.replace("%", "")
+                                                        }
+                                                        disabled={
+                                                          fields?.length < 2 &&
+                                                          userInfoState?.companyRole !==
+                                                            CompanyRole.GOVERNMENT &&
+                                                          userInfoState?.companyRole !==
+                                                            CompanyRole.MINISTRY
+                                                        }
+                                                      />
+                                                    </Form.Item>
+                                                    {fields?.length > 1 &&
+                                                      name !== 0 && (
+                                                        <MinusCircleOutlined
+                                                          className="dynamic-delete-button"
+                                                          onClick={() => {
+                                                            remove(name);
+                                                          }}
+                                                        />
+                                                      )}
+                                                  </div>
+                                                </Space>
+                                              );
+                                            }
+                                          )}
+                                          <Form.Item>
+                                            <Button
+                                              type="dashed"
+                                              onClick={() => add()}
+                                              icon={<PlusOutlined />}
+                                            ></Button>
+                                          </Form.Item>
+                                        </div>
+                                      );
+                                    }}
+                                  </Form.List>
+                                </>
                               )}
-                              <Form.List
-                                name="ownershipPercentage"
-                                initialValue={
-                                  initialOrganisationOwnershipValues
-                                }
-                              >
-                                {(fields, { add, remove }) => {
-                                  return (
+                              {!article6trade && (
+                                <>
+                                  {implementOwner ? (
                                     <div
                                       className="space-container"
                                       style={{ width: "100%" }}
                                     >
-                                      {fields.map(
-                                        ({ key, name, ...restField }) => {
-                                          return (
-                                            <Space
-                                              wrap={true}
-                                              key={key}
-                                              style={{
-                                                display: "flex",
-                                                marginBottom: 8,
-                                              }}
-                                              align="center"
-                                              size={"large"}
-                                            >
-                                              <div className="ownership-list-item">
-                                                <Form.Item
-                                                  {...restField}
-                                                  label={t(
-                                                    "addProgramme:company"
-                                                  )}
-                                                  name={[name, "organisation"]}
-                                                  wrapperCol={{ span: 24 }}
-                                                  className="organisation"
-                                                  rules={[
-                                                    {
-                                                      required: true,
-                                                      message: `${t(
-                                                        "addProgramme:company"
-                                                      )} ${t("isRequired")}`,
-                                                      validateTrigger: "onBlur",
-                                                    },
-                                                  ]}
-                                                  shouldUpdate
-                                                >
-                                                  <Select
-                                                    size="large"
-                                                    loading={loadingList}
-                                                    disabled={
-                                                      name === 0 &&
-                                                      userInfoState?.companyRole !==
-                                                        CompanyRole.GOVERNMENT &&
-                                                      userInfoState?.companyRole !==
-                                                        CompanyRole.MINISTRY
-                                                    }
-                                                  >
-                                                    {organisationsList.map(
-                                                      (organisation) => (
-                                                        <Select.Option
-                                                          key={
-                                                            organisation.companyId
-                                                          }
-                                                          value={
-                                                            organisation.taxId
-                                                          }
-                                                          disabled={
-                                                            selectedOrgs?.includes(
-                                                              organisation.taxId
-                                                            ) ||
-                                                            (userInfoState?.companyRole !==
-                                                              CompanyRole.GOVERNMENT &&
-                                                              userInfoState?.companyRole !==
-                                                                CompanyRole.MINISTRY &&
-                                                              userOrgTaxId ===
-                                                                organisation?.taxId)
-                                                          }
-                                                        >
-                                                          {organisation.name}
-                                                        </Select.Option>
-                                                      )
-                                                    )}
-                                                  </Select>
-                                                </Form.Item>
-                                                <Form.Item
-                                                  {...restField}
-                                                  label={t(
-                                                    "addProgramme:proponentPercentage"
-                                                  )}
-                                                  className="ownership-percent"
-                                                  name={[
-                                                    name,
-                                                    "proponentPercentage",
-                                                  ]}
-                                                  labelCol={{ span: 24 }}
-                                                  wrapperCol={{ span: 24 }}
-                                                  required={true}
-                                                  rules={[
-                                                    {
-                                                      required: true,
-                                                      message: `${t(
-                                                        "addProgramme:proponentPercentage"
-                                                      )} ${t("isRequired")}`,
-                                                    },
-                                                    {
-                                                      validator: async (
-                                                        rule,
-                                                        value
-                                                      ) => {
-                                                        if (
-                                                          ownershipPercentageValidation &&
-                                                          name === 0
-                                                        ) {
-                                                          throw new Error(
-                                                            `${t(
-                                                              "addProgramme:proponentPercentage"
-                                                            )} ${t(
-                                                              "isRequired"
-                                                            )}`
-                                                          );
-                                                        }
-                                                      },
-                                                    },
-                                                  ]}
-                                                  shouldUpdate
-                                                >
-                                                  <InputNumber
-                                                    size="large"
-                                                    min={1}
-                                                    max={100}
-                                                    formatter={(value) =>
-                                                      `${value}%`
-                                                    }
-                                                    parser={(value: any) =>
-                                                      value.replace("%", "")
-                                                    }
-                                                    disabled={
-                                                      fields?.length < 2 &&
-                                                      userInfoState?.companyRole !==
-                                                        CompanyRole.GOVERNMENT &&
-                                                      userInfoState?.companyRole !==
-                                                        CompanyRole.MINISTRY
-                                                    }
-                                                  />
-                                                </Form.Item>
-                                                {fields?.length > 1 &&
-                                                  name !== 0 && (
-                                                    <MinusCircleOutlined
-                                                      className="dynamic-delete-button"
-                                                      onClick={() => {
-                                                        remove(name);
-                                                      }}
-                                                    />
-                                                  )}
-                                              </div>
-                                            </Space>
-                                          );
-                                        }
-                                      )}
-                                      <Form.Item>
-                                        <Button
-                                          type="dashed"
-                                          onClick={() => add()}
-                                          icon={<PlusOutlined />}
-                                        ></Button>
-                                      </Form.Item>
+                                      <Space
+                                        wrap={true}
+                                        style={{
+                                          display: "flex",
+                                          marginBottom: 8,
+                                        }}
+                                        align="center"
+                                        size={"large"}
+                                      >
+                                        <div className="ownership-list-item">
+                                          <Form.Item
+                                            label={t(
+                                              "addProgramme:governmentDepartment"
+                                            )}
+                                            name={"implementingOwner"}
+                                            wrapperCol={{ span: 24 }}
+                                            className="organisation"
+                                            initialValue={
+                                              implementOwner
+                                                ? implementOwner.name +
+                                                  " - " +
+                                                  Object.keys(GovDepartment)[
+                                                    Object.values(
+                                                      GovDepartment
+                                                    ).indexOf(
+                                                      implementOwner.govDep as GovDepartment
+                                                    )
+                                                  ]
+                                                : "Implementing Owner"
+                                            }
+                                            required={true}
+                                          >
+                                            <Input
+                                              size="large"
+                                              disabled={true}
+                                            />
+                                          </Form.Item>
+                                          <Form.Item
+                                            label={t("addProgramme:ownership")}
+                                            className="ownership-percent"
+                                            name={"implementPercentage"}
+                                            labelCol={{ span: 24 }}
+                                            wrapperCol={{ span: 24 }}
+                                            required={true}
+                                            initialValue={
+                                              implementOwner
+                                                ? "Implementing"
+                                                : "Supporting"
+                                            }
+                                          >
+                                            <InputNumber
+                                              size="large"
+                                              disabled={true}
+                                            />
+                                          </Form.Item>
+                                        </div>
+                                      </Space>
                                     </div>
-                                  );
-                                }}
-                              </Form.List>
+                                  ) : (
+                                    <div
+                                      className="space-container"
+                                      style={{ width: "100%" }}
+                                    >
+                                      <Space
+                                        wrap={true}
+                                        style={{
+                                          display: "flex",
+                                          marginBottom: 8,
+                                        }}
+                                        align="center"
+                                        size={"large"}
+                                      >
+                                        <div className="ownership-list-item">
+                                          <Form.Item
+                                            label={t(
+                                              "addProgramme:governmentDepartment"
+                                            )}
+                                            name={"implementingOwner"}
+                                            wrapperCol={{ span: 24 }}
+                                            className="organisation"
+                                            rules={[
+                                              {
+                                                required: true,
+                                                message: `${t(
+                                                  "addProgramme:governmentDepartment"
+                                                )} ${t("isRequired")}`,
+                                              },
+                                            ]}
+                                          >
+                                            <Select
+                                              size="large"
+                                              loading={loadingList}
+                                            >
+                                              {ministryList.map(
+                                                (organisation) =>
+                                                  organisation.govDep && (
+                                                    <Select.Option
+                                                      key={
+                                                        organisation.companyId
+                                                      }
+                                                      value={organisation.taxId}
+                                                    >
+                                                      {organisation.name +
+                                                        "-" +
+                                                        Object.keys(
+                                                          GovDepartment
+                                                        )[
+                                                          Object.values(
+                                                            GovDepartment
+                                                          ).indexOf(
+                                                            organisation.govDep as GovDepartment
+                                                          )
+                                                        ]}
+                                                    </Select.Option>
+                                                  )
+                                              )}
+                                            </Select>
+                                          </Form.Item>
+                                          <Form.Item
+                                            label={t("addProgramme:ownership")}
+                                            className="ownership-percent"
+                                            name={"implementPercentage"}
+                                            labelCol={{ span: 24 }}
+                                            wrapperCol={{ span: 24 }}
+                                            required={true}
+                                            initialValue={"Implementing"}
+                                          >
+                                            <InputNumber
+                                              size="large"
+                                              disabled={true}
+                                            />
+                                          </Form.Item>
+                                        </div>
+                                      </Space>
+                                    </div>
+                                  )}
+                                  <Form.List name="article6Percentage">
+                                    {(fields, { add, remove }) => {
+                                      return (
+                                        <div
+                                          className="space-container"
+                                          style={{ width: "100%" }}
+                                        >
+                                          {fields.map(
+                                            ({ key, name, ...restField }) => {
+                                              return (
+                                                <Space
+                                                  wrap={true}
+                                                  key={key}
+                                                  style={{
+                                                    display: "flex",
+                                                    marginBottom: 8,
+                                                  }}
+                                                  align="center"
+                                                  size={"large"}
+                                                >
+                                                  <div className="ownership-list-item">
+                                                    <Form.Item
+                                                      {...restField}
+                                                      label={t(
+                                                        "addProgramme:governmentDepartment"
+                                                      )}
+                                                      name={[
+                                                        name,
+                                                        "organisation",
+                                                      ]}
+                                                      rules={[
+                                                        {
+                                                          validator: async (
+                                                            rule,
+                                                            value
+                                                          ) => {
+                                                            if (
+                                                              String(
+                                                                value
+                                                              ).trim() === "" ||
+                                                              String(
+                                                                value
+                                                              ).trim() ===
+                                                                undefined ||
+                                                              value === null ||
+                                                              value ===
+                                                                undefined
+                                                            ) {
+                                                              throw new Error(
+                                                                `${t(
+                                                                  "addProgramme:governmentDepartment"
+                                                                )} shouldn't be empty`
+                                                              );
+                                                            }
+                                                          },
+                                                        },
+                                                      ]}
+                                                      wrapperCol={{ span: 24 }}
+                                                      className="organisation"
+                                                      shouldUpdate
+                                                    >
+                                                      <Select
+                                                        size="large"
+                                                        loading={loadingList}
+                                                      >
+                                                        {ministryList.map(
+                                                          (organisation) =>
+                                                            organisation.govDep && (
+                                                              <Select.Option
+                                                                key={
+                                                                  organisation.companyId
+                                                                }
+                                                                value={
+                                                                  organisation.taxId
+                                                                }
+                                                                disabled={
+                                                                  selectedOrgs?.includes(
+                                                                    organisation.taxId.trim()
+                                                                  ) ||
+                                                                  implementOwner?.taxId ===
+                                                                    organisation.taxId ||
+                                                                  state?.record?.implementingOwner.trim() ===
+                                                                    organisation.taxId
+                                                                }
+                                                              >
+                                                                {organisation.name +
+                                                                  " - " +
+                                                                  Object.keys(
+                                                                    GovDepartment
+                                                                  )[
+                                                                    Object.values(
+                                                                      GovDepartment
+                                                                    ).indexOf(
+                                                                      organisation.govDep as GovDepartment
+                                                                    )
+                                                                  ]}
+                                                              </Select.Option>
+                                                            )
+                                                        )}
+                                                      </Select>
+                                                    </Form.Item>
+                                                    <Form.Item
+                                                      {...restField}
+                                                      label={t(
+                                                        "addProgramme:ownership"
+                                                      )}
+                                                      className="ownership-percent"
+                                                      name={[
+                                                        name,
+                                                        "proponentPercentage",
+                                                      ]}
+                                                      initialValue={
+                                                        "Supporting"
+                                                      }
+                                                      labelCol={{ span: 24 }}
+                                                      wrapperCol={{ span: 24 }}
+                                                      shouldUpdate
+                                                    >
+                                                      <InputNumber
+                                                        size="large"
+                                                        disabled={true}
+                                                      />
+                                                    </Form.Item>
+                                                    {
+                                                      <MinusCircleOutlined
+                                                        className="dynamic-delete-button"
+                                                        onClick={() => {
+                                                          remove(name);
+                                                        }}
+                                                      />
+                                                    }
+                                                  </div>
+                                                </Space>
+                                              );
+                                            }
+                                          )}
+                                          <Form.Item>
+                                            <Button
+                                              type="dashed"
+                                              onClick={() => add()}
+                                              icon={<PlusOutlined />}
+                                            ></Button>
+                                          </Form.Item>
+                                        </div>
+                                      );
+                                    }}
+                                  </Form.List>
+                                </>
+                              )}
                               <Form.Item
                                 label={t(
                                   "addProgramme:environmentalAssessmentRegistrationNo"
@@ -1437,67 +1933,6 @@ export const ProgrammeCreationComponent = (props: any) => {
                             </div>
                           </Col>
                         </Row>
-                        <Row
-                          className="selection-details-row"
-                          gutter={[16, 16]}
-                        >
-                          <Col md={24} xl={12} className="in-ndc-col">
-                            <Row className="in-ndc-row">
-                              <Col md={16} lg={18} xl={18}>
-                                <div className="included-label">
-                                  <div>{t("addProgramme:inNDC")}</div>
-                                  <div className="info-container">
-                                    <Tooltip
-                                      arrowPointAtCenter
-                                      placement="topLeft"
-                                      trigger="hover"
-                                      title={t("addProgramme:inNDCToolTip")}
-                                      overlayClassName="custom-tooltip"
-                                    >
-                                      <InfoCircle color="#000000" size={17} />
-                                    </Tooltip>
-                                  </div>
-                                </div>
-                              </Col>
-                              <Col
-                                md={8}
-                                lg={6}
-                                xl={6}
-                                className="included-val"
-                              >
-                                <Radio.Group
-                                  size="middle"
-                                  disabled={ndcScopeChanged}
-                                  value={includedInNDC}
-                                  onChange={onInCludedNDCChange}
-                                >
-                                  <div className="yes-no-radio-container">
-                                    <Radio.Button
-                                      className="yes-no-radio"
-                                      value={true}
-                                      onClick={() =>
-                                        onClickIncludedInNDCScope(true)
-                                      }
-                                    >
-                                      {t("addProgramme:yes")}
-                                    </Radio.Button>
-                                  </div>
-                                  <div className="yes-no-radio-container">
-                                    <Radio.Button
-                                      className="yes-no-radio"
-                                      value={false}
-                                      onClick={() =>
-                                        onClickIncludedInNDCScope(false)
-                                      }
-                                    >
-                                      {t("addProgramme:no")}
-                                    </Radio.Button>
-                                  </div>
-                                </Radio.Group>
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Row>
                         <div className="steps-actions">
                           <Button
                             type="primary"
@@ -1583,22 +2018,28 @@ export const ProgrammeCreationComponent = (props: any) => {
                                   style={{ width: "100%", paddingRight: 12 }}
                                 />
                               </Form.Item>
-                              <Form.Item
-                                label={t("addProgramme:minViableCarbonPrice")}
-                                name="minViableCarbonPrice"
-                              >
-                                <InputNumber
-                                  disabled
-                                  size="large"
-                                  style={{ width: "100%", paddingRight: 12 }}
-                                />
-                              </Form.Item>
+                              {article6trade && (
+                                <Form.Item
+                                  label={t("addProgramme:minViableCarbonPrice")}
+                                  name="minViableCarbonPrice"
+                                >
+                                  <InputNumber
+                                    disabled
+                                    size="large"
+                                    style={{ width: "100%", paddingRight: 12 }}
+                                  />
+                                </Form.Item>
+                              )}
                             </div>
                           </Col>
                           <Col xl={12} md={24}>
                             <div className="details-part-two">
                               <Form.Item
-                                label={t("addProgramme:creditEst")}
+                                label={
+                                  article6trade
+                                    ? t("addProgramme:creditEst")
+                                    : t("addProgramme:creditReduction")
+                                }
                                 name="creditEst"
                                 rules={[
                                   {
@@ -1614,9 +2055,13 @@ export const ProgrammeCreationComponent = (props: any) => {
                                         value === undefined
                                       ) {
                                         throw new Error(
-                                          `${t("addProgramme:creditEst")} ${t(
-                                            "isRequired"
-                                          )}`
+                                          `${
+                                            article6trade
+                                              ? t("addProgramme:creditEst")
+                                              : t(
+                                                  "addProgramme:creditReduction"
+                                                )
+                                          } ${t("isRequired")}`
                                         );
                                       } else if (
                                         !isNaN(value) &&

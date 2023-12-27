@@ -255,8 +255,10 @@
           width: 100%;
 
           .yes-no-radio-container {
-            width: 45%;
+            width: max-content;
             text-align: center;
+            margin-right: 1rem;
+
             .ant-radio-button-wrapper-checked:not(
                 .ant-radio-button-wrapper-disabled
               ) {
@@ -280,9 +282,8 @@
             margin-right: 0.5rem;
           }
           .yes-no-radio {
-            width: 100%;
             .ant-radio-button-checked {
-              background: $primary-purple;
+              background: $primary-color;
               color: #ffffff;
             }
           }

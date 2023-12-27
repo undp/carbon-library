@@ -53,6 +53,8 @@ import { CompanyState } from "../enum/company.state.enum";
 import { OrganisationDto } from "../dto/organisation.dto";
 import { PasswordHashService } from "../util/passwordHash.service";
 import { FilterEntry } from "../dto/filter.entry";
+import { GovDepartment, ministryOrgs } from "../enum/govDep.enum";
+import { Ministry } from "../enum/ministry.enum";
 
 @Injectable()
 export class UserService {
@@ -548,6 +550,24 @@ export class UserService {
       }
     }
     if (company) {
+      const ministrykey = Object.keys(Ministry)[Object.values(Ministry).indexOf(company.ministry as Ministry)];
+      if (company.companyRole == CompanyRole.MINISTRY &&
+        !ministryOrgs[ministrykey].includes(
+          Object.keys(GovDepartment)[
+            Object.values(GovDepartment).indexOf(
+              company.govDep as GovDepartment
+            )
+          ],
+        )
+      ) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            'user.wrongMinistryAndGovDep',
+            [],
+          ),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       if (companyRole != CompanyRole.GOVERNMENT && companyRole != CompanyRole.API && companyRole !== CompanyRole.MINISTRY && !isRegistrationValue) {
         throw new HttpException(
           this.helperService.formatReqMessagesString("user.userUnAUth", []),
@@ -605,10 +625,11 @@ export class UserService {
       }
 
       if (company.companyRole == CompanyRole.MINISTRY) {
+        company.taxId = "00000"+this.configService.get("systemCountry")+"-"+company.ministry+"-"+company.govDep
         const ministry = await this.companyService.findMinistryByDepartment(
           company.govDep
         );
-        if (ministry) {
+        if (ministry.ministry==company.ministry && ministry.govDep==company.govDep) {
           throw new HttpException(
             this.helperService.formatReqMessagesString(
               "user.MinistryDepartmentAlreadyExist",

@@ -110,7 +110,6 @@ export class Company implements EntitySubject {
   ministry: Ministry;
 
   @Column({
-    unique: true,
     nullable: true,
     type: "enum",
     enum: GovDepartment,
