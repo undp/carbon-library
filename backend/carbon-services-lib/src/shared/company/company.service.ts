@@ -695,15 +695,16 @@ export class CompanyService {
     organisationSyncRequest: OrganisationSyncRequestDto,
     abilityCondition: string
   ): Promise<DataResponseDto | undefined> {
-    const { organizationIdentifierId, organisationUpdateDto: companyUpdateDto } = organisationSyncRequest;
+    const {organizationIdentifierId, organisationUpdateDto:companyUpdateDto} = organisationSyncRequest;
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
-        `"taxId" = '${organizationIdentifierId}' ${abilityCondition
-          ? " AND (" +
-          this.helperService.parseMongoQueryToSQL(abilityCondition) +
-          ")"
-          : ""
+        `"taxId" = '${organizationIdentifierId}' ${
+          abilityCondition
+            ? " AND (" +
+              this.helperService.parseMongoQueryToSQL(abilityCondition) +
+              ")"
+            : ""
         }`
       )
       .getOne();
@@ -719,7 +720,8 @@ export class CompanyService {
 
     if (companyUpdateDto.logo) {
       const response: any = await this.fileHandler.uploadFile(
-        `profile_images/${company.companyId
+        `profile_images/${
+          company.companyId
         }_${new Date().getTime()}.png`,
         companyUpdateDto.logo
       );
@@ -737,55 +739,47 @@ export class CompanyService {
       }
     }
 
-    if (companyUpdateDto.regions) {
+    if(companyUpdateDto.regions){
       companyUpdateDto.geographicalLocationCordintes = await this.locationService
-        .getCoordinatesForRegion(companyUpdateDto.regions)
-        .then((response: any) => {
-          console.log("response from forwardGeoCoding function -> ", response);
-          return [...response];
-        });
+      .getCoordinatesForRegion(companyUpdateDto.regions)
+      .then((response: any) => {
+        console.log("response from forwardGeoCoding function -> ", response);
+        return  [...response];
+      });
     }
 
-    const { taxId, nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
+    const { nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
     if (!companyUpdateFields.hasOwnProperty("website")) {
       companyUpdateFields["website"] = "";
     }
-    // const result = await this.companyRepo
-    //   .update(
-    //     {
-    //       taxId: taxId,
-    //     },
-    //     this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
-    //   )
-    //   .catch((err: any) => {
-    //     this.logger.error(err);
-    //     return err;
-    //   });
-
     const result = await this.companyRepo
-      .createQueryBuilder()
-      .update(Company)
-      .set(this.configService.get('systemType') !== SYSTEM_TYPE.CARBON_REGISTRY ? { ...companyUpdateFields, nationalSopValue } : { ...companyUpdateFields })
-      .where("taxId = :id", { id: taxId })
-      .execute()
+      .update(
+        {
+          taxId: company.taxId,
+        },
+        this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
+      )
       .catch((err: any) => {
         this.logger.error(err);
-        return new HttpException(
-          this.helperService.formatReqMessagesString(
-            "company.companyUpdateFailed",
-            []
-          ),
-          HttpStatus.INTERNAL_SERVER_ERROR
-        );;
+        return err;
       });
 
     console.log('result', result);
 
-    return new DataResponseDto(
-      HttpStatus.OK,
-      await this.findByCompanyId(company.companyId)
-    );
+    if (result.affected > 0) {
+      return new DataResponseDto(
+        HttpStatus.OK,
+        await this.findByCompanyId(company.companyId)
+      );
+    }
 
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "company.companyUpdateFailed",
+        []
+      ),
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
   }
 
   async companyTransferCancel(companyId: number, remark: string) {
