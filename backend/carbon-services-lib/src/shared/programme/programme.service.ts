@@ -1622,6 +1622,11 @@ export class ProgrammeService {
     user: User,
   ): Promise<Programme | undefined> {
     this.logger.verbose('ProgrammeDTO received', JSON.stringify(programmeDto));
+    if(programmeDto.proponentPercentage){
+      for(const i in programmeDto.proponentPercentage){
+        programmeDto.proponentPercentage[i]=this.helperService.halfUpToPrecision(programmeDto.proponentPercentage[i])
+      }
+    }
     const programme: Programme = this.toProgramme(programmeDto);
     if(programme.creditEst)programme.creditEst=this.helperService.halfUpToPrecision(programme.creditEst)
     this.logger.verbose("Programme  create", JSON.stringify(programme));
