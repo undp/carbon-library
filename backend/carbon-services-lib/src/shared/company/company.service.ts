@@ -685,6 +685,94 @@ export class CompanyService {
     );
   }
 
+  async updateByTaxId(
+    companyUpdateDto: OrganisationUpdateDto,
+    abilityCondition: string
+  ): Promise<DataResponseDto | undefined> {
+    const company = await this.companyRepo
+      .createQueryBuilder()
+      .where(
+        `"taxId" = '${companyUpdateDto.taxId}' ${
+          abilityCondition
+            ? " AND (" +
+              this.helperService.parseMongoQueryToSQL(abilityCondition) +
+              ")"
+            : ""
+        }`
+      )
+      .getOne();
+    if (!company) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "company.noActiveCompany",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    if (companyUpdateDto.logo) {
+      const response: any = await this.fileHandler.uploadFile(
+        `profile_images/${
+          company.companyId
+        }_${new Date().getTime()}.png`,
+        companyUpdateDto.logo
+      );
+
+      if (response) {
+        companyUpdateDto.logo = response;
+      } else {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "company.companyUpdateFailed",
+            []
+          ),
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+
+    if(companyUpdateDto.regions){
+      companyUpdateDto.geographicalLocationCordintes = await this.locationService
+      .getCoordinatesForRegion(companyUpdateDto.regions)
+      .then((response: any) => {
+        console.log("response from forwardGeoCoding function -> ", response);
+        return  [...response];
+      });
+    }
+
+    const { taxId, nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
+    if (!companyUpdateFields.hasOwnProperty("website")) {
+      companyUpdateFields["website"] = "";
+    }
+    const result = await this.companyRepo
+      .update(
+        {
+          taxId: taxId,
+        },
+        this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
+      )
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+
+    if (result.affected > 0) {
+      return new DataResponseDto(
+        HttpStatus.OK,
+        await this.findByCompanyId(company.companyId)
+      );
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "company.companyUpdateFailed",
+        []
+      ),
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+
   async companyTransferCancel(companyId: number, remark: string) {
     await this.programmeTransferRepo
       .createQueryBuilder()
