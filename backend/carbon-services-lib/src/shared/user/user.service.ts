@@ -625,6 +625,7 @@ export class UserService {
       }
 
       if (company.companyRole == CompanyRole.MINISTRY) {
+        
         company.taxId = "00000"+this.configService.get("systemCountry")+"-"+company.ministry+"-"+company.govDep
         const ministry = await this.companyService.findMinistryByDepartment(
           company.govDep
