@@ -21,6 +21,7 @@ import { NDCAction } from "../entities/ndc.action.entity";
 import { NDCActionDto } from "../dto/ndc.action.dto";
 import { EmailHelperService } from "../email-helper/email-helper.service";
 import { EmailTemplates } from "../email-helper/email.template";
+import { OrganisationUpdateDto } from "../dto/organisation.update.dto";
 
 @Injectable()
 export class RegistryClientService {
@@ -89,6 +90,13 @@ export class RegistryClientService {
       userDto.company.name
     );
     return resp;
+  }
+
+  public async CompanyUpdate(organisationUpdateDto: OrganisationUpdateDto) {
+    console.log('d1 organisationUpdateDto', OrganisationUpdateDto);
+    const response = await this.sendHttp("national/organisation/update", organisationUpdateDto);
+    console.log('d1 CompanyUpdate', response);
+    return response;
   }
 
   public async authProgramme(actionProps:any) {

@@ -661,6 +661,15 @@ export class CompanyService {
       });
 
     if (result.affected > 0) {
+
+      const companyUpdateAction: AsyncAction = {
+        actionType: AsyncActionType.CompanyUpdate,
+        actionProps: companyUpdateDto,
+      };
+      await this.asyncOperationsInterface.AddAction(
+        companyUpdateAction
+      );
+
       return new DataResponseDto(
         HttpStatus.OK,
         await this.findByCompanyId(company.companyId)
