@@ -233,6 +233,7 @@ export class RegistryClientService {
         "proponentPercentage": programme.proponentPercentage,
         "programmeProperties": props,
         "creditEst": programme.creditEst,
+        "article6trade": true,
         "environmentalAssessmentRegistrationNo": programme.environmentalAssessmentRegistrationNo
       }
 
