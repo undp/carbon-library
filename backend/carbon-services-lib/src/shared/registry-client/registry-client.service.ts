@@ -22,6 +22,7 @@ import { NDCActionDto } from "../dto/ndc.action.dto";
 import { EmailHelperService } from "../email-helper/email-helper.service";
 import { EmailTemplates } from "../email-helper/email.template";
 import { OrganisationUpdateDto } from "../dto/organisation.update.dto";
+import { OrganisationSyncRequestDto } from "../dto/organisation.sync.request.dto";
 
 @Injectable()
 export class RegistryClientService {
@@ -93,9 +94,9 @@ export class RegistryClientService {
     return resp;
   }
 
-  public async CompanyUpdate(organisationUpdateDto: OrganisationUpdateDto) {
-    console.log('d1 organisationUpdateDto ', organisationUpdateDto);
-    const response = await this.sendHttpPut("/national/organisation/updateByTax", organisationUpdateDto);
+  public async CompanyUpdate(organisationSyncRequestDto: OrganisationSyncRequestDto) {
+    console.log('d1 organisationSyncRequestDto ', organisationSyncRequestDto);
+    const response = await this.sendHttpPut("/national/organisation/sync", organisationSyncRequestDto);
     console.log('d1 CompanyUpdate', response);
     return response;
   }

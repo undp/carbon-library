@@ -41,6 +41,7 @@ import {
 import { AsyncActionType } from "../enum/async.action.type.enum";
 import { LocationInterface } from "../location/location.interface";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
+import { OrganisationSyncRequestDto } from "../dto/organisation.sync.request.dto";
 
 @Injectable()
 export class CompanyService {
@@ -662,12 +663,17 @@ export class CompanyService {
 
     if (result.affected > 0) {
 
-      const companyUpdateAction: AsyncAction = {
+      const organisationSyncRequestDto: OrganisationSyncRequestDto = {
+        organizationIdentifierId: company.taxId,
+        organisationUpdateDto: companyUpdateDto
+      }
+
+      const companySyncAction: AsyncAction = {
         actionType: AsyncActionType.CompanyUpdate,
-        actionProps: companyUpdateDto,
+        actionProps: organisationSyncRequestDto,
       };
       await this.asyncOperationsInterface.AddAction(
-        companyUpdateAction
+        companySyncAction
       );
 
       return new DataResponseDto(
@@ -685,14 +691,15 @@ export class CompanyService {
     );
   }
 
-  async updateByTaxId(
-    companyUpdateDto: OrganisationUpdateDto,
+  async sync(
+    organisationSyncRequest: OrganisationSyncRequestDto,
     abilityCondition: string
   ): Promise<DataResponseDto | undefined> {
+    const {organizationIdentifierId, organisationUpdateDto:companyUpdateDto} = organisationSyncRequest;
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
-        `"taxId" = '${companyUpdateDto.taxId}' ${
+        `"taxId" = '${organizationIdentifierId}' ${
           abilityCondition
             ? " AND (" +
               this.helperService.parseMongoQueryToSQL(abilityCondition) +
