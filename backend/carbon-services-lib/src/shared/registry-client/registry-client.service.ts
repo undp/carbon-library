@@ -95,7 +95,7 @@ export class RegistryClientService {
 
   public async CompanyUpdate(organisationUpdateDto: OrganisationUpdateDto) {
     console.log('d1 organisationUpdateDto ', organisationUpdateDto);
-    const response = await this.sendHttpPut("/national/organisation/update", organisationUpdateDto);
+    const response = await this.sendHttpPut("/national/organisation/updateByTax", organisationUpdateDto);
     console.log('d1 CompanyUpdate', response);
     return response;
   }
