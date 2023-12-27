@@ -1598,30 +1598,30 @@ export const GHGEmissionsComponent = (props: any) => {
           <Row gutter={16} className="panel-content-input-box-row">
             <Col xl={6}>
               <Tooltip title={co2 ? addCommSep(Number(co2)) : co2}>
-                <>
+                <div>
                   <InputNumber value={co2 ? addCommSep(Number(co2)) : co2} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
             <Col xl={6}>
               <Tooltip title={ch4 ? addCommSep(Number(ch4)) : ch4}>
-                <>
+                <div>
                   <InputNumber value={ch4 ? addCommSep(Number(ch4)) : ch4} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
             <Col xl={6}>
               <Tooltip title={n2o ? addCommSep(Number(n2o)) : n2o}>
-                <>
+                <div>
                   <InputNumber value={n2o ? addCommSep(Number(n2o)) : n2o} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
             <Col xl={6}>
               <Tooltip title={co2eq ? addCommSep(Number(co2eq)) : co2eq}>
-                <>
+                <div>
                   <InputNumber value={co2eq ? addCommSep(Number(co2eq)) : co2eq} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
           </Row>
@@ -2363,44 +2363,44 @@ export const GHGEmissionsComponent = (props: any) => {
                                   <Tooltip title={tabData.totalCo2WithoutLand?.co2
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2))
                                     : tabData.totalCo2WithoutLand?.co2}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.co2
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2))
                                         : tabData.totalCo2WithoutLand?.co2} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={6}>
                                   <Tooltip title={tabData.totalCo2WithoutLand?.ch4
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.ch4))
                                     : tabData.totalCo2WithoutLand?.ch4}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.ch4
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.ch4))
                                         : tabData.totalCo2WithoutLand?.ch4} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={6}>
                                   <Tooltip title={tabData.totalCo2WithoutLand?.n2o
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.n2o))
                                     : tabData.totalCo2WithoutLand?.n2o}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.n2o
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.n2o))
                                         : tabData.totalCo2WithoutLand?.n2o} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={6}>
                                   <Tooltip title={tabData.totalCo2WithoutLand?.co2eq
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2eq))
                                     : tabData.totalCo2WithoutLand?.co2eq}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.co2eq
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2eq))
                                         : tabData.totalCo2WithoutLand?.co2eq} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                               </Row>
@@ -2417,44 +2417,44 @@ export const GHGEmissionsComponent = (props: any) => {
                                   <Tooltip title={tabData.totalCo2WithLand?.co2
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.co2))
                                     : tabData.totalCo2WithLand?.co2}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.co2
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.co2))
                                         : tabData.totalCo2WithLand?.co2} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={6}>
                                   <Tooltip title={tabData.totalCo2WithLand?.ch4
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.ch4))
                                     : tabData.totalCo2WithLand?.ch4}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.ch4
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.ch4))
                                         : tabData.totalCo2WithLand?.ch4} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={6}>
                                   <Tooltip title={tabData.totalCo2WithLand?.n2o
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.n2o))
                                     : tabData.totalCo2WithLand?.n2o}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.n2o
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.n2o))
                                         : tabData.totalCo2WithLand?.n2o} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={6}>
                                   <Tooltip title={tabData.totalCo2WithLand?.co2eq
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.co2eq))
                                     : tabData.totalCo2WithLand?.co2eq}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.co2eq
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.co2eq))
                                         : tabData.totalCo2WithLand?.co2eq} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                               </Row>

@@ -1459,23 +1459,23 @@ export const GHGProjectionsComponent = (props: any) => {
           <Row gutter={16} className="panel-content-input-box-row">
             <Col xl={7}>
               <Tooltip title={bau ? addCommSep(Number(bau)) : bau}>
-                <>
+                <div>
                   <InputNumber value={bau ? addCommSep(Number(bau)) : bau} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
             <Col xl={7}>
               <Tooltip title={conditionalNdc ? addCommSep(Number(conditionalNdc)) : conditionalNdc}>
-                <>
+                <div>
                   <InputNumber value={conditionalNdc ? addCommSep(Number(conditionalNdc)) : conditionalNdc} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
             <Col xl={7}>
               <Tooltip title={unconditionalNdc ? addCommSep(Number(unconditionalNdc)) : unconditionalNdc}>
-                <>
+                <div>
                   <InputNumber value={unconditionalNdc ? addCommSep(Number(unconditionalNdc)) : unconditionalNdc} disabled />
-                </>
+                </div>
               </Tooltip>
             </Col>
           </Row>
@@ -2165,33 +2165,33 @@ export const GHGProjectionsComponent = (props: any) => {
                                   <Tooltip title={tabData.totalCo2WithoutLand?.bau
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.bau))
                                     : tabData.totalCo2WithoutLand?.bau}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.bau
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.bau))
                                         : tabData.totalCo2WithoutLand?.bau} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={7}>
                                   <Tooltip title={tabData.totalCo2WithoutLand?.conditionalNdc
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.conditionalNdc))
                                     : tabData.totalCo2WithoutLand?.conditionalNdc}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.conditionalNdc
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.conditionalNdc))
                                         : tabData.totalCo2WithoutLand?.conditionalNdc} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={7}>
                                   <Tooltip title={tabData.totalCo2WithoutLand?.unconditionalNdc
                                     ? addCommSep(Number(tabData.totalCo2WithoutLand?.unconditionalNdc))
                                     : tabData.totalCo2WithoutLand?.unconditionalNdc}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithoutLand?.unconditionalNdc
                                         ? addCommSep(Number(tabData.totalCo2WithoutLand?.unconditionalNdc))
                                         : tabData.totalCo2WithoutLand?.unconditionalNdc} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                               </Row>
@@ -2208,33 +2208,33 @@ export const GHGProjectionsComponent = (props: any) => {
                                   <Tooltip title={tabData.totalCo2WithLand?.bau
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.bau))
                                     : tabData.totalCo2WithLand?.bau}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.bau
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.bau))
                                         : tabData.totalCo2WithLand?.bau} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={7}>
                                   <Tooltip title={tabData.totalCo2WithLand?.conditionalNdc
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.conditionalNdc))
                                     : tabData.totalCo2WithLand?.conditionalNdc}>
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.conditionalNdc
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.conditionalNdc))
                                         : tabData.totalCo2WithLand?.conditionalNdc} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                                 <Col xl={7}>
                                   <Tooltip title={tabData.totalCo2WithLand?.unconditionalNdc
                                     ? addCommSep(Number(tabData.totalCo2WithLand?.unconditionalNdc))
                                     : tabData.totalCo2WithLand?.unconditionalNdc} >
-                                    <>
+                                    <div>
                                       <InputNumber value={tabData.totalCo2WithLand?.unconditionalNdc
                                         ? addCommSep(Number(tabData.totalCo2WithLand?.unconditionalNdc))
                                         : tabData.totalCo2WithLand?.unconditionalNdc} disabled />
-                                    </>
+                                    </div>
                                   </Tooltip>
                                 </Col>
                               </Row>
