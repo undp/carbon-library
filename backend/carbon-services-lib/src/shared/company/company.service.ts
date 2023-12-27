@@ -649,7 +649,7 @@ export class CompanyService {
       const ministry = await this.findMinistryByDepartment(
         companyUpdateDto.govDep
       );
-      if (ministry.ministry==companyUpdateDto.ministry && ministry.govDep==companyUpdateDto.govDep) {
+      if (ministry && ministry.ministry==companyUpdateDto.ministry && ministry.govDep==companyUpdateDto.govDep) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
             "company.MinistryDepartmentAlreadyExist",
