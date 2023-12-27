@@ -1802,13 +1802,13 @@ export class ProgrammeService {
       3,
     );
     programme.countryCodeA2 = this.configService.get('systemCountry');
-
-    programme.programmeProperties.carbonPriceUSDPerTon = parseFloat(
-      (
+    programme.programmeProperties.estimatedProgrammeCostUSD = this.helperService.halfUpToPrecision(programme.programmeProperties.estimatedProgrammeCostUSD)
+    programme.programmeProperties.carbonPriceUSDPerTon = 
+      this.helperService.halfUpToPrecision(
         programme.programmeProperties.estimatedProgrammeCostUSD /
         programme.creditEst
-      ).toFixed(PRECISION),
-    );
+      )
+    
     programme.programmeProperties.creditYear = new Date(
       programme.startTime * 1000,
     ).getFullYear();
