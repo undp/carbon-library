@@ -764,8 +764,6 @@ export class CompanyService {
         return err;
       });
 
-    console.log('result', result);
-
     if (result.affected > 0) {
       return new DataResponseDto(
         HttpStatus.OK,
