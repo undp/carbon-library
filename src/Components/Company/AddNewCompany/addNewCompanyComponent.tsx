@@ -1118,11 +1118,11 @@ export const AddNewCompanyComponent = (props: any) => {
                             CompanyRole.MINISTRY &&
                             !isGuest && (
                               <div className="minister-radio-container">
-                                <Tooltip
-                                  placement="top"
-                                  title="Permitted to perform all project-related actions within the Ministry"
-                                >
-                                  {ministryDropdown.length > 0 ? (
+                                {ministryDropdown.length > 0 ? (
+                                  <Tooltip
+                                    placement="top"
+                                    title="Permitted to perform all project-related actions within the Ministry"
+                                  >
                                     <Radio.Button
                                       className="minister"
                                       value="Ministry"
@@ -1130,7 +1130,12 @@ export const AddNewCompanyComponent = (props: any) => {
                                       <AuditOutlined className="role-icons" />
                                       Ministry
                                     </Radio.Button>
-                                  ) : (
+                                  </Tooltip>
+                                ) : (
+                                  <Tooltip
+                                    placement="top"
+                                    title="All ministries have been implemented"
+                                  >
                                     <Radio.Button
                                       className="minister"
                                       value="Ministry"
@@ -1139,8 +1144,8 @@ export const AddNewCompanyComponent = (props: any) => {
                                       <AuditOutlined className="role-icons" />
                                       Ministry
                                     </Radio.Button>
-                                  )}
-                                </Tooltip>
+                                  </Tooltip>
+                                )}
                               </div>
                             )}
                         </>
