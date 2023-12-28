@@ -96,12 +96,14 @@ export const NdcDetailsComponent = (props: any) => {
     userInfoState?.userRole !== Role.ViewOnly;
 
   const isMainNdcActionsEditable =
+    selectedPeriod &&
     !selectedPeriod.finalized &&
     userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
     userInfoState?.userRole !== Role.ViewOnly;
 
   const isSubNdcActionsEditable = (record: NdcDetail) => {
     return (
+      selectedPeriod &&
       !selectedPeriod.finalized &&
       record.status !== NdcDetailsActionStatus.Approved &&
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
@@ -113,6 +115,7 @@ export const NdcDetailsComponent = (props: any) => {
 
   const checkSubNdcActionCreatePermission = () => {
     return (
+      selectedPeriod &&
       !selectedPeriod.finalized &&
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
         userInfoState?.companyRole === CompanyRole.MINISTRY) &&
@@ -257,6 +260,7 @@ export const NdcDetailsComponent = (props: any) => {
     if (
       record.status === NdcDetailsActionStatus.Pending &&
       isGovernmentUser &&
+      selectedPeriod &&
       !selectedPeriod.finalized
     ) {
       return (
@@ -672,6 +676,7 @@ export const NdcDetailsComponent = (props: any) => {
                 }}
                 footer={() =>
                   isGovernmentUser &&
+                  selectedPeriod &&
                   !selectedPeriod.finalized && (
                     <Row justify={"center"}>
                       <Button
@@ -689,7 +694,7 @@ export const NdcDetailsComponent = (props: any) => {
             </Form>
           </Col>
         </Row>
-        {isGovernmentUser && !selectedPeriod.finalized ? (
+        {isGovernmentUser && selectedPeriod && !selectedPeriod.finalized ? (
           <Row justify="end">
             {isMainActionInEditMode() ? (
               <>
