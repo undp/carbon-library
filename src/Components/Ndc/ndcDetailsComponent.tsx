@@ -132,7 +132,7 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const ndcMainDetailsForPeriod =
-    selectedPeriod.key !== "add_new"
+    selectedPeriod && selectedPeriod.key !== "add_new"
       ? ndcActionsList.filter((ndcDetail: NdcDetail) => {
           return (
             ndcDetail.periodId === parseInt(selectedPeriod.key) &&
@@ -1062,14 +1062,16 @@ export const NdcDetailsComponent = (props: any) => {
           centered={false}
           defaultActiveKey="1"
           items={periodItems}
-          activeKey={selectedPeriod.key}
+          activeKey={selectedPeriod ? selectedPeriod.key : "1"}
           onChange={onTabChange}
         />
       </div>
       <div>
-        {selectedPeriod.key === "add_new"
-          ? addNewPeriodContent()
-          : mainNdcActionTableContent()}
+        {selectedPeriod
+          ? selectedPeriod.key === "add_new"
+            ? addNewPeriodContent()
+            : mainNdcActionTableContent()
+          : ""}
       </div>
       <UserActionConfirmationModel
         t={t}
