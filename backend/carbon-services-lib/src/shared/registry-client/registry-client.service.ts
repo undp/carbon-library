@@ -73,7 +73,6 @@ export class RegistryClientService {
         },
       })
       .catch((ex) => {
-        console.log('d1 exception', ex);
         console.log("Exception", ex.response?.data?.statusCode);
         if (
           ex.response?.data?.statusCode == 400 &&
@@ -95,9 +94,8 @@ export class RegistryClientService {
   }
 
   public async CompanyUpdate(organisationSyncRequestDto: OrganisationSyncRequestDto) {
-    console.log('d1 organisationSyncRequestDto ', organisationSyncRequestDto);
     const response = await this.sendHttpPut("/national/organisation/sync", organisationSyncRequestDto);
-    console.log('d1 CompanyUpdate', response);
+    console.log( "Successfully called organisation sync request", response );
     return response;
   }
 
