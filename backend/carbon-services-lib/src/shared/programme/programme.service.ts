@@ -2270,19 +2270,19 @@ export class ProgrammeService {
     }
 
     ndcAction.coBenefitsProperties = ndcActionDto.coBenefitsProperties;
-    if(ndcAction.ndcFinancing.userEstimatedCredits){
+    if(ndcAction.ndcFinancing?.userEstimatedCredits){
       ndcAction.ndcFinancing.userEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.userEstimatedCredits)
     }
-    if(ndcAction.ndcFinancing.systemEstimatedCredits){
+    if(ndcAction.ndcFinancing?.systemEstimatedCredits){
       ndcAction.ndcFinancing.systemEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.systemEstimatedCredits)
     }
-    if(ndcAction.solarProperties.energyGeneration){
+    if(ndcAction.solarProperties?.energyGeneration){
       ndcAction.solarProperties.energyGeneration=this.helperService.halfUpToPrecision(ndcAction.solarProperties.energyGeneration)
     }
-    if(ndcAction.creditCalculationProperties.energyGeneration){
+    if(ndcAction.creditCalculationProperties?.energyGeneration){
       ndcAction.creditCalculationProperties.energyGeneration=this.helperService.halfUpToPrecision(ndcAction.creditCalculationProperties.energyGeneration)
     }
-    if(ndcAction.agricultureProperties.landArea){
+    if(ndcAction.agricultureProperties?.landArea){
       ndcAction.agricultureProperties.landArea=this.helperService.halfUpToPrecision(ndcAction.agricultureProperties.landArea)
     }
     await this.checkTotalUserEstimatedCredits(ndcAction, program);
