@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum } from "class-validator";
+import { IsEnum, IsNumber, IsOptional } from "class-validator";
 import { TypeOfMitigation } from "../enum/typeofmitigation.enum";
 import { SubTypeOfMitigation } from "../enum/typeofmitigation.enum";
 
@@ -16,4 +16,8 @@ export class CreditCalculationProperties {
         message: 'Invalid sub mitigation type. Supported following values:' + Object.values(SubTypeOfMitigation)
     })
     subTypeOfMitigation: SubTypeOfMitigation;
+
+    @IsOptional()
+    @IsNumber()
+    energyGeneration?:number
 }
