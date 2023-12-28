@@ -422,6 +422,13 @@ export class ProgrammeService {
       } received ${JSON.stringify(req)}`,
     );
 
+    if(req.percentage){
+      for(const i in req.percentage){
+        req.percentage[i]=this.helperService.halfUpToPrecision(req.percentage[i])
+      }
+    }
+    req.amount=this.helperService.halfUpToPrecision(req.amount)
+
     if (req.percentage && req.percentage.reduce((a, b) => a + b, 0) <= 0) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
