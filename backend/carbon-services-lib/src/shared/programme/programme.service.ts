@@ -1644,6 +1644,7 @@ export class ProgrammeService {
   ): Promise<Programme | undefined> {
     this.logger.verbose('ProgrammeDTO received', JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
+    if(programme.creditEst)programme.creditEst=this.helperService.halfUpToPrecision(programme.creditEst)
     this.logger.verbose("Programme  create", JSON.stringify(programme));
 
     const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
@@ -2278,6 +2279,9 @@ export class ProgrammeService {
     }
 
     ndcAction.coBenefitsProperties = ndcActionDto.coBenefitsProperties;
+    if(ndcAction.ndcFinancing.userEstimatedCredits){
+      ndcAction.ndcFinancing.userEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.userEstimatedCredits)
+    }
     await this.checkTotalUserEstimatedCredits(ndcAction, program);
     await this.calcCreditNDCAction(ndcAction, program);
     console.log('testing ndcAction', ndcAction);
@@ -3092,7 +3096,8 @@ export class ProgrammeService {
     for (let transfer of transfers) {
       const companyIndex = programme.companyId.indexOf(transfer.fromCompanyId);
       const companyProponent = programme.creditOwnerPercentage[companyIndex];
-      const creditBalance = (programme.creditBalance * companyProponent) / 100;
+      const creditBalance =
+        this.helperService.halfUpToPrecision((programme.creditBalance * companyProponent) / 100);
       if (transfer.creditAmount > creditBalance) {
         const result = await this.programmeTransferRepo
           .update(
@@ -3435,8 +3440,8 @@ export class ProgrammeService {
     if (!req.companyCredit) {
       req.companyCredit = programme.creditOwnerPercentage.map(
         (p, i) =>
-          (programme.creditBalance * p) / 100 -
-          (programme.creditFrozen ? programme.creditFrozen[i] : 0),
+          this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * p) / 100) -
+          (programme.creditFrozen ? programme.creditFrozen[i] : 0))
       );
     }
 
@@ -3486,14 +3491,14 @@ export class ProgrammeService {
         frozenCredit[fromCompanyId],
       );
       const companyAvailableCredit =
-        (programme.creditBalance * ownershipMap[fromCompanyId]) / 100 -
-        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0);
+        this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * ownershipMap[fromCompanyId]) / 100) -
+        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0));
 
       let transferCompanyCredit;
       if (req.fromCompanyIds.length == 1 && !req.companyCredit) {
         transferCompanyCredit = companyAvailableCredit;
       } else {
-        transferCompanyCredit = req.companyCredit[j];
+        transferCompanyCredit = this.helperService.halfUpToPrecision(req.companyCredit[j]);
       }
 
       if (companyAvailableCredit < transferCompanyCredit) {
@@ -4076,11 +4081,11 @@ export class ProgrammeService {
 
       if (!req.companyCredit) {
         const reqIndex = programme.companyId.indexOf(requester.companyId);
-        req.companyCredit = [
-          (programme.creditBalance *
+        req.companyCredit = [ 
+          this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance *
             programme.creditOwnerPercentage[reqIndex]) /
-            100 -
-            (programme.creditFrozen ? programme.creditFrozen[reqIndex] : 0),
+            100) -
+            (programme.creditFrozen ? programme.creditFrozen[reqIndex] : 0)),
         ];
       }
     } else {
@@ -4090,8 +4095,8 @@ export class ProgrammeService {
       if (!req.companyCredit) {
         req.companyCredit = programme.creditOwnerPercentage.map(
           (p, i) =>
-            (programme.creditBalance * p) / 100 -
-            (programme.creditFrozen ? programme.creditFrozen[i] : 0),
+          this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * p) / 100 )-
+            (programme.creditFrozen ? programme.creditFrozen[i] : 0))
         );
       }
     }
@@ -4128,14 +4133,14 @@ export class ProgrammeService {
         );
       }
       const companyAvailableCredit =
-        (programme.creditBalance * ownershipMap[fromCompanyId]) / 100 -
-        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0);
+      this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * ownershipMap[fromCompanyId]) / 100) -
+        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0));
 
       let transferCompanyCredit;
       if (req.fromCompanyIds.length == 1 && !req.companyCredit) {
         transferCompanyCredit = companyAvailableCredit;
       } else {
-        transferCompanyCredit = req.companyCredit[j];
+        transferCompanyCredit = this.helperService.halfUpToPrecision(req.companyCredit[j]);
       }
 
       if (
@@ -4325,9 +4330,9 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
-      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
-      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
-      totalCreditIssuance+=action.issueCredit
+      verfiedMitigationMap[action.actionId].availableCredits=this.helperService.halfUpToPrecision(verfiedMitigationMap[action.actionId].availableCredits-action.issueCredit)
+      verfiedMitigationMap[action.actionId].issuedCredits=this.helperService.halfUpToPrecision(verfiedMitigationMap[action.actionId].issuedCredits+action.issueCredit)
+      totalCreditIssuance=this.helperService.halfUpToPrecision(totalCreditIssuance+action.issueCredit)
       this.updateMitigationProps(program.mitigationActions,action.actionId,verfiedMitigationMap[action.actionId])
     })
     if ((program.creditEst - program.creditIssued )< totalCreditIssuance) {
@@ -5148,7 +5153,7 @@ export class ProgrammeService {
   private getNdcCreditIssuanceRef = (issueAmount: mitigationIssueProperties[]) =>{
     let ref =""
     issueAmount.map(action=>{
-      ref+=`${action.actionId}?${action.issueCredit}&`
+      ref+=`${action.actionId}?${this.helperService.halfUpToPrecision(action.issueCredit)}&`
     })
     return ref.slice(0,-1)
   }
