@@ -98,6 +98,11 @@
     "govermentOwnershipOfProgramme":"Government should be a project owner.",
     "proponentIsNotAProgrammeDevOrGov": "Proponent is not a project developer or government",
     "programmeExistsWithAssessmentRegId": "The project already exists with the given environmental assessment registration number",
-    "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from Activity:{} should be less than its estimated credit amount",
-    "omgeRetireDesc": " and {} credits as Overall Mitigation in Global Emission"
+    "issuedCreditCannotExceedEstMitigationActionCredits": "Credit issue amount from NDC Action:{} should be less than its estimated credit amount",
+    "ndcActionUpdateFailed":  " Internal error on Ndc Action update",
+    "omgeRetireDesc": " and {} credits as Overall Mitigation in Global Emission",
+    "ndcActionCreateFailed":  " Internal error on Ndc Action create",
+    "ndcActionPeriodCreateFailed":  " Internal error on Period create",
+    "ndcActionNotExist": "Ndc Action does not exist",
+    "companyNotExist": "User company does not exist"
   }

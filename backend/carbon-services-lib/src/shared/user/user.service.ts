@@ -56,6 +56,7 @@ import { DataExportService } from "../util/data.export.service";
 import { DataExportQueryDto } from "../dto/data.export.query.dto";
 import { DataExportUserDto } from "../dto/data.export.user.dto";
 import { FilterEntry } from "../dto/filter.entry";
+import { EmailHelperService } from '../email-helper/email-helper.service';
 
 @Injectable()
 export class UserService {
@@ -67,6 +68,8 @@ export class UserService {
     @InjectEntityManager() private entityManger: EntityManager,
     @Inject(forwardRef(() => CompanyService))
     private companyService: CompanyService,
+    @Inject(forwardRef(() => EmailHelperService))
+    private emailHelperService: EmailHelperService,
     private counterService: CounterService,
     private countryService: CountryService,
     private fileHandler: FileHandlerInterface,
@@ -419,12 +422,13 @@ export class UserService {
           organisationDto.name = company.name;
           organisationDto.email = company.email;
           organisationDto.phoneNo = company.phoneNo;
-          organisationDto.website = company.website;
           organisationDto.address = company.address;
           organisationDto.logo = company.logo;
           organisationDto.companyRole = company.companyRole;
           organisationDto.regions = company.regions;
-
+          if(company.website && company.website.trim().length>0){
+            organisationDto.website = company.website;
+          }
           userDto.company = organisationDto;
 
           if (company && user.user_role !== Role.Root && company.companyRole !== CompanyRole.API) {
@@ -731,14 +735,10 @@ export class UserService {
       u.isPending = true;
 
       const hostAddress = this.configService.get("host");
-      const users = await this.getGovAdminUsers();
-
-      users.forEach(async (user: any) => {
-        const templateData = {
-          name: user.user_name,
-          countryName: this.configService.get("systemCountryName"),
+      await this.emailHelperService.sendEmailToGovernmentAdmins(
+        EmailTemplates.ORGANISATION_REGISTRATION,
+        {
           home: hostAddress,
-          email: user.email,
           organisationName: company.name,
           systemName: this.configService.get("systemName"),
           organisationRole: company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
@@ -747,26 +747,8 @@ export class UserService {
           organisationPageLink:
             hostAddress +
             `/companyManagement/viewAll`,
-        };
-        const action: AsyncAction = {
-          actionType: AsyncActionType.Email,
-          actionProps: {
-            emailType: EmailTemplates.ORGANISATION_REGISTRATION.id,
-            sender: user.user_email,
-            subject: this.helperService.getEmailTemplateMessage(
-              EmailTemplates.ORGANISATION_REGISTRATION["subject"],
-              templateData,
-              true
-            ),
-            emailBody: this.helperService.getEmailTemplateMessage(
-              EmailTemplates.ORGANISATION_REGISTRATION["html"],
-              templateData,
-              false
-            ),
-          },
-        };
-        await this.asyncOperationsInterface.AddAction(action);
-      });
+        }, undefined, undefined, undefined, undefined
+      );
 
     } else {
       const templateData = {

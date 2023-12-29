@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Empty, Form, Input, InputNumber, Radio } from "antd";
+import { Col, Empty, Form, Input, InputNumber, Radio, Row } from "antd";
 import { FormElementType, RadioButtonStatus } from "../../../Definitions";
 
 const Social = (props: any) => {
   const { onFormSubmit, socialViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace("social");
+  translator.setDefaultNamespace("unfcccSdTool");
   const t = translator.t;
   const [form] = Form.useForm();
   const [refreshCounter, setRefreshCounter] = useState(0);
@@ -217,6 +217,19 @@ const Social = (props: any) => {
 
   return (
     <div className="social-tab-item">
+      <div className="unfccSdTool-section-wrapper">
+        <Row justify="center" align="middle" style={{ width: '100%' }}>
+          <Col span={24}>
+            <div className="unfccSdTool-section-divider" />
+          </Col>
+          <Col span={24} className="unfcccSdTool-section-title">
+            <span>
+              {t("social")}
+            </span>
+
+          </Col>
+        </Row>
+      </div>
       {viewOnly && !socialViewData && (
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
       )}
@@ -347,7 +360,7 @@ const Social = (props: any) => {
                           name={element.name}
                         >
                           <Radio.Group size="middle" disabled>
-                            <div className="radio-container">
+                            <div className="radio-container-view">
                               <Radio.Button className="radio">
                                 {socialViewData[element.name]}
                               </Radio.Button>
@@ -371,7 +384,7 @@ const Social = (props: any) => {
                                     className="mg-left-4"
                                   >
                                     <Radio.Group size="middle" disabled>
-                                      <div className="radio-container">
+                                      <div className="radio-container-view-child">
                                         <Radio.Button className="radio">
                                           {socialViewData[elementItem.name]}
                                         </Radio.Button>

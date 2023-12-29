@@ -1,6 +1,8 @@
 {
   "dashboard": "Dashboard",
   "ghgInventory": "GHG Inventory",
+  "emissions" : "Emissions",
+  "projections" : "Projections",
   "programmes": "Projects",
   "transfers": "Transfers",
   "companies": "Organisations",

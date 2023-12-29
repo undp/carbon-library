@@ -884,4 +884,18 @@ export class CompanyService {
 
     return resp;
   }
+
+  async getMinistries() {
+    const result = await this.companyRepo
+      .createQueryBuilder("company")
+      .where("company.companyRole= :companyRole AND company.state= :activeState", {
+        companyRole: CompanyRole.MINISTRY,
+        activeState: CompanyState.ACTIVE
+      })
+      .select(["company.name", "company.companyId"])
+      .getRawMany();
+
+    return result;
+  }
+
 }
