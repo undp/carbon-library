@@ -310,7 +310,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           docAction(designDocId, DocumentStatus.ACCEPTED)
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop: "3px" }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -325,14 +325,14 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: "3px" }}
                       />
                     </>
                   )}
                 {designDocStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop: "3px" }}
                   />
                 )}
                 {designDocStatus === DocumentStatus.REJECTED && (
@@ -370,7 +370,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       download
                     >
                       <BookOutlined
-                        className="common-progress-icon margin-right-1"
+                        className="common-progress-icon"
                         style={{ color: "#3F3A47" }}
                       />
                     </a>
@@ -403,8 +403,16 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               programmeOwnerId,
                               ministryLevelPermission
                             )
-                              ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                              : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                              ? {
+                                  color: "#3F3A47",
+                                  cursor: "pointer",
+                                  margin: "0px 0px 1.5px 0px",
+                                }
+                              : {
+                                  color: "#cacaca",
+                                  cursor: "default",
+                                  margin: "0px 0px 1.5px 0px",
+                                }
                           }
                           onClick={() =>
                             uploadDocUserPermission(
@@ -461,8 +469,16 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 1.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 1.5px 0px",
+                            }
                       }
                       onClick={() =>
                         uploadDocUserPermission(
@@ -537,7 +553,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           docAction(methDocId, DocumentStatus.ACCEPTED)
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop: "3px" }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -552,14 +568,14 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: "3px" }}
                       />
                     </>
                   )}
                 {methodDocStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop: "3px" }}
                   />
                 )}
                 {methodDocStatus === DocumentStatus.REJECTED && (
@@ -597,7 +613,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       download
                     >
                       <BookOutlined
-                        className="common-progress-icon margin-right-1"
+                        className="common-progress-icon"
                         style={{ color: "#3F3A47" }}
                       />
                     </a>
@@ -630,8 +646,15 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                               programmeOwnerId,
                               ministryLevelPermission
                             )
-                              ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                              : { color: "#cacaca", margin: "0px 0px 2.5px 0px"  }
+                              ? {
+                                  color: "#3F3A47",
+                                  cursor: "pointer",
+                                  margin: "0px 0px 1.5px 0px",
+                                }
+                              : {
+                                  color: "#cacaca",
+                                  margin: "0px 0px 1.5px 0px",
+                                }
                           }
                           onClick={() =>
                             designDocStatus === DocumentStatus.ACCEPTED &&
@@ -694,8 +717,16 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 1.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 1.5px 0px",
+                            }
                       }
                       onClick={() =>
                         designDocStatus === DocumentStatus.ACCEPTED &&
@@ -776,7 +807,7 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           docAction(impactAssessmentId, DocumentStatus.ACCEPTED)
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop: "3px" }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -791,14 +822,14 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: "3px" }}
                       />
                     </>
                   )}
                 {impactAssessmentStatus === DocumentStatus.ACCEPTED && (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop: "3px" }}
                   />
                 )}
                 {impactAssessmentStatus === DocumentStatus.REJECTED && (
@@ -835,10 +866,12 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       rel="noopener noreferrer"
                       download
                     >
-                      <BookOutlined
-                        className="common-progress-icon margin-right-1"
-                        style={{ color: "#3F3A47" }}
-                      />
+                      <div>
+                        <BookOutlined
+                          className="common-progress-icon"
+                          style={{ color: "#3F3A47" }}
+                        />
+                      </div>
                     </a>
                   )}
                   {impactAssessmentStatus !== DocumentStatus.ACCEPTED && (
@@ -855,8 +888,16 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                           style={
                             uploadImpactAssessmentDocUserPermission &&
                             !isProjectRejected
-                              ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
-                              : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px" }
+                              ? {
+                                  color: "#3F3A47",
+                                  cursor: "pointer",
+                                  margin: "0px 0px 1.5px 0px",
+                                }
+                              : {
+                                  color: "#cacaca",
+                                  cursor: "default",
+                                  margin: "0px 0px 1.5px 0px",
+                                }
                           }
                           onClick={() =>
                             uploadImpactAssessmentDocUserPermission &&
@@ -896,8 +937,16 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
                       style={
                         uploadImpactAssessmentDocUserPermission &&
                         !isProjectRejected
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px" }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 1.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 1.5px 0px",
+                            }
                       }
                       onClick={() =>
                         uploadImpactAssessmentDocUserPermission &&
