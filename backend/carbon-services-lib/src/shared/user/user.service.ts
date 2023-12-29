@@ -608,6 +608,35 @@ export class UserService {
         }
       }
 
+      const duplicateCompany = await this.companyService.checkForCompanyDuplicates(company.email, company.taxId, company.paymentId);
+      if (duplicateCompany) {
+        if (duplicateCompany.email === company.email) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "user.orgEmailExist",
+              []
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        } else if (duplicateCompany.taxId === company.taxId) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "user.taxIdExistAlready",
+              []
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        } else if (duplicateCompany.paymentId === company.paymentId) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "user.paymentIdExistAlready",
+              []
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        }
+      }
+
       company.createdTime = new Date().getTime();
     }
 
