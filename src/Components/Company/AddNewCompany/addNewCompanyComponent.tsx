@@ -94,7 +94,8 @@ export const AddNewCompanyComponent = (props: any) => {
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList([t("national"), ...regionNames]);
+        const uniqueRegionNames: any = Array.from(new Set(regionNames))
+        setRegionsList([t("national"), ...uniqueRegionNames]);
       }
     } catch (error: any) {
       console.log("Error in getting regions list", error);
