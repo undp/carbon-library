@@ -942,7 +942,7 @@ export const InvestmentCreationComponent = (props: any) => {
                               </Col>
                             </Row>
                           )}
-                        <Row className="row" gutter={[4, 4]}>
+                        <Row className="row" gutter={[16, 16]}>
                           <Col xl={8} md={12}>
                             <Form.Item
                               label={t("programme:type")}
