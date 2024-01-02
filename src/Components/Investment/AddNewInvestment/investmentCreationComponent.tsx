@@ -174,6 +174,7 @@ export const InvestmentCreationComponent = (props: any) => {
   const getNationalInvestmentDetails = async () => {
     setLoadingInvestment(true);
     try {
+      let optionalFilters: any = {};
       let filterAnd: any[] = [];
       filterAnd = [
         {
@@ -194,11 +195,26 @@ export const InvestmentCreationComponent = (props: any) => {
           operation: "=",
           value: userInfoState?.companyId,
         });
+      } else if (
+        (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
+          userInfoState?.companyRole === CompanyRole.MINISTRY) &&
+        data?.programmeId
+      ) {
+        let filterOr: any[] = [];
+        data.companyId.map((id) =>
+          filterOr.push({
+            key: "toCompanyId",
+            operation: "=",
+            value: id,
+          })
+        );
+        optionalFilters.filterOr = filterOr;
       }
       const response = await post("national/programme/investmentQuery", {
         page: 1,
         size: 100,
         filterAnd: filterAnd,
+        ...optionalFilters,
       });
       if (response.data) {
         setNationalInvestmentList(response?.data);
