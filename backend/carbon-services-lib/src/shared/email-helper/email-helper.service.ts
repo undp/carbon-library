@@ -321,6 +321,12 @@ export class EmailHelperService {
       programme = await this.programmeLedger.getProgrammeById(programmeId);
 
     switch (template.id) {
+      case "ORGANISATION_REGISTRATION":
+        templateData = {
+          ...templateData,
+        };
+        break;
+
       case "CREDIT_TRANSFER_GOV_ACCEPTED_TO_INITIATOR":
         companyDetails = await this.companyService.findByCompanyId(companyId);
         templateData = {
