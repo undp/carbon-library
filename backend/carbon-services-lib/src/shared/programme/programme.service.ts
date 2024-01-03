@@ -422,12 +422,33 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
-  async addInvestment(req: InvestmentRequestDto, requester: User) {
+  async addInvestment(req: InvestmentRequestDto, requester: User) { 
     this.logger.log(
       `Programme investment request by ${requester.companyId}-${
         requester.id
       } received ${JSON.stringify(req)}`,
     );
+
+    if(req.period && (req.period.length!=2 || req.period[0]>=req.period[1])){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.invalidPeriod',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const todaySart = (new Date().getTime())/1000 - 24*60*60
+    if(req.startOfPayback && req.startOfPayback<todaySart){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.paybackStartDate<currentDate',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     if (req.percentage && req.percentage.reduce((a, b) => a + b, 0) <= 0) {
       throw new HttpException(
