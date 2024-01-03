@@ -6237,6 +6237,7 @@ export class ProgrammeService {
         id: true,
         nationalPlanObjective: true,
         kpi: true,
+        kpiUnit: true,
         ministryName: true,
         periodId: true,
         parentActionId: true,
@@ -6270,6 +6271,7 @@ export class ProgrammeService {
       }
     }
 
+    ndcDetailsAction.kpi = parseFloat(ndcDetailsAction.kpi.toFixed(PRECISION));
     const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
     await this.ndcDetailsActionRepo.save(addedNdcDetailsAction).catch(error => {
       this.logger.error(error);
@@ -6337,6 +6339,8 @@ export class ProgrammeService {
         );
       }
     }
+
+    ndcDetailsAction.kpi = parseFloat(ndcDetailsAction.kpi.toFixed(PRECISION));
 
     const result = await this.ndcDetailsActionRepo.update({
       id: ndcDetailsAction.id
