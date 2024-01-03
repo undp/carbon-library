@@ -76,8 +76,8 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
           },
           {
             key: "companyRole",
-            operation: "!=",
-            value: "Certifier",
+            operation: "=",
+            value: CompanyRole.PROGRAMME_DEVELOPER,
           },
         ],
         sort: {
