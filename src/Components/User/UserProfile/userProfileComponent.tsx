@@ -8,6 +8,7 @@ import LanguageSelection from "../../Common/LanguageSelection/languageSelection"
 import React from "react";
 import { SectoralScope, addCommSep } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { CompanyDetailsComponent } from "../../Company/CompanyDetails/companyDetailsComponent";
 
 export const UserProfileComponent = (props: any) => {
   const {
@@ -41,17 +42,7 @@ export const UserProfileComponent = (props: any) => {
         setUserDetails(response.data.user);
         setIsLoading(false);
       }
-    } catch (exception) {}
-  };
-
-  const getEnumKeysFromValues = (values: string[]): string[] => {
-    const enumKeys: string[] = [];
-    for (const key in SectoralScope) {
-      if (values.includes(SectoralScope[key as keyof typeof SectoralScope])) {
-        enumKeys.push(key);
-      }
-    }
-    return enumKeys;
+    } catch (exception) { }
   };
 
   useEffect(() => {
@@ -166,156 +157,13 @@ export const UserProfileComponent = (props: any) => {
                   </Skeleton>
                 </div>
               </Card>
-              <Card className="card-container">
-                <div className="info-view">
-                  <div className="title">
-                    <span className="title-icon">
-                      <BankOutlined />
-                    </span>
-                    <span className="title-text">
-                      {t("userProfile:organisationDetailsHeading")}
-                    </span>
-                  </div>
-                  <Skeleton loading={isLoading} active>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:name")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.name
-                          ? organisationDetails.name
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:taxId")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.taxId &&
-                        organisationDetails.companyRole !==
-                          CompanyRole.GOVERNMENT
-                          ? organisationDetails.taxId
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:paymentId")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.paymentId
-                          ? organisationDetails.paymentId
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:companyRole")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        <CompanyRoleIcon
-                          role={organisationDetails.companyRole}
-                        />
-                      </Col>
-                    </Row>
-                    {organisationDetails?.companyRole ===
-                      CompanyRole.MINISTRY && (
-                      <>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("userProfile:ministerName")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {organisationDetails.nameOfMinister
-                              ? organisationDetails.nameOfMinister
-                              : "-"}
-                          </Col>
-                        </Row>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("userProfile:sectoralScope")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {organisationDetails.sectoralScope
-                              ? getEnumKeysFromValues(
-                                  organisationDetails.sectoralScope
-                                ).join(", ")
-                              : "-"}
-                          </Col>
-                        </Row>
-                      </>
-                    )}
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:email")}
-                      </Col>
-                      <Col span={12} className="field-value nextline-overflow">
-                        {organisationDetails.email
-                          ? organisationDetails.email
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:phoneNo")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.phoneNo
-                          ? organisationDetails.phoneNo
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:website")}
-                      </Col>
-                      <Col span={12} className="field-value ellipsis-overflow">
-                        {organisationDetails.website ? (
-                          <a
-                            target={"blank"}
-                            href={organisationDetails.website}
-                          >
-                            {organisationDetails.website}
-                          </a>
-                        ) : (
-                          "-"
-                        )}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:address")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.address
-                          ? organisationDetails.address
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:programmeCount")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.programmeCount
-                          ? organisationDetails.programmeCount
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("userProfile:creditBalance")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {organisationDetails.creditBalance
-                          ? addCommSep(organisationDetails.creditBalance)
-                          : "-"}
-                      </Col>
-                    </Row>
-                  </Skeleton>
-                </div>
-              </Card>
+              <CompanyDetailsComponent
+                t={t}
+                companyDetails={organisationDetails}
+                userDetails={userDetails}
+                isLoading={isLoading}
+                regionField
+              />
             </Col>
           </Row>
         </div>
