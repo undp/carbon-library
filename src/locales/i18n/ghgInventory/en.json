@@ -74,6 +74,8 @@
     "emissionsComparisonTitle": "GHG Emission Comparison",
     "emissionsComparisonTT": "Emissions projected and actual projections for each year under each type during the specified period",
     "remarks": "Remarks",
-    "finalize": "Finalise"
+    "finalize": "Finalise",
+    "noEmissions": "No Emissions",
+    "noProjections": "No Projections"
   }
   
