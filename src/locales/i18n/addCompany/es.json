@@ -6,14 +6,18 @@
   "name": "Nombre",
   "email": "Correo Electrónico",
   "taxId": "Número de Identificación Fiscal",
+  "paymentId": "ID de Pago de Registro",
   "website": "Sitio Web",
   "companyLogo": "Logo de la Organización",
-  "companyLogoWithType": "Logo de la Organización (Tipo de Archivo: JPEG, PNG, SVG)",
+  "companyLogoWithType": "Logo de la Organización (Tipo de Archivo: JPEG, PNG)",
   "unsupportedFormat": "Formato de archivo no compatible!",
   "maxUploadSize": "El tamaño máximo de carga de archivo es de 5 MB!",
   "role": "Rol",
   "certifier": "Certificador",
-  "programmeDeveleper": "Desarrollador de Programas",
+  "programmeDeveleper": "Desarrollador",
+  "min": "Ministerio",
+  "ministerName": "Nombre del Ministro",
+  "sectoralScope": "Alcance Sectorial",
   "viewer": "Visualizador",
   "viewerToolTip": "Autorizado para certificar y revocar certificaciones de programas",
   "programmeDeveleperToolTip": "Autorizado para poseer programas y transferir créditos de carbono",
@@ -32,5 +36,6 @@
   "companyUpdatedSuccess": "La organización se ha actualizado con éxito",
   "companyRegisteredSuccess": "La solicitud de registro de usuario ha sido enviada",
   "errorInAddUser": "Error al agregar usuario!",
-  "errorInUpdatingCompany": "Error al actualizar la empresa!"
+  "errorInUpdatingCompany": "Error al actualizar la empresa!",
+  "nationalSopValue": "Participación Nacional en los Ingresos"
 }

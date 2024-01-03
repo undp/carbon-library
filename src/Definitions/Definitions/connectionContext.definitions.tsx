@@ -6,8 +6,8 @@ export type Methods = 'get' | 'post' | 'delete' | 'put' | 'patch';
 
 export type ConnectionContextProviderProps = {
   serverURL: string;
-  statServerUrl?: string;
   t: any;
+  statServerUrl?: string;
   children: ReactNode;
 };
 

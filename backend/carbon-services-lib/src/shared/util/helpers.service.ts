@@ -8,6 +8,7 @@ import { chartStatsRequestDto } from "../dto/chartStats.request.dto";
 import { ConfigService } from "@nestjs/config";
 import { I18nService } from "nestjs-i18n";
 import { programmeStatusRequestDto } from "../dto/programmeStatus.request.dto";
+import { Integer } from "ion-js/dist/commonjs/es6/dom";
 
 @Injectable()
 export class HelperService {
@@ -38,6 +39,17 @@ export class HelperService {
       text += i > 0 && sup == i ? "0" : possible.charAt(sup);
     }
     return Number(text);
+  }
+
+  public halfUpToPrecision(value:number,precision:number=2){
+    if(precision>0)
+    {
+      return parseFloat((value*(10**precision)).toFixed(0))/(10**precision)
+    }
+    else if(precision==0){
+      return parseFloat(value.toFixed(0))
+    }
+    return value
   }
   
   private prepareValue(value: any, table?: string, toLower?: boolean) {

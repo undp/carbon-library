@@ -121,7 +121,7 @@ export const NdcActionViewComponent = (props: any) => {
               download
             >
               <BookOutlined
-                className="common-progress-icon margin-right-1"
+                className="common-progress-icon"
                 style={{ color: "#3F3A47" }}
               />
             </a>
@@ -324,15 +324,17 @@ export const NdcActionViewComponent = (props: any) => {
     }
     if (
       ndcActionDetails?.typeOfMitigation === MitigationTypes.AGRICULTURE &&
-      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR &&
+      ndcActionDetails?.subTypeOfMitigation ===
+        MitigationSubTypes.SOIL_ENRICHMENT_BIOCHAR &&
       ndcActionDetails?.creditCalculationProperties
     ) {
       mitigationDetails[t("ndcAction:viewMitigationWeight")] =
-        addCommSep(ndcActionDetails?.creditCalculationProperties?.weight) + 't'
+        addCommSep(ndcActionDetails?.creditCalculationProperties?.weight) + "t";
     }
     if (
       ndcActionDetails?.typeOfMitigation === MitigationTypes.SOLAR &&
-      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV &&
+      ndcActionDetails?.subTypeOfMitigation ===
+        MitigationSubTypes.SOLAR_PHOTOVOLTAICS_PV &&
       ndcActionDetails?.solarProperties
     ) {
       mitigationDetails[t("ndcAction:viewMitigationEnergyGeneration")] =
@@ -343,23 +345,27 @@ export const NdcActionViewComponent = (props: any) => {
     }
     if (
       ndcActionDetails?.typeOfMitigation === MitigationTypes.SOLAR &&
-      (ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID || 
-      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID) &&
+      (ndcActionDetails?.subTypeOfMitigation ===
+        MitigationSubTypes.SOLAR_WATER_PUMPING_OFF_GRID ||
+        ndcActionDetails?.subTypeOfMitigation ===
+          MitigationSubTypes.SOLAR_WATER_PUMPING_ON_GRID) &&
       ndcActionDetails?.creditCalculationProperties
     ) {
       mitigationDetails[t("ndcAction:viewMitigationEnergyGeneration")] =
-        addCommSep(ndcActionDetails?.creditCalculationProperties?.energyGeneration) +
-        ndcActionDetails?.creditCalculationProperties?.energyGenerationUnit;
+        addCommSep(
+          ndcActionDetails?.creditCalculationProperties?.energyGeneration
+        ) + ndcActionDetails?.creditCalculationProperties?.energyGenerationUnit;
     }
 
     if (
       ndcActionDetails?.typeOfMitigation === MitigationTypes.EE_HOUSEHOLDS &&
-      ndcActionDetails?.subTypeOfMitigation === MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA &&
+      ndcActionDetails?.subTypeOfMitigation ===
+        MitigationSubTypes.STOVES_HOUSES_IN_NAMIBIA &&
       ndcActionDetails?.creditCalculationProperties
     ) {
       mitigationDetails[t("ndcAction:viewMitigationNoOfDays")] =
         ndcActionDetails?.creditCalculationProperties?.numberOfDays;
-        mitigationDetails[t("ndcAction:viewMitigationNoOfPeople")] =
+      mitigationDetails[t("ndcAction:viewMitigationNoOfPeople")] =
         ndcActionDetails?.creditCalculationProperties?.numberOfPeopleInHousehold;
     }
 
@@ -596,6 +602,8 @@ export const NdcActionViewComponent = (props: any) => {
                           </div>
                         )}
                       </div>
+                    </div>
+                    <Row>
                       <div className="icon">
                         {!monitoringReportData?.url && (
                           <Tooltip
@@ -620,43 +628,43 @@ export const NdcActionViewComponent = (props: any) => {
                           </Tooltip>
                         )}
                       </div>
-                    </div>
-                    {monitoringReportData?.url && (
-                      <Row>
-                        <div className="icon">
-                          {monitoringReportData?.status ===
-                            DocumentStatus.ACCEPTED && (
-                            <CheckCircleOutlined
-                              className="common-progress-icon"
-                              style={{ color: "#5DC380" }}
-                            />
-                          )}
-                          {monitoringReportData?.status ===
-                            DocumentStatus.REJECTED && (
-                            <ExclamationCircleOutlined
-                              className="common-progress-icon"
-                              style={{ color: "#FD6F70" }}
-                            />
-                          )}
-                        </div>
-                        <div className="link mg-left-1">
-                          {monitoringReportData?.url &&
-                            linkDocVisible(monitoringReportData?.status) && (
-                              <a
-                                href={monitoringReportData?.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                              >
-                                <BookOutlined
-                                  className="common-progress-icon margin-right-1"
-                                  style={{ color: "#3F3A47" }}
-                                />
-                              </a>
+                      {monitoringReportData?.url && (
+                        <>
+                          <div className="icon">
+                            {monitoringReportData?.status ===
+                              DocumentStatus.ACCEPTED && (
+                              <CheckCircleOutlined
+                                className="common-progress-icon"
+                                style={{ color: "#5DC380" }}
+                              />
                             )}
-                        </div>
-                      </Row>
-                    )}
+                            {monitoringReportData?.status ===
+                              DocumentStatus.REJECTED && (
+                              <ExclamationCircleOutlined
+                                className="common-progress-icon"
+                                style={{ color: "#FD6F70" }}
+                              />
+                            )}
+                          </div>
+                          <div className="link mg-left-1">
+                            {monitoringReportData?.url &&
+                              linkDocVisible(monitoringReportData?.status) && (
+                                <a
+                                  href={monitoringReportData?.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                >
+                                  <BookOutlined
+                                    className="common-progress-icon"
+                                    style={{ color: "#3F3A47" }}
+                                  />
+                                </a>
+                              )}
+                          </div>
+                        </>
+                      )}
+                    </Row>
                   </div>
                   <div className="report-details">
                     <div className="report-type">
@@ -679,6 +687,8 @@ export const NdcActionViewComponent = (props: any) => {
                           </div>
                         )}
                       </div>
+                    </div>
+                    <Row>
                       <div className="icon">
                         {!verificationReportData?.url && (
                           <Tooltip
@@ -703,43 +713,45 @@ export const NdcActionViewComponent = (props: any) => {
                           </Tooltip>
                         )}
                       </div>
-                    </div>
-                    {verificationReportData?.url && (
-                      <Row>
-                        <div className="icon">
-                          {verificationReportData?.status ===
-                            DocumentStatus.ACCEPTED && (
-                            <CheckCircleOutlined
-                              className="common-progress-icon"
-                              style={{ color: "#5DC380" }}
-                            />
-                          )}
-                          {verificationReportData?.status ===
-                            DocumentStatus.REJECTED && (
-                            <ExclamationCircleOutlined
-                              className="common-progress-icon"
-                              style={{ color: "#FD6F70" }}
-                            />
-                          )}
-                        </div>
-                        <div className="link mg-left-1">
-                          {verificationReportData?.url &&
-                            linkDocVisible(verificationReportData?.status) && (
-                              <a
-                                href={verificationReportData?.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                              >
-                                <BookOutlined
-                                  className="common-progress-icon margin-right-1"
-                                  style={{ color: "#3F3A47" }}
-                                />
-                              </a>
+                      {verificationReportData?.url && (
+                        <>
+                          <div className="icon">
+                            {verificationReportData?.status ===
+                              DocumentStatus.ACCEPTED && (
+                              <CheckCircleOutlined
+                                className="common-progress-icon"
+                                style={{ color: "#5DC380" }}
+                              />
                             )}
-                        </div>
-                      </Row>
-                    )}
+                            {verificationReportData?.status ===
+                              DocumentStatus.REJECTED && (
+                              <ExclamationCircleOutlined
+                                className="common-progress-icon"
+                                style={{ color: "#FD6F70" }}
+                              />
+                            )}
+                          </div>
+                          <div className="link mg-left-1">
+                            {verificationReportData?.url &&
+                              linkDocVisible(
+                                verificationReportData?.status
+                              ) && (
+                                <a
+                                  href={verificationReportData?.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                >
+                                  <BookOutlined
+                                    className="common-progress-icon"
+                                    style={{ color: "#3F3A47" }}
+                                  />
+                                </a>
+                              )}
+                          </div>
+                        </>
+                      )}
+                    </Row>
                   </div>
                   {/* <InfoView
                     data={ndcActionReportDetails}

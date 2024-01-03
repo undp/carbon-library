@@ -128,7 +128,11 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
               if (action.actionId == ndcActionId) {
                 modified = true;
                 let docAdded = false;
-                for (var document of action.projectMaterial) {
+                for (var documentDetails of action.projectMaterial) {
+                  let document: any;
+                  documentDetails.url
+                    ? (document = documentDetails.url)
+                    : (document = documentDetails);
                   if (document.includes("VERIFICATION_REPORT")) {
                     docAdded = true;
                     break;
@@ -340,7 +344,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           )
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop: '3px' }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -359,14 +363,14 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: '3px' }}
                       />
                     </>
                   )
                 ) : monitoringReportAccepted ? (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop: '3px' }}
                   />
                 ) : (
                   monitoringReportRejected && (
@@ -379,7 +383,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                     >
                       <ExclamationCircleOutlined
                         className="common-progress-icon"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: '3px' }}
                       />
                     </Tooltip>
                   )
@@ -415,8 +419,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px" }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
@@ -461,7 +473,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                   >
                     <BookOutlined
                       className="common-progress-icon margin-right-1"
-                      style={{ color: "#3F3A47" }}
+                      style={{ color: "#3F3A47", paddingTop: '3px' }}
                     />
                   </a>
                 )}
@@ -497,8 +509,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
@@ -568,7 +588,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           )
                         }
                         className="common-progress-icon"
-                        style={{ color: "#976ED7" }}
+                        style={{ color: "#976ED7", paddingTop: '3px' }}
                       />
                       <DislikeOutlined
                         onClick={() => {
@@ -587,14 +607,14 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           setOpenRejectDocConfirmationModal(true);
                         }}
                         className="common-progress-icon margin-left-1"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: '3px' }}
                       />
                     </>
                   )
                 ) : verificationReportAccepted ? (
                   <CheckCircleOutlined
                     className="common-progress-icon"
-                    style={{ color: "#5DC380" }}
+                    style={{ color: "#5DC380", paddingTop: '3px' }}
                   />
                 ) : (
                   verifcationReportRejected && (
@@ -607,7 +627,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                     >
                       <ExclamationCircleOutlined
                         className="common-progress-icon"
-                        style={{ color: "#FD6F70" }}
+                        style={{ color: "#FD6F70", paddingTop: '3px' }}
                       />
                     </Tooltip>
                   )
@@ -643,8 +663,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
@@ -694,7 +722,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                   >
                     <BookOutlined
                       className="common-progress-icon margin-right-1"
-                      style={{ color: "#3F3A47" }}
+                      style={{ color: "#3F3A47", paddingTop: '3px' }}
                     />
                   </a>
                 )}
@@ -730,8 +758,16 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           programmeOwnerId,
                           ministryLevelPermission
                         )
-                          ? { color: "#3F3A47", cursor: "pointer", margin: "0px 0px 2.5px 0px"  }
-                          : { color: "#cacaca", cursor: "default", margin: "0px 0px 2.5px 0px"  }
+                          ? {
+                              color: "#3F3A47",
+                              cursor: "pointer",
+                              margin: "0px 0px 2.5px 0px",
+                            }
+                          : {
+                              color: "#cacaca",
+                              cursor: "default",
+                              margin: "0px 0px 2.5px 0px",
+                            }
                       }
                       onClick={() => {
                         if (
