@@ -635,6 +635,23 @@ export class CompanyService {
   }
 
   async queryNames(query: QueryDto, abilityCondition: string): Promise<any> {
+
+    if (query.filterAnd) {
+      query.filterAnd.push({
+        key: "state",
+        operation: "in",
+        value: [1],
+      });
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: "state",
+        operation: "in",
+        value: [1],
+      });
+      query.filterAnd = filterAnd;
+    }
+
     const resp = await this.companyRepo
       .createQueryBuilder()
       .select(['"companyId"', '"name"', '"state"', '"taxId"'])
