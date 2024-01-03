@@ -2200,7 +2200,10 @@ ${total}
               Carbon Registry
             </Button>
             <Link to="/dashboard/mrv">
-              <Button className="rgdefault">Transparency System</Button>
+              <Button className="mid-default-btn">Transparency System</Button>
+            </Link>
+            <Link to="/dashboard/ghg">
+              <Button className="rgdefault">GHG Inventory</Button>
             </Link>
           </ButtonGroup>
         </div>
