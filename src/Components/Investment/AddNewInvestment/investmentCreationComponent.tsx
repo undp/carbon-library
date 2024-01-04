@@ -1302,7 +1302,9 @@ export const InvestmentCreationComponent = (props: any) => {
                                       <Row className="row" gutter={[16, 16]}>
                                         <Col xl={8} md={15}>
                                           <div className="label">
-                                            {companyNames[Number(companyId)]}
+                                            {govData.companyId == companyId
+                                              ? govData.name
+                                              : companyNames[Number(companyId)]}
                                             <span className="required-mark">
                                               *
                                             </span>
