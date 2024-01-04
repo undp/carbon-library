@@ -11,7 +11,7 @@ export const ConnectionContextProvider: FC<ConnectionContextProviderProps> = (
   props: ConnectionContextProviderProps
 ) => {
   const [token, setToken] = useState<string>();
-  const { serverURL, t, children, statServerUrl } = props;
+  const { serverURL, t, statServerUrl, children } = props;
 
   useEffect(() => {
     const timer = setInterval(async () => {

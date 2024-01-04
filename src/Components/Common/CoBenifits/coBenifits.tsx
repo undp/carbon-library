@@ -9,7 +9,6 @@ import Environmental from "./environmental";
 import Economic from "./economic";
 import Social from "./social";
 import { RadioButtonStatus } from "../../../Definitions";
-import { useConnection } from "../../../Context";
 import SocialEnvironmentalRisk from "./socialEnvironmentalRisk";
 
 export interface CoBenefitProps {

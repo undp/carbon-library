@@ -12,14 +12,13 @@ import {
     ChartSeriesItem,
     GHGChartSeriesItem
 } from './ghg.chart.options';
+import { useConnection, useUserContext } from "../../../Context";
 
 const { RangePicker } = DatePicker;
 
 export const GHGDashboardComponent = (props: any) => {
     const {
         t,
-        useUserContext,
-        useConnection,
         Chart,
         ButtonGroup,
         Link,
