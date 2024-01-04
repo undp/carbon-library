@@ -97,12 +97,14 @@ export const NdcDetailsComponent = (props: any) => {
     userInfoState?.userRole !== Role.ViewOnly;
 
   const isMainNdcActionsEditable =
+    selectedPeriod &&
     !selectedPeriod.finalized &&
     userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
     userInfoState?.userRole !== Role.ViewOnly;
 
   const isSubNdcActionsEditable = (record: NdcDetail) => {
     return (
+      selectedPeriod &&
       !selectedPeriod.finalized &&
       record.status !== NdcDetailsActionStatus.Approved &&
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
@@ -114,6 +116,7 @@ export const NdcDetailsComponent = (props: any) => {
 
   const checkSubNdcActionCreatePermission = () => {
     return (
+      selectedPeriod &&
       !selectedPeriod.finalized &&
       (userInfoState?.companyRole === CompanyRole.GOVERNMENT ||
         userInfoState?.companyRole === CompanyRole.MINISTRY) &&
@@ -130,7 +133,7 @@ export const NdcDetailsComponent = (props: any) => {
   };
 
   const ndcMainDetailsForPeriod =
-    selectedPeriod.key !== "add_new"
+    selectedPeriod && selectedPeriod.key !== "add_new"
       ? ndcActionsList.filter((ndcDetail: NdcDetail) => {
           return (
             ndcDetail.periodId === parseInt(selectedPeriod.key) &&
@@ -152,6 +155,7 @@ export const NdcDetailsComponent = (props: any) => {
       actionType: NdcDetailsActionType.SubAction,
       nationalPlanObjective: "",
       kpi: "",
+      kpiUnit: "",
       ministryName: loginMinistry,
       status: NdcDetailsActionStatus.New,
       parentActionId: mainActionId,
@@ -165,6 +169,7 @@ export const NdcDetailsComponent = (props: any) => {
       form.setFieldsValue({
         nationalPlanObjective: "",
         kpi: "",
+        kpiUnit: "",
       });
     }
 
@@ -204,6 +209,7 @@ export const NdcDetailsComponent = (props: any) => {
         return;
       } else if (
         updatedFields.kpi === row.kpi &&
+        updatedFields.kpiUnit === row.kpiUnit &&
         updatedFields.nationalPlanObjective === row.nationalPlanObjective
       ) {
         ClearEditMode();
@@ -226,7 +232,7 @@ export const NdcDetailsComponent = (props: any) => {
         }
         const response = await post("national/programme/addNdcDetailsAction", {
           ...updatedItem,
-          kpi: parseInt(updatedItem.kpi.toString()),
+          kpi: parseFloat(updatedItem.kpi.toString()),
         });
       } else {
         updatedItem.status = NdcDetailsActionStatus.Pending;
@@ -234,7 +240,7 @@ export const NdcDetailsComponent = (props: any) => {
           "national/programme/updateNdcDetailsAction",
           {
             ...updatedItem,
-            kpi: parseInt(updatedItem.kpi.toString()),
+            kpi: parseFloat(updatedItem.kpi.toString()),
           }
         );
       }
@@ -255,6 +261,7 @@ export const NdcDetailsComponent = (props: any) => {
     if (
       record.status === NdcDetailsActionStatus.Pending &&
       isGovernmentUser &&
+      selectedPeriod &&
       !selectedPeriod.finalized
     ) {
       return (
@@ -350,7 +357,30 @@ export const NdcDetailsComponent = (props: any) => {
               <span>{record.kpi}</span>
             </Tooltip>
           ) : (
-            <Input placeholder="Enter Kpi" />
+            <Input placeholder={t("ndc:kpiPlaceHolder")} />
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: t("ndc:ndcColumnsKpiUnit"),
+      dataIndex: "kpiUnit",
+      key: "kpiUnit",
+      align: "left" as const,
+      width: 100,
+      editable: true,
+      render: (_: any, record: NdcDetail) => (
+        <Space size="middle">
+          {record.kpiUnit ? (
+            <Tooltip
+              title={
+                isNdcActionEditable(record) ? "" : t("ndc:ndcUnauthorisedMsg")
+              }
+            >
+              <span>{record.kpiUnit}</span>
+            </Tooltip>
+          ) : (
+            <Input placeholder={t("ndc:kpiUnitPlaceHolder")} />
           )}
         </Space>
       ),
@@ -459,6 +489,7 @@ export const NdcDetailsComponent = (props: any) => {
       form.setFieldsValue({
         nationalPlanObjective: "",
         kpi: "",
+        kpiUnit: "",
       });
       const periodId: number = parseInt(selectedPeriod.key);
       const newData: NdcDetail = {
@@ -466,6 +497,7 @@ export const NdcDetailsComponent = (props: any) => {
         actionType: NdcDetailsActionType.MainAction,
         nationalPlanObjective: "",
         kpi: "",
+        kpiUnit: "",
         ministryName: loginMinistry,
         periodId: periodId,
         status: NdcDetailsActionStatus.New,
@@ -645,6 +677,7 @@ export const NdcDetailsComponent = (props: any) => {
                 }}
                 footer={() =>
                   isGovernmentUser &&
+                  selectedPeriod &&
                   !selectedPeriod.finalized && (
                     <Row justify={"center"}>
                       <Button
@@ -662,7 +695,7 @@ export const NdcDetailsComponent = (props: any) => {
             </Form>
           </Col>
         </Row>
-        {isGovernmentUser && !selectedPeriod.finalized ? (
+        {isGovernmentUser && selectedPeriod && !selectedPeriod.finalized ? (
           <Row justify="end">
             {isMainActionInEditMode() ? (
               <>
@@ -1030,14 +1063,16 @@ export const NdcDetailsComponent = (props: any) => {
           centered={false}
           defaultActiveKey="1"
           items={periodItems}
-          activeKey={selectedPeriod.key}
+          activeKey={selectedPeriod ? selectedPeriod.key : "1"}
           onChange={onTabChange}
         />
       </div>
       <div>
-        {selectedPeriod.key === "add_new"
-          ? addNewPeriodContent()
-          : mainNdcActionTableContent()}
+        {selectedPeriod
+          ? selectedPeriod.key === "add_new"
+            ? addNewPeriodContent()
+            : mainNdcActionTableContent()
+          : ""}
       </div>
       <UserActionConfirmationModel
         t={t}

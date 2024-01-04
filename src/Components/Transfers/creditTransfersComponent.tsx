@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { EllipsisOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
 import {
   Row,
   Checkbox,
@@ -98,6 +98,7 @@ export const CreditTransferComponent = (props: any) => {
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
   const [ministryLevelFilter, setMinistryLevelFilter] =
     useState<boolean>(false);
+  const [dataQuery, setDataQuery] = useState<any>();
 
   const onStatusQuery = async (checkedValues: CheckboxValueType[]) => {
     console.log(checkedValues);
@@ -205,9 +206,47 @@ export const CreditTransferComponent = (props: any) => {
       console.log(response);
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
+      setDataQuery({
+        filterAnd: filter,
+        filterOr: dataFilter,
+        sort: sort,
+        filterBy: filterBy,
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting programme transfers", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      setLoading(false);
+    }
+  };
+
+  const downloadTransferData = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/programme/transfers/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+        filterBy: dataQuery.filterBy,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting transfers", error);
       message.open({
         type: "error",
         content: error.message,
@@ -865,7 +904,7 @@ export const CreditTransferComponent = (props: any) => {
 
                 {userInfoState?.companyRole === CompanyRole.MINISTRY && (
                   <Checkbox
-                    className="label"
+                    className="label ministry-level-filter-checkbox"
                     onChange={(v) => {
                       if (v.target.checked) {
                         setMinistryLevelFilter(true);
@@ -891,6 +930,16 @@ export const CreditTransferComponent = (props: any) => {
                   onSearch={setSearch}
                   style={{ width: 265 }}
                 />
+              </div>
+              <div className="download-data-btn">
+                <a onClick={downloadTransferData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
               </div>
             </div>
           </Col>

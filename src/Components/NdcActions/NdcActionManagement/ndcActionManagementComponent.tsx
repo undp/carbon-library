@@ -27,6 +27,7 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { useConnection, useUserContext } from "../../../Context";
+import { DownloadOutlined } from "@ant-design/icons";
 
 export const NdcActionManagementComponent = (props: any) => {
   const {
@@ -50,6 +51,7 @@ export const NdcActionManagementComponent = (props: any) => {
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
   const [ministryLevelFilter, setMinistryLevelFilter] =
     useState<boolean>(false);
+  const [dataQuery, setDataQuery] = useState<any>();
 
   const { Search } = Input;
   const { post } = useConnection();
@@ -275,6 +277,11 @@ export const NdcActionManagementComponent = (props: any) => {
 
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
+      setDataQuery({
+        filterAnd: filter,
+        filterBy: filterBy,
+        sort: sort,
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting ndc actions", error);
@@ -314,6 +321,38 @@ export const NdcActionManagementComponent = (props: any) => {
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);
+      setLoading(false);
+    }
+  };
+
+  const downloadNdcData = async () => {
+    setLoading(true);
+
+    try {
+      const response: any = await post("national/programme/queryNdcActions/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterBy: dataQuery.filterBy,
+        sort: dataQuery.sort,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting NDC Actions", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };
@@ -451,6 +490,17 @@ export const NdcActionManagementComponent = (props: any) => {
                   style={{ width: 265 }}
                 />
               </div>
+              <div className="download-data-btn">
+                <a onClick={downloadNdcData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
+              </div>
+
             </div>
           </Col>
         </Row>
