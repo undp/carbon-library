@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Col,
+  DatePicker,
   Form,
   Input,
   InputNumber,
@@ -14,6 +15,7 @@ import {
   Tooltip,
   message,
 } from "antd";
+import type { RadioChangeEvent } from "antd";
 import type { RadioChangeEvent } from "antd";
 import "../investmentComponent.scss";
 import {
@@ -85,8 +87,9 @@ export const InvestmentCreationComponent = (props: any) => {
     value: Object.values(Instrument)[index],
   }));
 
-  const onInstrumentChange = (value: any) => {
-    setInstrument(value);
+  const onInstrumentChange = (e: RadioChangeEvent) => {
+    console.log("radio checked", e.target.value);
+    setInstrument([e.target.value]);
   };
 
   const onPercentageChange = (value: any) => {
@@ -337,6 +340,7 @@ export const InvestmentCreationComponent = (props: any) => {
     return <Loading />;
   }
   console.log("data", data);
+  console.log("data", data);
 
   if (data && Object.keys(data)[0] !== "ownership") {
     // for (const company of data!?.company) {
@@ -434,6 +438,7 @@ export const InvestmentCreationComponent = (props: any) => {
 
   const onChangeTypeCreation = (e: RadioChangeEvent) => {
     console.log("radio checked", e.target.value);
+    console.log("radio checked", e.target.value);
     setTypeCreation(e.target.value);
     formOne.resetFields();
     formTwo.resetFields();
@@ -494,6 +499,10 @@ export const InvestmentCreationComponent = (props: any) => {
                                 },
                               ]}
                             >
+                              <Radio.Group
+                                size="large"
+                                defaultValue={typeCreation}
+                              >
                               <Radio.Group
                                 size="large"
                                 defaultValue={typeCreation}

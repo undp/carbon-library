@@ -7,6 +7,7 @@ import { InvestmentStream } from "../enum/investment.stream";
 import { ESGType } from "../enum/esg.type";
 import { InvestmentDto } from "./investment.dto";
 import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
+import { GuaranteePayback, InsurancePayback } from "../enum/investment.payback.enum";
 
 export class InvestmentRequestDto extends InvestmentDto{
   @ApiProperty()

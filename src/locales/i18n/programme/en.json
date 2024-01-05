@@ -84,6 +84,14 @@
     "addSupportBtnText": "ADD SUPPORT",
     "addSupportSub": "Add Support to a project in the Transparency System",
     "programmeExistsWithAssessmentRegId": "Project already exist with the given environmental assessment registration number",
+    "period":"Period",
+    "payback":"Payback",
+    "loanPeriod":"Loan Period",
+    "startOfPayback":"Start of Payback", 
+    "LumpSum":"LUMP SUM",
+    "Upfront":"UPFRONT",
+    "Annual":"ANNUAL",
     "existingInvestmentSource":"Source",
     "noInvestmentData":"No financing information available"
+
 }

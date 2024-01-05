@@ -1,6 +1,7 @@
 import {
   AuditOutlined,
   BankOutlined,
+  DownloadOutlined,
   ExperimentOutlined,
   FilterOutlined,
   PlusOutlined,
@@ -71,6 +72,7 @@ export const CompanyManagementComponent = (props: any) => {
     useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("");
   const [sortField, setSortField] = useState<string>("");
+  const [dataQuery, setDataQuery] = useState<any>();
   const ability = useAbilityContext();
   const { post } = useConnection();
 
@@ -325,8 +327,46 @@ export const CompanyManagementComponent = (props: any) => {
         setTableData(availableCompanies);
         setTotalCompany(response?.response?.data?.total);
       }
+      setDataQuery({
+        filterAnd: filterAnd(),
+        filterOr: filterOr(),
+        sort: sort(),
+      })
       setLoading(false);
     } catch (error: any) {
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      setLoading(false);
+    }
+  };
+
+  const downloadCompanyData = async () => {
+    setLoading(true);
+
+    try {
+      const response: any = await post("national/organisation/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+      });
+
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting organisations", error);
       message.open({
         type: "error",
         content: error.message,
@@ -474,6 +514,16 @@ export const CompanyManagementComponent = (props: any) => {
                     />
                   </a>
                 </Dropdown>
+              </div>
+              <div className="download-data-btn company-data-download">
+                <a onClick={downloadCompanyData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
               </div>
             </div>
           </Col>
