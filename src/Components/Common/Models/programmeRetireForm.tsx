@@ -101,7 +101,7 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
           {
             key: "name",
             operation: "like",
-            value: newValue.charAt(0).toUpperCase() + newValue.slice(1) + "%",
+            value: "%" + newValue.charAt(0).toUpperCase() + newValue.slice(1) + "%",
           },
         ],
         sort: {

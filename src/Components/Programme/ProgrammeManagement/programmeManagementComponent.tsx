@@ -308,7 +308,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       filter.push({
         key: "title",
         operation: "like",
-        value: `${search}%`,
+        value: `%${search}%`,
       });
     }
 

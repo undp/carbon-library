@@ -226,14 +226,14 @@ export const NdcActionManagementComponent = (props: any) => {
         {
           key: "programmeName",
           operation: "like",
-          value: `${search}%`,
+          value: `%${search}%`,
         },
       ];
       if (!isNaN(Number(search))) {
         interFilterOr.push({
           key: "id",
           operation: "like",
-          value: `${search}`,
+          value: `%${search}%`,
         });
       }
       filter.push({
