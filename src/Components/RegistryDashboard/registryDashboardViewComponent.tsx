@@ -2217,24 +2217,24 @@ ${total}
                   ? pendingProjectsWithoutTimeRange
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? transferRequestReceived
-                    : programmesUnCertifed
+                  ? transferRequestReceived
+                  : programmesUnCertifed
               }
-              title={t(
+              title={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "programmesPending"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? "trasnferReqReceived"
-                    : "programmesUnCertified"
-              )}
+                  ? "trasnferReqReceived"
+                  : "programmesUnCertified"
+              }
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdateProgrammesStats
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? lastUpdatePendingTransferReceived
-                    : lastUpdateProgrammesCertifiable
+                  ? lastUpdatePendingTransferReceived
+                  : lastUpdateProgrammesCertifiable
               }
               icon={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
@@ -2248,6 +2248,15 @@ ${total}
               }
               loading={loadingWithoutTimeRange}
               companyRole={userInfoState?.companyRole}
+              tooltip={t(
+                userInfoState?.companyRole === CompanyRole.GOVERNMENT
+                  ? "tTprogrammespendingGoverment"
+                  : userInfoState?.companyRole ===
+                    CompanyRole.PROGRAMME_DEVELOPER
+                  ? "tTTransferReqRecProgrammeDev"
+                  : "tTProgrammesUnCertiCertifier"
+              )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">
@@ -2257,24 +2266,24 @@ ${total}
                   ? transferRequestSent
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? transferRequestSent
-                    : programmesCertifed
+                  ? transferRequestSent
+                  : programmesCertifed
               }
-              title={t(
+              title={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "trasnferReqInit"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? "trasnferReqInit"
-                    : "programmesCertified"
-              )}
+                  ? "trasnferReqInit"
+                  : "programmesCertified"
+              }
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdatePendingTransferSent
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? lastUpdatePendingTransferSent
-                    : lastUpdateProgrammesCertified
+                  ? lastUpdatePendingTransferSent
+                  : lastUpdateProgrammesCertified
               }
               icon={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
@@ -2288,6 +2297,15 @@ ${total}
               }
               loading={loadingWithoutTimeRange}
               companyRole={userInfoState?.companyRole}
+              tooltip={t(
+                userInfoState?.companyRole === CompanyRole.GOVERNMENT
+                  ? "tTTransferReqSentGovernment"
+                  : userInfoState?.companyRole ===
+                    CompanyRole.PROGRAMME_DEVELOPER
+                  ? "tTTransferReqInitProgrammeDev"
+                  : "tTProgrammesCertiCertifier"
+              )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">
@@ -2297,24 +2315,24 @@ ${total}
                   ? creditBalanceWithoutTimeRange
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? creditBalanceWithoutTimeRange
-                    : creditCertiedBalanceWithoutTimeRange
+                  ? creditBalanceWithoutTimeRange
+                  : creditCertiedBalanceWithoutTimeRange
               }
-              title={t(
+              title={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "creditBal"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? "creditBal"
-                    : "creditCertified"
-              )}
+                  ? "creditBal"
+                  : "creditCertified"
+              }
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdateCreditBalance
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                    ? lastUpdateCreditBalance
-                    : lastUpdateProgrammesCertified
+                  ? lastUpdateCreditBalance
+                  : lastUpdateProgrammesCertified
               }
               icon={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT ? (
@@ -2328,6 +2346,15 @@ ${total}
               }
               loading={loadingWithoutTimeRange}
               companyRole={userInfoState?.companyRole}
+              tooltip={t(
+                userInfoState?.companyRole === CompanyRole.GOVERNMENT
+                  ? "tTCreditBalanceGovernment"
+                  : userInfoState?.companyRole ===
+                    CompanyRole.PROGRAMME_DEVELOPER
+                  ? "tTCreditBalanceProgrammeDev"
+                  : "tTCreditCertifiedCertifier"
+              )}
+              t={t}
             />
           </Col>
         </Row>
