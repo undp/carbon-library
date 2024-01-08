@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -16,6 +17,7 @@ import { InvestmentType } from '../enum/investment.type';
 import { InvestmentLevel } from '../enum/investment.level';
 import { InvestmentStream } from '../enum/investment.stream';
 import { ESGType } from '../enum/esg.type';
+import { GuaranteePayback, InsurancePayback } from '../enum/investment.payback.enum';
 
 export class InvestmentDto {
   @IsNotEmpty()
@@ -24,39 +26,65 @@ export class InvestmentDto {
   @ApiProperty()
   amount: number;
 
-  @ApiPropertyOptional({ enum: Instrument, isArray: true })
+  @ApiProperty({ enum: Instrument, isArray: true })
   @IsEnum(Instrument, {
     message:
       'Invalid instrument type. Supported following values:' +
       Object.values(Instrument),
     each: true,
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsArray()
   instrument: Instrument[];
 
   @ApiPropertyOptional()
-  @ValidateIf((o) => o.instrument && o.instrument.indexOf(Instrument.LOAN) >= 0)
+  @ValidateIf(o => (o.instrument && (o.instrument.indexOf(Instrument.LOAN) >= 0 || o.instrument.indexOf(Instrument.GUARANTEE)>= 0 || o.instrument.indexOf(Instrument.CONLOAN)>= 0 || o.instrument.indexOf(Instrument.NONCONLOAN)>= 0)))
   @IsNumber()
   @IsOptional()
   @IsNotEmpty()
   interestRate?: number;
 
   @ApiPropertyOptional()
-  @ValidateIf(
-    (o) => o.instrument && o.instrument.indexOf(Instrument.RESULT_BASED) >= 0,
-  )
+  @ValidateIf(o => (o.instrument && o.instrument.indexOf(Instrument.RESULT_BASED) >= 0))
+
   @IsString()
   @IsNotEmpty()
   resultMetric?: string;
 
   @ApiPropertyOptional()
-  @ValidateIf(
-    (o) => o.instrument && o.instrument.indexOf(Instrument.RESULT_BASED) >= 0,
-  )
+  @ValidateIf(o => (o.instrument && o.instrument.indexOf(Instrument.RESULT_BASED) >= 0))
   @IsNumber()
   @IsNotEmpty()
   paymentPerMetric?: number;
+
+  @ApiPropertyOptional()
+  @ValidateIf(o => (o.instrument && (o.instrument.indexOf(Instrument.CONLOAN) >= 0 || o.instrument.indexOf(Instrument.NONCONLOAN) >= 0)))
+  @IsNumber()
+  @IsNotEmpty()
+  startOfPayback?: number;
+
+  @ApiPropertyOptional({ enum: GuaranteePayback })
+  @IsEnum(GuaranteePayback, {
+      message: 'Invalid type. Supported following values:' + Object.values(GuaranteePayback)
+  })
+  @ValidateIf(o => (o.instrument && o.instrument.indexOf(Instrument.GUARANTEE) >= 0))
+  @IsNotEmpty()
+  guaranteePayback?: GuaranteePayback;
+
+  @ApiPropertyOptional({ enum: InsurancePayback })
+  @IsEnum(InsurancePayback, {
+      message: 'Invalid type. Supported following values:' + Object.values(InsurancePayback)
+  })
+  @ValidateIf(o => (o.instrument && o.instrument.indexOf(Instrument.INSURANCE) >= 0))
+  @IsNotEmpty()
+  insurancePayback?: InsurancePayback;
+
+  @ApiPropertyOptional({isArray:true})
+  @ValidateIf(o => (o.instrument && (o.instrument.indexOf(Instrument.GUARANTEE) >= 0 || o.instrument.indexOf(Instrument.CONLOAN) >= 0 || o.instrument.indexOf(Instrument.NONCONLOAN) >= 0)))
+  @IsArray()
+  @IsInt({ each: true })
+  period?:number[]
+
 
   @ApiPropertyOptional()
   @ValidateIf(

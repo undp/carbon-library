@@ -16,7 +16,6 @@ import {
   message,
 } from "antd";
 import type { RadioChangeEvent } from "antd";
-import type { RadioChangeEvent } from "antd";
 import "../investmentComponent.scss";
 import {
   ProgrammeT,
@@ -39,6 +38,13 @@ import { useConnection, useUserContext } from "../../../Context";
 import TextArea from "antd/lib/input/TextArea";
 import { ProgrammeStageUnified, Role } from "../../../Definitions";
 import { TooltipColor } from "../../../Styles";
+import moment from "moment";
+import FormItem from "antd/es/form/FormItem";
+import {
+  GuaranteePayback,
+  InsurancePayback,
+} from "../../../Definitions/Enums/payback.enum";
+const { RangePicker } = DatePicker;
 
 export const InvestmentCreationComponent = (props: any) => {
   const {
@@ -389,18 +395,30 @@ export const InvestmentCreationComponent = (props: any) => {
     if (payload.paymentPerMetric) {
       payload.paymentPerMetric = parseFloat(payload.paymentPerMetric);
     }
+    if (payload.period) {
+      payload.period[0] = moment(payload.period[0]).startOf("day").unix();
+      payload.period[1] = moment(payload.period[1]).endOf("day").unix();
+    }
+    if (payload.startOfPayback) {
+      payload.startOfPayback = moment(payload.startOfPayback)
+        .startOf("day")
+        .unix();
+    }
     payload.toCompanyId = Number(payload.toCompanyId);
     try {
       let response: any;
       if (investmentOwnershipType == InvestmentOwnershipType.PROJECT) {
         if (typeCreation == InvestmentCreationType.EXISTING) {
           payload.nationalInvestmentId = investmentData.requestId;
+        } else {
+          payload.instrument = [payload.instrument];
         }
         payload.programmeId = projectData?.programmeId;
         payload.fromCompanyIds = projectData?.companyId.map((e) => Number(e));
         payload.percentage = val.percentage;
         response = await post("national/programme/addInvestment", payload);
       } else {
+        payload.instrument = [payload.instrument];
         response = await post("national/organisation/addInvestment", payload);
       }
       console.log("investment creation -> ", response);
@@ -437,7 +455,6 @@ export const InvestmentCreationComponent = (props: any) => {
   };
 
   const onChangeTypeCreation = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
     console.log("radio checked", e.target.value);
     setTypeCreation(e.target.value);
     formOne.resetFields();
@@ -499,10 +516,6 @@ export const InvestmentCreationComponent = (props: any) => {
                                 },
                               ]}
                             >
-                              <Radio.Group
-                                size="large"
-                                defaultValue={typeCreation}
-                              >
                               <Radio.Group
                                 size="large"
                                 defaultValue={typeCreation}
@@ -627,16 +640,41 @@ export const InvestmentCreationComponent = (props: any) => {
                                 <Form.Item
                                   label={t("programme:instrument")}
                                   name="instrument"
-                                  wrapperCol={{ span: 24 }}
-                                  className=""
+                                  required={true}
+                                  className="investment-radio-button"
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: "",
+                                    },
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (
+                                          String(value).trim() === "" ||
+                                          String(value).trim() === undefined ||
+                                          value === null ||
+                                          value === undefined
+                                        ) {
+                                          throw new Error(
+                                            `${t("programme:instrument")} ${t(
+                                              "isRequired"
+                                            )}`
+                                          );
+                                        }
+                                      },
+                                    },
+                                  ]}
                                 >
-                                  <Checkbox.Group
-                                    options={instrumentOptions}
-                                    defaultValue={instrumentOptions.map(
-                                      (e) => e.value
-                                    )}
+                                  <Radio.Group
                                     onChange={onInstrumentChange}
-                                  />
+                                    value={instrument[0]}
+                                  >
+                                    {instrumentOptions.map((e) => {
+                                      return (
+                                        <Radio value={e.value}>{e.label}</Radio>
+                                      );
+                                    })}
+                                  </Radio.Group>
                                 </Form.Item>
                               </Col>
                             </Row>
@@ -685,6 +723,261 @@ export const InvestmentCreationComponent = (props: any) => {
                                     </div>
                                   </Col>
                                 </Row>
+                              )}
+                            {instrument &&
+                              (instrument.indexOf(Instrument.CONLOAN) >= 0 ||
+                                instrument.indexOf(Instrument.NONCONLOAN) >=
+                                  0) && (
+                                <div className="details-part-two">
+                                  <Row className="row" gutter={[16, 16]}>
+                                    <Col xl={8} md={12}>
+                                      <Form.Item
+                                        label={t("programme:interestRate")}
+                                        name="interestRate"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:interestRate"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              } else if (!isNaN(value)) {
+                                                return Promise.resolve();
+                                              } else {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:interestRate"
+                                                  )} ${t("isInvalid")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </Col>
+                                  </Row>
+                                  <Row className="row" gutter={[16, 16]}>
+                                    <Col xl={8} md={12}>
+                                      <Form.Item
+                                        label={t("programme:loanPeriod")}
+                                        name="period"
+                                        required={true}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:loanPeriod"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <RangePicker
+                                          showTime
+                                          allowClear={true}
+                                          format="DD:MM:YYYY"
+                                          size="large"
+                                        />
+                                      </Form.Item>
+                                    </Col>
+                                    <Col xl={8} md={12}>
+                                      <Form.Item
+                                        label={t("programme:startOfPayback")}
+                                        name="startOfPayback"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:startOfPayback"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <DatePicker
+                                          size="large"
+                                          disabledDate={(currentDate: any) =>
+                                            currentDate <
+                                            moment().startOf("day")
+                                          }
+                                        />
+                                      </Form.Item>
+                                    </Col>
+                                  </Row>
+                                </div>
+                              )}
+                            {instrument &&
+                              instrument.indexOf(Instrument.GUARANTEE) >= 0 && (
+                                <div className="details-part-two">
+                                  <Row className="row" gutter={[16, 16]}>
+                                    <Col xl={8} md={12}>
+                                      <Form.Item
+                                        label={t("programme:interestRate")}
+                                        name="interestRate"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:interestRate"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              } else if (!isNaN(value)) {
+                                                return Promise.resolve();
+                                              } else {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:interestRate"
+                                                  )} ${t("isInvalid")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Input size="large" />
+                                      </Form.Item>
+                                    </Col>
+                                  </Row>
+                                  <Row className="row" gutter={[16, 16]}>
+                                    <Col xl={8} md={12}>
+                                      <Form.Item
+                                        label={t("programme:period")}
+                                        name="period"
+                                        required={true}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t("programme:period")} ${t(
+                                                    "isRequired"
+                                                  )}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <RangePicker
+                                          showTime
+                                          allowClear={true}
+                                          format="DD:MM:YYYY"
+                                          size="large"
+                                        />
+                                      </Form.Item>
+                                    </Col>
+                                    <Col xl={8} md={12}>
+                                      <Form.Item
+                                        label={t("programme:payback")}
+                                        wrapperCol={{ span: 13 }}
+                                        className="role-group"
+                                        name="guaranteePayback"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:payback"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Radio.Group size="large">
+                                          {Object.values(GuaranteePayback).map(
+                                            (k, index) => (
+                                              <div className="condition-radio-container">
+                                                <Radio.Button
+                                                  className="condition-radio"
+                                                  value={k}
+                                                >
+                                                  {t("programme:" + k)}
+                                                </Radio.Button>
+                                              </div>
+                                            )
+                                          )}
+                                        </Radio.Group>
+                                      </Form.Item>
+                                    </Col>
+                                  </Row>
+                                </div>
                               )}
                             {instrument &&
                               instrument.indexOf(Instrument.RESULT_BASED) >=
@@ -788,6 +1081,59 @@ export const InvestmentCreationComponent = (props: any) => {
                                 </Row>
                               )}
                             {instrument &&
+                              instrument.indexOf(Instrument.INSURANCE) >= 0 && (
+                                <Row className="row" gutter={[16, 16]}>
+                                  <Col xl={8} md={12}>
+                                    <div className="details-part-two">
+                                      <Form.Item
+                                        label={t("programme:payback")}
+                                        wrapperCol={{ span: 13 }}
+                                        className="role-group"
+                                        name="insurancePayback"
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: "",
+                                          },
+                                          {
+                                            validator: async (rule, value) => {
+                                              if (
+                                                String(value).trim() === "" ||
+                                                String(value).trim() ===
+                                                  undefined ||
+                                                value === null ||
+                                                value === undefined
+                                              ) {
+                                                throw new Error(
+                                                  `${t(
+                                                    "programme:payback"
+                                                  )} ${t("isRequired")}`
+                                                );
+                                              }
+                                            },
+                                          },
+                                        ]}
+                                      >
+                                        <Radio.Group size="large">
+                                          {Object.values(InsurancePayback).map(
+                                            (k, index) => (
+                                              <div className="condition-radio-container">
+                                                <Radio.Button
+                                                  className="condition-radio"
+                                                  value={k}
+                                                >
+                                                  {t("programme:" + k)}
+                                                </Radio.Button>
+                                              </div>
+                                            )
+                                          )}
+                                        </Radio.Group>
+                                      </Form.Item>
+                                    </div>
+                                  </Col>
+                                </Row>
+                              )}
+                            {instrument &&
                               instrument.indexOf(Instrument.OTHER) >= 0 && (
                                 <Row className="row" gutter={[16, 16]}>
                                   <Col xl={12} md={24}>
@@ -825,7 +1171,7 @@ export const InvestmentCreationComponent = (props: any) => {
                                   </Col>
                                 </Row>
                               )}
-                            <Row className="row" gutter={[4, 4]}>
+                            <Row className="row" gutter={[16, 16]}>
                               <Col xl={8} md={12}>
                                 <Form.Item
                                   label={t("programme:type")}
