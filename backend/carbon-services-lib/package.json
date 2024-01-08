@@ -1,6 +1,6 @@
 {
   "name": "@undp/carbon-services-lib",
-  "version": "0.0.305-CARBON-325-bugfix.0",
+  "version": "0.0.305",
   "description": "Backend library",
   "author": "",
   "private": false,
