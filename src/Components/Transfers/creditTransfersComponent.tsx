@@ -41,6 +41,7 @@ import {
 import { ProfileIcon } from "../Common/ProfileIcon/profile.icon";
 import { creditUnit } from "../../Definitions/Definitions/common.definitions";
 import { TransferActionModel } from "../Common/Models/transferActionModel";
+import { useConnection, useUserContext, useSettingsContext } from "../../Context";
 
 type CompanyInfo = {
   name: string;
@@ -57,9 +58,6 @@ type PopupInfo = {
 
 export const CreditTransferComponent = (props: any) => {
   const {
-    useConnection,
-    useUserContext,
-    useSettingsContext,
     translator,
     onNavigateToProgrammeView,
   } = props;
