@@ -4193,7 +4193,7 @@ export class ProgrammeService {
       const endTimestamp = programme.endTime * 1000;
 
       const companies: Company[] = programme.company;
-      const concatenatedNames = companies.map(company => company.name).join(', ');
+      const concatenatedNames = companies.map(company => company?.name).join(', ');
 
       const certifiers: Company[] = programme.certifier;
       const concatenatedCertifiersNames = certifiers.map(company => company?.name).join(', ');
