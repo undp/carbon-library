@@ -4,8 +4,7 @@ import { FormElementType, RadioButtonStatus } from "../../../Definitions";
 
 const Social = (props: any) => {
   const { onFormSubmit, socialViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace("unfcccSdTool");
-  const t = translator.t;
+  const t = translator;
   const [form] = Form.useForm();
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [socialDetails, setSocialDetails] = useState();

@@ -4,8 +4,7 @@ import { RadioButtonStatus } from "../../../Definitions";
 
 const Economic = (props: any) => {
   const { onFormSubmit, economicViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace("unfcccSdTool");
-  const t = translator.t;
+  const t = translator;
   const economicDetailsInitial: any[] = [
     {
       section: t("growth"),

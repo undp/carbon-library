@@ -4,8 +4,7 @@ import { RadioButtonStatus } from "../../../Definitions";
 
 const Environmental = (props: any) => {
   const { onFormSubmit, environmentalViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace("unfcccSdTool");
-  const t = translator.t;
+  const t = translator;
   const environmentalDetailsInitial: any[] = [
     {
       section: t("air"),
