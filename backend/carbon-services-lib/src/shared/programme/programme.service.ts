@@ -1766,7 +1766,7 @@ export class ProgrammeService {
 
     if (
       (user.companyRole === CompanyRole.PROGRAMME_DEVELOPER &&
-      !companyIds.includes(user.companyId)) || (user.companyRole === CompanyRole.MINISTRY &&
+      !companyIds.includes(user.companyId)) || (programmeDto.article6trade == false && user.companyRole === CompanyRole.MINISTRY &&
         !companyIds.includes(user.companyId))
     ) {
       throw new HttpException(

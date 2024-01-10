@@ -525,7 +525,7 @@ export const ProgrammeCreationComponent = (props: any) => {
             : proponentTxIds,
         proponentPercentage: proponentPercentages,
         article6trade: article6trade,
-        supportingowners: !article6trade ? supportingOwners : undefined,
+        supportingowners: !article6trade && supportingOwners ? supportingOwners : undefined,
         implementinguser: !article6trade ? finalImplementingOwner : undefined,
         programmeProperties: {
           buyerCountryEligibility: article6trade
