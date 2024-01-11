@@ -220,7 +220,7 @@ export const InvestmentCreationComponent = (props: any) => {
         .startOf("day")
         .unix();
     }
-    payload.instrument = [payload.instrument];
+    payload.instrument = Array.isArray(payload.instrument) ? payload.instrument : [payload.instrument];
     payload.fromCompanyIds = data.companyId.map((e) => Number(e));
     payload.percentage = val.percentage;
     payload.toCompanyId = Number(payload.toCompanyId);
