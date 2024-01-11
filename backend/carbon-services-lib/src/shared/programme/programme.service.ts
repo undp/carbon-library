@@ -1760,6 +1760,13 @@ export class ProgrammeService {
         );
       }
 
+      if (programmeDto.article6trade === false && projectCompany.companyRole === CompanyRole.PROGRAMME_DEVELOPER){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString('user.userUnAUth', []),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
       companyIds.push(projectCompany.companyId);
       companyNames.push(projectCompany.name);
     }

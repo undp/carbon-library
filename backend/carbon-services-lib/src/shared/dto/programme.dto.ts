@@ -62,16 +62,17 @@ export class ProgrammeDto {
     @ArrayMinSize(1)
     proponentTaxVatId: string[];
 
+    @ApiProperty()
     @IsNotEmpty()
     @IsBoolean()
     @IsOptional()
-    @IsNotEmpty()
     article6trade?: boolean;
 
-    @ApiProperty()
+    @ApiPropertyOptional()
+    @IsOptional()
     @ValidateIf(o => o.article6trade === false)
     @IsArray()
-    supportingowners: string[];
+    supportingowners?: string[];
 
     @ApiProperty()
     @ValidateIf(o => o.article6trade === false)
