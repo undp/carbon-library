@@ -532,6 +532,18 @@ export const ProgrammeManagementComponent = (props: any) => {
                       } else {
                         setMinistryLevelFilter(false);
                       }
+                    } else if (
+                      userInfoState?.companyRole === CompanyRole.CERTIFIER
+                    ) {
+                      setDataFilter(
+                        v.target.checked
+                          ? {
+                              key: "certifierId",
+                              operation: "ANY",
+                              value: userInfoState?.companyId,
+                            }
+                          : undefined
+                      );
                     } else {
                       setDataFilter(
                         v.target.checked

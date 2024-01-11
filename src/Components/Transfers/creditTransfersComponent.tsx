@@ -913,7 +913,7 @@ export const CreditTransferComponent = (props: any) => {
                       }
                     }}
                   >
-                    {t("ndcAction:ministryLevel")}
+                    {t("view:ministryLevel")}
                   </Checkbox>
                 )}
               </div>
