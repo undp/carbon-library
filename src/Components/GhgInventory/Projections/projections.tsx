@@ -38,13 +38,11 @@ import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesC
 import { ClipboardCheck } from 'react-bootstrap-icons';
 import { GHGRecordState } from '../../../Definitions/Enums/ghg.record.state.enum';
 import GHGUserActionConfirmationModel from '../../Common/Models/ghgUserActionConfirmationModel';
-
+import { useConnection, useUserContext } from "../../../Context";
 
 export const GHGProjectionsComponent = (props: any) => {
   const {
     t,
-    useUserContext,
-    useConnection,
   } = props;
   const { userInfoState } = useUserContext();
   const [data, setData] = useState<any[]>([]);

@@ -21,8 +21,10 @@ import {
   Programme,
 } from "../../../Definitions/Definitions/programme.definitions";
 import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
+import { useConnection } from "../../../Context";
 import { CompanyRole } from "../../../Definitions";
 import { InfoCircle } from "react-bootstrap-icons";
+
 
 export interface ProgrammeRetireFormProps {
   programme: Programme;
@@ -33,7 +35,6 @@ export interface ProgrammeRetireFormProps {
   hideType: boolean;
   myCompanyId?: number;
   translator: any;
-  useConnection: any;
 }
 
 export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
@@ -47,8 +48,7 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
     subText,
     hideType,
     myCompanyId,
-    translator,
-    useConnection,
+    translator
   } = props;
 
   const t = translator.t;

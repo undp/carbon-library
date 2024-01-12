@@ -37,9 +37,10 @@ import { TooltipColor } from "../../Styles";
 import { EllipsisOutlined, LockOutlined } from "@ant-design/icons";
 import * as Icon from "react-bootstrap-icons";
 import UserActionConfirmationModel from "../Common/Models/userActionConfirmationModel";
+import { useUserContext, useConnection } from "../../Context";
 
 export const NdcDetailsComponent = (props: any) => {
-  const { t, useConnection, useUserContext } = props;
+  const { t } = props;
   const { RangePicker } = DatePicker;
   const [ndcActionsList, setNdcActionsList] = useState([] as NdcDetail[]);
   const [loading, setLoading] = useState<boolean>(false);
