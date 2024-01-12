@@ -1366,10 +1366,19 @@ export class ProgrammeService {
   async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
     this.logger.log('Add Registry Document triggered')
 
-    const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
-
     const sqlProgram = await this.findByExternalId(documentDto.externalId);
-    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, certifierId);
+    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, undefined);
+    if(documentDto.certifierTaxId){
+    const certifier = await this.companyService.findByTaxId(documentDto.certifierTaxId);
+    const updateCert = await this.programmeLedger.updateCertifier(
+      sqlProgram.programmeId,
+      certifier.companyId,
+      true,
+      certifier ? certifier.name : '',
+      undefined,)
+
+      this.logger.log('Certifying the programme', updateCert)
+    }
 
     console.log('Add document on registry', sqlProgram, resp, documentDto)
 
@@ -1641,7 +1650,7 @@ export class ProgrammeService {
     ndcAction && ndcAction.typeOfMitigation
     ){
       const certifierId = (await this.companyService.findByTaxId(req.certifierTaxId))?.companyId;
-      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, certifierId);
+      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, undefined);
     }
   }
 
@@ -4085,11 +4094,19 @@ export class ProgrammeService {
 
   async programmeAccept(accept: ProgrammeAcceptedDto): Promise<DataResponseDto | undefined> {
     this.logger.log('Add accept triggered', accept.type)
-    const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
-
     const sqlProgram = await this.findByExternalId(accept.externalId);
-    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, certifierId);
-    
+    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, undefined);
+    if(accept.certifierTaxId){
+      const certifier = await this.companyService.findByTaxId(accept.certifierTaxId);
+      const updateCert = await this.programmeLedger.updateCertifier(
+        sqlProgram.programmeId,
+        certifier.companyId,
+        true,
+        certifier ? certifier.name : '',
+        undefined,)
+  
+        this.logger.log('Certifying the programme', updateCert)
+      }
     console.log('Add accept on registry', sqlProgram, resp, accept)
 
     if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
