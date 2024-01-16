@@ -12,6 +12,7 @@ export type NdcDetail = {
   actionType: NdcDetailsActionType;
   nationalPlanObjective: string;
   kpi: number|string;
+  kpiUnit: string;
   ministryName: string;
   periodId?: number;
   status: NdcDetailsActionStatus;

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { EllipsisOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
 import {
   Row,
   Checkbox,
@@ -47,6 +47,7 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { Role } from "../../../Definitions/Enums/role.enum";
 import { PlusOutlined } from "@ant-design/icons";
+import { useConnection, useUserContext, useSettingsContext } from "../../../Context";
 
 type PopupInfo = {
   title: string;
@@ -60,10 +61,7 @@ type PopupInfo = {
 export const InvestmentManagementComponent = (props: any) => {
   const {
     translator,
-    useConnection,
     onNavigateToProgrammeView,
-    useUserContext,
-    useSettingsContext,
     onClickAddOwnership,
     enableAddOwnership
   } = props;
@@ -100,6 +98,8 @@ export const InvestmentManagementComponent = (props: any) => {
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
   const [ministryLevelFilter, setMinistryLevelFilter] =
     useState<boolean>(false);
+  const [dataQuery, setDataQuery] = useState<any>();
+
 
   const onStatusQuery = async (checkedValues: CheckboxValueType[]) => {
     console.log(checkedValues);
@@ -196,9 +196,47 @@ export const InvestmentManagementComponent = (props: any) => {
       console.log(response);
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
+      setDataQuery({
+        filterAnd: filter,
+        filterOr: dataFilter,
+        sort: sort,
+        filterBy: filterBy,
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting programme investment", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      setLoading(false);
+    }
+  };
+
+  const downloadInvestmentData = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/programme/investments/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+        filterBy: dataQuery.filterBy,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting investments", error);
       message.open({
         type: "error",
         content: error.message,
@@ -768,6 +806,16 @@ export const InvestmentManagementComponent = (props: any) => {
                   onSearch={setSearch}
                   style={{ width: 265 }}
                 />
+              </div>
+              <div className="download-data-btn">
+                <a onClick={downloadInvestmentData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
               </div>
             </div>
           </Col>
