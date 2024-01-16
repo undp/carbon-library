@@ -1,16 +1,15 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ConfigService } from "@nestjs/config";
-import { LedgerReplicatorInterface } from "./replicator-interface.service";
-import { Pool } from "pg";
-import { plainToClass } from "class-transformer";
-import { ProcessEventService } from "./process.event.service";
-import { Counter } from "../shared/entities/counter.entity";
-import { CounterType } from "../shared/util/counter.type.enum";
-import { Programme } from "../shared/entities/programme.entity";
-import { CreditOverall } from "../shared/entities/credit.overall.entity";
-
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { LedgerReplicatorInterface } from './replicator-interface.service';
+import { Pool } from 'pg';
+import { plainToClass } from 'class-transformer';
+import { ProcessEventService } from './process.event.service';
+import { Counter } from '../shared/entities/counter.entity';
+import { CounterType } from '../shared/util/counter.type.enum';
+import { Programme } from '../shared/entities/programme.entity';
+import { CreditOverall } from '../shared/entities/credit.overall.entity';
 
 @Injectable()
 export class PgSqlReplicatorService implements LedgerReplicatorInterface {
@@ -22,21 +21,21 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
   ) {}
 
   async replicate(event): Promise<any> {
-    this.logger.log("Start received", JSON.stringify(event));
+    this.logger.log('Start received', JSON.stringify(event));
 
-    let dbc = this.configService.get<any>("database");
+    let dbc = this.configService.get<any>('database');
     const config = {
       host: dbc['host'],
       port: dbc['port'],
       user: dbc['username'],
       password: dbc['password'],
-      database: dbc["database"] + "Events"
-    }
+      database: dbc['database'] + 'Events',
+    };
     const dbCon = new Pool(config);
-    
-    const replicateActions = async()=>{
+
+    const replicateActions = async () => {
       const seqObj = await this.counterRepo.findOneBy({
-        id: CounterType.REPLICATE_SEQ,
+        id: CounterType.REPLICATE_SEQ
       });
 
       let lastSeq = 0;
@@ -44,35 +43,34 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
         lastSeq = seqObj.counter;
       }
 
-      const tableName = this.configService.get<string>("ledger.table");
-      const companyTableName = this.configService.get<string>(
-        "ledger.companyTable"
-      );
+      const tableName = this.configService.get<string>('ledger.table');
+      const companyTableName = this.configService.get<string>('ledger.companyTable');
 
-      const sql = `select data, hash from ${tableName} where hash > $1 order by hash`
-      const results = await dbCon.query(
-        sql,
-        [lastSeq]
-      );
-
-      this.logger.log(`Query for new data ${sql} ${lastSeq}`)
-      this.logger.log(`Periodical replicate check - last seq:${lastSeq} new events: ${results?.rows?.length}`);
+      let results = null;
+      try {
+        const sql = `select data, hash from ${tableName} where hash > $1 order by hash`;
+        results = await dbCon.query(sql,[lastSeq]);
+        this.logger.log(`Query for new data ${sql} ${lastSeq}`);
+        this.logger.log(`Periodical replicate check - last seq:${lastSeq} new events: ${results?.rows?.length}`);
+      } catch (exception) {
+        this.logger.log(`Data Read failed from : ${tableName}`, exception);
+      }
 
       if (results) {
         let newSeq = 0;
         for (const row of results.rows) {
           const data = row.data;
-          console.log('Data', data)
+          console.log('Data', data);
           const programme: Programme = plainToClass(
             Programme,
             JSON.parse(JSON.stringify(data))
           );
-          await this.eventProcessor.process(programme, undefined, 0, 0)
-          newSeq = row.hash
-          await this.counterRepo.save({ id: CounterType.REPLICATE_SEQ, counter:  newSeq})
+          await this.eventProcessor.process(programme, undefined, 0, 0);
+          newSeq = row.hash;
+          await this.counterRepo.save({id: CounterType.REPLICATE_SEQ, counter: newSeq});
         }
       }
-      
+
       const seqObjComp = await this.counterRepo.findOneBy({
         id: CounterType.REPLICATE_SEQ_COMP,
       });
@@ -82,10 +80,13 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
         lastSeqComp = seqObjComp.counter;
       }
 
-      const resultsCompany = await dbCon.query(
-        `select * from ${companyTableName} where hash > $1 order by hash`,
-        [lastSeqComp]
-      );
+      let resultsCompany = null;
+      try {
+        const companySql = `select * from ${companyTableName} where hash > $1 order by hash`;
+        resultsCompany = await dbCon.query(companySql, [lastSeqComp]);
+      } catch (exception) {
+        this.logger.log(`Data Read failed from : ${companyTableName}`, exception);
+      }
 
       if (resultsCompany) {
         let newSeq = 0;
@@ -95,13 +96,13 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
             CreditOverall,
             JSON.parse(JSON.stringify(data))
           );
-          newSeq = row.hash
-          await this.eventProcessor.process(undefined, creditOverall, row.hash, new Date(row.meta.txTime).getTime())
-          await this.counterRepo.save({ id: CounterType.REPLICATE_SEQ_COMP, counter:  newSeq})
+          newSeq = row.hash;
+          await this.eventProcessor.process(undefined, creditOverall, row.hash, new Date(row.meta.txTime).getTime());
+          await this.counterRepo.save({id: CounterType.REPLICATE_SEQ_COMP, counter: newSeq});
         }
       }
-      setTimeout( replicateActions , 1000)
-    }
-    await replicateActions()
+      setTimeout(replicateActions, 1000);
+    };
+    await replicateActions();
   }
 }
