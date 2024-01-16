@@ -23,6 +23,17 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
 
   async replicate(event): Promise<any> {
     this.logger.log("Start received", JSON.stringify(event));
+
+    let dbc = this.configService.get<any>("database");
+    const config = {
+      host: dbc['host'],
+      port: dbc['port'],
+      user: dbc['username'],
+      password: dbc['password'],
+      database: dbc["database"] + "Events"
+    }
+    const dbCon = new Pool(config);
+    
     const replicateActions = async()=>{
       const seqObj = await this.counterRepo.findOneBy({
         id: CounterType.REPLICATE_SEQ,
@@ -37,16 +48,6 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
       const companyTableName = this.configService.get<string>(
         "ledger.companyTable"
       );
-
-      let dbc = this.configService.get<any>("database");
-      const config = {
-        host: dbc['host'],
-        port: dbc['port'],
-        user: dbc['username'],
-        password: dbc['password'],
-        database: dbc["database"] + "Events"
-      }
-      const dbCon = new Pool(config);
 
       const sql = `select data, hash from ${tableName} where hash > $1 order by hash`
       const results = await dbCon.query(
