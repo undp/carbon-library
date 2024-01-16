@@ -107,11 +107,27 @@ import { SolarWaterPumpOffGridProperties } from "../dto/solar.water.pump.off.gri
 import { SolarWaterPumpOnGridProperties } from "../dto/solar.water.pump.on.grid.properties";
 import { StovesHousesInNamibiaProperties } from "../dto/stoves.houses.in.namibia.properties";
 import { SoilEnhancementBiocharProperties } from "../dto/soil.enhancement.biochar.properties";
+import { DataExportService } from "../util/data.export.service";
+import { DataExportQueryDto } from '../dto/data.export.query.dto';
+import { DataExportProgrammeDto } from "../dto/data.export.programme.dto";
+import { DataExportNdcActionDto } from "../dto/data.export.ndc.action.dto";
+import { DataExportInvestmentDto } from "../dto/data.export.investment.dto";
+import { DataExportTransferDto } from "../dto/data.export.transfer.dto";
 import { LetterSustainableDevSupportLetterGen } from '../util/letter.sustainable.dev.support';
+import { NdcDetailsPeriod } from "../entities/ndc.details.period.entity";
 import { GovernmentCreditAccounts } from '../enum/government.credit.accounts.enum';
+import { NdcDetailsAction } from "../entities/ndc.details.action.entity";
+import { NdcDetailsPeriodDto } from "../dto/ndc.details.period.dto";
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
+import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
+import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
+import { NdcDetailsActionType } from "../enum/ndc.details.action.type.enum";
+import { Role } from '../casl/role.enum';
+import { BaseIdDto } from '../dto/base.id.dto';
+import { EventLog } from "../entities/event.log.entity";
+import { EventLogType } from "../enum/event.log.type.enum";
 
 export declare function PrimaryGeneratedColumn(
   options: PrimaryGeneratedColumnType,
@@ -162,6 +178,12 @@ export class ProgrammeService {
     private letterOfIntentResponseGen: LetterOfIntentResponseGen,
     private letterOfAuthorisationRequestGen: LetterOfAuthorisationRequestGen,
     private letterSustainableDevSupportLetterGen: LetterSustainableDevSupportLetterGen,
+    private dataExportService: DataExportService,
+    @InjectRepository(NdcDetailsPeriod) 
+    private ndcDetailsPeriodRepo: Repository<NdcDetailsPeriod>,
+    @InjectRepository(NdcDetailsAction) 
+    private ndcDetailsActionRepo: Repository<NdcDetailsAction>,
+    @InjectRepository(EventLog) private eventLogRepo: Repository<EventLog>,
   ) {}
 
   private fileExtensionMap = new Map([
@@ -401,12 +423,33 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, resp);
   }
 
-  async addInvestment(req: InvestmentRequestDto, requester: User) {
+  async addInvestment(req: InvestmentRequestDto, requester: User) { 
     this.logger.log(
       `Programme investment request by ${requester.companyId}-${
         requester.id
       } received ${JSON.stringify(req)}`,
     );
+
+    if(req.period && (req.period.length!=2 || req.period[0]>=req.period[1])){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.invalidPeriod',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const todaySart = (new Date().getTime())/1000 - 24*60*60
+    if(req.startOfPayback && req.startOfPayback<todaySart){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.paybackStartDate<currentDate',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     if (req.percentage && req.percentage.reduce((a, b) => a + b, 0) <= 0) {
       throw new HttpException(
@@ -946,6 +989,7 @@ export class ProgrammeService {
     program: Programme,
     certifierUser?: User,
   ) {
+    let eventLog: EventLog = new EventLog();
     if (
       this.configService.get('systemType') == SYSTEM_TYPE.CARBON_TRANSPARENCY
     ) {
@@ -1015,6 +1059,18 @@ export class ProgrammeService {
           }
         }
       }
+      if(program && d.type == DocType.VERIFICATION_REPORT) {
+        const eventData = {
+          actionId: ndc.id,
+          action: ndc.action,
+          estimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
+          sectoralScope: program.sectoralScope,
+          sector: program.sector
+        }
+        eventLog.eventData = eventData;
+        eventLog.type = EventLogType.ESTIMATED_CREDIT_ISSUE;
+        eventLog.createdTime = new Date().getTime();
+      }
     }
     console.log('NDC COmmit', ndc);
     if (ndc) {
@@ -1027,6 +1083,9 @@ export class ProgrammeService {
           status: ndc.status,
         },
       );
+      if (eventLog.type !== undefined) {
+        await em.save(eventLog);
+      }
     }
   }
 
@@ -1601,6 +1660,7 @@ export class ProgrammeService {
   ): Promise<Programme | undefined> {
     this.logger.verbose('ProgrammeDTO received', JSON.stringify(programmeDto));
     const programme: Programme = this.toProgramme(programmeDto);
+    if(programme.creditEst)programme.creditEst=this.helperService.halfUpToPrecision(programme.creditEst)
     this.logger.verbose("Programme  create", JSON.stringify(programme));
 
     const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
@@ -2259,6 +2319,9 @@ export class ProgrammeService {
     }
 
     ndcAction.coBenefitsProperties = ndcActionDto.coBenefitsProperties;
+    if(ndcAction.ndcFinancing.userEstimatedCredits){
+      ndcAction.ndcFinancing.userEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.userEstimatedCredits)
+    }
     await this.checkTotalUserEstimatedCredits(ndcAction, program);
     await this.calcCreditNDCAction(ndcAction, program);
     console.log('testing ndcAction', ndcAction);
@@ -2432,6 +2495,332 @@ export class ProgrammeService {
       resp.length > 0 ? resp[0] : undefined,
       resp.length > 1 ? resp[1] : undefined,
     );
+  }
+
+  async downloadNdcActions(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+  ) {
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+    queryDto.filterBy = queryData.filterBy;
+
+    let queryBuilder = await this.ndcActionViewRepo
+      .createQueryBuilder("ndcaction")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "ndcaction",
+            abilityCondition
+          ),
+          "ndcaction"
+        )
+      );
+
+    if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.leftJoinAndMapOne(
+        "ndcaction.programmeDetails",
+        Programme,
+        "programme",
+        "programme.programmeId = ndcaction.programmeId"
+      )
+        .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
+          allowedScopes: queryDto.filterBy.value
+        });
+    }
+
+    queryBuilder = queryBuilder.leftJoinAndMapMany(
+      "ndcaction.documents",
+    ProgrammeDocument,
+    "programmeDocument",
+    "programmeDocument.actionId = ndcaction.id");
+
+    const resp = await queryBuilder.orderBy(
+      queryDto?.sort?.key &&
+      `"ndcaction".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
+      queryDto?.sort?.order,
+      queryDto?.sort?.nullFirst !== undefined
+        ? queryDto?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
+      .getMany();
+
+    if (resp.length > 0) {
+      const prepData = this.prepareNdcActionDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "ndcActionExport." + key,
+            []
+          )
+        )
+      }
+
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "ndcActionExport.activities", 
+        []
+      ));
+      return path;
+    }
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  private prepareNdcActionDataForExport(ndcActions: any) {
+    const exportData: DataExportNdcActionDto[] = [];
+
+    for (const ndcAction of ndcActions) {
+
+      const ndcActionReports: ProgrammeDocument[] = ndcAction.documents;
+      const concatenatedReportUrls = ndcActionReports.map(document => document.url).join(', ');
+
+      const dto = new DataExportNdcActionDto();
+      dto.id = ndcAction.id;
+      dto.programmeId = ndcAction.programmeId;
+      dto.programmeName = ndcAction.programmeName;
+      dto.action = ndcAction.action;
+      dto.methodology = ndcAction.methodology;
+      dto.typeOfMitigation = ndcAction.typeOfMitigation;
+      dto.subTypeOfMitigation = ndcAction.subTypeOfMitigation;
+      dto.agricultureLandArea = ndcAction.agricultureProperties?.landArea;
+      dto.agricultureLandAreaUnit = ndcAction.agricultureProperties?.landAreaUnit;
+      dto.solarEnergyGeneration = ndcAction.solarProperties?.energyGeneration;
+      dto.solarEnergyGenerationUnit = ndcAction.solarProperties?.energyGenerationUnit;
+      dto.solarConsumerGroup = ndcAction.solarProperties?.consumerGroup;
+
+      dto.creditCalculationTypeOfMitigation = ndcAction.creditCalculationProperties?.typeOfMitigation;
+      dto.creditCalculationSubTypeOfMitigation = ndcAction.creditCalculationProperties?.subTypeOfMitigation;
+      dto.creditCalculationEnergyGeneration = ndcAction.creditCalculationProperties?.energyGeneration;
+      dto.creditCalculationEnergyGenerationUnit = ndcAction.creditCalculationProperties?.energyGenerationUnit;
+      dto.creditCalculationConsumerGroup = ndcAction.creditCalculationProperties?.consumerGroup;
+      dto.creditCalculationLandArea = ndcAction.creditCalculationProperties?.landArea;
+      dto.creditCalculationLandAreaUnit = ndcAction.creditCalculationProperties?.landAreaUnit;
+      dto.creditCalculationWeight = ndcAction.creditCalculationProperties?.weight;
+      dto.creditCalculationNumberOfDays = ndcAction.creditCalculationProperties?.numberOfDays;
+      dto.creditCalculationNumberOfPeopleInHousehold = ndcAction.creditCalculationProperties?.numberOfPeopleInHousehold;
+
+      dto.adaptationImplementingAgency = ndcAction.adaptationProperties?.implementingAgency;
+      dto.adaptationNationalPlanObjectives = ndcAction.adaptationProperties?.nationalPlanObjectives;
+      dto.adaptationNationalPlanCoverage = ndcAction.adaptationProperties?.nationalPlanCoverage;
+      dto.adaptationGhgEmissionsAvoidedCO2 = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.CO2;
+      dto.adaptationGhgEmissionsAvoidedCH4 = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.CH4;
+      dto.adaptationGhgEmissionsAvoidedN2O = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.N2O;
+      dto.adaptationGhgEmissionsAvoidedHFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.HFCs;
+      dto.adaptationGhgEmissionsAvoidedPFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.PFCs;
+      dto.adaptationGhgEmissionsAvoidedSF6 = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.SF6;
+      dto.adaptationGhgEmissionsReducedCO2 = ndcAction.adaptationProperties?.ghgEmissionsReduced?.CO2;
+      dto.adaptationGhgEmissionsReducedCH4 = ndcAction.adaptationProperties?.ghgEmissionsReduced?.CH4;
+      dto.adaptationGhgEmissionsReducedN2O = ndcAction.adaptationProperties?.ghgEmissionsReduced?.N2O;
+      dto.adaptationGhgEmissionsReducedHFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced?.HFCs;
+      dto.adaptationGhgEmissionsReducedPFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced?.PFCs;
+      dto.adaptationGhgEmissionsReducedSF6 = ndcAction.adaptationProperties?.ghgEmissionsReduced?.SF6;
+      dto.adaptationIncludedInNAP = ndcAction.adaptationProperties?.includedInNAP;
+      dto.ndcFinancingUserEstimatedCredits = ndcAction.ndcFinancing?.userEstimatedCredits;
+      dto.ndcFinancingSystemEstimatedCredits = ndcAction.ndcFinancing?.systemEstimatedCredits;
+
+      dto.coBenefitsPropertiesSdgGoals = ndcAction.coBenefitsProperties?.sdgGoals;
+      //coBenefitsProperties:safeGuards
+      dto.coBenefitsPropertiesSafeguardsIsRespectHumanRights = ndcAction.coBenefitsProperties?.safeguardDetails?.isRespectHumanRights;
+      dto.coBenefitsPropertiesSafeguardsIsProjectDiscriminate = ndcAction.coBenefitsProperties?.safeguardDetails?.isProjectdiscriminate;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ1;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ2;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ3 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ3;
+      dto.coBenefitsPropertiesSafeguardsGenderEqualityQ4 = ndcAction.coBenefitsProperties?.safeguardDetails?.genderEqualityQ4;
+      dto.coBenefitsPropertiesSafeguardsCommunityHealthQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.communityHealthQ1;
+      dto.coBenefitsPropertiesSafeguardsHistoricHeritageQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.historicHeritageQ1;
+      dto.coBenefitsPropertiesSafeguardsForcedEvictionQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.forcedEvictionQ1;
+      dto.coBenefitsPropertiesSafeguardsLandTenureQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.landTenureQ1;
+      dto.coBenefitsPropertiesSafeguardsLandTenureQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.landTenureQ2;
+      dto.coBenefitsPropertiesSafeguardsIndigenousPeopleQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.indegenousPeopleQ1;
+      dto.coBenefitsPropertiesSafeguardsCorruptionQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.corruptionQ1;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ1;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ2;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ3 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ3;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsQ4 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsQ4;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ1;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ2;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ3 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ3;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ4 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ4;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ5 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ5;
+      dto.coBenefitsPropertiesSafeguardsLabourRightsSubQ6 = ndcAction.coBenefitsProperties?.safeguardDetails?.labourRightsSubQ6;
+      dto.coBenefitsPropertiesSafeguardsEconomicConsequencesQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.economicConsequencesQ1;
+      dto.coBenefitsPropertiesSafeguardsEmissionsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.emissionsQ1;
+      dto.coBenefitsPropertiesSafeguardsEnergySupplyQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.energySupplyQ1;
+      dto.coBenefitsPropertiesSafeguardsWaterPatternQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.waterPatternQ1;
+      dto.coBenefitsPropertiesSafeguardsErosionQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.erosoinQ1;
+      dto.coBenefitsPropertiesSafeguardsErosionQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.erosoinQ2;
+      dto.coBenefitsPropertiesSafeguardsLandscapeQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.landscapeQ1;
+      dto.coBenefitsPropertiesSafeguardsNaturalDisasterQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.naturalDisasterQ1;
+      dto.coBenefitsPropertiesSafeguardsGeneticQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.geneticQ1;
+      dto.coBenefitsPropertiesSafeguardsPollutantsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.pollutantsQ1;
+      dto.coBenefitsPropertiesSafeguardsHazardousWasteQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.hazardousWasteQ1;
+      dto.coBenefitsPropertiesSafeguardsPesticidesQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.pesticidesQ1;
+      dto.coBenefitsPropertiesSafeguardsHarvestForestsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.harvestForestsQ1;
+      dto.coBenefitsPropertiesSafeguardsFoodQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.foodQ1;
+      dto.coBenefitsPropertiesSafeguardsAnimalHusbandryQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.animalHusbandryQ1;
+      dto.coBenefitsPropertiesSafeguardsCriticalHabitatsQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.criticalHabitatsQ1;
+      dto.coBenefitsPropertiesSafeguardsEndangeredSpeciesQ1 = ndcAction.coBenefitsProperties?.safeguardDetails?.endangeredSpeciesQ1;
+      dto.coBenefitsPropertiesSafeguardsEndangeredSpeciesQ2 = ndcAction.coBenefitsProperties?.safeguardDetails?.endangeredSpeciesQ2;
+
+      // coBenefitsProperties:AssessmentDetails
+      dto.coBenefitsPropertiesAssessmentDetailsEmail = ndcAction.coBenefitsProperties?.assessmentDetails?.email;
+      dto.coBenefitsPropertiesAssessmentDetailsTitle = ndcAction.coBenefitsProperties?.assessmentDetails?.title;
+      dto.coBenefitsPropertiesAssessmentDetailsFunder = ndcAction.coBenefitsProperties?.assessmentDetails?.funder;
+      dto.coBenefitsPropertiesAssessmentDetailsLastName = ndcAction.coBenefitsProperties?.assessmentDetails?.lastName;
+      dto.coBenefitsPropertiesAssessmentDetailsFirstName = ndcAction.coBenefitsProperties?.assessmentDetails?.firstName;
+      dto.coBenefitsPropertiesAssessmentDetailsStudyName = ndcAction.coBenefitsProperties?.assessmentDetails?.studyName;
+      dto.coBenefitsPropertiesAssessmentDetailsTelephone = ndcAction.coBenefitsProperties?.assessmentDetails?.telephone;
+      dto.coBenefitsPropertiesAssessmentDetailsOrganisation = ndcAction.coBenefitsProperties?.assessmentDetails?.organisation;
+      dto.coBenefitsPropertiesAssessmentDetailsAffiliationCdm = ndcAction.coBenefitsProperties?.assessmentDetails?.affiliationCDM;
+      dto.coBenefitsPropertiesAssessmentDetailsVerifyingDetails = ndcAction.coBenefitsProperties?.assessmentDetails?.verifyingDetails;
+      dto.coBenefitsPropertiesAssessmentDetailsVerifyingOrgName = ndcAction.coBenefitsProperties?.assessmentDetails?.verifyingOrgName;
+      dto.coBenefitsPropertiesAssessmentDetailsIsThePersonListed = ndcAction.coBenefitsProperties?.assessmentDetails?.isThePersonListed;
+      dto.coBenefitsPropertiesAssessmentDetailsIsWillingToVerified = ndcAction.coBenefitsProperties?.assessmentDetails?.IsWillingToVerified;
+      dto.coBenefitsPropertiesAssessmentDetailsIsThirdPartyVerified = ndcAction.coBenefitsProperties?.assessmentDetails?.IsThirdPartyVerified;
+      // coBenefitsProperties:Economic
+      dto.coBenefitsPropertiesEconomicGrowthQ1 = ndcAction.coBenefitsProperties?.economic?.growthQ1;
+      dto.coBenefitsPropertiesEconomicGrowthQ2 = ndcAction.coBenefitsProperties?.economic?.growthQ2;
+      dto.coBenefitsPropertiesEconomicGrowthQ3 = ndcAction.coBenefitsProperties?.economic?.growthQ3;
+      dto.coBenefitsPropertiesEconomicGrowthQ4 = ndcAction.coBenefitsProperties?.economic?.growthQ4;
+      dto.coBenefitsPropertiesEconomicGrowthQ5 = ndcAction.coBenefitsProperties?.economic?.growthQ5;
+      dto.coBenefitsPropertiesEconomicGrowthQ6 = ndcAction.coBenefitsProperties?.economic?.growthQ6;
+      dto.coBenefitsPropertiesEconomicGrowthQ7 = ndcAction.coBenefitsProperties?.economic?.growthQ7;
+      dto.coBenefitsPropertiesEconomicGrowthQ8 = ndcAction.coBenefitsProperties?.economic?.growthQ8;
+      dto.coBenefitsPropertiesEconomicEnergyQ1 = ndcAction.coBenefitsProperties?.economic?.energyQ1;
+      dto.coBenefitsPropertiesEconomicEnergyQ2 = ndcAction.coBenefitsProperties?.economic?.energyQ2;
+      dto.coBenefitsPropertiesEconomicEnergyQ3 = ndcAction.coBenefitsProperties?.economic?.energyQ3;
+      dto.coBenefitsPropertiesEconomicEnergyQ4 = ndcAction.coBenefitsProperties?.economic?.energyQ4;
+      dto.coBenefitsPropertiesEconomicEnergyQ5 = ndcAction.coBenefitsProperties?.economic?.energyQ5;
+      dto.coBenefitsPropertiesEconomicTechTransferQ1 = ndcAction.coBenefitsProperties?.economic?.techTransferQ1;
+      dto.coBenefitsPropertiesEconomicTechTransferQ2 = ndcAction.coBenefitsProperties?.economic?.techTransferQ2;
+      dto.coBenefitsPropertiesEconomicTechTransferQ3 = ndcAction.coBenefitsProperties?.economic?.techTransferQ3;
+      dto.coBenefitsPropertiesEconomicTechTransferQ4 = ndcAction.coBenefitsProperties?.economic?.techTransferQ4;
+      dto.coBenefitsPropertiesEconomicTechTransferQ5 = ndcAction.coBenefitsProperties?.economic?.techTransferQ5;
+      dto.coBenefitsPropertiesEconomicTechTransferQ6 = ndcAction.coBenefitsProperties?.economic?.techTransferQ6;
+      dto.coBenefitsPropertiesEconomicBalanceOfPaymentsQ1 = ndcAction.coBenefitsProperties?.economic?.balanceOfPaymentsQ1;
+      dto.coBenefitsPropertiesEconomicBalanceOfPaymentsQ2 = ndcAction.coBenefitsProperties?.economic?.balanceOfPaymentsQ2;
+      dto.coBenefitsPropertiesEconomicBalanceOfPaymentsQ3 = ndcAction.coBenefitsProperties?.economic?.balanceOfPaymentsQ3;
+      dto.coBenefitsPropertiesEconomicFurtherInfoQ1 = ndcAction.coBenefitsProperties?.economic?.furtherInfoQ1;
+      // coBenefitsProperties:GenderParity
+      dto.coBenefitsPropertiesGenderParityDiscriminationAgainstGirls = ndcAction.coBenefitsProperties?.genderParity?.discriminationAgainstGirls;
+      dto.coBenefitsPropertiesGenderParityViolationAgainstGirls = ndcAction.coBenefitsProperties?.genderParity?.violationAgainstGirls;
+      dto.coBenefitsPropertiesGenderParityHarmfulPracticesAgainstGirls = ndcAction.coBenefitsProperties?.genderParity?.harmfulPracticesAgainstGirls;
+      dto.coBenefitsPropertiesGenderParityEqualRightsToGirls = ndcAction.coBenefitsProperties?.genderParity?.equalRightsToGirls;
+      dto.coBenefitsPropertiesGenderParityEqualRightsToHealthToGirls = ndcAction.coBenefitsProperties?.genderParity?.equalRightsToHealthToGirls;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenEmployed = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenEmpoyed;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenTrained = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenTrained;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenSelectedForDecisionMaking = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenSelectedForDecisionMaking;
+      dto.coBenefitsPropertiesGenderParityNumberOfWomenProvidedAccessForTech = ndcAction.coBenefitsProperties?.genderParity?.numberOfWomenProvidedAccessForTech;
+      // coBenefitsProperties:Environmental
+      dto.coBenefitsPropertiesEnvironmentalAirQ1 = ndcAction.coBenefitsProperties?.environmental?.airQ1;
+      dto.coBenefitsPropertiesEnvironmentalAirQ2 = ndcAction.coBenefitsProperties?.environmental?.airQ2;
+      dto.coBenefitsPropertiesEnvironmentalAirQ3 = ndcAction.coBenefitsProperties?.environmental?.airQ3;
+      dto.coBenefitsPropertiesEnvironmentalAirQ4 = ndcAction.coBenefitsProperties?.environmental?.airQ4;
+      dto.coBenefitsPropertiesEnvironmentalAirQ5 = ndcAction.coBenefitsProperties?.environmental?.airQ5;
+      dto.coBenefitsPropertiesEnvironmentalAirQ6 = ndcAction.coBenefitsProperties?.environmental?.airQ6;
+      dto.coBenefitsPropertiesEnvironmentalAirQ7 = ndcAction.coBenefitsProperties?.environmental?.airQ7;
+      dto.coBenefitsPropertiesEnvironmentalAirQ8 = ndcAction.coBenefitsProperties?.environmental?.airQ8;
+      dto.coBenefitsPropertiesEnvironmentalAirQ9 = ndcAction.coBenefitsProperties?.environmental?.airQ9;
+      dto.coBenefitsPropertiesEnvironmentalLandQ1 = ndcAction.coBenefitsProperties?.environmental?.landQ1;
+      dto.coBenefitsPropertiesEnvironmentalLandQ2 = ndcAction.coBenefitsProperties?.environmental?.landQ2;
+      dto.coBenefitsPropertiesEnvironmentalLandQ3 = ndcAction.coBenefitsProperties?.environmental?.landQ3;
+      dto.coBenefitsPropertiesEnvironmentalLandQ4 = ndcAction.coBenefitsProperties?.environmental?.landQ4;
+      dto.coBenefitsPropertiesEnvironmentalLandQ5 = ndcAction.coBenefitsProperties?.environmental?.landQ5;
+      dto.coBenefitsPropertiesEnvironmentalLandQ6 = ndcAction.coBenefitsProperties?.environmental?.landQ6;
+      dto.coBenefitsPropertiesEnvironmentalLandQ7 = ndcAction.coBenefitsProperties?.environmental?.landQ7;
+      dto.coBenefitsPropertiesEnvironmentalLandQ8 = ndcAction.coBenefitsProperties?.environmental?.landQ8;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ1 = ndcAction.coBenefitsProperties?.environmental?.waterQ1;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ2 = ndcAction.coBenefitsProperties?.environmental?.waterQ2;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ3 = ndcAction.coBenefitsProperties?.environmental?.waterQ3;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ4 = ndcAction.coBenefitsProperties?.environmental?.waterQ4;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ5 = ndcAction.coBenefitsProperties?.environmental?.waterQ5;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ6 = ndcAction.coBenefitsProperties?.environmental?.waterQ6;
+      dto.coBenefitsPropertiesEnvironmentalWaterQ7 = ndcAction.coBenefitsProperties?.environmental?.waterQ7;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ1 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ1;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ2 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ2;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ3 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ3;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ4 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ4;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ5 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ5;
+      dto.coBenefitsPropertiesEnvironmentalNaturalResourceQ6 = ndcAction.coBenefitsProperties?.environmental?.naturalResourceQ6;
+      // coBenefitsProperties:SocialValue
+      dto.coBenefitsPropertiesSocialValueJobRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ5 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ5
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ6 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ6
+      dto.coBenefitsPropertiesSocialValueJobRelatedSubQ7 = ndcAction.coBenefitsProperties?.socialValueDetails?.jobRelatedSubQ7
+      dto.coBenefitsPropertiesSocialValueHealthRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ5 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ5
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ6 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ6
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ7 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ7
+      dto.coBenefitsPropertiesSocialValueHealthRelatedSubQ8 = ndcAction.coBenefitsProperties?.socialValueDetails?.healthRelatedSubQ8
+      dto.coBenefitsPropertiesSocialValueEducationRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueEducationRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.educationRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedMainQ = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedMainQ
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ1 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ1
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ2 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ2
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ3 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ3
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ4 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ4
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ5 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ5
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ6 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ6
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ7 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ7
+      dto.coBenefitsPropertiesSocialValueWelfareRelatedSubQ8 = ndcAction.coBenefitsProperties?.socialValueDetails?.welfareRelatedSubQ8
+
+      dto.enablementTitle = ndcAction.enablementProperties?.title;
+      dto.enablementType = ndcAction.enablementProperties?.type;
+      dto.enablementReport = ndcAction.enablementProperties?.report;
+      dto.txTime = this.helperService.formatTimestamp(ndcAction.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(ndcAction.createdTime);
+      dto.constantVersion = ndcAction.constantVersion;
+      dto.sector = ndcAction.sector;
+      dto.status = ndcAction.status;
+      dto.companyId = ndcAction.companyId;
+      dto.emissionReductionExpected = ndcAction.emissionReductionExpected;
+      dto.emissionReductionAchieved = ndcAction.emissionReductionAchieved;
+      dto.projectReports = concatenatedReportUrls;
+      exportData.push(dto);
+    }
+
+    return exportData;
+  }
+
+  private flattenObject(ob) {
+    let result = {};
+  
+    for (const key in ob) {
+      if ((typeof ob[key]) === 'object' && !Array.isArray(ob[key])) {
+        const temp = this.flattenObject(ob[key]);
+        for (const subKey in temp) {
+          result[key + '.' + subKey] = temp[subKey];
+        }
+      } else {
+        result[key] = ob[key];
+      }
+    }
+  
+    return result;
   }
 
   async queryDocuments(
@@ -2781,6 +3170,132 @@ export class ProgrammeService {
     );
   }
 
+  async downloadTransfers(
+    queryData: DataExportQueryDto,
+    abilityCondition: string,
+    user: User
+  ) {
+
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.filterBy = queryData.filterBy;
+    queryDto.sort = queryData.sort;
+
+    let queryBuilder = await this.programmeTransferViewRepo
+      .createQueryBuilder("programme_transfer")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "programme_transfer",
+            abilityCondition
+          )
+        )
+      );
+
+    if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.andWhere("programme_transfer.programmeSectoralScope IN (:...allowedScopes)", {
+        allowedScopes: queryDto.filterBy.value
+      });
+    }
+
+    const resp = await queryBuilder.orderBy(
+      queryDto?.sort?.key &&
+      this.helperService.generateSortCol(queryDto?.sort?.key),
+      queryDto?.sort?.order,
+      queryDto?.sort?.nullFirst !== undefined
+        ? queryDto?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
+      .getMany();
+
+    if (resp.length > 0) {
+      const prepData = this.prepareTransferDataForExport(resp);
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "transferExport." + key,
+            []
+          )
+        )
+      }
+
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "transferExport.transfers", 
+        []
+      ));
+      return path;
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  private prepareTransferDataForExport(transfers: any) {
+    const exportData: DataExportTransferDto[] = [];
+
+
+    for (const transfer of transfers) {
+      const transferSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+        (key) => SectoralScopeDef[key] === transfer.programmeSectoralScope,
+      );
+
+      const transferRetireTypeKey = Object.keys(RetireType).find(
+        (key) => RetireType[key] === transfer.retirementType,
+      );
+
+      const dto = new DataExportTransferDto();
+      dto.requestId = transfer.requestId;
+      dto.programmeId = transfer.programmeId;
+      dto.initiator = transfer.initiator;
+      dto.initiatorCompanyId = transfer.initiatorCompanyId;
+      dto.toCompanyId = transfer.toCompanyId;
+      dto.toAccount = transfer.toAccount;
+      dto.retirementType = transferRetireTypeKey;
+      dto.fromCompanyId = transfer.fromCompanyId;
+      dto.creditAmount = transfer.creditAmount;
+      dto.comment = transfer.comment;
+      dto.txRef = transfer.txRef;
+      dto.txTime = this.helperService.formatTimestamp(transfer.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(transfer.createdTime);
+      dto.authTime = transfer.authTime;
+      dto.status = transfer.status === TransferStatus.NOTRECOGNISED ? "Not Recognised" : transfer.status;
+      dto.isRetirement = transfer.isRetirement;
+      dto.creditBalance = transfer.creditBalance;
+      dto.programmeTitle = transfer.programmeTitle;
+      dto.programmeCertifierId = transfer.programmeCertifierId;
+      dto.serialNo = transfer.serialNo;
+      dto.programmeSector = transfer.programmeSector;
+      dto.programmeSectoralScope = transferSectoralScopeKey;
+      dto.certifier = (transfer.certifier && Array.isArray(transfer.certifier) && transfer.certifier.length > 0)
+        ? transfer.certifier.map((certifier) => certifier ? certifier.companyId : null)
+        : [];
+      dto.sender = transfer.sender[0].companyId;
+      dto.requester = transfer.requester[0].companyId;
+      dto.receiver = transfer.receiver[0].companyId;
+      dto.proponentTaxVatId = transfer.proponentTaxVatId;
+      dto.proponentPercentage = transfer.proponentPercentage;
+      dto.companyId = transfer.companyId;
+      dto.creditOwnerPercentage = transfer.creditOwnerPercentage;
+
+      exportData.push(dto);
+    }
+
+    return exportData;
+
+  }
+
   async transferApprove(req: ProgrammeTransferApprove, approver: User) {
     // TODO: Handle transaction, can happen
     console.log('Approver', approver);
@@ -3079,7 +3594,8 @@ export class ProgrammeService {
     for (let transfer of transfers) {
       const companyIndex = programme.companyId.indexOf(transfer.fromCompanyId);
       const companyProponent = programme.creditOwnerPercentage[companyIndex];
-      const creditBalance = (programme.creditBalance * companyProponent) / 100;
+      const creditBalance =
+        this.helperService.halfUpToPrecision((programme.creditBalance * companyProponent) / 100);
       if (transfer.creditAmount > creditBalance) {
         const result = await this.programmeTransferRepo
           .update(
@@ -3422,8 +3938,8 @@ export class ProgrammeService {
     if (!req.companyCredit) {
       req.companyCredit = programme.creditOwnerPercentage.map(
         (p, i) =>
-          (programme.creditBalance * p) / 100 -
-          (programme.creditFrozen ? programme.creditFrozen[i] : 0),
+          this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * p) / 100) -
+          (programme.creditFrozen ? programme.creditFrozen[i] : 0))
       );
     }
 
@@ -3473,14 +3989,14 @@ export class ProgrammeService {
         frozenCredit[fromCompanyId],
       );
       const companyAvailableCredit =
-        (programme.creditBalance * ownershipMap[fromCompanyId]) / 100 -
-        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0);
+        this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * ownershipMap[fromCompanyId]) / 100) -
+        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0));
 
       let transferCompanyCredit;
       if (req.fromCompanyIds.length == 1 && !req.companyCredit) {
         transferCompanyCredit = companyAvailableCredit;
       } else {
-        transferCompanyCredit = req.companyCredit[j];
+        transferCompanyCredit = this.helperService.halfUpToPrecision(req.companyCredit[j]);
       }
 
       if (companyAvailableCredit < transferCompanyCredit) {
@@ -3637,6 +4153,169 @@ export class ProgrammeService {
   //   const resp = await this.programmeLedger.addMitigation(mitigation.externalId, mitigation.mitigation);
   //   return new DataResponseDto(HttpStatus.OK, resp);
   // }
+
+  async downloadProgrammes(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+  ) {
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+    queryDto.filterBy = queryData.filterBy;
+
+    let resp = await this.programmeViewRepo
+      .createQueryBuilder("programme")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "programme",
+            abilityCondition
+          ),
+          "programme"
+        )
+      )
+      .leftJoinAndMapMany(
+        "programme.documents",
+      ProgrammeDocument,
+      "programmeDocument",
+      "programmeDocument.programmeId = programme.programmeId AND programmeDocument.type IN (:...types)", // Adding the condition for types
+      { types: [DocType.DESIGN_DOCUMENT, DocType.NO_OBJECTION_LETTER, DocType.METHODOLOGY_DOCUMENT, DocType.AUTHORISATION_LETTER, DocType.ENVIRONMENTAL_IMPACT_ASSESSMENT] } )
+      .orderBy(
+        queryDto?.sort?.key &&
+        `"programme".${this.helperService.generateSortCol(queryDto?.sort?.key)}`,
+        queryDto?.sort?.order,
+        queryDto?.sort?.nullFirst !== undefined
+          ? queryDto?.sort?.nullFirst === true
+            ? "NULLS FIRST"
+            : "NULLS LAST"
+          : undefined
+      )
+      .getMany();
+
+    if (resp.length > 0) {
+      const prepData = this.prepareProgrammeDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "programmeExport." + key,
+            []
+          )
+        )
+      }
+
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "programmeExport.projects", 
+        []
+      ));
+      return path;
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  private prepareProgrammeDataForExport(programmes: any) {
+    const exportData: DataExportProgrammeDto[] = [];
+    
+
+    for (const programme of programmes) {
+
+      const startTimestamp = programme.startTime * 1000;
+      const endTimestamp = programme.endTime * 1000;
+
+      const companies: Company[] = programme.company;
+      const concatenatedNames = companies.map(company => company?.name).join(', ');
+
+      const certifiers: Company[] = programme.certifier;
+      const concatenatedCertifiersNames = certifiers.map(company => company?.name).join(', ');
+
+      const programmeDocuments: ProgrammeDocument[] = programme.documents;
+      const concatenatedDocumentUrls = programmeDocuments.map(document => document.url).join(', ');
+
+      const programmeSectoralScopeKey = Object.keys(SectoralScopeDef).find(
+        (key) => SectoralScopeDef[key] === programme.sectoralScope,
+      );
+
+      const dto = new DataExportProgrammeDto();
+      dto.programmeId = programme.programmeId;
+      dto.serialNo = programme.serialNo;
+      dto.title = programme.title;
+      dto.externalId = programme.externalId;
+      dto.sectoralScope = programmeSectoralScopeKey;
+      dto.sector = programme.sector;
+      dto.applicantType = "Programme Developer";
+      dto.countryCodeA2 = programme.countryCodeA2;
+      dto.currentStage = programme.currentStage;
+      dto.programmeOwner = concatenatedNames;
+      dto.buyerCountry = programme.programmeProperties?.buyerCountryEligibility;
+      dto.startTime = this.helperService.formatTimestamp(startTimestamp);
+      dto.endTime = this.helperService.formatTimestamp(endTimestamp);
+      dto.creditEst = programme.creditEst;
+      dto.emissionReductionExpected = programme.emissionReductionExpected;
+      dto.emissionReductionAchieved = programme.emissionReductionAchieved;
+      dto.financingType = this.addSpaces(programme.programmeProperties.sourceOfFunding);
+      dto.creditChange = programme.creditChange;
+      dto.creditIssued = programme.creditIssued;
+      dto.creditBalance = programme.creditBalance;
+      dto.creditRetired = programme.creditRetired;
+      dto.creditFrozen = programme.creditFrozen;
+      dto.creditTransferred = programme.creditTransferred;
+      dto.constantVersion = programme.constantVersion;
+      dto.proponentTaxVatId = programme.proponentTaxVatId;
+      dto.companyId = programme.companyId;
+      dto.proponentPercentage = programme.proponentPercentage;
+      dto.creditOwnerPercentage = programme.creditOwnerPercentage;
+      dto.certifierId = programme.certifierId;
+      dto.revokedCertifierId = programme.revokedCertifierId;
+      dto.creditUnit = programme.creditUnit;
+      dto.ndcScope = programme.programmeProperties?.ndcScope;
+      dto.creditYear = programme.programmeProperties?.creditYear;
+      dto.includedInNdc = programme.programmeProperties?.includedInNdc;
+      dto.greenHouseGasses = programme.programmeProperties?.greenHouseGasses;
+      dto.carbonPriceUSDPerTon = programme.programmeProperties?.carbonPriceUSDPerTon;
+      dto.geographicalLocation = programme.programmeProperties?.geographicalLocation;
+      dto.estimatedProgrammeCostUSD = programme.programmeProperties?.estimatedProgrammeCostUSD;
+      dto.txTime = this.helperService.formatTimestamp(programme.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(programme.createdTime);
+      dto.authTime = this.helperService.formatTimestamp(programme.authTime);
+      dto.creditUpdateTime = this.helperService.formatTimestamp(programme.creditUpdateTime);
+      dto.statusUpdateTime = this.helperService.formatTimestamp(programme.statusUpdateTime);
+      dto.certifiedTime = this.helperService.formatTimestamp(programme.certifiedTime);
+      dto.txRef = programme.txRef;
+      dto.txType = programme.txType;
+      dto.geographicalLocationCordintes = programme.geographicalLocationCordintes;
+      dto.environmentalAssessmentRegistrationNo = programme.environmentalAssessmentRegistrationNo;
+      dto.createdAt = this.helperService.formatTimestamp(programme.createdAt);
+      dto.updatedAt = this.helperService.formatTimestamp(programme.updatedAt);
+      dto.certifier = concatenatedCertifiersNames;
+      dto.programmeDocuments = concatenatedDocumentUrls;
+
+      exportData.push(dto);
+    }
+
+    return exportData;
+
+  }
+
+  private addSpaces = (text: string) => {
+    if (!text) {
+      return text;
+    }
+    if (text === text.toUpperCase()) {
+      return text;
+    }
+    return text.replace(/([A-Z])/g, " $1").trim();
+  };
 
   async query(
     query: QueryDto,
@@ -4065,11 +4744,11 @@ export class ProgrammeService {
 
       if (!req.companyCredit) {
         const reqIndex = programme.companyId.indexOf(requester.companyId);
-        req.companyCredit = [
-          (programme.creditBalance *
+        req.companyCredit = [ 
+          this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance *
             programme.creditOwnerPercentage[reqIndex]) /
-            100 -
-            (programme.creditFrozen ? programme.creditFrozen[reqIndex] : 0),
+            100) -
+            (programme.creditFrozen ? programme.creditFrozen[reqIndex] : 0)),
         ];
       }
     } else {
@@ -4079,8 +4758,8 @@ export class ProgrammeService {
       if (!req.companyCredit) {
         req.companyCredit = programme.creditOwnerPercentage.map(
           (p, i) =>
-            (programme.creditBalance * p) / 100 -
-            (programme.creditFrozen ? programme.creditFrozen[i] : 0),
+          this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * p) / 100 )-
+            (programme.creditFrozen ? programme.creditFrozen[i] : 0))
         );
       }
     }
@@ -4117,14 +4796,14 @@ export class ProgrammeService {
         );
       }
       const companyAvailableCredit =
-        (programme.creditBalance * ownershipMap[fromCompanyId]) / 100 -
-        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0);
+      this.helperService.halfUpToPrecision(this.helperService.halfUpToPrecision((programme.creditBalance * ownershipMap[fromCompanyId]) / 100) -
+        (frozenCredit[fromCompanyId] ? frozenCredit[fromCompanyId] : 0));
 
       let transferCompanyCredit;
       if (req.fromCompanyIds.length == 1 && !req.companyCredit) {
         transferCompanyCredit = companyAvailableCredit;
       } else {
-        transferCompanyCredit = req.companyCredit[j];
+        transferCompanyCredit = this.helperService.halfUpToPrecision(req.companyCredit[j]);
       }
 
       if (
@@ -4314,9 +4993,9 @@ export class ProgrammeService {
           HttpStatus.BAD_REQUEST
         );
       }
-      verfiedMitigationMap[action.actionId].availableCredits-=action.issueCredit
-      verfiedMitigationMap[action.actionId].issuedCredits+=action.issueCredit
-      totalCreditIssuance+=action.issueCredit
+      verfiedMitigationMap[action.actionId].availableCredits=this.helperService.halfUpToPrecision(verfiedMitigationMap[action.actionId].availableCredits-action.issueCredit)
+      verfiedMitigationMap[action.actionId].issuedCredits=this.helperService.halfUpToPrecision(verfiedMitigationMap[action.actionId].issuedCredits+action.issueCredit)
+      totalCreditIssuance=this.helperService.halfUpToPrecision(totalCreditIssuance+action.issueCredit)
       this.updateMitigationProps(program.mitigationActions,action.actionId,verfiedMitigationMap[action.actionId])
     })
     if ((program.creditEst - program.creditIssued )< totalCreditIssuance) {
@@ -4369,6 +5048,27 @@ export class ProgrammeService {
       },
     };
     await this.asyncOperationsInterface.AddAction(issueCReq);
+
+    req.issueAmount.map(async (actionDetails: mitigationIssueProperties) => {
+      let eventLog: EventLog = new EventLog();
+      const eventData = {
+        actionId: actionDetails.actionId,
+        issuedCredits: actionDetails.issueCredit,
+        programmeId: req.programmeId,
+        externalId: program.externalId,
+        sectoralScope: program.sectoralScope,
+        sector: program.sector
+      }
+      eventLog.eventData = eventData;
+      eventLog.type = EventLogType.ACTUAL_CREDIT_ISSUE;
+      eventLog.createdTime = new Date().getTime();
+      eventLog.createdBy = user.id;
+      await this.entityManager.transaction(async (em) => {
+        return await em.save(eventLog);
+      });
+      
+    })
+
 
     const sqlProgram = await this.findById(program.programmeId);
     if (sqlProgram.cadtId) {
@@ -5137,7 +5837,7 @@ export class ProgrammeService {
   private getNdcCreditIssuanceRef = (issueAmount: mitigationIssueProperties[]) =>{
     let ref =""
     issueAmount.map(action=>{
-      ref+=`${action.actionId}?${action.issueCredit}&`
+      ref+=`${action.actionId}?${this.helperService.halfUpToPrecision(action.issueCredit)}&`
     })
     return ref.slice(0,-1)
   }
@@ -5191,6 +5891,128 @@ export class ProgrammeService {
       resp.length > 1 ? resp[1] : undefined,
     );
   }
+
+  async downloadInvestments(
+    queryData: DataExportQueryDto,
+    abilityCondition: string
+  ) {
+
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.filterBy = queryData.filterBy;
+    queryDto.sort = queryData.sort;
+
+    let queryBuilder = await this.investmentViewRepo
+      .createQueryBuilder("investment")
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQLWithTable(
+            "investment",
+            abilityCondition
+          )
+        )
+      )
+
+    if (queryDto.filterBy !== null && queryDto.filterBy !== undefined && queryDto.filterBy.key === 'ministryLevel') {
+      queryBuilder = queryBuilder.leftJoinAndMapOne(
+        "investment.programmeDetails",
+        Programme,
+        "programme",
+        "programme.programmeId = investment.programmeId"
+      )
+        .andWhere("programme.sectoralScope IN (:...allowedScopes)", {
+          allowedScopes: queryDto.filterBy.value
+        });
+    }
+
+    const resp = await queryBuilder.orderBy(
+      queryDto?.sort?.key &&
+      this.helperService.generateSortCol(queryDto?.sort?.key),
+      queryDto?.sort?.order,
+      queryDto?.sort?.nullFirst !== undefined
+        ? queryDto?.sort?.nullFirst === true
+          ? "NULLS FIRST"
+          : "NULLS LAST"
+        : undefined
+    )
+      .getMany();
+
+    if (resp.length > 0) {
+      const prepData = this.prepareInvestmentDataForExport(resp)
+
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            "investmentExport." + key,
+            []
+          )
+        )
+      }
+
+      const path = await this.dataExportService.generateCsv(prepData, headers, this.helperService.formatReqMessagesString(
+        "investmentExport.financing", 
+        []
+      ));
+      return path;
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "programme.nothingToExport",
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
+
+  }
+
+  private prepareInvestmentDataForExport(investments: any) {
+    const exportData: DataExportInvestmentDto[] = [];
+    
+
+    for (const investment of investments) {
+      const dto = new DataExportInvestmentDto();
+      dto.requestId = investment.requestId;
+      dto.programmeId = investment.programmeId;
+      dto.programmeTitle = investment.programmeTitle;
+      dto.programmeSector = investment.programmeSector;
+      dto.amount = investment.amount;
+      dto.instrument = investment.instrument;
+      dto.interestRate = investment.interestRate;
+      dto.resultMetric = investment.resultMetric;
+      dto.paymentPerMetric = investment.paymentPerMetric;
+      dto.comments = investment.comments;
+      dto.type = investment.type;
+      dto.level = investment.level;
+      dto.stream = investment.stream;
+      dto.esgClassification = investment.esgClassification;
+      dto.status = investment.status;
+      dto.fromCompanyId = investment.fromCompanyId;
+      dto.percentage = investment.percentage;
+      dto.shareFromOwner = investment.shareFromOwner;
+      dto.txTime = this.helperService.formatTimestamp(investment.txTime);
+      dto.createdTime = this.helperService.formatTimestamp(investment.createdTime);
+      dto.txRef = investment.txRef;
+      dto.sender = investment.sender[0]?.companyId;
+      dto.requester = investment.requester[0]?.companyId;
+      dto.receiver = investment.receiver[0]?.companyId;
+      dto.proponentTaxVatId = investment.proponentTaxVatId;
+      dto.proponentPercentage = investment.proponentPercentage;
+      dto.companyId = investment.companyId;
+      dto.creditOwnerPercentage = investment.creditOwnerPercentage;
+      dto.toGeo = investment.toGeo;
+      dto.fromGeo = investment.fromGeo;
+      exportData.push(dto);
+    }
+
+    return exportData;
+
+  }
+
   async investmentCancel(req: InvestmentCancel, requester: User) {
     this.logger.log(
       `Investment cancel by ${requester.companyId}-${
@@ -5411,5 +6233,288 @@ export class ProgrammeService {
     );
 
     return transferResult;
+  }
+  async getNdcDetailsPeriods(abilityCondition: any, user: User) {
+    return await this.ndcDetailsPeriodRepo.find({
+      select: {
+        id: true,
+        startYear: true,
+        endYear: true,
+        finalized: true,
+      },
+      where: {
+        deleted: false
+      }
+    });
+  }
+
+  async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    const addedNdcDetailsPeriod = this.ndcDetailsPeriodRepo.create(ndcDetailsPeriod);
+    await this.ndcDetailsPeriodRepo.save(addedNdcDetailsPeriod).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionPeriodCreateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return new DataResponseDto(HttpStatus.OK, addedNdcDetailsPeriod);
+  }
+
+  async deleteNdcDetailsPeriod(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsPeriodRepo.update(id, { deleted: true }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });;
+    return new DataResponseDto(HttpStatus.OK, {});
+  }
+
+  async finalizeNdcDetailsPeriod(id: number, abilityCondition: any, user: User) {
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsPeriodRepo.update(id, { finalized: true }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    return new DataResponseDto(HttpStatus.OK, {});
+  }
+
+  async getNdcDetailActions(abilityCondition: any, user: User) {
+    return await this.ndcDetailsActionRepo.find({
+      select: {
+        id: true,
+        nationalPlanObjective: true,
+        kpi: true,
+        kpiUnit: true,
+        ministryName: true,
+        periodId: true,
+        parentActionId: true,
+        actionType: true,
+        status: true
+      }
+    });
+  }
+
+  async addNdcDetailAction(ndcDetailsAction: NdcDetailsActionDto, abilityCondition: any, user: User) {
+    if (user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.MainAction && user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.SubAction) {
+      if (user.companyRole !== CompanyRole.GOVERNMENT && user.companyRole !== CompanyRole.MINISTRY) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("programme.unAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
+    ndcDetailsAction.kpi = parseFloat(ndcDetailsAction.kpi.toFixed(PRECISION));
+    const addedNdcDetailsAction = this.ndcDetailsActionRepo.create(ndcDetailsAction);
+    await this.ndcDetailsActionRepo.save(addedNdcDetailsAction).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionCreateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, addedNdcDetailsAction);
+  }
+
+  async updateNdcDetailsAction(ndcDetailsAction: NdcDetailsActionDto, abilityCondition: any, user: User) {
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: {
+        id: ndcDetailsAction.id
+      }
+    })
+
+    if (!ndcAction) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.ndcActionNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const company = await this.companyRepo.findOne({
+      where: { companyId: user.companyId }
+    });
+
+    if (!company) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.companyNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (ndcAction.status === NdcDetailsActionStatus.Approved || user.role === Role.ViewOnly) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.MainAction && user.companyRole !== CompanyRole.GOVERNMENT) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (ndcDetailsAction.actionType === NdcDetailsActionType.SubAction) {
+      if (!(user.companyRole === CompanyRole.GOVERNMENT || (user.companyRole === CompanyRole.MINISTRY && company.name === ndcAction.ministryName))) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString("programme.unAuth", []),
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
+    ndcDetailsAction.kpi = parseFloat(ndcDetailsAction.kpi.toFixed(PRECISION));
+
+    const result = await this.ndcDetailsActionRepo.update({
+      id: ndcDetailsAction.id
+    }, {
+      ...ndcDetailsAction
+    }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.ndcActionUpdateFailed",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+
+    if (result.affected > 0) {
+      return new DataResponseDto(HttpStatus.OK, {});
+    }
+  }
+
+  async approveNdcDetailsAction(idDto: BaseIdDto, abilityCondition: any, user: User) {
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: {
+        id: idDto.id
+      }
+    })
+
+    if (!ndcAction) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.ndcActionNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly || ndcAction.status === NdcDetailsActionStatus.Approved) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    await this.ndcDetailsActionRepo.update(idDto.id, { status: NdcDetailsActionStatus.Approved }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, {});
+  }
+
+  async rejectNdcDetailsAction(idDto: BaseIdDto, abilityCondition: any, user: User) {
+    const ndcAction = await this.ndcDetailsActionRepo.findOne({
+      where: {
+        id: idDto.id
+      }
+    })
+
+    if (!ndcAction) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.ndcActionNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly || ndcAction.status === NdcDetailsActionStatus.Approved) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString("programme.unAuth", []),
+        HttpStatus.FORBIDDEN
+      );
+    }
+    await this.ndcDetailsActionRepo.update(idDto.id, { status: NdcDetailsActionStatus.Rejected }).catch(error => {
+      this.logger.error(error);
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.internalErrorStatusUpdating",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    });
+    return new DataResponseDto(HttpStatus.OK, {});
   }
 }

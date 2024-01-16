@@ -48,3 +48,5 @@ export * from "./Entities/programmeTransfer";
 export * from "./Entities/user";
 export * from "./Entities/programme";
 export * from "./Entities/programmeCertify";
+export * from "./Entities/emission";
+export * from "./Entities/projection";
