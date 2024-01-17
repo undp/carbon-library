@@ -33,72 +33,91 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
     };
     const dbCon = new Pool(config);
 
-    const replicateActions = async () => {
-      const seqObj = await this.counterRepo.findOneBy({
-        id: CounterType.REPLICATE_SEQ
-      });
+    let retryCountTable = 0;
+    let retryCountCTable = 0;
+    const retryLimit = 10;
 
-      let lastSeq = 0;
-      if (seqObj) {
-        lastSeq = seqObj.counter;
-      }
+    const replicateActions = async () => {
 
       const tableName = this.configService.get<string>('ledger.table');
       const companyTableName = this.configService.get<string>('ledger.companyTable');
 
-      let results = null;
       try {
+        const seqObj = await this.counterRepo.findOneBy({
+          id: CounterType.REPLICATE_SEQ
+        });
+  
+        let lastSeq = 0;
+        if (seqObj) {
+          lastSeq = seqObj.counter;
+        }
+
         const sql = `select data, hash from ${tableName} where hash > $1 order by hash`;
-        results = await dbCon.query(sql,[lastSeq]);
+        const results = await dbCon.query(sql,[lastSeq]);
         this.logger.log(`Query for new data ${sql} ${lastSeq}`);
         this.logger.log(`Periodical replicate check - last seq:${lastSeq} new events: ${results?.rows?.length}`);
-      } catch (exception) {
-        this.logger.log(`Data Read failed from : ${tableName}`, exception);
-      }
 
-      if (results) {
-        let newSeq = 0;
-        for (const row of results.rows) {
-          const data = row.data;
-          console.log('Data', data);
-          const programme: Programme = plainToClass(
-            Programme,
-            JSON.parse(JSON.stringify(data))
-          );
-          await this.eventProcessor.process(programme, undefined, 0, 0);
-          newSeq = row.hash;
-          await this.counterRepo.save({id: CounterType.REPLICATE_SEQ, counter: newSeq});
+        if (results) {
+          let newSeq = 0;
+          for (const row of results.rows) {
+            const data = row.data;
+            console.log('Data', data);
+            const programme: Programme = plainToClass(
+              Programme,
+              JSON.parse(JSON.stringify(data))
+            );
+            await this.eventProcessor.process(programme, undefined, 0, 0);
+            newSeq = row.hash;
+            await this.counterRepo.save({id: CounterType.REPLICATE_SEQ, counter: newSeq});
+          }
+        }
+        retryCountTable = 0;
+      } catch (exception) {
+        this.logger.log(`Failed Executing Ops for : ${tableName}`, exception);
+        if (retryCountTable > retryLimit) {
+          this.logger.log('Ledger Replicator terminated');
+          return;
+        } else {
+          retryCountTable += 1; //ref
+          replicateActions;
         }
       }
 
-      const seqObjComp = await this.counterRepo.findOneBy({
-        id: CounterType.REPLICATE_SEQ_COMP,
-      });
-
-      let lastSeqComp = 0;
-      if (seqObjComp) {
-        lastSeqComp = seqObjComp.counter;
-      }
-
-      let resultsCompany = null;
-      try {
+      try{
+        const seqObjComp = await this.counterRepo.findOneBy({
+          id: CounterType.REPLICATE_SEQ_COMP,
+        });
+  
+        let lastSeqComp = 0;
+        if (seqObjComp) {
+          lastSeqComp = seqObjComp.counter;
+        }
+  
         const companySql = `select * from ${companyTableName} where hash > $1 order by hash`;
-        resultsCompany = await dbCon.query(companySql, [lastSeqComp]);
-      } catch (exception) {
-        this.logger.log(`Data Read failed from : ${companyTableName}`, exception);
-      }
-
-      if (resultsCompany) {
-        let newSeq = 0;
-        for (const row of resultsCompany.rows) {
-          const data = row.data;
-          const creditOverall: CreditOverall = plainToClass(
-            CreditOverall,
-            JSON.parse(JSON.stringify(data))
-          );
-          newSeq = row.hash;
-          await this.eventProcessor.process(undefined, creditOverall, row.hash, new Date(row.meta.txTime).getTime());
-          await this.counterRepo.save({id: CounterType.REPLICATE_SEQ_COMP, counter: newSeq});
+        const resultsCompany = await dbCon.query(companySql, [lastSeqComp]);
+  
+        if (resultsCompany) {
+          let newSeq = 0;
+          for (const row of resultsCompany.rows) {
+            const data = row.data;
+            const creditOverall: CreditOverall = plainToClass(
+              CreditOverall,
+              JSON.parse(JSON.stringify(data))
+            );
+            newSeq = row.hash;
+            await this.eventProcessor.process(undefined, creditOverall, row.hash, new Date(row.meta.txTime).getTime());
+            await this.counterRepo.save({id: CounterType.REPLICATE_SEQ_COMP, counter: newSeq});
+          }
+        }
+        retryCountCTable = 0;
+      }catch (exception){
+        this.logger.log(`Failed Executing Ops for : ${tableName}`, exception);
+        if (retryCountCTable > retryLimit) {
+          this.logger.log('Ledger Replicator terminated');
+          return;
+        } else {
+          retryCountCTable += 1; //ref
+          replicateActions;
         }
       }
       setTimeout(replicateActions, 1000);
