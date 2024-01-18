@@ -11,7 +11,7 @@
     "enterNewPlanTxt": "Please add the Programmes",
     "addSubNdcAction": "+ Add Sub NDC Action",
     "delete": "DELETE",
-    "finalize": "FINALIZE",
+    "finalize": "FINALISE",
     "ndcColumnsMinistry": "Government Department",
     "ndcColumnsStatus": "Status",
     "approve": "Approve",
@@ -35,5 +35,6 @@
     "kpiGreaterThanZero": "KPI value must be greater than 0",
     "kpiMaxLength": "KPI cannot exceed 10000000",
     "sameStartEndDates": "Start year must be earlier than the end year",
-    "ndcUnauthorisedMsg": "This action is unauthorised"
+    "ndcUnauthorisedMsg": "This action is unauthorised",
+    "invalidYearsSelected": "Entered start year and/or end year is invalid"
 }

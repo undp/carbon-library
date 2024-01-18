@@ -46,7 +46,7 @@ export const NdcDetailsComponent = (props: any) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [periodItems, setPeriodItems] = useState([] as Period[]);
   const [selectedPeriod, setSelectedPeriod] = useState({} as Period);
-  const selectedDateRangeRef = useRef({} as DateRange);
+  const selectedDateRangeRef = useRef({} as DateRange | null);
   const [tableKey, setTableKey] = useState(0);
   const { get, post, put } = useConnection();
   const [ministryOrgList, setMinistryOrgList] = useState([] as any);
@@ -696,7 +696,7 @@ export const NdcDetailsComponent = (props: any) => {
           </Col>
         </Row>
         {isGovernmentUser && selectedPeriod && !selectedPeriod.finalized ? (
-          <Row justify="end">
+          <Row justify="end" className="ndc-button-row">
             {isMainActionInEditMode() ? (
               <>
                 <Button className="mg-left-1" disabled>
@@ -773,51 +773,57 @@ export const NdcDetailsComponent = (props: any) => {
   }
 
   const onAddNewPeriod = async () => {
+    if (!selectedDateRangeRef ||
+      !selectedDateRangeRef.current ||
+      !selectedDateRangeRef.current.startYear ||
+      !selectedDateRangeRef.current.endYear) {
+      message.open({
+        type: "error",
+        content: t("ndc:invalidYearsSelected"),
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      return;
+    }
     try {
-      if (
-        selectedDateRangeRef &&
-        selectedDateRangeRef.current &&
-        selectedDateRangeRef.current.startYear &&
-        selectedDateRangeRef.current.endYear
-      ) {
-        const periodItem = {
-          startYear: selectedDateRangeRef.current.startYear,
-          endYear: selectedDateRangeRef.current.endYear,
-          finalized: false,
-        };
+      const periodItem = {
+        startYear: selectedDateRangeRef.current.startYear,
+        endYear: selectedDateRangeRef.current.endYear,
+        finalized: false,
+      };
 
-        const existingIndex = periodItems.findIndex(
-          (item: any) =>
-            inRange(periodItem.startYear, item.startYear, item.endYear) ||
-            inRange(periodItem.endYear, item.startYear, item.endYear)
+      const existingIndex = periodItems.findIndex(
+        (item: any) =>
+          inRange(periodItem.startYear, item.startYear, item.endYear) ||
+          inRange(periodItem.endYear, item.startYear, item.endYear)
+      );
+
+      if (existingIndex === -1) {
+        const response = await post(
+          "national/programme/addNdcDetailsPeriod",
+          {
+            ...periodItem,
+          }
         );
 
-        if (existingIndex === -1) {
-          const response = await post(
-            "national/programme/addNdcDetailsPeriod",
-            {
-              ...periodItem,
-            }
-          );
-
-          if (response && response.data) {
-            const addedPeriodItem = response.data;
-            const updatedPeriodItem = {
-              ...addedPeriodItem,
-              key: addedPeriodItem.id,
-              label: `${addedPeriodItem.startYear}-${addedPeriodItem.endYear}`,
-            };
-            setPeriodItems((items: any) => [...items, updatedPeriodItem]);
-            setSelectedPeriod(updatedPeriodItem);
-          }
-        } else {
-          message.open({
-            type: "error",
-            content: t("ndc:rangeAlreadyExists"),
-            duration: 3,
-            style: { textAlign: "right", marginRight: 15, marginTop: 10 },
-          });
+        if (response && response.data) {
+          const addedPeriodItem = response.data;
+          const updatedPeriodItem = {
+            ...addedPeriodItem,
+            key: addedPeriodItem.id,
+            label: `${addedPeriodItem.startYear}-${addedPeriodItem.endYear}`,
+          };
+          setPeriodItems((items: any) => [...items, updatedPeriodItem]);
+          setSelectedPeriod(updatedPeriodItem);
+          selectedDateRangeRef.current = null
         }
+      } else {
+        message.open({
+          type: "error",
+          content: t("ndc:rangeAlreadyExists"),
+          duration: 3,
+          style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+        });
       }
     } catch (exception: any) {
       message.open({
@@ -845,6 +851,11 @@ export const NdcDetailsComponent = (props: any) => {
       } else {
         selectedDateRangeRef.current = period;
       }
+    } else {
+      selectedDateRangeRef.current = {
+        startYear: range,
+        endYear: range,
+      };
     }
   };
 
