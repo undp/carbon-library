@@ -23,6 +23,7 @@ import {
   linkDocVisible,
   uploadDocUserPermission,
 } from "../../../Utils/documentsPermission";
+import { useConnection, useUserContext } from "../../../Context";
 
 export interface NdcActionBodyProps {
   data?: any;
@@ -32,9 +33,7 @@ export interface NdcActionBodyProps {
   programmeOwnerId?: any;
   getProgrammeDocs?: any;
   ministryLevelPermission?: boolean;
-  useConnection: any;
   translator: any;
-  useUserContext: any;
   onFinish?: any;
   programme?: any;
 }
@@ -49,9 +48,7 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
     programmeOwnerId,
     getProgrammeDocs,
     ministryLevelPermission,
-    useConnection,
     translator,
-    useUserContext,
     onFinish,
     programme,
   } = props;

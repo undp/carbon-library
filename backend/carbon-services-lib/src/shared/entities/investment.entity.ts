@@ -6,6 +6,7 @@ import { InvestmentLevel } from "../enum/investment.level";
 import { InvestmentStream } from "../enum/investment.stream";
 import { ESGType } from "../enum/esg.type";
 import { InvestmentStatus } from "../enum/investment.status";
+import { GuaranteePayback, InsurancePayback } from "../enum/investment.payback.enum";
 
 @Entity()
 export class Investment implements EntitySubject {
@@ -49,6 +50,22 @@ export class Investment implements EntitySubject {
 
   @Column({
     type: "enum",
+    enum: GuaranteePayback,
+    array: false,
+    nullable: true
+  })
+  guaranteePayback: GuaranteePayback;
+
+  @Column({
+    type: "enum",
+    enum: InsurancePayback,
+    array: false,
+    nullable: true
+  })
+  insurancePayback: InsurancePayback;
+
+  @Column({
+    type: "enum",
     enum: InvestmentLevel,
     array: false,
     nullable: true
@@ -83,6 +100,12 @@ export class Investment implements EntitySubject {
 
   @Column("real")
   percentage: number;
+
+  @Column({ type: "bigint", nullable: true })
+  startOfPayback: number;
+
+  @Column("bigint", { array: true, nullable: true })
+  period: number[];
 
   @Column("real", {nullable: true})
   shareFromOwner: number;
