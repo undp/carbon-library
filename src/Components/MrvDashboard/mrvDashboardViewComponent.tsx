@@ -17,20 +17,19 @@ import { MrvPieChartsStatComponent } from "./mrvPieChartStatComponent";
 import { getChartOptions } from "./mrvChartOptions";
 import { ListWidgetComponent } from "./listWidgetComponent";
 import { MapStatsComponent } from "./mapStatsComponent";
+import { useConnection, useUserContext } from "../../Context";
 
 const { RangePicker } = DatePicker;
 
 export const MrvDashboardComponent = (props: any) => {
   const {
-    useConnection,
-    useUserContext,
     Link,
     Chart,
     t,
     ButtonGroup,
     isMultipleDashboardsVisible = false,
   } = props;
-  const { get, post, delete: del } = useConnection();
+  const { get, post, delete: del, statServerUrl } = useConnection();
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
   const { userInfoState } = useUserContext();
@@ -597,7 +596,7 @@ export const MrvDashboardComponent = (props: any) => {
         "stats/programme/agg",
         genPayload(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       console.log("Response", response);
       const newd: any = {};

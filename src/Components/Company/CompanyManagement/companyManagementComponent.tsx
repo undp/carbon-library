@@ -45,6 +45,7 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { CompanyState } from "../../../Definitions";
 import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
+import { useConnection } from "../../../Context";
 
 const { Search } = Input;
 
@@ -52,7 +53,6 @@ export const CompanyManagementComponent = (props: any) => {
   const {
     t,
     useAbilityContext,
-    post,
     visibleColumns,
     onNavigateToCompanyProfile,
     onClickAddCompany,
@@ -74,6 +74,7 @@ export const CompanyManagementComponent = (props: any) => {
   const [sortField, setSortField] = useState<string>("");
   const [dataQuery, setDataQuery] = useState<any>();
   const ability = useAbilityContext();
+  const { post } = useConnection();
 
   document.addEventListener("mousedown", (event: any) => {
     const organisationFilterArea1 = document.querySelector(".filter-bar");

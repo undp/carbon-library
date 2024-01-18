@@ -16,6 +16,7 @@ import {
   SectoralScope,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
 import { CompanyDetailsComponent } from "../CompanyDetails/companyDetailsComponent";
 
 export const CompanyProfileComponent = (props: any) => {
@@ -23,7 +24,6 @@ export const CompanyProfileComponent = (props: any) => {
     t,
     useAbilityContext,
     useLocation,
-    useConnection,
     onNavigateToCompanyManagement,
     onNavigateToCompanyEdit,
     regionField,

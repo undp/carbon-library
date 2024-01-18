@@ -33,6 +33,7 @@ import {
 } from "../../../Definitions";
 
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
+import { useConnection, useUserContext } from "../../../Context";
 
 type SizeType = Parameters<typeof Form>[0]["size"];
 
@@ -68,8 +69,6 @@ const sectoralScopes: any = {
 
 export const ProgrammeCreationComponent = (props: any) => {
   const {
-    useUserContext,
-    useConnection,
     useLocation,
     onNavigateToProgrammeView,
     translator,
