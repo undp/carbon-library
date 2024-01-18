@@ -2661,18 +2661,18 @@ export class ProgrammeService {
       dto.adaptationImplementingAgency = ndcAction.adaptationProperties?.implementingAgency;
       dto.adaptationNationalPlanObjectives = ndcAction.adaptationProperties?.nationalPlanObjectives;
       dto.adaptationNationalPlanCoverage = ndcAction.adaptationProperties?.nationalPlanCoverage;
-      dto.adaptationGhgEmissionsAvoidedCO2 = ndcAction.adaptationProperties?.ghgEmissionsAvoided.CO2;
-      dto.adaptationGhgEmissionsAvoidedCH4 = ndcAction.adaptationProperties?.ghgEmissionsAvoided.CH4;
-      dto.adaptationGhgEmissionsAvoidedN2O = ndcAction.adaptationProperties?.ghgEmissionsAvoided.N2O;
-      dto.adaptationGhgEmissionsAvoidedHFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided.HFCs;
-      dto.adaptationGhgEmissionsAvoidedPFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided.PFCs;
-      dto.adaptationGhgEmissionsAvoidedSF6 = ndcAction.adaptationProperties?.ghgEmissionsAvoided.SF6;
-      dto.adaptationGhgEmissionsReducedCO2 = ndcAction.adaptationProperties?.ghgEmissionsReduced.CO2;
-      dto.adaptationGhgEmissionsReducedCH4 = ndcAction.adaptationProperties?.ghgEmissionsReduced.CH4;
-      dto.adaptationGhgEmissionsReducedN2O = ndcAction.adaptationProperties?.ghgEmissionsReduced.N2O;
-      dto.adaptationGhgEmissionsReducedHFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced.HFCs;
-      dto.adaptationGhgEmissionsReducedPFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced.PFCs;
-      dto.adaptationGhgEmissionsReducedSF6 = ndcAction.adaptationProperties?.ghgEmissionsReduced.SF6;
+      dto.adaptationGhgEmissionsAvoidedCO2 = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.CO2;
+      dto.adaptationGhgEmissionsAvoidedCH4 = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.CH4;
+      dto.adaptationGhgEmissionsAvoidedN2O = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.N2O;
+      dto.adaptationGhgEmissionsAvoidedHFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.HFCs;
+      dto.adaptationGhgEmissionsAvoidedPFCs = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.PFCs;
+      dto.adaptationGhgEmissionsAvoidedSF6 = ndcAction.adaptationProperties?.ghgEmissionsAvoided?.SF6;
+      dto.adaptationGhgEmissionsReducedCO2 = ndcAction.adaptationProperties?.ghgEmissionsReduced?.CO2;
+      dto.adaptationGhgEmissionsReducedCH4 = ndcAction.adaptationProperties?.ghgEmissionsReduced?.CH4;
+      dto.adaptationGhgEmissionsReducedN2O = ndcAction.adaptationProperties?.ghgEmissionsReduced?.N2O;
+      dto.adaptationGhgEmissionsReducedHFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced?.HFCs;
+      dto.adaptationGhgEmissionsReducedPFCs = ndcAction.adaptationProperties?.ghgEmissionsReduced?.PFCs;
+      dto.adaptationGhgEmissionsReducedSF6 = ndcAction.adaptationProperties?.ghgEmissionsReduced?.SF6;
       dto.adaptationIncludedInNAP = ndcAction.adaptationProperties?.includedInNAP;
       dto.ndcFinancingUserEstimatedCredits = ndcAction.ndcFinancing?.userEstimatedCredits;
       dto.ndcFinancingSystemEstimatedCredits = ndcAction.ndcFinancing?.systemEstimatedCredits;
@@ -4312,7 +4312,7 @@ export class ProgrammeService {
       const endTimestamp = programme.endTime * 1000;
 
       const companies: Company[] = programme.company;
-      const concatenatedNames = companies.map(company => company.name).join(', ');
+      const concatenatedNames = companies.map(company => company?.name).join(', ');
 
       const certifiers: Company[] = programme.certifier;
       const concatenatedCertifiersNames = certifiers.map(company => company?.name).join(', ');
