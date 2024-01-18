@@ -12,14 +12,13 @@ import {
     ChartSeriesItem,
     GHGChartSeriesItem
 } from './ghg.chart.options';
+import { useConnection, useUserContext } from "../../../Context";
 
 const { RangePicker } = DatePicker;
 
 export const GHGDashboardComponent = (props: any) => {
     const {
         t,
-        useUserContext,
-        useConnection,
         Chart,
         ButtonGroup,
         Link,
@@ -44,8 +43,6 @@ export const GHGDashboardComponent = (props: any) => {
         [GhgStatCardTypes.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR],
         [GhgStatCardTypes.AGG_EMISSIONS_COMPARISON],
     ];
-
-    const TTSuffix = userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER ? 'My' : '';
 
     const handleResize = () => {
         setScreenWidth(window.innerWidth);
@@ -198,7 +195,7 @@ export const GHGDashboardComponent = (props: any) => {
             aggType: GhgStatCardTypes.AGG_EMISSIONS_BY_SECTOR,
             configs: {
                 title: t('emissionsBySectorTitle'),
-                tooltip: t('emissionsBySectorTT' + TTSuffix),
+                tooltip: t('emissionsBySectorTT'),
                 colors: colors,
                 chartColumnWidth: 12,
                 chartWidth: 490,
@@ -213,7 +210,7 @@ export const GHGDashboardComponent = (props: any) => {
             aggType: GhgStatCardTypes.AGG_EMISSIONS_BY_GAS,
             configs: {
                 title: t('emissionsByGasTitle'),
-                tooltip: t('emissionsByGasTT' + TTSuffix),
+                tooltip: t('emissionsByGasTT'),
                 colors: colors,
                 chartColumnWidth: 12,
                 chartWidth: 490,
@@ -227,7 +224,7 @@ export const GHGDashboardComponent = (props: any) => {
             aggType: GhgStatCardTypes.AGG_EMISSIONS_MITIGATION_POTENTIAL_BY_SECTOR,
             configs: {
                 title: t('emissionsMitigationPotentialBySectorTitle'),
-                tooltip: t('emissionsMitigationPotentialBySectorTT' + TTSuffix),
+                tooltip: t('emissionsMitigationPotentialBySectorTT'),
                 colors: colors,
                 chartColumnWidth: 24,
                 chartWidth: screenWidth * 0.72,
@@ -241,7 +238,7 @@ export const GHGDashboardComponent = (props: any) => {
             aggType: GhgStatCardTypes.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR,
             configs: {
                 title: t('emissionsReductionPercentageBySectorTitle'),
-                tooltip: t('emissionsReductionPercentageBySectorTT' + TTSuffix),
+                tooltip: t('emissionsReductionPercentageBySectorTT'),
                 colors: colors,
                 chartColumnWidth: 24,
                 chartWidth: screenWidth * 0.72,
@@ -255,7 +252,7 @@ export const GHGDashboardComponent = (props: any) => {
             aggType: GhgStatCardTypes.AGG_EMISSIONS_COMPARISON,
             configs: {
                 title: t('emissionsComparisonTitle'),
-                tooltip: t('emissionsComparisonTT' + TTSuffix),
+                tooltip: t('emissionsComparisonTT'),
                 colors: colorsComparison,
                 chartColumnWidth: 24,
                 chartWidth: screenWidth * 0.72,
@@ -466,7 +463,7 @@ export const GHGDashboardComponent = (props: any) => {
     };
 
     return (
-        <div className="dashboard-main-container">
+        <div className="ghg-dashboard-main-container">
             {isMultipleDashboardsVisible && (
                 <div className="systemchange-container" style={{ marginLeft: `20px` }}>
                     <ButtonGroup aria-label="outlined button group">
