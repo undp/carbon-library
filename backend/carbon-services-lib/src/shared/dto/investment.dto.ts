@@ -26,14 +26,19 @@ export class InvestmentDto {
   @ApiProperty()
   amount: number;
 
-  @ApiProperty({ enum: Instrument, isArray: true })
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  nationalInvestmentId: number;
+
+  @ApiPropertyOptional({ enum: Instrument, isArray: true })
+  @ValidateIf(o=>(!o.nationalInvestmentId))
   @IsEnum(Instrument, {
     message:
       'Invalid instrument type. Supported following values:' +
       Object.values(Instrument),
     each: true,
   })
-  @IsNotEmpty()
   @IsArray()
   instrument: Instrument[];
 

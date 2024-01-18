@@ -228,6 +228,7 @@ export class CompanyService {
     investment.amount = Math.round(req.amount);
     investment.status = InvestmentStatus.APPROVED;
     investment.category = InvestmentCategoryEnum.National;
+    investment.nationalInvestmentId = null
     const results = await this.investmentRepo
       .insert([investment])
       .catch((err: any) => {
