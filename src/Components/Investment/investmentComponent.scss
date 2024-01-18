@@ -121,3 +121,33 @@
     }
   }
 }
+
+.add-programme-main-container{
+  .adding-section{
+    .form-section{
+      .investment-sought-form-container{
+        .investment-sought-form{
+          .investment-radio-button{
+            .ant-radio-group {
+              display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              justify-content: space-between;
+              width: fit-content;
+            }
+            
+          }
+          .details-part-two{
+            .row{
+              .ant-picker-large {
+                height: 40px !important;
+                width: 100%;
+              }
+            }
+            
+          }
+        }
+      }
+    }
+  }
+}

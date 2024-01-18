@@ -76,6 +76,27 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             placeholder={t("ndc:nationalPlanObjectivePlaceHolder")}
           />
         </Form.Item>
+      ) : editing && dataIndex === "kpiUnit" ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              validator: async (rule: any, value: any) => {
+                const trimValue =
+                  typeof value === "string" ? value.trim() : value;
+                if (!trimValue) {
+                  throw new Error(`${title} ${t("ndc:isRequired")}`);
+                }
+              },
+            },
+          ]}
+        >
+          <Input
+            onBlur={() => onBlurHandler(record)}
+            placeholder={t("ndc:kpiUnitPlaceHolder")}
+          />
+        </Form.Item>
       ) : editing && dataIndex === "kpi" ? (
         <Form.Item
           name={dataIndex}
@@ -90,7 +111,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
                     throw new Error(t("ndc:kpiInvalidFormat"));
                   } else if (+trimValue <= 0) {
                     throw new Error(t("ndc:kpiGreaterThanZero"));
-                  }else if (trimValue.toString().length > 7){
+                  } else if (trimValue.toString().length > 7) {
                     throw new Error(t("ndc:kpiMaxLength"));
                   }
                 } else {
