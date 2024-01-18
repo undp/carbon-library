@@ -24,6 +24,7 @@ import {
   linkDocVisible,
   uploadDocUserPermission,
 } from "../../../Utils/documentsPermission";
+import { useConnection, useUserContext } from "../../../Context";
 
 export interface ProgrammeDocumentsProps {
   data: any;
@@ -34,8 +35,6 @@ export interface ProgrammeDocumentsProps {
   getDocumentDetails: any;
   getProgrammeById: any;
   ministryLevelPermission?: boolean;
-  useConnection: any;
-  useUserContext: any;
   translator: any;
   methodologyDocumentUpdated: any;
   programmeStatus?: any;
@@ -53,8 +52,6 @@ export const ProgrammeDocuments: FC<ProgrammeDocumentsProps> = (
     getDocumentDetails,
     getProgrammeById,
     ministryLevelPermission,
-    useConnection,
-    useUserContext,
     translator,
     methodologyDocumentUpdated,
     programmeStatus,

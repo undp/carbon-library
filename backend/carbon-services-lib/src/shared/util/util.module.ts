@@ -30,6 +30,7 @@ import { LetterOfIntentResponseGen } from "./letter.of.intent.response.gen";
 import { LetterOfAuthorisationRequestGen } from "./letter.of.authorisation.request.gen";
 import { PasswordHashService } from "./passwordHash.service";
 import { LetterSustainableDevSupportLetterGen } from "./letter.sustainable.dev.support";
+import { DataExportService } from "./data.export.service";
 
 @Module({
   imports: [
@@ -81,7 +82,8 @@ import { LetterSustainableDevSupportLetterGen } from "./letter.sustainable.dev.s
     LetterOfIntentResponseGen,
     LetterOfAuthorisationRequestGen,
     PasswordHashService,
-    LetterSustainableDevSupportLetterGen
+    LetterSustainableDevSupportLetterGen,
+    DataExportService
   ],
   exports: [
     CounterService,
@@ -95,7 +97,8 @@ import { LetterSustainableDevSupportLetterGen } from "./letter.sustainable.dev.s
     LetterOfIntentResponseGen,
     LetterOfAuthorisationRequestGen,
     PasswordHashService,
-    LetterSustainableDevSupportLetterGen
+    LetterSustainableDevSupportLetterGen,
+    DataExportService
   ],
 })
 export class UtilModule {}

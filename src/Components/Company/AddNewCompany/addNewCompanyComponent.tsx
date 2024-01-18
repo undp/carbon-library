@@ -36,14 +36,13 @@ import {
   getBase64,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
 
 export const AddNewCompanyComponent = (props: any) => {
   const {
     t,
     onNavigateToCompanyManagement,
     maximumImageSize,
-    useConnection,
-    useUserContext,
     useLocation,
     regionField,
     isGuest,

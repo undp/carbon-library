@@ -22,18 +22,18 @@ import { Action } from "../../../Definitions/Enums/action.enum";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import ChangePasswordModel from "../../Common/Models/changePasswordModel";
 import { Role } from "../../../Definitions";
+import { useConnection, useUserContext } from "../../../Context";
 
 export const AddNewUserComponent = (props: any) => {
   const {
     t,
     onNavigateToUserManagement,
     onNavigateLogin,
-    useConnection,
-    useUserContext,
     useLocation,
     useAbilityContext,
     themeColor,
   } = props;
+
   const { post, put, delete: del, get } = useConnection();
   const [formOne] = Form.useForm();
   const { state } = useLocation();
