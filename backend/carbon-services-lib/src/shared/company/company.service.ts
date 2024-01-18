@@ -945,5 +945,17 @@ export class CompanyService {
     console.log("INSIDE findCompanyByTaxIdPaymentIdOrEmail company", company);
     return company;
   }
+  
+  async checkForCompanyDuplicates(email: any, taxId: any, paymentId: any) {
+    const companies = await this.companyRepo.find({
+      where: [
+        { email: email },
+        { taxId: taxId },
+        { paymentId: paymentId }
+      ]
+    });
+
+    return companies && companies.length > 0 ? companies[0] : undefined;
+  }
 
 }
