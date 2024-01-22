@@ -44,5 +44,6 @@
     "omgePercentage":"Overall Mitigation in Global Emissions (OMGE) Account",
     "allmincreated":"All ministries have been implemented",
     "govdepnotexist": "Department not exist in Selected Ministry",
-    "govDep": "Government Department"
+    "govdep": "Department",
+    "ministry": "Ministry"
 }

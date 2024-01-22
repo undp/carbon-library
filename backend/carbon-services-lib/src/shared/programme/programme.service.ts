@@ -1843,13 +1843,27 @@ export class ProgrammeService {
     }
     if (programmeDto.article6trade == false){
       const implementingUser = await this.companyService.findByTaxId(programmeDto.implementinguser)
-      const supportingUsers = []
-      for (const taxId of programmeDto.supportingowners) {
-        const supportCompany = await this.companyService.findByTaxId(taxId);
-        supportingUsers.push(supportCompany.companyId);
+      const supportingUsers = [];
+      if (
+        programmeDto.supportingowners &&
+        programmeDto.supportingowners.length > 0
+      ) {
+        for (const taxId of programmeDto.supportingowners) {
+          const supportCompany = await this.companyService.findByTaxId(taxId);
+          supportingUsers.push(supportCompany.companyId);
+        }
       } 
       programme.implementinguser = implementingUser.companyId
       programme.supportingowners = supportingUsers
+
+      if(user.companyRole === CompanyRole.MINISTRY){
+        if(user.companyId !== implementingUser.companyId){
+          throw new HttpException(
+            this.helperService.formatReqMessagesString('user.userUnAUth', []),
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
     }
     programme.programmeId = await this.counterService.incrementCount(
       CounterType.PROGRAMME,

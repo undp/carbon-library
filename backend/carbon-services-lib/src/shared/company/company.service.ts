@@ -787,35 +787,43 @@ export class CompanyService {
     if (!company) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
-          "company.noActiveCompany",
-          []
-        ),
-        HttpStatus.BAD_REQUEST
-      );
-    }
-    const ministrykey = Object.keys(Ministry)[Object.values(Ministry).indexOf(companyUpdateDto.ministry as Ministry)];
-    if ((company.companyRole == CompanyRole.MINISTRY || (company.companyRole == CompanyRole.GOVERNMENT)) &&
-      !ministryOrgs[ministrykey].includes(
-        Object.keys(GovDepartment)[
-          Object.values(GovDepartment).indexOf(
-            companyUpdateDto.govDep as GovDepartment
-          )
-        ],
-      )
-    ) {
-      throw new HttpException(
-        this.helperService.formatReqMessagesString(
-          'company.wrongMinistryAndGovDep',
+          'company.noActiveCompany',
           [],
         ),
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (
+      company.companyRole == CompanyRole.MINISTRY ||
+      company.companyRole == CompanyRole.GOVERNMENT
+    ) {
+      const ministrykey =
+        Object.keys(Ministry)[
+          Object.values(Ministry).indexOf(companyUpdateDto.ministry as Ministry)
+        ];
+      if (
+        !ministryOrgs[ministrykey].includes(
+          Object.keys(GovDepartment)[
+            Object.values(GovDepartment).indexOf(
+              companyUpdateDto.govDep as GovDepartment,
+            )
+          ],
+        )
+      ) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            'company.wrongMinistryAndGovDep',
+            [],
+          ),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
     if (company.companyRole == CompanyRole.MINISTRY || company.companyRole == CompanyRole.GOVERNMENT){
       const ministry = await this.findMinistryByDepartment(
         companyUpdateDto.govDep
       );
-      if (ministry && ministry.ministry==companyUpdateDto.ministry && ministry.govDep==companyUpdateDto.govDep) {
+      if (company.govDep!=companyUpdateDto.govDep && company.ministry!=companyUpdateDto.ministry && ministry && ministry.ministry==companyUpdateDto.ministry && ministry.govDep==companyUpdateDto.govDep) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
             "company.MinistryDepartmentAlreadyExist",
