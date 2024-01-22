@@ -1374,7 +1374,7 @@ export class ProgrammeService {
       sqlProgram.programmeId,
       certifier.companyId,
       true,
-      certifier ? certifier.name : '',
+      certifier ? `${certifier.companyId}#${certifier.name}` : '',
       undefined,)
 
       this.logger.log('Certifying the programme', updateCert)
@@ -4102,7 +4102,7 @@ export class ProgrammeService {
         sqlProgram.programmeId,
         certifier.companyId,
         true,
-        certifier ? certifier.name : '',
+        certifier ? `${certifier.companyId}#${certifier.name}`  : '',
         undefined,)
   
         this.logger.log('Certifying the programme', updateCert)
