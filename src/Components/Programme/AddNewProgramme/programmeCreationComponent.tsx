@@ -1472,7 +1472,7 @@ export const ProgrammeCreationComponent = (props: any) => {
                                                       value={organisation.taxId}
                                                     >
                                                       {organisation.name +
-                                                        "-" +
+                                                        " - " +
                                                         Object.keys(
                                                           GovDepartment
                                                         )[
