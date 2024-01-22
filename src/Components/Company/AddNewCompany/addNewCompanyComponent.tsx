@@ -326,7 +326,9 @@ export const AddNewCompanyComponent = (props: any) => {
             Object.values(Ministry).indexOf(min as Ministry)
           ];
         if (response.data.length === ministryOrgs[minkey].length) {
-          excludingmin.push(min);
+          if (!isUpdate && min !== initialMinistry) {
+            excludingmin.push(min);
+          }
         }
       }
       leftmins = ministries.filter((x: string) => !excludingmin.includes(x));
