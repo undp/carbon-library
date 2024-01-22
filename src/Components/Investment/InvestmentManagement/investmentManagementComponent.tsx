@@ -845,7 +845,7 @@ export const InvestmentManagementComponent = (props: any) => {
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description={
                         tableData.length === 0
-                          ? t("creditTransfer:noTransfer")
+                          ? t("programme:noinvestment")
                           : null
                       }
                     />

@@ -90,6 +90,6 @@
     "startOfPayback":"Start of Payback", 
     "LumpSum":"LUMP SUM",
     "Upfront":"UPFRONT",
-    "Annual":"ANNUAL"
-
+    "Annual":"ANNUAL",
+    "noinvestment": "No Financings Available"
 }
