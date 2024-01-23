@@ -572,7 +572,7 @@ export const NdcDetailsComponent = (props: any) => {
       });
     } else {
       setActionInfo({
-        action: "Finalize",
+        action: "Finalise",
         headerText: t("ndc:finalizeApproveTitle"),
         text: t("ndc:finalizeApproveSubTitle"),
         type: "primary",
@@ -884,7 +884,7 @@ export const NdcDetailsComponent = (props: any) => {
             id: actionInfo.recordId,
           }
         );
-      } else if (actionInfo.action === "Finalize") {
+      } else if (actionInfo.action === "Finalise") {
         actionResponse = await post(
           "national/programme/finalizeNdcDetailsPeriod",
           {
@@ -916,7 +916,7 @@ export const NdcDetailsComponent = (props: any) => {
           style: { textAlign: "right", marginRight: 15, marginTop: 10 },
         });
         fetchNdcDetailPeriods();
-      } else if (actionInfo.action === "Finalize") {
+      } else if (actionInfo.action === "Finalise") {
         message.open({
           type: "success",
           content: t("ndc:finalizeSuccessMsg"),
