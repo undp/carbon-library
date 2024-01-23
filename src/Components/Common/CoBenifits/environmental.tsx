@@ -222,7 +222,7 @@ const Environmental = (props: any) => {
       const sectionName = changedFieldName.replace(/\d/g, "").replace("Q", "");
       const updatedEnvironmentalDetails = [...environmentalDetails];
       const sectionIndex = updatedEnvironmentalDetails.findIndex(
-        (section) => section.section === t(sectionName)
+        (section) => section.section === t(`coBenifits:${sectionName}`)
       );
 
       updatedEnvironmentalDetails[sectionIndex].fields.forEach((field: any) => {
