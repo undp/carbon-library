@@ -126,7 +126,11 @@ const Assessment = (props: any) => {
             document: values,
           }));
         } else {
-          changedValues[changedField.name[0]] = changedField.value;
+          if (changedField.value && changedField.value?.length > 0) {
+            changedValues[changedField.name[0]] = changedField.value;
+          } else {
+            changedValues[changedField.name[0]] = undefined;
+          }
         }
       });
 
