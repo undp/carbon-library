@@ -182,7 +182,7 @@ const Economic = (props: any) => {
       const sectionName = changedFieldName.replace(/\d/g, "").replace("Q", "");
       const updatedEconomicDetails = [...economicDetails];
       const sectionIndex = updatedEconomicDetails.findIndex(
-        (section) => section.section === t(sectionName)
+        (section) => section.section === t(`coBenifits:${sectionName}`)
       );
 
       updatedEconomicDetails[sectionIndex].fields.forEach((field: any) => {
