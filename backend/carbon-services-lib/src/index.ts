@@ -169,6 +169,7 @@ export * from './shared/dto/projection.properties';
 export * from './shared/dto/programme.mitigation.issue'
 export * from './shared/dto/ndc.details.action.dto'
 export * from './shared/dto/base.id.dto'
+export * from './shared/dto/organisation.duplicate.check.dto'
 
 //from transparency
 export * from './shared/dto/adaptation.properties'

@@ -149,7 +149,7 @@ export const CreditTransferComponent = (props: any) => {
         {
           key: "programmeTitle",
           operation: "like",
-          value: `${search}%`,
+          value: `%${search}%`,
         },
       ];
       if (!isNaN(Number(search))) {
@@ -502,7 +502,7 @@ export const CreditTransferComponent = (props: any) => {
                       requestId,
                       comment,
                       "transferReject",
-                      `${t("creditTransfer:internationalTranferReqAccepted")}`
+                      `${t("creditTransfer:internationalTransferReqRejected")}`
                     ),
                   type: "danger",
                   remarkRequired: true,

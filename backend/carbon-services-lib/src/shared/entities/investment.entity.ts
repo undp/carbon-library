@@ -29,13 +29,13 @@ export class Investment implements EntitySubject {
   })
   instrument: Instrument[];
 
-  @Column({nullable: true})
+  @Column({nullable: true, type: 'double precision'})
   interestRate?: number;
 
   @Column({nullable: true})
   resultMetric?: string;
 
-  @Column({nullable: true})
+  @Column({nullable: true, type: 'double precision' })
   paymentPerMetric?: number;
 
   @Column({nullable: true})

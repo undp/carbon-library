@@ -125,6 +125,11 @@
       background-color: rgba(#ffa070, 1);
       border: none;
     }
+
+    .ant-checkbox-input[value='Approved'] + .ant-checkbox-inner {
+      background-color: rgba(#16b1ff, 1);
+      border: none;
+    }
   }
 }
 
