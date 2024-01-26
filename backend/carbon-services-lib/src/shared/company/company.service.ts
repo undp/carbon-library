@@ -75,7 +75,6 @@ export class CompanyService {
     @InjectRepository(Investment)
     private investmentRepo: Repository<Investment>,
     private dataExportService: DataExportService,
-    private dataExportService: DataExportService,
     private httpUtilService: HttpUtilService
   ) {}
 

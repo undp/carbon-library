@@ -223,7 +223,7 @@ export class RegistryClientService {
 
   public async addNationalInvestment(investment:InvestmentSyncDto){
     console.log('creating national Investment on registry', investment)
-    const resp = await this.sendHttp("/national/organisation/addInvestment", investment);
+    const resp = await this.httpUtilService.sendHttp("/national/organisation/addInvestment", investment);
     console.log('Successfully create national Investment on registry')
     return resp;
   }
