@@ -23,9 +23,9 @@ export const getStatusTagType = (status: InvestmentStatus) => {
     case InvestmentStatus.REJECTED:
       return "error";
     case InvestmentStatus.PENDING:
-      return "processing";
-    case InvestmentStatus.APPROVED:
       return "success";
+    case InvestmentStatus.APPROVED:
+      return "processing";
     default:
       return "default";
   }
