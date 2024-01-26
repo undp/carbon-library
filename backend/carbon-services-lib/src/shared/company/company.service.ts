@@ -45,6 +45,8 @@ import { DataExportService } from "../util/data.export.service";
 import { DataExportCompanyDto } from "../dto/data.export.company.dto";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
 import { SectoralScope } from "../enum/sectoral.scope.enum";
+import { HttpUtilService } from "../util/http.util.service";
+import { OrganisationDuplicateCheckDto } from "../dto/organisation.duplicate.check.dto";
 
 @Injectable()
 export class CompanyService {
@@ -64,7 +66,8 @@ export class CompanyService {
     private userService: UserService,
     private asyncOperationsInterface: AsyncOperationsInterface,
     private locationService: LocationInterface,
-    private dataExportService: DataExportService
+    private dataExportService: DataExportService,
+    private httpUtilService: HttpUtilService
   ) {}
 
   async suspend(
@@ -915,6 +918,34 @@ export class CompanyService {
     return result;
   }
 
+  public async checkCompanyExistOnOtherSystem(
+    organisationDuplicateCheckDto: OrganisationDuplicateCheckDto
+  ) {
+    console.log('check if organisation already exist in other system with taxId, paymentId or email', organisationDuplicateCheckDto)
+    const resp = await this.httpUtilService.sendHttp("/national/organisation/exists", organisationDuplicateCheckDto);
+    if (typeof resp === 'boolean') {
+      return resp;
+    } else {
+      console.log('Successfully requested and response received for ', organisationDuplicateCheckDto);
+      return resp.data;
+    }
+  }
+
+  async findCompanyByTaxIdPaymentIdOrEmail(
+    orgDuplicateCheckDto: OrganisationDuplicateCheckDto
+  ): Promise<Company | undefined> {
+    console.log("INSIDE findCompanyByTaxIdPaymentIdOrEmail", orgDuplicateCheckDto.taxId, orgDuplicateCheckDto.paymentId, orgDuplicateCheckDto.email);
+    const company = await this.companyRepo.createQueryBuilder('company')
+      .where('company.taxId = :taxId OR company.paymentId = :paymentId OR company.email = :email', {
+        taxId: orgDuplicateCheckDto.taxId,
+        paymentId: orgDuplicateCheckDto.paymentId,
+        email: orgDuplicateCheckDto.email
+      })
+      .getOne();
+    console.log("INSIDE findCompanyByTaxIdPaymentIdOrEmail company", company);
+    return company;
+  }
+  
   async checkForCompanyDuplicates(email: any, taxId: any, paymentId: any) {
     const companies = await this.companyRepo.find({
       where: [

@@ -98,7 +98,7 @@ export class OrganisationUpdateDto {
   @IsNotEmpty()
   @IsNumber()
   @IsInt()
-  @Min(1)
+  @Min(0)
   @Max(99)
   @ApiProperty()
   omgePercentage: number;

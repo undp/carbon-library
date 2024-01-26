@@ -71,7 +71,7 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
           {
             key: "name",
             operation: "like",
-            value: newValue + "%",
+            value: "%" + newValue + "%",
           },
           {
             key: "companyRole",
