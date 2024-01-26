@@ -59,7 +59,7 @@ export const ListWidgetComponent: FC<ListWidgetProps> = (
               </Tooltip>
             </div>
           </div>
-          <div className="total-programme-details">
+          <div className="mrv-total-programme-details">
             <div className="details">
               <div className="detail">{totalText}</div>
               <div className="value">{addCommSepRound(total)}</div>
