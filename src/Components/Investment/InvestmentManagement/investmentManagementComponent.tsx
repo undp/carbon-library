@@ -142,7 +142,7 @@ export const InvestmentManagementComponent = (props: any) => {
         {
           key: "programmeTitle",
           operation: "like",
-          value: `${search}%`,
+          value: `%${search}%`,
         },
       ];
       if (!isNaN(Number(search))) {

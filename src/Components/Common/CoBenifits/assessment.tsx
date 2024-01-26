@@ -18,13 +18,13 @@ import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
 import { RcFile } from "antd/lib/upload";
 import { RadioButtonStatus, getBase64, titleList } from "../../../Definitions";
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
-import { useConnection } from "../../../Context";
 
 const Assessment = (props: any) => {
   const {
     onFormSubmit,
     assessmentViewData,
     viewOnly,
+    useConnection,
     translator,
   } = props;
   translator.setDefaultNamespace("coBenifits");
