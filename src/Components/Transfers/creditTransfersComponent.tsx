@@ -502,7 +502,7 @@ export const CreditTransferComponent = (props: any) => {
                       requestId,
                       comment,
                       "transferReject",
-                      `${t("creditTransfer:internationalTranferReqAccepted")}`
+                      `${t("creditTransfer:internationalTransferReqRejected")}`
                     ),
                   type: "danger",
                   remarkRequired: true,
