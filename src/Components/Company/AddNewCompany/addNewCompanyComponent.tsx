@@ -813,11 +813,25 @@ export const AddNewCompanyComponent = (props: any) => {
                             throw new Error(`${t("addCompany:phoneNo")} ${t("isRequired")}`);
                           } else {
                             const phoneNo = formatPhoneNumber(String(value));
-                            if (!isPossiblePhoneNumber(String(value))) {
-                              throw new Error(
-                                `${t("addCompany:phoneNo")} ${t("isInvalid")}`
-                              );
+                            if (String(value).trim() !== "") {
+                              if (
+                                phoneNo === null ||
+                                phoneNo === "" ||
+                                phoneNo === undefined
+                              ) {
+                                throw new Error(
+                                  `${t("addCompany:phoneNo")} ${t("isRequired")}`
+                                );
+                              } else {
+                                if (!isPossiblePhoneNumber(String(value))) {
+                                  throw new Error(
+                                    `${t("addCompany:phoneNo")} ${t("isInvalid")}`
+                                  );
+                                }
+                              }
+                              
                             }
+                            
                           }
                         },
                       },
