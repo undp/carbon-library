@@ -53,7 +53,7 @@ export class ProgrammeRetire {
     @IsNotEmpty()
     @IsNumber()
     @IsInt()
-    @Min(1)
+    @Min(0)
     @Max(99)
     omgePercentage: number;
 }
