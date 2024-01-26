@@ -252,7 +252,7 @@ export const CompanyManagementComponent = (props: any) => {
         {
           key: searchByTermOrganisation,
           operation: "like",
-          value: networksearchOrganisations + "%",
+          value: "%" + networksearchOrganisations + "%",
         },
       ];
     } else return undefined;
@@ -270,7 +270,7 @@ export const CompanyManagementComponent = (props: any) => {
         {
           key: searchByTermOrganisation,
           operation: "like",
-          value: networksearchOrganisations + "%",
+          value: "%" + networksearchOrganisations + "%",
         },
         {
           key: "companyRole",
