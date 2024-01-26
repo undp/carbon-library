@@ -21,6 +21,7 @@ import { NDCAction } from "../entities/ndc.action.entity";
 import { NDCActionDto } from "../dto/ndc.action.dto";
 import { EmailHelperService } from "../email-helper/email-helper.service";
 import { EmailTemplates } from "../email-helper/email.template";
+import { InvestmentSyncDto } from "../dto/investment.sync.dto";
 import { HttpUtilService } from "../util/http.util.service";
 
 @Injectable()
@@ -217,6 +218,13 @@ export class RegistryClientService {
         "externalId": ndc.externalId
     });
     console.log('Successfully create mitigation on registry', mitigationReq.actionId)
+    return resp;
+  }
+
+  public async addNationalInvestment(investment:InvestmentSyncDto){
+    console.log('creating national Investment on registry', investment)
+    const resp = await this.sendHttp("/national/organisation/addInvestment", investment);
+    console.log('Successfully create national Investment on registry')
     return resp;
   }
 
