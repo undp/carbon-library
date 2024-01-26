@@ -57,6 +57,8 @@ import { DataExportQueryDto } from "../dto/data.export.query.dto";
 import { DataExportUserDto } from "../dto/data.export.user.dto";
 import { FilterEntry } from "../dto/filter.entry";
 import { EmailHelperService } from '../email-helper/email-helper.service';
+import { HttpUtilService } from "../util/http.util.service";
+import { SYSTEM_TYPE } from "../enum/system.names.enum";
 
 @Injectable()
 export class UserService {
@@ -77,6 +79,7 @@ export class UserService {
     private locationService: LocationInterface,
     private passwordHashService: PasswordHashService,
     private dataExportService: DataExportService,
+    private httpUtilService: HttpUtilService
   ) {}
 
   private async generateApiKey(email) {
@@ -514,6 +517,62 @@ export class UserService {
       )
       .execute();
   }
+
+  async validateAndCreateUser(
+    userDto: UserDto,
+    companyId: number,
+    companyRole: CompanyRole,
+    isRegistration?: boolean
+  ): Promise<User | DataResponseMessageDto | undefined> {
+
+    this.logger.verbose(`User received for validation ${userDto.email} ${companyId}`);
+    userDto.email = userDto.email?.toLowerCase();
+    const createdUserDto = {...userDto};
+    if (userDto.company) {
+      createdUserDto.company = { ...userDto.company }
+      if (this.configService.get('systemType') !== SYSTEM_TYPE.CARBON_UNIFIED) {
+        const companyExists = await this.companyService.checkCompanyExistOnOtherSystem({
+          taxId: createdUserDto.company?.taxId,
+          paymentId: createdUserDto.company?.paymentId,
+          email: createdUserDto.company?.email
+        })
+        if (companyExists) {
+          this.handleDuplicateCompanyError(createdUserDto.company, companyExists)
+        }
+      }
+    }
+    
+    const user = await this.findOne(userDto.email);
+    if (user) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "user.createExistingUser",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    if(this.configService.get('systemType') !== SYSTEM_TYPE.CARBON_UNIFIED){
+      const userExists = await this.checkUserExistOnOtherSystem(userDto.email);
+      if (userExists) {
+        let errorMessage = "user.createExistingUser";
+        if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_TRANSPARENCY) {
+          errorMessage = "user.createExistingUserInRegistry";
+        } else if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_REGISTRY) {
+          errorMessage = "user.createExistingUserInTransparency";
+        }
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            errorMessage,
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+    }
+
+    return await this.create(userDto, companyId, companyRole, isRegistration);
+  };
 
   async create(
     userDto: UserDto,
@@ -1160,5 +1219,48 @@ export class UserService {
       .getRawMany();
 
     return result;
+  }
+
+  private async checkUserExistOnOtherSystem(userEmail: string) {
+    console.log('check if user already exist in other system with email :', userEmail)
+    const resp = await this.httpUtilService.sendHttp("/national/user/exists", {
+      "email": userEmail
+    });
+    if (typeof resp === 'boolean') {
+      return resp;
+    } else {
+      // 'resp' is of type 'AxiosResponse<any, any>'
+      console.log('Successfully requested and response received for ', userEmail);
+      return resp.data;
+    }
+  }
+
+  public async checkUserExists(email: string) {
+    return await this.findOne(email);
+  }
+
+  private handleDuplicateCompanyError(newCompany: any, existingCompany: any) {
+    let errorMessage = "user.createExistingCompany";
+
+    if (newCompany.taxId === existingCompany.taxId) {
+      errorMessage = "user.createExistingCompanyWithTaxIdIn";
+    } else if (newCompany.paymentId === existingCompany.paymentId) {
+      errorMessage = "user.createExistingCompanyWithPaymentIdIn";
+    } else if (newCompany.email === existingCompany.email) {
+      errorMessage = "user.createExistingCompanyWithEmailIn";
+    }
+
+    if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_TRANSPARENCY) {
+      errorMessage = `${errorMessage}Registry`;
+    } else if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_REGISTRY) {
+      errorMessage = `${errorMessage}Transparency`;
+    }
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        errorMessage,
+        []
+      ),
+      HttpStatus.BAD_REQUEST
+    );
   }
 }
