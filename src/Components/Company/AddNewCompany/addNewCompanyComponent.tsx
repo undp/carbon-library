@@ -158,7 +158,7 @@ export const AddNewCompanyComponent = (props: any) => {
     };
     setLoading(true);
     try {
-      if (requestData.phoneNo) {
+      if (requestData.phoneNo && requestData.phoneNo.length > 4) {
         requestData.phoneNo = formatPhoneNumberIntl(requestData.phoneNo);
       } else {
         requestData.phoneNo = undefined;

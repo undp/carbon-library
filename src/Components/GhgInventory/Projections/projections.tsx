@@ -269,14 +269,14 @@ export const GHGProjectionsComponent = (props: any) => {
     let sum = 0;
     for (const key in obj) {
       if (key === conditionType) {
-        sum += Number.isInteger(obj[key]) ? obj[key] : 0;
+        sum += (typeof obj[key] === "number") ? obj[key] : 0;
       } else if (
         typeof obj[key] === 'object' &&
         key !== 'totalCo2WithLand' &&
         key !== 'totalCo2WithoutLand'
       ) {
         const calculatedSum = calculateSumEmissionView(obj[key], conditionType)
-        sum += Number.isInteger(calculatedSum) ? calculatedSum : 0;
+        sum += (typeof calculatedSum === "number") ? calculatedSum : 0;
       }
     }
     return sum;

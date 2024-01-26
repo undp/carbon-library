@@ -1,10 +1,16 @@
-@import '../../Styles/variables.scss';
+@import "../../Styles/variables.scss";
 
 .steps-actions {
   display: flex;
   flex-direction: row-reverse;
   margin-right: 1rem;
   justify-content: flex-start;
+}
+.details-part-two {
+  .ant-input-number {
+    width: 50%;
+    margin-left: 15px;
+  }
 }
 
 .investment-title-bar {
@@ -51,7 +57,7 @@
     text-align: center;
     .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
       color: $dark-text-color !important;
-      border-color: $primary-purple !important;
+      border-color: $primary-purple;
       box-shadow: none;
       max-width: 200px;
     }
@@ -90,32 +96,32 @@
     border: none;
   }
   .ant-checkbox-checked {
-    .ant-checkbox-input[value='Rejected'] + .ant-checkbox-inner {
+    .ant-checkbox-input[value="Rejected"] + .ant-checkbox-inner {
       background-color: rgba(#ed4d47, 0.6);
       border: none;
     }
 
-    .ant-checkbox-input[value='Cancelled'] + .ant-checkbox-inner {
+    .ant-checkbox-input[value="Cancelled"] + .ant-checkbox-inner {
       background-color: rgba(#3a3541, 0.4);
       border: none;
     }
 
-    .ant-checkbox-input[value='Accepted'] + .ant-checkbox-inner {
+    .ant-checkbox-input[value="Accepted"] + .ant-checkbox-inner {
       background-color: rgba(#16b1ff, 1);
       border: none;
     }
 
-    .ant-checkbox-input[value='Pending'] + .ant-checkbox-inner {
+    .ant-checkbox-input[value="Pending"] + .ant-checkbox-inner {
       background-color: rgba(#76c327, 0.6);
       border: none;
     }
 
-    .ant-checkbox-input[value='Recognised'] + .ant-checkbox-inner {
+    .ant-checkbox-input[value="Recognised"] + .ant-checkbox-inner {
       background-color: rgba(#976ed7, 1);
       border: none;
     }
 
-    .ant-checkbox-input[value='NotRecognised'] + .ant-checkbox-inner {
+    .ant-checkbox-input[value="NotRecognised"] + .ant-checkbox-inner {
       background-color: rgba(#ffa070, 1);
       border: none;
     }
