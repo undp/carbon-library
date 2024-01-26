@@ -391,7 +391,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
       ];
     } else return undefined;
@@ -410,7 +410,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
         {
           key: "role",
@@ -434,7 +434,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
         {
           key: "role",
@@ -453,7 +453,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
         {
           key: "companyRole",
