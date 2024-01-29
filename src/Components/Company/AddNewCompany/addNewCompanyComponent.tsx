@@ -399,7 +399,11 @@ export const AddNewCompanyComponent = (props: any) => {
                   response.data[i].govDep as GovDepartment
                 )
               ];
-            existDep.push(departName);
+            if (response.data[i].govDep !== intialGovDep) {
+              existDep.push(departName);
+            } else {
+              continue;
+            }
           }
         }
         setexistGovdep(existDep);
