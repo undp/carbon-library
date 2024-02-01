@@ -49,7 +49,10 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (genderParityDetails) {
       const values = Object.values(genderParityDetails).filter(
         (val: any) =>
-          (val !== undefined && val.trim().length === 0) || val === undefined
+          (val !== undefined &&
+            typeof val != "boolean" &&
+            val.trim().length === 0) ||
+          val === undefined
       );
       const keys = Object.keys(genderParityDetails);
       if (keys.length === values.length) {
@@ -84,7 +87,10 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     if (coBenefitsAssessmentDetails) {
       const values = Object.values(coBenefitsAssessmentDetails).filter(
         (val: any) =>
-          (val !== undefined && val.trim().length === 0) || val === undefined
+          (val !== undefined &&
+            typeof val != "boolean" &&
+            val.trim().length === 0) ||
+          val === undefined
       );
       const keys = Object.keys(coBenefitsAssessmentDetails);
       if (keys.length === values.length) {
@@ -100,7 +106,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       }
       setIsAssessmentFormValid(isFormValid);
     }
-  }
+  };
   const onSafeguardFormSubmit = (safeguardDetails: any) => {
     setCoBenefitDetails((pre: any) => ({
       ...pre,
@@ -176,21 +182,28 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       label: t("coBenifits:unfcccSdTool"),
       key: "4",
       children: (
-        <><Environmental
-          onFormSubmit={onEnvironmentalFormSubmit}
-          environmentalViewData={viewOnly
-            ? coBenifitsViewDetails?.environmental
-              ? coBenifitsViewDetails?.environmental
-              : {}
-            : undefined}
-          viewOnly={viewOnly || false}
-          translator={translator} />
+        <>
+          <Environmental
+            onFormSubmit={onEnvironmentalFormSubmit}
+            environmentalViewData={
+              viewOnly
+                ? coBenifitsViewDetails?.environmental
+                  ? coBenifitsViewDetails?.environmental
+                  : {}
+                : undefined
+            }
+            viewOnly={viewOnly || false}
+            translator={translator}
+          />
           <Social
             onFormSubmit={onSocialFormSubmit}
-            socialViewData={(viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
-              (!viewOnly && coBenefitsDetails?.socialValueDetails)}
+            socialViewData={
+              (viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
+              (!viewOnly && coBenefitsDetails?.socialValueDetails)
+            }
             viewOnly={viewOnly || false}
-            translator={translator} />
+            translator={translator}
+          />
 
           <Economic
             onFormSubmit={onEconomicFormSubmit}
