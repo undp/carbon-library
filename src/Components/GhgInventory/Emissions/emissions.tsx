@@ -267,14 +267,14 @@ export const GHGEmissionsComponent = (props: any) => {
     let sum = 0;
     for (const key in obj) {
       if (key === gasType) {
-        sum += Number.isInteger(obj[key]) ? obj[key] : 0;
+        sum += (typeof obj[key] === "number") ? obj[key] : 0;
       } else if (
         typeof obj[key] === 'object' &&
         key !== 'totalCo2WithLand' &&
         key !== 'totalCo2WithoutLand'
       ) {
         const calculatedSum = calculateSumEmissionView(obj[key], gasType)
-        sum += Number.isInteger(calculatedSum) ? calculatedSum : 0;
+        sum += (typeof calculatedSum === "number") ? calculatedSum : 0;
       }
     }
     return sum;
@@ -1303,6 +1303,7 @@ export const GHGEmissionsComponent = (props: any) => {
       setWasteCo2Eq(sum);
     }
     if (panelHeading === 'other') {
+      console.log("INSIDE setOtherCo2Eq", formValues.other_indirectN2oEmissions_co2eq, formValues.other_other_co2eq);
       const sum =
         (formValues.other_indirectN2oEmissions_co2eq || 0) + (formValues.other_other_co2eq || 0);
       setOtherCo2Eq(sum);
@@ -1473,21 +1474,21 @@ export const GHGEmissionsComponent = (props: any) => {
               </Tooltip>
             </Col>
             <Col xl={6}>
-              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'ch4')))}>
                 <div className="ch4-total-pill">
                   {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'ch4')))}
                 </div>
               </Tooltip>
             </Col>
             <Col xl={6}>
-              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'n2o')))}>
                 <div className="n2o-total-pill">
                   {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'n2o')))}
                 </div>
               </Tooltip>
             </Col>
             <Col xl={6}>
-              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2eq')))}>
                 <div className="co2eq-total-pill">
                   {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2eq')))}
                 </div>
