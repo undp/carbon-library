@@ -374,6 +374,12 @@ export const InvestmentCreationComponent = (props: any) => {
 
   const prevOne = () => {
     setCurrent(current - 1);
+    if (stepOneData.period && Number.isInteger(stepOneData.period[0])) {
+      stepOneData.period[0] = moment.unix(stepOneData.period[0]);
+    }
+    if (stepOneData.period && Number.isInteger(stepOneData.period[1])) {
+      stepOneData.period[1] = moment.unix(stepOneData.period[1]);
+    }
     setPrevInvestor(stepOneData.toCompanyId);
     // formTwo.resetFields();
     // setCurrentPercTotal(0);
