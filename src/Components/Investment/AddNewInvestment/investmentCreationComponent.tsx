@@ -414,14 +414,14 @@ export const InvestmentCreationComponent = (props: any) => {
         if (typeCreation == InvestmentCreationType.EXISTING) {
           payload.nationalInvestmentId = investmentData.requestId;
         } else {
-          payload.instrument = [payload.instrument];
+          payload.instrument = payload.instrument;
         }
         payload.programmeId = projectData?.programmeId;
         payload.fromCompanyIds = projectData?.companyId.map((e) => Number(e));
         payload.percentage = val.percentage;
         response = await post("national/programme/addInvestment", payload);
       } else {
-        payload.instrument = [payload.instrument];
+        payload.instrument = payload.instrument;
         response = await post("national/organisation/addInvestment", payload);
       }
       console.log("investment creation -> ", response);
