@@ -5,90 +5,89 @@ import { RadioButtonStatus } from "../../../Definitions";
 const SocialEnvironmentalRisk = (props: any) => {
   const { onFormSubmit, SocialEnvironmentalRiskData, viewOnly, translator } =
     props;
-  translator.setDefaultNamespace("socialEnvironmentalRisk");
   const t = translator.t;
   const [form] = Form.useForm();
   const [socialEnvironmentalFormDetails, setSocialEnvironmentalFormDetails] =
     useState();
   const [socialEnvironmentalDetails, setSocialEnvironmentalDetails] = useState([
     {
-      title: t("humanRightsSubHeader"),
+      title: t("socialEnvironmentalRisk:humanRightsSubHeader"),
       isTitleVisible: true,
       subItems: [
         {
-          title: t("humanRights"),
+          title: t("socialEnvironmentalRisk:humanRights"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("humanRightsQ1"),
+              label: t("socialEnvironmentalRisk:humanRightsQ1"),
               name: "humanRightsQ1",
             },
             {
-              label: t("humanRightsQ2"),
+              label: t("socialEnvironmentalRisk:humanRightsQ2"),
               name: "humanRightsQ2",
             },
             {
-              label: t("humanRightsQ3"),
+              label: t("socialEnvironmentalRisk:humanRightsQ3"),
               name: "humanRightsQ3",
             },
             {
-              label: t("humanRightsQ4"),
+              label: t("socialEnvironmentalRisk:humanRightsQ4"),
               name: "humanRightsQ4",
             },
             {
-              label: t("humanRightsQ5"),
+              label: t("socialEnvironmentalRisk:humanRightsQ5"),
               name: "humanRightsQ5",
             },
             {
-              label: t("humanRightsQ6"),
+              label: t("socialEnvironmentalRisk:humanRightsQ6"),
               name: "humanRightsQ6",
             },
             {
-              label: t("humanRightsQ7"),
+              label: t("socialEnvironmentalRisk:humanRightsQ7"),
               name: "humanRightsQ7",
             },
           ],
         },
         {
-          title: t("genderEqalityWomenEmpower"),
+          title: t("socialEnvironmentalRisk:genderEqalityWomenEmpower"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("genderEqalityWomenEmpowerQ1"),
+              label: t("socialEnvironmentalRisk:genderEqalityWomenEmpowerQ1"),
               name: "genderEqalityWomenEmpowerQ1",
             },
             {
-              label: t("genderEqalityWomenEmpowerQ2"),
+              label: t("socialEnvironmentalRisk:genderEqalityWomenEmpowerQ2"),
               name: "genderEqalityWomenEmpowerQ2",
             },
             {
-              label: t("genderEqalityWomenEmpowerQ3"),
+              label: t("socialEnvironmentalRisk:genderEqalityWomenEmpowerQ3"),
               name: "genderEqalityWomenEmpowerQ3",
             },
             {
-              label: t("genderEqalityWomenEmpowerQ4"),
+              label: t("socialEnvironmentalRisk:genderEqalityWomenEmpowerQ4"),
               name: "genderEqalityWomenEmpowerQ4",
             },
             {
-              label: t("genderEqalityWomenEmpowerQ5"),
+              label: t("socialEnvironmentalRisk:genderEqalityWomenEmpowerQ5"),
               name: "genderEqalityWomenEmpowerQ5",
             },
           ],
         },
         {
-          title: t("accountability"),
+          title: t("socialEnvironmentalRisk:accountability"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("accountabilityQ1"),
+              label: t("socialEnvironmentalRisk:accountabilityQ1"),
               name: "accountabilityQ1",
             },
             {
-              label: t("accountabilityQ2"),
+              label: t("socialEnvironmentalRisk:accountabilityQ2"),
               name: "AccountabilityQ2",
             },
             {
-              label: t("accountabilityQ3"),
+              label: t("socialEnvironmentalRisk:accountabilityQ3"),
               name: "accountabilityQ3",
             },
           ],
@@ -96,277 +95,277 @@ const SocialEnvironmentalRisk = (props: any) => {
       ],
     },
     {
-      title: t("standardSubHeader"),
+      title: t("socialEnvironmentalRisk:standardSubHeader"),
       isTitleVisible: true,
       subItems: [
         {
-          title: t("standard1"),
+          title: t("socialEnvironmentalRisk:standard1"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard1Q1"),
+              label: t("socialEnvironmentalRisk:standard1Q1"),
               name: "standard1Q1",
             },
             {
-              label: t("standard1Q2"),
+              label: t("socialEnvironmentalRisk:standard1Q2"),
               name: "standard1Q2",
             },
             {
-              label: t("standard1Q3"),
+              label: t("socialEnvironmentalRisk:standard1Q3"),
               name: "standard1Q3",
             },
             {
-              label: t("standard1Q4"),
+              label: t("socialEnvironmentalRisk:standard1Q4"),
               name: "standard1Q4",
             },
             {
-              label: t("standard1Q5"),
+              label: t("socialEnvironmentalRisk:standard1Q5"),
               name: "standard1Q5",
             },
             {
-              label: t("standard1Q6"),
+              label: t("socialEnvironmentalRisk:standard1Q6"),
               name: "standard1Q6",
             },
             {
-              label: t("standard1Q7"),
+              label: t("socialEnvironmentalRisk:standard1Q7"),
               name: "standard1Q7",
             },
             {
-              label: t("standard1Q8"),
+              label: t("socialEnvironmentalRisk:standard1Q8"),
               name: "standard1Q8",
             },
             {
-              label: t("standard1Q9"),
+              label: t("socialEnvironmentalRisk:standard1Q9"),
               name: "standard1Q9",
             },
             {
-              label: t("standard1Q10"),
+              label: t("socialEnvironmentalRisk:standard1Q10"),
               name: "standard1Q10",
             },
             {
-              label: t("standard1Q11"),
+              label: t("socialEnvironmentalRisk:standard1Q11"),
               name: "standard1Q11",
             },
             {
-              label: t("standard1Q12"),
+              label: t("socialEnvironmentalRisk:standard1Q12"),
               name: "standard1Q12",
             },
             {
-              label: t("standard1Q13"),
+              label: t("socialEnvironmentalRisk:standard1Q13"),
               name: "standard1Q13",
             },
             {
-              label: t("standard1Q14"),
+              label: t("socialEnvironmentalRisk:standard1Q14"),
               name: "standard1Q14",
             },
           ],
         },
         {
-          title: t("standard2"),
+          title: t("socialEnvironmentalRisk:standard2"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard2Q1"),
+              label: t("socialEnvironmentalRisk:standard2Q1"),
               name: "standard2Q1",
             },
             {
-              label: t("standard2Q2"),
+              label: t("socialEnvironmentalRisk:standard2Q2"),
               name: "standard2Q2",
             },
             {
-              label: t("standard2Q3"),
+              label: t("socialEnvironmentalRisk:standard2Q3"),
               name: "standard2Q3",
             },
             {
-              label: t("standard2Q4"),
+              label: t("socialEnvironmentalRisk:standard2Q4"),
               name: "standard2Q4",
             },
           ],
         },
         {
-          title: t("standard3"),
+          title: t("socialEnvironmentalRisk:standard3"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard3Q1"),
+              label: t("socialEnvironmentalRisk:standard3Q1"),
               name: "standard3Q1",
             },
             {
-              label: t("standard3Q2"),
+              label: t("socialEnvironmentalRisk:standard3Q2"),
               name: "standard3Q2",
             },
             {
-              label: t("standard3Q3"),
+              label: t("socialEnvironmentalRisk:standard3Q3"),
               name: "standard3Q3",
             },
             {
-              label: t("standard3Q4"),
+              label: t("socialEnvironmentalRisk:standard3Q4"),
               name: "standard3Q4",
             },
             {
-              label: t("standard3Q5"),
+              label: t("socialEnvironmentalRisk:standard3Q5"),
               name: "standard3Q5",
             },
             {
-              label: t("standard3Q6"),
+              label: t("socialEnvironmentalRisk:standard3Q6"),
               name: "standard3Q6",
             },
             {
-              label: t("standard3Q7"),
+              label: t("socialEnvironmentalRisk:standard3Q7"),
               name: "standard3Q7",
             },
             {
-              label: t("standard3Q8"),
+              label: t("socialEnvironmentalRisk:standard3Q8"),
               name: "standard3Q8",
             },
           ],
         },
         {
-          title: t("standard4"),
+          title: t("socialEnvironmentalRisk:standard4"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard4Q1"),
+              label: t("socialEnvironmentalRisk:standard4Q1"),
               name: "standard4Q1",
             },
             {
-              label: t("standard4Q2"),
+              label: t("socialEnvironmentalRisk:standard4Q2"),
               name: "standard4Q2",
             },
             {
-              label: t("standard4Q3"),
+              label: t("socialEnvironmentalRisk:standard4Q3"),
               name: "standard4Q3",
             },
             {
-              label: t("standard4Q4"),
+              label: t("socialEnvironmentalRisk:standard4Q4"),
               name: "standard4Q4",
             },
             {
-              label: t("standard4Q5"),
+              label: t("socialEnvironmentalRisk:standard4Q5"),
               name: "standard4Q5",
             },
           ],
         },
         {
-          title: t("standard5"),
+          title: t("socialEnvironmentalRisk:standard5"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard5Q1"),
+              label: t("socialEnvironmentalRisk:standard5Q1"),
               name: "standard5Q1",
             },
             {
-              label: t("standard5Q2"),
+              label: t("socialEnvironmentalRisk:standard5Q2"),
               name: "standard5Q2",
             },
             {
-              label: t("standard5Q3"),
+              label: t("socialEnvironmentalRisk:standard5Q3"),
               name: "standard5Q3",
             },
             {
-              label: t("standard5Q4"),
+              label: t("socialEnvironmentalRisk:standard5Q4"),
               name: "standard5Q4",
             },
           ],
         },
         {
-          title: t("standard6"),
+          title: t("socialEnvironmentalRisk:standard6"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard6Q1"),
+              label: t("socialEnvironmentalRisk:standard6Q1"),
               name: "standard6Q1",
             },
             {
-              label: t("standard6Q2"),
+              label: t("socialEnvironmentalRisk:standard6Q2"),
               name: "standard6Q2",
             },
             {
-              label: t("standard6Q3"),
+              label: t("socialEnvironmentalRisk:standard6Q3"),
               name: "standard6Q3",
             },
             {
-              label: t("standard6Q4"),
+              label: t("socialEnvironmentalRisk:standard6Q4"),
               name: "standard6Q4",
             },
             {
-              label: t("standard6Q5"),
+              label: t("socialEnvironmentalRisk:standard6Q5"),
               name: "standard6Q5",
             },
             {
-              label: t("standard6Q6"),
+              label: t("socialEnvironmentalRisk:standard6Q6"),
               name: "standard6Q6",
             },
             {
-              label: t("standard6Q7"),
+              label: t("socialEnvironmentalRisk:standard6Q7"),
               name: "standard6Q7",
             },
             {
-              label: t("standard6Q8"),
+              label: t("socialEnvironmentalRisk:standard6Q8"),
               name: "standard6Q8",
             },
             {
-              label: t("standard6Q9"),
+              label: t("socialEnvironmentalRisk:standard6Q9"),
               name: "standard6Q9",
             },
           ],
         },
         {
-          title: t("standard7"),
+          title: t("socialEnvironmentalRisk:standard7"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard7Q1"),
+              label: t("socialEnvironmentalRisk:standard7Q1"),
               name: "standard7Q1",
             },
             {
-              label: t("standard7Q2"),
+              label: t("socialEnvironmentalRisk:standard7Q2"),
               name: "standard7Q2",
             },
             {
-              label: t("standard7Q3"),
+              label: t("socialEnvironmentalRisk:standard7Q3"),
               name: "standard7Q3",
             },
             {
-              label: t("standard7Q4"),
+              label: t("socialEnvironmentalRisk:standard7Q4"),
               name: "standard7Q4",
             },
             {
-              label: t("standard7Q5"),
+              label: t("socialEnvironmentalRisk:standard7Q5"),
               name: "standard7Q5",
             },
             {
-              label: t("standard7Q6"),
+              label: t("socialEnvironmentalRisk:standard7Q6"),
               name: "standard7Q6",
             },
           ],
         },
         {
-          title: t("standard8"),
+          title: t("socialEnvironmentalRisk:standard8"),
           isTitleVisible: true,
           subItems: [
             {
-              label: t("standard8Q1"),
+              label: t("socialEnvironmentalRisk:standard8Q1"),
               name: "standard8Q1",
             },
             {
-              label: t("standard8Q2"),
+              label: t("socialEnvironmentalRisk:standard8Q2"),
               name: "standard8Q2",
             },
             {
-              label: t("standard8Q3"),
+              label: t("socialEnvironmentalRisk:standard8Q3"),
               name: "standard8Q3",
             },
             {
-              label: t("standard8Q4"),
+              label: t("socialEnvironmentalRisk:standard8Q4"),
               name: "standard8Q4",
             },
             {
-              label: t("standard8Q5"),
+              label: t("socialEnvironmentalRisk:standard8Q5"),
               name: "standard8Q5",
             },
             {
-              label: t("standard8Q6"),
+              label: t("socialEnvironmentalRisk:standard8Q6"),
               name: "standard8Q6",
             },
           ],
@@ -465,7 +464,7 @@ const SocialEnvironmentalRisk = (props: any) => {
                                     className="radio"
                                     value={RadioButtonStatus.YES}
                                   >
-                                    {t("yes")}
+                                    {t("socialEnvironmentalRisk:yes")}
                                   </Radio.Button>
                                 </div>
                                 <div className="radio-container">
@@ -473,7 +472,7 @@ const SocialEnvironmentalRisk = (props: any) => {
                                     className="radio"
                                     value={RadioButtonStatus.NO}
                                   >
-                                    {t("no")}
+                                    {t("socialEnvironmentalRisk:no")}
                                   </Radio.Button>
                                 </div>
                               </Radio.Group>

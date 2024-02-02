@@ -38,7 +38,6 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
   const [coBenefitDetails, setCoBenefitDetails] = useState<any>();
   const [isSocialFormValid, setIsSocialFormValid] = useState<any>(true);
   const [isAssessmentFormValid, setIsAssessmentFormValid] = useState<any>(true);
-  translator.setDefaultNamespace("coBenifits");
   const t = translator.t;
 
   const onSdgGoalsFormSubmit = (sdgGoalsDetails: any) => {
