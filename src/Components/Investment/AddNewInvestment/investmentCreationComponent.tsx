@@ -374,6 +374,12 @@ export const InvestmentCreationComponent = (props: any) => {
 
   const prevOne = () => {
     setCurrent(current - 1);
+    if (stepOneData.period && Number.isInteger(stepOneData.period[0])) {
+      stepOneData.period[0] = moment.unix(stepOneData.period[0]);
+    }
+    if (stepOneData.period && Number.isInteger(stepOneData.period[1])) {
+      stepOneData.period[1] = moment.unix(stepOneData.period[1]);
+    }
     setPrevInvestor(stepOneData.toCompanyId);
     // formTwo.resetFields();
     // setCurrentPercTotal(0);
@@ -414,14 +420,14 @@ export const InvestmentCreationComponent = (props: any) => {
         if (typeCreation == InvestmentCreationType.EXISTING) {
           payload.nationalInvestmentId = investmentData.requestId;
         } else {
-          payload.instrument = [payload.instrument];
+          payload.instrument = payload.instrument;
         }
         payload.programmeId = projectData?.programmeId;
         payload.fromCompanyIds = projectData?.companyId.map((e) => Number(e));
         payload.percentage = val.percentage;
         response = await post("national/programme/addInvestment", payload);
       } else {
-        payload.instrument = [payload.instrument];
+        payload.instrument = payload.instrument;
         response = await post("national/organisation/addInvestment", payload);
       }
       console.log("investment creation -> ", response);
