@@ -21,7 +21,6 @@ export interface CoBenefitProps {
   loading?: any;
   sdgGoalImages?: any;
   translator?: any;
-  useConnection?: any;
 }
 
 export const CoBenifitsComponent = (props: CoBenefitProps) => {
@@ -35,7 +34,6 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     loading = false,
     sdgGoalImages,
     translator,
-    useConnection,
   } = props;
   const [coBenefitDetails, setCoBenefitDetails] = useState<any>();
   const [isSocialFormValid, setIsSocialFormValid] = useState<any>(true);
@@ -193,7 +191,6 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
             (!viewOnly && coBenefitsDetails?.assessmentDetails)
           }
           viewOnly={viewOnly || false}
-          useConnection={useConnection}
           translator={translator}
         />
       ),

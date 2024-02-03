@@ -13,6 +13,8 @@ import {
   Collapse,
   InputNumber,
   message,
+  Tooltip,
+  Empty,
 } from 'antd';
 import {
   UploadOutlined,
@@ -36,12 +38,11 @@ import DiscardChangesConfirmationModel from '../../Common/Models/discardChangesC
 import { ClipboardCheck } from 'react-bootstrap-icons';
 import { GHGRecordState } from '../../../Definitions/Enums/ghg.record.state.enum';
 import GHGUserActionConfirmationModel from '../../Common/Models/ghgUserActionConfirmationModel';
+import { useConnection, useUserContext } from "../../../Context";
 
 export const GHGEmissionsComponent = (props: any) => {
   const {
     t,
-    useUserContext,
-    useConnection,
   } = props;
   const { userInfoState } = useUserContext();
   const [data, setData] = useState<any[]>([]);
@@ -109,6 +110,20 @@ export const GHGEmissionsComponent = (props: any) => {
   const [otherCh4, setOtherCh4] = useState<number>(0);
   const [otherN2o, setOtherN2o] = useState<number>(0);
   const [otherCo2Eq, setOtherCo2Eq] = useState<number>(0);
+
+  const [totalCo2WithoutLandEmissions, setTotalCo2WithoutLandEmissions] = useState({
+    totalCo2WithoutLand_ch4: 0,
+    totalCo2WithoutLand_co2: 0,
+    totalCo2WithoutLand_n2o: 0,
+    totalCo2WithoutLand_co2eq: 0
+  });
+
+  const [totalCo2WithLandEmissions, setTotalCo2WithLandEmissions] = useState({
+    totalCo2WithLand_ch4: 0,
+    totalCo2WithLand_co2: 0,
+    totalCo2WithLand_n2o: 0,
+    totalCo2WithLand_co2eq: 0
+  });
 
   const [isSavedFormDataSet, setIsSavedFormDataSet] = useState<boolean>(false);
   const [formDataVersion, setFormDataVersion] = useState(1);
@@ -252,14 +267,14 @@ export const GHGEmissionsComponent = (props: any) => {
     let sum = 0;
     for (const key in obj) {
       if (key === gasType) {
-        sum += Number.isInteger(obj[key]) ? obj[key] : 0;
+        sum += (typeof obj[key] === "number") ? obj[key] : 0;
       } else if (
         typeof obj[key] === 'object' &&
         key !== 'totalCo2WithLand' &&
         key !== 'totalCo2WithoutLand'
       ) {
         const calculatedSum = calculateSumEmissionView(obj[key], gasType)
-        sum += Number.isInteger(calculatedSum) ? calculatedSum : 0;
+        sum += (typeof calculatedSum === "number") ? calculatedSum : 0;
       }
     }
     return sum;
@@ -1288,6 +1303,7 @@ export const GHGEmissionsComponent = (props: any) => {
       setWasteCo2Eq(sum);
     }
     if (panelHeading === 'other') {
+      console.log("INSIDE setOtherCo2Eq", formValues.other_indirectN2oEmissions_co2eq, formValues.other_other_co2eq);
       const sum =
         (formValues.other_indirectN2oEmissions_co2eq || 0) + (formValues.other_other_co2eq || 0);
       setOtherCo2Eq(sum);
@@ -1387,6 +1403,27 @@ export const GHGEmissionsComponent = (props: any) => {
     }
   };
 
+  const handleTotalCo2WithoutLandEmissions = (field: any, value: any) => {
+    setTotalCo2WithoutLandEmissions(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
+  };
+
+  const handleTotalCo2WithLandEmissions = (field: any, value: any) => {
+    setTotalCo2WithLandEmissions(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
+  };
+
+  // Helper function to get form field value
+  const getFieldValue = (fieldName: string) => {
+    const formValues = form.getFieldsValue(true);
+    const fieldValue = formValues[fieldName];
+    return (fieldValue && fieldValue >= 0) ? addCommSep(Number(fieldValue)) : fieldValue;
+  };
+
   const renderPanelHeader = (panelHeading: any) => (
     <Row gutter={16}>
       <Col xl={12} md={12} className="panel-header-col">
@@ -1395,16 +1432,24 @@ export const GHGEmissionsComponent = (props: any) => {
       <Col xl={9} md={9} className="panel-header-emission-value-col">
         <Row gutter={16}>
           <Col xl={6}>
-            <div className="co2-total-pill">{addCommSep(Number(getCO2Sum(panelHeading)))}</div>
+            <Tooltip title={addCommSep(Number(getCO2Sum(panelHeading)))}>
+              <div className="co2-total-pill">{addCommSep(Number(getCO2Sum(panelHeading)))}</div>
+            </Tooltip>
           </Col>
           <Col xl={6}>
-            <div className="ch4-total-pill">{addCommSep(Number(getCH4Sum(panelHeading)))}</div>
+            <Tooltip title={addCommSep(Number(getCH4Sum(panelHeading)))}>
+              <div className="ch4-total-pill">{addCommSep(Number(getCH4Sum(panelHeading)))}</div>
+            </Tooltip>
           </Col>
           <Col xl={6}>
-            <div className="n2o-total-pill">{addCommSep(Number(getN2OSum(panelHeading)))}</div>
+            <Tooltip title={addCommSep(Number(getN2OSum(panelHeading)))}>
+              <div className="n2o-total-pill">{addCommSep(Number(getN2OSum(panelHeading)))}</div>
+            </Tooltip>
           </Col>
           <Col xl={6}>
-            <div className="co2eq-total-pill">{addCommSep(Number(getCO2EQSum(panelHeading)))}</div>
+            <Tooltip title={addCommSep(Number(getCO2EQSum(panelHeading)))}>
+              <div className="co2eq-total-pill">{addCommSep(Number(getCO2EQSum(panelHeading)))}</div>
+            </Tooltip>
           </Col>
         </Row>
       </Col>
@@ -1422,24 +1467,32 @@ export const GHGEmissionsComponent = (props: any) => {
         <Col xl={9} md={9}>
           <Row gutter={16} className="panel-header-emission-value-col">
             <Col xl={6}>
-              <div className="co2-total-pill">
-                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}
-              </div>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}>
+                <div className="co2-total-pill">
+                  {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2')))}
+                </div>
+              </Tooltip>
             </Col>
             <Col xl={6}>
-              <div className="ch4-total-pill">
-                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'ch4')))}
-              </div>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'ch4')))}>
+                <div className="ch4-total-pill">
+                  {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'ch4')))}
+                </div>
+              </Tooltip>
             </Col>
             <Col xl={6}>
-              <div className="n2o-total-pill">
-                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'n2o')))}
-              </div>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'n2o')))}>
+                <div className="n2o-total-pill">
+                  {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'n2o')))}
+                </div>
+              </Tooltip>
             </Col>
             <Col xl={6}>
-              <div className="co2eq-total-pill">
-                {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2eq')))}
-              </div>
+              <Tooltip title={addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2eq')))}>
+                <div className="co2eq-total-pill">
+                  {addCommSep(Number(calculateSumEmissionView(emissionsObject, 'co2eq')))}
+                </div>
+              </Tooltip>
             </Col>
           </Row>
         </Col>
@@ -1455,65 +1508,73 @@ export const GHGEmissionsComponent = (props: any) => {
       <Col xl={9} md={9}>
         <Row gutter={16} className="panel-content-input-box-row">
           <Col xl={6}>
-            <Form.Item
-              name={panelHeading + '_' + item + '_co2'}
-              rules={[
-                {
-                  validator: async (rule, value) => {
-                    if (value && value < 0) {
-                      throw new Error();
-                    }
+            <Tooltip title={getFieldValue(panelHeading + '_' + item + '_co2')}>
+              <Form.Item
+                name={panelHeading + '_' + item + '_co2'}
+                rules={[
+                  {
+                    validator: async (rule, value) => {
+                      if (value && value < 0) {
+                        throw new Error();
+                      }
+                    },
                   },
-                },
-              ]}
-            >
-              <InputNumber onChange={(event) => calculateSumCo2(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
-            </Form.Item>
+                ]}
+              >
+                <InputNumber onChange={(event) => calculateSumCo2(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly} />
+              </Form.Item>
+            </Tooltip>
           </Col>
           <Col xl={6}>
-            <Form.Item name={panelHeading + '_' + item + '_ch4'}
-              rules={[
-                {
-                  validator: async (rule, value) => {
-                    if (value && value < 0) {
-                      throw new Error();
-                    }
+            <Tooltip title={getFieldValue(panelHeading + '_' + item + '_ch4')}>
+              <Form.Item name={panelHeading + '_' + item + '_ch4'}
+                rules={[
+                  {
+                    validator: async (rule, value) => {
+                      if (value && value < 0) {
+                        throw new Error();
+                      }
+                    },
                   },
-                },
-              ]}
-            >
-              <InputNumber onChange={(event) => calculateSumCh4(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
-            </Form.Item>
+                ]}
+              >
+                <InputNumber onChange={(event) => calculateSumCh4(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly} />
+              </Form.Item>
+            </Tooltip>
           </Col>
           <Col xl={6}>
-            <Form.Item name={panelHeading + '_' + item + '_n2o'}
-              rules={[
-                {
-                  validator: async (rule, value) => {
-                    if (value && value < 0) {
-                      throw new Error();
-                    }
+            <Tooltip title={getFieldValue(panelHeading + '_' + item + '_n2o')}>
+              <Form.Item name={panelHeading + '_' + item + '_n2o'}
+                rules={[
+                  {
+                    validator: async (rule, value) => {
+                      if (value && value < 0) {
+                        throw new Error();
+                      }
+                    },
                   },
-                },
-              ]}
-            >
-              <InputNumber onChange={(event) => calculateSumN2o(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
-            </Form.Item>
+                ]}
+              >
+                <InputNumber onChange={(event) => calculateSumN2o(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly} />
+              </Form.Item>
+            </Tooltip>
           </Col>
           <Col xl={6}>
-            <Form.Item name={panelHeading + '_' + item + '_co2eq'}
-              rules={[
-                {
-                  validator: async (rule, value) => {
-                    if (value && value < 0) {
-                      throw new Error();
-                    }
+            <Tooltip title={getFieldValue(panelHeading + '_' + item + '_co2eq')}>
+              <Form.Item name={panelHeading + '_' + item + '_co2eq'}
+                rules={[
+                  {
+                    validator: async (rule, value) => {
+                      if (value && value < 0) {
+                        throw new Error();
+                      }
+                    },
                   },
-                },
-              ]}
-            >
-              <InputNumber onChange={(event) => calculateSumCo2Eq(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly}/>
-            </Form.Item>
+                ]}
+              >
+                <InputNumber onChange={(event) => calculateSumCo2Eq(event, panelHeading)} disabled={userInfoState?.userRole === Role.ViewOnly} />
+              </Form.Item>
+            </Tooltip>
           </Col>
         </Row>
       </Col>
@@ -1536,16 +1597,32 @@ export const GHGEmissionsComponent = (props: any) => {
         <Col xl={9} md={9}>
           <Row gutter={16} className="panel-content-input-box-row">
             <Col xl={6}>
-              <InputNumber value={co2 ? addCommSep(Number(co2)) : co2} disabled />
+              <Tooltip title={co2 ? addCommSep(Number(co2)) : co2}>
+                <div>
+                  <InputNumber value={co2 ? addCommSep(Number(co2)) : co2} disabled />
+                </div>
+              </Tooltip>
             </Col>
             <Col xl={6}>
-              <InputNumber value={ch4 ? addCommSep(Number(ch4)) : ch4} disabled />
+              <Tooltip title={ch4 ? addCommSep(Number(ch4)) : ch4}>
+                <div>
+                  <InputNumber value={ch4 ? addCommSep(Number(ch4)) : ch4} disabled />
+                </div>
+              </Tooltip>
             </Col>
             <Col xl={6}>
-              <InputNumber value={n2o ? addCommSep(Number(n2o)) : n2o} disabled />
+              <Tooltip title={n2o ? addCommSep(Number(n2o)) : n2o}>
+                <div>
+                  <InputNumber value={n2o ? addCommSep(Number(n2o)) : n2o} disabled />
+                </div>
+              </Tooltip>
             </Col>
             <Col xl={6}>
-              <InputNumber value={co2eq ? addCommSep(Number(co2eq)) : co2eq} disabled />
+              <Tooltip title={co2eq ? addCommSep(Number(co2eq)) : co2eq}>
+                <div>
+                  <InputNumber value={co2eq ? addCommSep(Number(co2eq)) : co2eq} disabled />
+                </div>
+              </Tooltip>
             </Col>
           </Row>
         </Col>
@@ -1635,6 +1712,17 @@ export const GHGEmissionsComponent = (props: any) => {
     return false;
   }
 
+  const displayEmptyView = () => {
+    if (!data || data.length === 0) {
+      if (userInfoState?.companyRole !== CompanyRole.GOVERNMENT && userInfoState?.companyRole !== CompanyRole.MINISTRY) {
+        return true;
+      } else if (userInfoState?.userRole === Role.ViewOnly) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const canViewForm = () => {
     if (userInfoState?.companyRole === CompanyRole.GOVERNMENT || userInfoState?.companyRole === CompanyRole.MINISTRY) {
       if (userInfoState?.userRole === Role.ViewOnly && data.some((item: any) => item.state === 'SAVED')) {
@@ -1655,401 +1743,67 @@ export const GHGEmissionsComponent = (props: any) => {
             <div className="body-sub-title">{t(`ghgInventory:totalNationalEmissionSubTitle`)}</div>
           </div>
         </div>
-        <div className="content-card add-emission">
-          <Tabs defaultActiveKey="Add New" centered>
-            {(canViewForm()) && (
-              <Tabs.TabPane key="Add New" tab={t(`ghgInventory:addNew`)}>
-                <div>
-                  <Form
-                    labelCol={{ span: 20 }}
-                    wrapperCol={{ span: 24 }}
-                    name="add-emission"
-                    className="programme-details-form"
-                    layout="vertical"
-                    requiredMark={true}
-                    form={form}
-                    onValuesChange={onValuesChange}
-                    onFinish={onOpenSaveFormModel}
-                  >
-                    <Row>
-                      <Col xl={12} md={12} className="add-new-year-picker-col">
-                        <div>
-                          <Form.Item
-                            label={t('ghgInventory:year')}
-                            name="year"
-                            rules={[
-                              {
-                                required: true,
-                                message: '',
-                              },
-                              {
-                                validator: async (rule, value) => {
-                                  if (
-                                    String(value).trim() === '' ||
-                                    String(value).trim() === undefined ||
-                                    value === null ||
-                                    value === undefined
-                                  ) {
-                                    throw new Error(`${t('ghgInventory:year')} ${t('isRequired')}`);
-                                  }
-                                },
-                              },
-                            ]}
-                          >
-                            <DatePicker
-                              onChange={handleYearChange}
-                              picker="year"
-                              disabledDate={isYearDisabled}
-                              size="large"
-                              disabled={isPendingFinalization}
-                            />
-                          </Form.Item>
-                        </div>
-                      </Col>
-                      <Col xl={12} md={12} className="add-new-upload-file-col">
-                        <Row className="add-new-upload-file-label">
-                          {t(`ghgInventory:emissionRemovalDocument`)}
-                        </Row>
-                        <Row>
-                          <Col xxl={5} xl={6} md={6} className="add-new-upload-file-inner-col">
-                            <Form.Item
-                              name="emissionsDocument"
-                              valuePropName="fileList"
-                              getValueFromEvent={normFile}
-                              required={true}
-                            >
-                              <Upload
-                                accept=".xlsx"
-                                showUploadList={false}
-                                beforeUpload={(file) => {
-                                  if (!checkFile(file)) {
-                                    message.open({
-                                      type: 'error',
-                                      content: t('ghgInventory:invalidFileType'),
-                                      duration: 4,
-                                      style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
-                                    });
-                                    return false;
-                                  }
-                                  // show an error message in UI
-                                  const reader = new FileReader();
-                                  reader.onload = (e) => {
-                                    const xldata = e.target?.result;
-                                    if (xldata) {
-                                      try {
-                                        const workbook = XLSX.read(xldata, { type: 'array' });
-                                        const sheetName = workbook.SheetNames[0];
-                                        const sheet = workbook.Sheets[sheetName];
-                                        const excelData = XLSX.utils.sheet_to_json(sheet);
-                                        if (!validateExcelDataFormat(sheet, excelData)) {
-                                          message.open({
-                                            type: 'error',
-                                            content: t('ghgInventory:invalidDataInExcel'),
-                                            duration: 4,
-                                            style: {
-                                              textAlign: 'right',
-                                              marginRight: 15,
-                                              marginTop: 10,
-                                            },
-                                          });
-                                          return false;
-                                        }
-                                        handleFileUploadData(excelData);
-                                        setUploadedFileName(file.name);
-                                      } catch (error) {
-                                        console.log(error, 'error', file);
-                                      }
-                                    }
-                                  };
-                                  reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for Excel files
-
-                                  // Prevent upload
-                                  return false;
-                                }}
-                              >
-                                <Button icon={<UploadOutlined />} disabled={userInfoState?.userRole === Role.ViewOnly}>
-                                  {t(`ghgInventory:upload`)}
-                                </Button>
-                              </Upload>
-                            </Form.Item>
-                          </Col>
-                          <Col xl={16} md={16} className="add-new-upload-file-name-input">
-                            <Input
-                              value={uploadedFileName}
-                              disabled={userInfoState?.userRole === Role.ViewOnly}
-                              readOnly
-                              suffix={
-                                uploadedFileName && (
-                                  <Button
-                                    onClick={clearUploadDoc}
-                                    icon={<DeleteOutlined />}
-                                    style={{ marginRight: '-10px', padding: '0px 6px' }}
-                                  />
-                                )
-                              }
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={16}>
-                      <Col span={9} offset={12}>
-                        <Row gutter={16} className="table-heading-row">
-                          <Col xl={6} className="table-heading-col">
-                            CO<sub>2</sub>
-                          </Col>
-                          <Col xl={6} className="table-heading-col">
-                            CH<sub>4</sub>
-                          </Col>
-                          <Col xl={6} className="table-heading-col">
-                            N<sub>2</sub>O
-                          </Col>
-                          <Col xl={6} className="table-heading-col">
-                            CO<sub>2</sub>-eq
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} className="total-emission-row">
-                      <Col xl={12} md={12}>
-                        <span className="total-emission-title">
-                          {t(`ghgInventory:totalNationalEmission`)}
-                        </span>
-                      </Col>
-                      <Col xl={9} md={9}>
-                        <Row gutter={16} className="total-emission-value-col">
-                          <Col xl={6}>
-                            <div className="co2-total-pill">{addCommSep(Number(totalNationalCo2))}</div>
-                          </Col>
-                          <Col xl={6}>
-                            <div className="ch4-total-pill">{addCommSep(Number(totalNationalCh4))}</div>
-                          </Col>
-                          <Col xl={6}>
-                            <div className="n2o-total-pill">{addCommSep(Number(totalNationalN2o))}</div>
-                          </Col>
-                          <Col xl={6}>
-                            <div className="co2eq-total-pill">{addCommSep(Number(totalNationalCo2Eq))}</div>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Collapse
-                      ghost
-                      expandIcon={({ isActive }) =>
-                        isActive ? <MinusCircleOutlined /> : <PlusCircleOutlined />
-                      }
+        {(displayEmptyView()) && (
+          <div className="content-card empty-emission-container">
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <span>
+                  {t("ghgInventory:noEmissions")}
+                </span>
+              }
+            />
+          </div>
+        )}
+        {(!displayEmptyView()) && (
+          <div className="content-card add-emission">
+            <Tabs defaultActiveKey="Add New" centered>
+              {(canViewForm()) && (
+                <Tabs.TabPane key="Add New" tab={t(`ghgInventory:addNew`)}>
+                  <div>
+                    <Form
+                      labelCol={{ span: 20 }}
+                      wrapperCol={{ span: 24 }}
+                      name="add-emission"
+                      className="programme-details-form"
+                      layout="vertical"
+                      requiredMark={true}
+                      form={form}
+                      onValuesChange={onValuesChange}
+                      onFinish={onOpenSaveFormModel}
                     >
-                      {Object.entries(formFields).map(([panelHeading, panelContent]) => (
-                        <Panel header={renderPanelHeader(panelHeading)} key={panelHeading}>
-                          {Array.isArray(panelContent)
-                            ? panelContent.map((item, index) =>
-                              renderPanelContent(panelHeading, item, index)
-                            )
-                            : Object.entries(panelContent).map(
-                              ([subPanelHeading, subPanelContent]) => (
-                                <div className="sub-panel">
-                                  <div className="sub-panel-heading">
-                                    {renderPanelHeader(subPanelHeading)}
-                                  </div>
-                                  {subPanelContent.map((item, index) =>
-                                    renderPanelContent(subPanelHeading, item, index)
-                                  )}
-                                </div>
-                              )
-                            )}
-                        </Panel>
-                      ))}
-                    </Collapse>
-                    <Row
-                      gutter={16}
-                      key={'totalCo2WithoutLand'}
-                      className="total-co2-without-land-row"
-                    >
-                      <Col xl={12} md={12} className="total-co2-without-land-title">
-                        <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
-                      </Col>
-                      <Col xl={9} md={9}>
-                        <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_co2"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly}/>
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_ch4"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_n2o"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithoutLand_co2eq"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
-                      <Col xl={12} md={12} className="total-co2-with-land-title">
-                        <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
-                      </Col>
-                      <Col xl={9} md={9}>
-                        <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_co2"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_ch4"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_n2o"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                          <Col xl={6}>
-                            <Form.Item name="totalCo2WithLand_co2eq"
-                              rules={[
-                                {
-                                  validator: async (rule, value) => {
-                                    if (value && value < 0) {
-                                      throw new Error();
-                                    }
-                                  },
-                                },
-                              ]}
-                            >
-                              <InputNumber disabled={userInfoState?.userRole === Role.ViewOnly} />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    {
-                      ((userInfoState?.companyRole === CompanyRole.GOVERNMENT || userInfoState?.companyRole === CompanyRole.MINISTRY)
-                        && (userInfoState?.userRole !== Role.ViewOnly)) &&
-                      (
-                        <div className="steps-actions">
-                          {userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
-                            (<Button className="finalize-btn" type="primary" loading={loading} onClick={onOpenFinalizeFormModel}>
-                              Finalise
-                            </Button>)}
-                          <Button className="submit-btn" type="primary" onClick={onOpenSaveFormModel} loading={loading}>
-                            Submit
-                          </Button>
-                          <Button className="back-btn" onClick={onOpenResetFormModel} loading={loading}>
-                            Cancel
-                          </Button>
-                        </div>
-                      )
-                    }
-
-                  </Form>
-                </div>
-              </Tabs.TabPane>
-            )}
-
-            {data.map(
-              (tabData: any) =>
-                tabData.state === 'FINALIZED' && (
-                  <Tabs.TabPane className='view-data-panel'
-                    key={tabData.id.toString()}
-                    tab={
-                      <span>
-                        {tabData.year}
-                        {tabData.state === 'FINALIZED' && <LockFilled style={{ marginLeft: 5 }} />}
-                      </span>
-                    }
-                  >
-                    <div>
                       <Row>
                         <Col xl={12} md={12} className="add-new-year-picker-col">
                           <div>
-                            <Row className="add-new-upload-file-label">Year</Row>
-                            <DatePicker
-                              picker="year"
-                              disabledDate={isYearDisabled}
-                              defaultValue={moment(tabData.year, 'YYYY')}
-                              disabled
-                              size="large"
-                            />
+                            <Form.Item
+                              label={t('ghgInventory:year')}
+                              name="year"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: '',
+                                },
+                                {
+                                  validator: async (rule, value) => {
+                                    if (
+                                      String(value).trim() === '' ||
+                                      String(value).trim() === undefined ||
+                                      value === null ||
+                                      value === undefined
+                                    ) {
+                                      throw new Error(`${t('ghgInventory:year')} ${t('isRequired')}`);
+                                    }
+                                  },
+                                },
+                              ]}
+                            >
+                              <DatePicker
+                                onChange={handleYearChange}
+                                picker="year"
+                                disabledDate={isYearDisabled}
+                                size="large"
+                                disabled={isPendingFinalization}
+                              />
+                            </Form.Item>
                           </div>
                         </Col>
                         <Col xl={12} md={12} className="add-new-upload-file-col">
@@ -2057,15 +1811,84 @@ export const GHGEmissionsComponent = (props: any) => {
                             {t(`ghgInventory:emissionRemovalDocument`)}
                           </Row>
                           <Row>
-                            <Col xl={15} md={15} className="view-download-file-name-input">
-                              <Input value={`GHG-Reporting-Emissions_${tabData.year}_V${tabData.version}.csv`} disabled />
-                            </Col>
-                            <Col xl={5} md={5} className="view-download-file-inner-col">
-                              <Button icon={<DownloadOutlined />} onClick={() => { downloadCSV(tabData) }}>
-                                {t(`ghgInventory:download`)}
-                              </Button>
-                            </Col>
+                            <Col xxl={5} xl={6} md={6} className="add-new-upload-file-inner-col">
+                              <Form.Item
+                                name="emissionsDocument"
+                                valuePropName="fileList"
+                                getValueFromEvent={normFile}
+                                required={true}
+                              >
+                                <Upload
+                                  accept=".xlsx"
+                                  showUploadList={false}
+                                  beforeUpload={(file) => {
+                                    if (!checkFile(file)) {
+                                      message.open({
+                                        type: 'error',
+                                        content: t('ghgInventory:invalidFileType'),
+                                        duration: 4,
+                                        style: { textAlign: 'right', marginRight: 15, marginTop: 10 },
+                                      });
+                                      return false;
+                                    }
+                                    // show an error message in UI
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                      const xldata = e.target?.result;
+                                      if (xldata) {
+                                        try {
+                                          const workbook = XLSX.read(xldata, { type: 'array' });
+                                          const sheetName = workbook.SheetNames[0];
+                                          const sheet = workbook.Sheets[sheetName];
+                                          const excelData = XLSX.utils.sheet_to_json(sheet);
+                                          if (!validateExcelDataFormat(sheet, excelData)) {
+                                            message.open({
+                                              type: 'error',
+                                              content: t('ghgInventory:invalidDataInExcel'),
+                                              duration: 4,
+                                              style: {
+                                                textAlign: 'right',
+                                                marginRight: 15,
+                                                marginTop: 10,
+                                              },
+                                            });
+                                            return false;
+                                          }
+                                          handleFileUploadData(excelData);
+                                          setUploadedFileName(file.name);
+                                        } catch (error) {
+                                          console.log(error, 'error', file);
+                                        }
+                                      }
+                                    };
+                                    reader.readAsArrayBuffer(file); // Use readAsArrayBuffer for Excel files
 
+                                    // Prevent upload
+                                    return false;
+                                  }}
+                                >
+                                  <Button icon={<UploadOutlined />} disabled={userInfoState?.userRole === Role.ViewOnly}>
+                                    {t(`ghgInventory:upload`)}
+                                  </Button>
+                                </Upload>
+                              </Form.Item>
+                            </Col>
+                            <Col xl={16} md={16} className="add-new-upload-file-name-input">
+                              <Input
+                                value={uploadedFileName}
+                                disabled={userInfoState?.userRole === Role.ViewOnly}
+                                readOnly
+                                suffix={
+                                  uploadedFileName && (
+                                    <Button
+                                      onClick={clearUploadDoc}
+                                      icon={<DeleteOutlined />}
+                                      style={{ marginRight: '-10px', padding: '0px 6px' }}
+                                    />
+                                  )
+                                }
+                              />
+                            </Col>
                           </Row>
                         </Col>
                       </Row>
@@ -2089,29 +1912,31 @@ export const GHGEmissionsComponent = (props: any) => {
                       </Row>
                       <Row gutter={16} className="total-emission-row">
                         <Col xl={12} md={12}>
-                          <span>{t(`ghgInventory:totalNationalEmission`)}</span>
+                          <span className="total-emission-title">
+                            {t(`ghgInventory:totalNationalEmission`)}
+                          </span>
                         </Col>
-                        <Col xl={9} md={9} className="total-emission-value-col">
-                          <Row gutter={16}>
+                        <Col xl={9} md={9}>
+                          <Row gutter={16} className="total-emission-value-col">
                             <Col xl={6}>
-                              <div className="co2-total-pill">
-                                {addCommSep(Number(calculateSumEmissionView(tabData, 'co2')))}
-                              </div>
+                              <Tooltip title={addCommSep(Number(totalNationalCo2))}>
+                                <div className="co2-total-pill">{addCommSep(Number(totalNationalCo2))}</div>
+                              </Tooltip>
                             </Col>
                             <Col xl={6}>
-                              <div className="ch4-total-pill">
-                                {addCommSep(Number(calculateSumEmissionView(tabData, 'ch4')))}
-                              </div>
+                              <Tooltip title={addCommSep(Number(totalNationalCh4))}>
+                                <div className="ch4-total-pill">{addCommSep(Number(totalNationalCh4))}</div>
+                              </Tooltip>
                             </Col>
                             <Col xl={6}>
-                              <div className="n2o-total-pill">
-                                {addCommSep(Number(calculateSumEmissionView(tabData, 'n2o')))}
-                              </div>
+                              <Tooltip title={addCommSep(Number(totalNationalN2o))}>
+                                <div className="n2o-total-pill">{addCommSep(Number(totalNationalN2o))}</div>
+                              </Tooltip>
                             </Col>
                             <Col xl={6}>
-                              <div className="co2eq-total-pill">
-                                {addCommSep(Number(calculateSumEmissionView(tabData, 'co2eq')))}
-                              </div>
+                              <Tooltip title={addCommSep(Number(totalNationalCo2Eq))}>
+                                <div className="co2eq-total-pill">{addCommSep(Number(totalNationalCo2Eq))}</div>
+                              </Tooltip>
                             </Col>
                           </Row>
                         </Col>
@@ -2122,154 +1947,526 @@ export const GHGEmissionsComponent = (props: any) => {
                           isActive ? <MinusCircleOutlined /> : <PlusCircleOutlined />
                         }
                       >
-                        {Object.entries(formFields).map(([panelHeading, panelContent]) => {
-                          const emissionsObject = tabData[panelHeading];
-                          const sectionTotalCo2 = calculateSumEmissionView(emissionsObject, 'co2');
-                          const sectionTotalCh4 = calculateSumEmissionView(emissionsObject, 'ch4');
-                          const sectionTotalN2o = calculateSumEmissionView(emissionsObject, 'n2o');
-                          const sectionTotalCo2eq = calculateSumEmissionView(emissionsObject, 'co2eq');
-                          if (!isSectionDataEmpty(sectionTotalCo2, sectionTotalCh4, sectionTotalN2o, sectionTotalCo2eq)) {
-                            return (
-                              <Panel
-                                header={renderPanelHeaderView(panelHeading, tabData)}
-                                key={panelHeading}
-                              >
-                                {Array.isArray(panelContent)
-                                  ? panelContent.map((item, index) => {
-                                    for (const key in tabData) {
-                                      if (key === panelHeading) {
-                                        const emissionsObject = tabData[key];
-                                        const emissionsData = emissionsObject[item];
-                                        if (!isRowDataEmpty(emissionsData)) {
-                                          return renderPanelContentView(
-                                            emissionsData?.co2,
-                                            emissionsData?.ch4,
-                                            emissionsData?.n2o,
-                                            emissionsData?.co2eq,
-                                            item,
-                                            index
-                                          );
+                        {Object.entries(formFields).map(([panelHeading, panelContent]) => (
+                          <Panel header={renderPanelHeader(panelHeading)} key={panelHeading}>
+                            {Array.isArray(panelContent)
+                              ? panelContent.map((item, index) =>
+                                renderPanelContent(panelHeading, item, index)
+                              )
+                              : Object.entries(panelContent).map(
+                                ([subPanelHeading, subPanelContent]) => (
+                                  <div className="sub-panel">
+                                    <div className="sub-panel-heading">
+                                      {renderPanelHeader(subPanelHeading)}
+                                    </div>
+                                    {subPanelContent.map((item, index) =>
+                                      renderPanelContent(subPanelHeading, item, index)
+                                    )}
+                                  </div>
+                                )
+                              )}
+                          </Panel>
+                        ))}
+                      </Collapse>
+                      <Row
+                        gutter={16}
+                        key={'totalCo2WithoutLand'}
+                        className="total-co2-without-land-row"
+                      >
+                        <Col xl={12} md={12} className="total-co2-without-land-title">
+                          <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
+                        </Col>
+                        <Col xl={9} md={9}>
+                          <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithoutLand_co2')}>
+                                <Form.Item name="totalCo2WithoutLand_co2"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithoutLand_co2', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithoutLand_ch4')}>
+                                <Form.Item name="totalCo2WithoutLand_ch4"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithoutLand_ch4', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithoutLand_n2o')}>
+                                <Form.Item name="totalCo2WithoutLand_n2o"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithoutLand_n2o', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithoutLand_co2eq')}>
+                                <Form.Item name="totalCo2WithoutLand_co2eq"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithoutLand_co2eq', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
+                        <Col xl={12} md={12} className="total-co2-with-land-title">
+                          <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
+                        </Col>
+                        <Col xl={9} md={9}>
+                          <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithLand_co2')}>
+                                <Form.Item name="totalCo2WithLand_co2"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithLand_co2', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithLand_ch4')}>
+                                <Form.Item name="totalCo2WithLand_ch4"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithLand_ch4', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithLand_n2o')}>
+                                <Form.Item name="totalCo2WithLand_n2o"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithLand_n2o', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                            <Col xl={6}>
+                              <Tooltip title={getFieldValue('totalCo2WithLand_co2eq')}>
+                                <Form.Item name="totalCo2WithLand_co2eq"
+                                  rules={[
+                                    {
+                                      validator: async (rule, value) => {
+                                        if (value && value < 0) {
+                                          throw new Error();
+                                        }
+                                      },
+                                    },
+                                  ]}
+                                >
+                                  <InputNumber
+                                    onChange={(value) => handleTotalCo2WithoutLandEmissions('totalCo2WithLand_co2eq', value)}
+                                    disabled={userInfoState?.userRole === Role.ViewOnly} />
+                                </Form.Item>
+                              </Tooltip>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      {
+                        ((userInfoState?.companyRole === CompanyRole.GOVERNMENT || userInfoState?.companyRole === CompanyRole.MINISTRY)
+                          && (userInfoState?.userRole !== Role.ViewOnly)) &&
+                        (
+                          <div className="steps-actions">
+                            {userInfoState?.companyRole === CompanyRole.GOVERNMENT &&
+                              (<Button className="finalize-btn" type="primary" loading={loading} onClick={onOpenFinalizeFormModel}>
+                                Finalise
+                              </Button>)}
+                            <Button className="submit-btn" type="primary" onClick={onOpenSaveFormModel} loading={loading}>
+                              Submit
+                            </Button>
+                            <Button className="back-btn" onClick={onOpenResetFormModel} loading={loading}>
+                              Cancel
+                            </Button>
+                          </div>
+                        )
+                      }
+
+                    </Form>
+                  </div>
+                </Tabs.TabPane>
+              )}
+
+              {data.map(
+                (tabData: any) =>
+                  tabData.state === 'FINALIZED' && (
+                    <Tabs.TabPane className='view-data-panel'
+                      key={tabData.id.toString()}
+                      tab={
+                        <span>
+                          {tabData.year}
+                          {tabData.state === 'FINALIZED' && <LockFilled style={{ marginLeft: 5 }} />}
+                        </span>
+                      }
+                    >
+                      <div>
+                        <Row>
+                          <Col xl={12} md={12} className="add-new-year-picker-col">
+                            <div>
+                              <Row className="add-new-upload-file-label">Year</Row>
+                              <DatePicker
+                                picker="year"
+                                disabledDate={isYearDisabled}
+                                defaultValue={moment(tabData.year, 'YYYY')}
+                                disabled
+                                size="large"
+                              />
+                            </div>
+                          </Col>
+                          <Col xl={12} md={12} className="add-new-upload-file-col">
+                            <Row className="add-new-upload-file-label">
+                              {t(`ghgInventory:emissionRemovalDocument`)}
+                            </Row>
+                            <Row>
+                              <Col xl={15} md={15} className="view-download-file-name-input">
+                                <Input value={`GHG-Reporting-Emissions_${tabData.year}_V${tabData.version}.csv`} disabled />
+                              </Col>
+                              <Col xl={5} md={5} className="view-download-file-inner-col">
+                                <Button icon={<DownloadOutlined />} onClick={() => { downloadCSV(tabData) }}>
+                                  {t(`ghgInventory:download`)}
+                                </Button>
+                              </Col>
+
+                            </Row>
+                          </Col>
+                        </Row>
+                        <Row gutter={16}>
+                          <Col span={9} offset={12}>
+                            <Row gutter={16} className="table-heading-row">
+                              <Col xl={6} className="table-heading-col">
+                                CO<sub>2</sub>
+                              </Col>
+                              <Col xl={6} className="table-heading-col">
+                                CH<sub>4</sub>
+                              </Col>
+                              <Col xl={6} className="table-heading-col">
+                                N<sub>2</sub>O
+                              </Col>
+                              <Col xl={6} className="table-heading-col">
+                                CO<sub>2</sub>-eq
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                        <Row gutter={16} className="total-emission-row">
+                          <Col xl={12} md={12}>
+                            <span>{t(`ghgInventory:totalNationalEmission`)}</span>
+                          </Col>
+                          <Col xl={9} md={9} className="total-emission-value-col">
+                            <Row gutter={16}>
+                              <Col xl={6}>
+                                <Tooltip title={addCommSep(Number(calculateSumEmissionView(tabData, 'co2')))}>
+                                  <div className="co2-total-pill">
+                                    {addCommSep(Number(calculateSumEmissionView(tabData, 'co2')))}
+                                  </div>
+                                </Tooltip>
+                              </Col>
+                              <Col xl={6}>
+                                <Tooltip title={addCommSep(Number(calculateSumEmissionView(tabData, 'ch4')))}>
+                                  <div className="ch4-total-pill">
+                                    {addCommSep(Number(calculateSumEmissionView(tabData, 'ch4')))}
+                                  </div>
+                                </Tooltip>
+                              </Col>
+                              <Col xl={6}>
+                                <Tooltip title={addCommSep(Number(calculateSumEmissionView(tabData, 'n2o')))}>
+                                  <div className="n2o-total-pill">
+                                    {addCommSep(Number(calculateSumEmissionView(tabData, 'n2o')))}
+                                  </div>
+                                </Tooltip>
+                              </Col>
+                              <Col xl={6}>
+                                <Tooltip title={addCommSep(Number(calculateSumEmissionView(tabData, 'co2eq')))}>
+                                  <div className="co2eq-total-pill">
+                                    {addCommSep(Number(calculateSumEmissionView(tabData, 'co2eq')))}
+                                  </div>
+                                </Tooltip>
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                        <Collapse
+                          ghost
+                          expandIcon={({ isActive }) =>
+                            isActive ? <MinusCircleOutlined /> : <PlusCircleOutlined />
+                          }
+                        >
+                          {Object.entries(formFields).map(([panelHeading, panelContent]) => {
+                            const emissionsObject = tabData[panelHeading];
+                            const sectionTotalCo2 = calculateSumEmissionView(emissionsObject, 'co2');
+                            const sectionTotalCh4 = calculateSumEmissionView(emissionsObject, 'ch4');
+                            const sectionTotalN2o = calculateSumEmissionView(emissionsObject, 'n2o');
+                            const sectionTotalCo2eq = calculateSumEmissionView(emissionsObject, 'co2eq');
+                            if (!isSectionDataEmpty(sectionTotalCo2, sectionTotalCh4, sectionTotalN2o, sectionTotalCo2eq)) {
+                              return (
+                                <Panel
+                                  header={renderPanelHeaderView(panelHeading, tabData)}
+                                  key={panelHeading}
+                                >
+                                  {Array.isArray(panelContent)
+                                    ? panelContent.map((item, index) => {
+                                      for (const key in tabData) {
+                                        if (key === panelHeading) {
+                                          const emissionsObject = tabData[key];
+                                          const emissionsData = emissionsObject[item];
+                                          if (!isRowDataEmpty(emissionsData)) {
+                                            return renderPanelContentView(
+                                              emissionsData?.co2,
+                                              emissionsData?.ch4,
+                                              emissionsData?.n2o,
+                                              emissionsData?.co2eq,
+                                              item,
+                                              index
+                                            );
+                                          }
                                         }
                                       }
-                                    }
-                                  })
-                                  : Object.entries(panelContent).map(
-                                    ([subPanelHeading, subPanelContent]) => {
-                                      const emissionsObject = tabData.energyEmissions[subPanelHeading];
-                                      const sectionTotalCo2 = calculateSumEmissionView(emissionsObject, 'co2');
-                                      const sectionTotalCh4 = calculateSumEmissionView(emissionsObject, 'ch4');
-                                      const sectionTotalN2o = calculateSumEmissionView(emissionsObject, 'n2o');
-                                      const sectionTotalCo2eq = calculateSumEmissionView(emissionsObject, 'co2eq');
-                                      if (!isSectionDataEmpty(sectionTotalCo2, sectionTotalCh4, sectionTotalN2o, sectionTotalCo2eq)) {
-                                        return (
-                                          <div className="sub-panel">
-                                            <div className="sub-panel-heading">
-                                              {renderPanelHeaderView(
-                                                subPanelHeading,
-                                                tabData.energyEmissions
-                                              )}
-                                            </div>
-                                            {subPanelContent.map((item, index) => {
-                                              for (const key in tabData.energyEmissions[
-                                                subPanelHeading
-                                              ]) {
-                                                if (key === item) {
-                                                  const emissionsObject =
-                                                    tabData.energyEmissions[subPanelHeading];
-                                                  const emissionsData = emissionsObject[item];
-                                                  if (!isRowDataEmpty(emissionsData)) {
-                                                    return renderPanelContentView(
-                                                      emissionsData?.co2,
-                                                      emissionsData?.ch4,
-                                                      emissionsData?.n2o,
-                                                      emissionsData?.co2eq,
-                                                      item,
-                                                      index
-                                                    );
+                                    })
+                                    : Object.entries(panelContent).map(
+                                      ([subPanelHeading, subPanelContent]) => {
+                                        const emissionsObject = tabData.energyEmissions[subPanelHeading];
+                                        const sectionTotalCo2 = calculateSumEmissionView(emissionsObject, 'co2');
+                                        const sectionTotalCh4 = calculateSumEmissionView(emissionsObject, 'ch4');
+                                        const sectionTotalN2o = calculateSumEmissionView(emissionsObject, 'n2o');
+                                        const sectionTotalCo2eq = calculateSumEmissionView(emissionsObject, 'co2eq');
+                                        if (!isSectionDataEmpty(sectionTotalCo2, sectionTotalCh4, sectionTotalN2o, sectionTotalCo2eq)) {
+                                          return (
+                                            <div className="sub-panel">
+                                              <div className="sub-panel-heading">
+                                                {renderPanelHeaderView(
+                                                  subPanelHeading,
+                                                  tabData.energyEmissions
+                                                )}
+                                              </div>
+                                              {subPanelContent.map((item, index) => {
+                                                for (const key in tabData.energyEmissions[
+                                                  subPanelHeading
+                                                ]) {
+                                                  if (key === item) {
+                                                    const emissionsObject =
+                                                      tabData.energyEmissions[subPanelHeading];
+                                                    const emissionsData = emissionsObject[item];
+                                                    if (!isRowDataEmpty(emissionsData)) {
+                                                      return renderPanelContentView(
+                                                        emissionsData?.co2,
+                                                        emissionsData?.ch4,
+                                                        emissionsData?.n2o,
+                                                        emissionsData?.co2eq,
+                                                        item,
+                                                        index
+                                                      );
+                                                    }
                                                   }
                                                 }
-                                              }
-                                            })}
-                                          </div>
-                                        )
+                                              })}
+                                            </div>
+                                          )
+                                        }
                                       }
-                                    }
-                                  )}
-                              </Panel>
-                            )
-                          }
-                        })}
-                      </Collapse>
-                      {(!isRowDataEmpty(tabData.totalCo2WithoutLand)) && (
-                        <Row
-                          gutter={16}
-                          key={'totalCo2WithoutLand'}
-                          className="total-co2-without-land-row"
-                        >
-                          <Col xl={12} md={12} className="total-co2-without-land-title">
-                            <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
-                          </Col>
-                          <Col xl={9} md={9}>
-                            <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithoutLand?.co2
-                                  ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2))
-                                  : tabData.totalCo2WithoutLand?.co2} disabled />
-                              </Col>
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithoutLand?.ch4
-                                  ? addCommSep(Number(tabData.totalCo2WithoutLand?.ch4))
-                                  : tabData.totalCo2WithoutLand?.ch4} disabled />
-                              </Col>
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithoutLand?.n2o
-                                  ? addCommSep(Number(tabData.totalCo2WithoutLand?.n2o))
-                                  : tabData.totalCo2WithoutLand?.n2o} disabled />
-                              </Col>
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithoutLand?.co2eq
-                                  ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2eq))
-                                  : tabData.totalCo2WithoutLand?.co2eq} disabled />
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Row>)}
-                      {(!isRowDataEmpty(tabData.totalCo2WithLand)) && (
-                        <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
-                          <Col xl={12} md={12} className="total-co2-with-land-title">
-                            <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
-                          </Col>
-                          <Col xl={9} md={9}>
-                            <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithLand?.co2
-                                  ? addCommSep(Number(tabData.totalCo2WithLand?.co2))
-                                  : tabData.totalCo2WithLand?.co2} disabled />
-                              </Col>
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithLand?.ch4
-                                  ? addCommSep(Number(tabData.totalCo2WithLand?.ch4))
-                                  : tabData.totalCo2WithLand?.ch4} disabled />
-                              </Col>
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithLand?.n2o
-                                  ? addCommSep(Number(tabData.totalCo2WithLand?.n2o))
-                                  : tabData.totalCo2WithLand?.n2o} disabled />
-                              </Col>
-                              <Col xl={6}>
-                                <InputNumber value={tabData.totalCo2WithLand?.co2eq
-                                  ? addCommSep(Number(tabData.totalCo2WithLand?.co2eq))
-                                  : tabData.totalCo2WithLand?.co2eq} disabled />
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Row>)}
-                    </div>
-                  </Tabs.TabPane>
-                )
-            )}
-          </Tabs>
-        </div>
+                                    )}
+                                </Panel>
+                              )
+                            }
+                          })}
+                        </Collapse>
+                        {(!isRowDataEmpty(tabData.totalCo2WithoutLand)) && (
+                          <Row
+                            gutter={16}
+                            key={'totalCo2WithoutLand'}
+                            className="total-co2-without-land-row"
+                          >
+                            <Col xl={12} md={12} className="total-co2-without-land-title">
+                              <span>{t(`ghgInventory:totalCo2WithoutLand`)}</span>
+                            </Col>
+                            <Col xl={9} md={9}>
+                              <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithoutLand?.co2
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2))
+                                    : tabData.totalCo2WithoutLand?.co2}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithoutLand?.co2
+                                        ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2))
+                                        : tabData.totalCo2WithoutLand?.co2} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithoutLand?.ch4
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.ch4))
+                                    : tabData.totalCo2WithoutLand?.ch4}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithoutLand?.ch4
+                                        ? addCommSep(Number(tabData.totalCo2WithoutLand?.ch4))
+                                        : tabData.totalCo2WithoutLand?.ch4} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithoutLand?.n2o
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.n2o))
+                                    : tabData.totalCo2WithoutLand?.n2o}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithoutLand?.n2o
+                                        ? addCommSep(Number(tabData.totalCo2WithoutLand?.n2o))
+                                        : tabData.totalCo2WithoutLand?.n2o} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithoutLand?.co2eq
+                                    ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2eq))
+                                    : tabData.totalCo2WithoutLand?.co2eq}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithoutLand?.co2eq
+                                        ? addCommSep(Number(tabData.totalCo2WithoutLand?.co2eq))
+                                        : tabData.totalCo2WithoutLand?.co2eq} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>)}
+                        {(!isRowDataEmpty(tabData.totalCo2WithLand)) && (
+                          <Row gutter={16} key={'totalCo2WithLand'} className="total-co2-with-land-row">
+                            <Col xl={12} md={12} className="total-co2-with-land-title">
+                              <span>{t(`ghgInventory:totalCo2WithLand`)}</span>
+                            </Col>
+                            <Col xl={9} md={9}>
+                              <Row gutter={16} className="panel-content-input-box-row total-co2-land-input-box-row">
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithLand?.co2
+                                    ? addCommSep(Number(tabData.totalCo2WithLand?.co2))
+                                    : tabData.totalCo2WithLand?.co2}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithLand?.co2
+                                        ? addCommSep(Number(tabData.totalCo2WithLand?.co2))
+                                        : tabData.totalCo2WithLand?.co2} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithLand?.ch4
+                                    ? addCommSep(Number(tabData.totalCo2WithLand?.ch4))
+                                    : tabData.totalCo2WithLand?.ch4}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithLand?.ch4
+                                        ? addCommSep(Number(tabData.totalCo2WithLand?.ch4))
+                                        : tabData.totalCo2WithLand?.ch4} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithLand?.n2o
+                                    ? addCommSep(Number(tabData.totalCo2WithLand?.n2o))
+                                    : tabData.totalCo2WithLand?.n2o}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithLand?.n2o
+                                        ? addCommSep(Number(tabData.totalCo2WithLand?.n2o))
+                                        : tabData.totalCo2WithLand?.n2o} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                                <Col xl={6}>
+                                  <Tooltip title={tabData.totalCo2WithLand?.co2eq
+                                    ? addCommSep(Number(tabData.totalCo2WithLand?.co2eq))
+                                    : tabData.totalCo2WithLand?.co2eq}>
+                                    <div>
+                                      <InputNumber value={tabData.totalCo2WithLand?.co2eq
+                                        ? addCommSep(Number(tabData.totalCo2WithLand?.co2eq))
+                                        : tabData.totalCo2WithLand?.co2eq} disabled />
+                                    </div>
+                                  </Tooltip>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>)}
+                      </div>
+                    </Tabs.TabPane>
+                  )
+              )}
+            </Tabs>
+          </div>
+        )}
       </div>
       <GHGUserActionConfirmationModel
         t={t}

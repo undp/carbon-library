@@ -45,7 +45,6 @@ export const ListWidgetComponent: FC<ListWidgetProps> = (
           <div className="title-section">
             <div className="title">
               {title}
-              {subTitle && <div className="unit">{subTitle}</div>}
             </div>
             <div className="info-container">
               <Tooltip
@@ -58,8 +57,9 @@ export const ListWidgetComponent: FC<ListWidgetProps> = (
                 <InfoCircle color="#000000" size={17} />
               </Tooltip>
             </div>
+            {subTitle && <div className="unit">{subTitle}</div>}
           </div>
-          <div className="total-programme-details">
+          <div className="mrv-total-programme-details">
             <div className="details">
               <div className="detail">{totalText}</div>
               <div className="value">{addCommSepRound(total)}</div>
