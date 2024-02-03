@@ -14,5 +14,6 @@
     "companyApprovalSuccess": "Successfully approved the company",
     "companyRejectionFailed": "Company rejection failed. Please try again",
     "companyRejectionSuccess": "Successfully rejected the company",
-    "nationalSopValue": "National Share of Proceeds"
+    "nationalSopValue": "National Share of Proceeds",
+    "companyTaxIdCannotUpdate": "Company Tax ID cannot be updated"
 }

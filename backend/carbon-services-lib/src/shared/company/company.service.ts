@@ -912,6 +912,16 @@ export class CompanyService {
       );
     }
 
+    if (company.taxId !== companyUpdateDto.taxId) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'company.companyTaxIdCannotUpdate',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     if (companyUpdateDto.logo) {
       const response: any = await this.fileHandler.uploadFile(
         `profile_images/${
