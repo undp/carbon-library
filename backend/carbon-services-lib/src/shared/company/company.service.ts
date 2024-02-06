@@ -912,7 +912,9 @@ export class CompanyService {
       );
     }
 
-    if (company.taxId !== companyUpdateDto.taxId) {
+    if (company.companyRole !== CompanyRole.GOVERNMENT && 
+      company.companyRole !== CompanyRole.MINISTRY && 
+      company.taxId !== companyUpdateDto.taxId) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           'company.companyTaxIdCannotUpdate',
