@@ -224,13 +224,16 @@ export class CadtApiService {
   public async issueCredit(
     programme: Programme,
     // ndcAction: NDCAction,
-    amount: number
+    issueAmounts: any[]
   ) {
 
     if (!programme.cadtId) {
         this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
         return;
     }
+
+    const amount = issueAmounts.reduce((n, {issueCredit}) => n + issueCredit, 0)
+    console.log("Programme", programme, amount)
 
     const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
@@ -248,12 +251,13 @@ export class CadtApiService {
         issuesStart = Number(blockBounds[cId][blockBounds[cId].length - 1].unitBlockEnd) + 1
       }
 
+
       const cAmount = Number((amount * programme.proponentPercentage[cIndex]/100).toFixed(0))
       const gap = Number((programme.creditEst * programme.proponentPercentage[cIndex]/100).toFixed(0))
       const req = {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
         "unitOwner": cName,
-        "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
+        "countryJurisdictionOfOwner": "Nigeria",         // this.configService.get('systemCountryName'),
         "unitBlockStart": String(issuesStart),
         "unitBlockEnd": String(issuesStart + cAmount - 1),
         "unitCount": cAmount,
@@ -364,7 +368,7 @@ export class CadtApiService {
           "warehouseUnitId": bound.unitId,
           "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
           "unitOwner": toCompany?.name,
-          "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
+          "countryJurisdictionOfOwner": "Nigeria", //this.configService.get('systemCountryName'),
           "unitBlockStart": String(bound.unitBlockStart),
           "unitBlockEnd": String(bound.unitBlockEnd),
           "unitCount": Number(bound.amount),
