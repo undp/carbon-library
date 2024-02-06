@@ -257,7 +257,7 @@ export class CadtApiService {
       const req = {
         "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
         "unitOwner": cName,
-        "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
+        "countryJurisdictionOfOwner": "Nigeria",         // this.configService.get('systemCountryName'),
         "unitBlockStart": String(issuesStart),
         "unitBlockEnd": String(issuesStart + cAmount - 1),
         "unitCount": cAmount,
@@ -368,7 +368,7 @@ export class CadtApiService {
           "warehouseUnitId": bound.unitId,
           "projectLocationId": programme.programmeProperties.geographicalLocation?.join(' '),
           "unitOwner": toCompany?.name,
-          "countryJurisdictionOfOwner": this.configService.get('systemCountryName'),
+          "countryJurisdictionOfOwner": "Nigeria", //this.configService.get('systemCountryName'),
           "unitBlockStart": String(bound.unitBlockStart),
           "unitBlockEnd": String(bound.unitBlockEnd),
           "unitCount": Number(bound.amount),
