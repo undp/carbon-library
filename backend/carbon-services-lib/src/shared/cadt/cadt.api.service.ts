@@ -224,13 +224,16 @@ export class CadtApiService {
   public async issueCredit(
     programme: Programme,
     // ndcAction: NDCAction,
-    amount: number
+    issueAmounts: any[]
   ) {
 
     if (!programme.cadtId) {
         this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
         return;
     }
+
+    const amount = issueAmounts.reduce((n, {issueCredit}) => n + issueCredit, 0)
+    console.log("Programme", programme, amount)
 
     const gov = await this.companyService.findGovByCountry(this.configService.get('systemCountry'));
     const blockStart = this.getBlockStartFromSerialNumber(programme.serialNo) + Number(programme.creditIssued);
@@ -247,6 +250,7 @@ export class CadtApiService {
       if (blockBounds[cId] && blockBounds[cId].length > 0) {
         issuesStart = Number(blockBounds[cId][blockBounds[cId].length - 1].unitBlockEnd) + 1
       }
+
 
       const cAmount = Number((amount * programme.proponentPercentage[cIndex]/100).toFixed(0))
       const gap = Number((programme.creditEst * programme.proponentPercentage[cIndex]/100).toFixed(0))
