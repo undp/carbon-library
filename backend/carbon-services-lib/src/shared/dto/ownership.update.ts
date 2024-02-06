@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
+import { ArrayMinSize, IsArray, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, isInt } from "class-validator";
 
 export class OwnershipUpdateDto {
 
@@ -37,4 +37,15 @@ export class OwnershipUpdateDto {
     @IsNumber()
     shareFromOwner: number;
 
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsNumber()
+    amount: number;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsNumber()
+    @IsInt()
+    @IsPositive()
+    investmentRequestId: number;
 }
