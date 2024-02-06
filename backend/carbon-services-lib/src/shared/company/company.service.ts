@@ -1,4 +1,4 @@
-import { PG_UNIQUE_VIOLATION } from "@drdgvhbh/postgres-error-codes";
+import { PG_UNIQUE_VIOLATION } from '@drdgvhbh/postgres-error-codes';
 import {
   forwardRef,
   HttpException,
@@ -6,46 +6,58 @@ import {
   Inject,
   Injectable,
   Logger,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { InjectRepository } from "@nestjs/typeorm";
-import { OrganisationDto } from "../dto/organisation.dto";
-import { QueryFailedError, Repository } from "typeorm";
-import { Company } from "../entities/company.entity";
-import { CompanyRole } from "../enum/company.role.enum";
-import { QueryDto } from "../dto/query.dto";
-import { DataListResponseDto } from "../dto/data.list.response";
-import { BasicResponseDto } from "../dto/basic.response.dto";
-import { CompanyState } from "../enum/company.state.enum";
-import { HelperService } from "../util/helpers.service";
-import { FindOrganisationQueryDto } from "../dto/find.organisation.dto";
-import { ProgrammeLedgerService } from "../programme-ledger/programme-ledger.service";
-import { OrganisationUpdateDto } from "../dto/organisation.update.dto";
-import { DataResponseDto } from "../dto/data.response.dto";
-import { ProgrammeTransfer } from "../entities/programme.transfer";
-import { TransferStatus } from "../enum/transform.status.enum";
-import { User } from "../entities/user.entity";
-import { EmailHelperService } from "../email-helper/email-helper.service";
-import { Programme } from "../entities/programme.entity";
-import { EmailTemplates } from "../email-helper/email.template";
-import { SystemActionType } from "../enum/system.action.type";
-import { FileHandlerInterface } from "../file-handler/filehandler.interface";
-import { CounterType } from "../util/counter.type.enum";
-import { CounterService } from "../util/counter.service";
-import { FilterEntry } from "../dto/filter.entry";
-import { UserService } from "../user/user.service";
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OrganisationDto } from '../dto/organisation.dto';
+import { QueryFailedError, Repository } from 'typeorm';
+import { Company } from '../entities/company.entity';
+import { CompanyRole } from '../enum/company.role.enum';
+import { QueryDto } from '../dto/query.dto';
+import { DataListResponseDto } from '../dto/data.list.response';
+import { BasicResponseDto } from '../dto/basic.response.dto';
+import { CompanyState } from '../enum/company.state.enum';
+import { HelperService } from '../util/helpers.service';
+import { FindOrganisationQueryDto } from '../dto/find.organisation.dto';
+import { ProgrammeLedgerService } from '../programme-ledger/programme-ledger.service';
+import { OrganisationUpdateDto } from '../dto/organisation.update.dto';
+import { DataResponseDto } from '../dto/data.response.dto';
+import { ProgrammeTransfer } from '../entities/programme.transfer';
+import { TransferStatus } from '../enum/transform.status.enum';
+import { User } from '../entities/user.entity';
+import { EmailHelperService } from '../email-helper/email-helper.service';
+import { Programme } from '../entities/programme.entity';
+import { EmailTemplates } from '../email-helper/email.template';
+import { SystemActionType } from '../enum/system.action.type';
+import { FileHandlerInterface } from '../file-handler/filehandler.interface';
+import { CounterType } from '../util/counter.type.enum';
+import { CounterService } from '../util/counter.service';
+import { FilterEntry } from '../dto/filter.entry';
+import { UserService } from '../user/user.service';
 import {
   AsyncAction,
   AsyncOperationsInterface,
-} from "../async-operations/async-operations.interface";
-import { AsyncActionType } from "../enum/async.action.type.enum";
-import { LocationInterface } from "../location/location.interface";
-import { SYSTEM_TYPE } from "../enum/system.names.enum";
+} from '../async-operations/async-operations.interface';
+import { AsyncActionType } from '../enum/async.action.type.enum';
+import { LocationInterface } from '../location/location.interface';
+import { DataExportQueryDto } from '../dto/data.export.query.dto';
+import { DataExportService } from '../util/data.export.service';
+import { DataExportCompanyDto } from '../dto/data.export.company.dto';
+import { SYSTEM_TYPE } from '../enum/system.names.enum';
+import { InvestmentDto } from '../dto/investment.dto';
+import { plainToClass } from 'class-transformer';
+import { Investment } from '../entities/investment.entity';
+import { InvestmentStatus } from '../enum/investment.status';
+import { InvestmentCategoryEnum } from '../enum/investment.category.enum';
+import { InvestmentSyncDto } from '../dto/investment.sync.dto';
+import { SectoralScope } from '../enum/sectoral.scope.enum';
+import { HttpUtilService } from "../util/http.util.service";
+import { OrganisationDuplicateCheckDto } from "../dto/organisation.duplicate.check.dto";
 
 @Injectable()
 export class CompanyService {
   constructor(
-  @InjectRepository(Company) private companyRepo: Repository<Company>,
+    @InjectRepository(Company) private companyRepo: Repository<Company>,
     private logger: Logger,
     private configService: ConfigService,
     private helperService: HelperService,
@@ -59,35 +71,39 @@ export class CompanyService {
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private asyncOperationsInterface: AsyncOperationsInterface,
-    private locationService: LocationInterface
+    private locationService: LocationInterface,
+    @InjectRepository(Investment)
+    private investmentRepo: Repository<Investment>,
+    private dataExportService: DataExportService,
+    private httpUtilService: HttpUtilService
   ) {}
 
   async suspend(
     companyId: number,
     user: any,
     remarks: string,
-    abilityCondition: string
+    abilityCondition: string,
   ): Promise<any> {
-    this.logger.verbose("Suspend company", companyId);
+    this.logger.verbose('Suspend company', companyId);
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
         `"companyId" = '${companyId}' and state = '1' ${
           abilityCondition
-            ? " AND (" +
+            ? ' AND (' +
               this.helperService.parseMongoQueryToSQL(abilityCondition) +
-              ")"
-            : ""
-        }`
+              ')'
+            : ''
+        }`,
       )
       .getOne();
     if (!company) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
-          "company.noActiveCompany",
-          []
+          'company.noActiveCompany',
+          [],
         ),
-        HttpStatus.UNAUTHORIZED
+        HttpStatus.UNAUTHORIZED,
       );
     }
     const result = await this.companyRepo
@@ -98,7 +114,7 @@ export class CompanyService {
         {
           state: CompanyState.SUSPENDED,
           remarks: remarks,
-        }
+        },
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -111,27 +127,27 @@ export class CompanyService {
         await this.programmeLedgerService.freezeCompany(
           companyId,
           this.getUserRefWithRemarks(user, `${remarks}#${company.name}`),
-          true
+          true,
         );
         await this.companyTransferCancel(
           companyId,
-          `${remarks}#${user.companyId}#${user.id}#${SystemActionType.SUSPEND_AUTO_CANCEL}#${company.name}#${user.companyName}`
+          `${remarks}#${user.companyId}#${user.id}#${SystemActionType.SUSPEND_AUTO_CANCEL}#${company.name}#${user.companyName}`,
         );
         await this.emailHelperService.sendEmail(
           company.email,
           EmailTemplates.PROGRAMME_DEVELOPER_ORG_DEACTIVATION,
           {},
-          user.companyId
+          user.companyId,
         );
       } else if (company.companyRole === CompanyRole.CERTIFIER) {
         await this.programmeLedgerService.revokeCompanyCertifications(
           companyId,
           this.getUserRefWithRemarks(
             user,
-            `${remarks}#${SystemActionType.SUSPEND_REVOKE}#${company.name}`
+            `${remarks}#${SystemActionType.SUSPEND_REVOKE}#${company.name}`,
           ),
           async (programme: Programme) => {
-            const hostAddress = this.configService.get("host");
+            const hostAddress = this.configService.get('host');
             await this.emailHelperService.sendEmailToProgrammeOwnerAdmins(
               programme.programmeId,
               EmailTemplates.PROGRAMME_CERTIFICATION_REVOKE_BY_SYSTEM,
@@ -143,58 +159,172 @@ export class CompanyService {
                 pageLink:
                   hostAddress +
                   `/programmeManagement/view/${programme.programmeId}`,
-              }
+              },
             );
-          }
+          },
         );
 
         await this.emailHelperService.sendEmail(
           company.email,
           EmailTemplates.CERTIFIER_ORG_DEACTIVATION,
           {},
-          user.companyId
+          user.companyId,
         );
       }
       return new BasicResponseDto(
         HttpStatus.OK,
         this.helperService.formatReqMessagesString(
-          "company.suspendCompanySuccess",
-          []
-        )
+          'company.suspendCompanySuccess',
+          [],
+        ),
       );
     }
     throw new HttpException(
-      this.helperService.formatReqMessagesString("company.suspendFailed", []),
-      HttpStatus.INTERNAL_SERVER_ERROR
+      this.helperService.formatReqMessagesString('company.suspendFailed', []),
+      HttpStatus.INTERNAL_SERVER_ERROR,
     );
+  }
+
+  async addNationalInvestment(
+    req: InvestmentDto,
+    requester: User,
+  ): Promise<any> {
+    //validations
+    this.logger.log(
+      `National investment request by ${requester.companyId}-${
+        requester.id
+      } received ${JSON.stringify(req)}`,
+    );
+    //requester validations
+    if (
+      requester.companyRole !== CompanyRole.GOVERNMENT &&
+      requester.companyRole != CompanyRole.MINISTRY &&
+      requester.companyId !== req.toCompanyId
+    ) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'company.cannotAddNationalInvestmentOnOtherCompanies',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    //to company validations
+    const companyDetails = await this.findByCompanyId(req.toCompanyId);
+    if (
+      companyDetails &&
+      companyDetails.companyRole !== CompanyRole.PROGRAMME_DEVELOPER
+    ) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString('user.investerUserAuth', []),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    //add investment
+    const investment = plainToClass(Investment, req);
+    investment.toCompanyId = req.toCompanyId;
+    investment.fromCompanyId = req.toCompanyId;
+    investment.initiator = requester.id;
+    investment.initiatorCompanyId = requester.companyId;
+    investment.txTime = new Date().getTime();
+    investment.createdTime = investment.txTime;
+    investment.amount = Math.round(req.amount);
+    investment.status = InvestmentStatus.APPROVED;
+    investment.category = InvestmentCategoryEnum.National;
+    investment.nationalInvestmentId = null
+    const results = await this.investmentRepo
+      .insert([investment])
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+    investment.requestId = results.identifiers[0].requestId;
+    investment.investmentName = `${companyDetails.name}_${
+      req.instrument && req.instrument.length
+        ? `${req.instrument.join('&')}_`
+        : ''
+    }${investment.requestId}`;
+    const result = await this.investmentRepo
+      .update(
+        {
+          requestId: investment.requestId,
+        },
+        {
+          investmentName: investment.investmentName,
+        },
+      )
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+    console.log('Investment', investment);
+    //sync investment
+    await this.asyncOperationsInterface.AddAction({
+      actionType: AsyncActionType.NationalInvestment,
+      actionProps: {
+        investorTaxId: companyDetails.taxId,
+        amount: investment.amount,
+        requestId: investment.requestId,
+        txRef: `${investment.requestId}#${investment.investmentName}`,
+      },
+    });
+    if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_UNIFIED) {
+      await this.programmeLedgerService.addCompanyInvestment(
+        investment.requestId,
+        investment.toCompanyId,
+        investment.amount,
+        `${investment.requestId}#${investment.investmentName}`,
+      );
+    }
+    return new DataResponseDto(HttpStatus.OK, investment);
+  }
+
+  async addInvestmentOnLedger(investment: InvestmentSyncDto): Promise<any> {
+    const compo = await this.findByTaxId(investment.investorTaxId);
+    if (!compo) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.proponentTaxIdNotInSystem',
+          [investment.investorTaxId],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const resp = await this.programmeLedgerService.addCompanyInvestment(
+      investment.requestId,
+      compo.companyId,
+      investment.amount,
+      investment.txRef,
+    );
+    return new DataResponseDto(HttpStatus.OK, resp);
   }
 
   async activate(
     companyId: number,
     user: User,
     remarks: string,
-    abilityCondition: string
+    abilityCondition: string,
   ): Promise<any> {
-    this.logger.verbose("revoke company", companyId);
+    this.logger.verbose('revoke company', companyId);
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
         `"companyId" = '${companyId}' and state = '0' ${
           abilityCondition
-            ? " AND (" +
+            ? ' AND (' +
               this.helperService.parseMongoQueryToSQL(abilityCondition) +
-              ")"
-            : ""
-        }`
+              ')'
+            : ''
+        }`,
       )
       .getOne();
     if (!company) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
-          "company.noSuspendedCompany",
-          []
+          'company.noSuspendedCompany',
+          [],
         ),
-        HttpStatus.UNAUTHORIZED
+        HttpStatus.UNAUTHORIZED,
       );
     }
     const result = await this.companyRepo
@@ -204,7 +334,7 @@ export class CompanyService {
         },
         {
           state: CompanyState.ACTIVE,
-        }
+        },
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -215,55 +345,52 @@ export class CompanyService {
       await this.programmeLedgerService.freezeCompany(
         companyId,
         this.getUserRefWithRemarks(user, `${remarks}#${company.name}`),
-        false
+        false,
       );
       await this.emailHelperService.sendEmail(
         company.email,
         EmailTemplates.ORG_REACTIVATION,
         {},
-        user.companyId
+        user.companyId,
       );
       return new BasicResponseDto(
         HttpStatus.OK,
         this.helperService.formatReqMessagesString(
-          "company.companyActivationSuccess",
-          []
-        )
+          'company.companyActivationSuccess',
+          [],
+        ),
       );
     }
     throw new HttpException(
       this.helperService.formatReqMessagesString(
-        "company.companyActivationFailed",
-        []
+        'company.companyActivationFailed',
+        [],
       ),
-      HttpStatus.INTERNAL_SERVER_ERROR
+      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
 
-
-  async approve(
-    companyId: number,
-    abilityCondition: string
-  ): Promise<any> {
-    this.logger.verbose("approve company", companyId);
+  async approve(companyId: number, abilityCondition: string): Promise<any> {
+    this.logger.verbose('approve company', companyId);
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
-        `"companyId" = '${companyId}' and (state ='2' or  state ='3') ${abilityCondition
-          ? " AND (" +
-          this.helperService.parseMongoQueryToSQL(abilityCondition) +
-          ")"
-          : ""
-        }`
+        `"companyId" = '${companyId}' and (state ='2' or  state ='3') ${
+          abilityCondition
+            ? ' AND (' +
+              this.helperService.parseMongoQueryToSQL(abilityCondition) +
+              ')'
+            : ''
+        }`,
       )
       .getOne();
     if (!company) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
-          "company.noPendingCompany",
-          []
+          'company.noPendingCompany',
+          [],
         ),
-        HttpStatus.UNAUTHORIZED
+        HttpStatus.UNAUTHORIZED,
       );
     }
     const result = await this.companyRepo
@@ -273,7 +400,7 @@ export class CompanyService {
         },
         {
           state: CompanyState.ACTIVE,
-        }
+        },
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -282,15 +409,15 @@ export class CompanyService {
 
     if (result.affected > 0) {
       try {
-        const hostAddress = this.configService.get("host");
+        const hostAddress = this.configService.get('host');
         const res = await this.userService.approveUser(company);
         const templateData = {
           organisationName: company.name,
-          countryName: this.configService.get("systemCountryName"),
-          systemName: this.configService.get("systemName"),
+          countryName: this.configService.get('systemCountryName'),
+          systemName: this.configService.get('systemName'),
           organisationRole:
             company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
-              ? "Programme Developer"
+              ? 'Programme Developer'
               : company.companyRole,
           home: hostAddress,
         };
@@ -301,14 +428,14 @@ export class CompanyService {
             emailType: EmailTemplates.ORGANISATION_CREATE.id,
             sender: company.email,
             subject: this.helperService.getEmailTemplateMessage(
-              EmailTemplates.ORGANISATION_CREATE["subject"],
+              EmailTemplates.ORGANISATION_CREATE['subject'],
               templateData,
-              true
+              true,
             ),
             emailBody: this.helperService.getEmailTemplateMessage(
-              EmailTemplates.ORGANISATION_CREATE["html"],
+              EmailTemplates.ORGANISATION_CREATE['html'],
               templateData,
-              false
+              false,
             ),
           },
         };
@@ -316,55 +443,55 @@ export class CompanyService {
       } catch (error) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "company.companyApprovalFailed",
-            []
+            'company.companyApprovalFailed',
+            [],
           ),
-          HttpStatus.INTERNAL_SERVER_ERROR
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
       return new BasicResponseDto(
         HttpStatus.OK,
         this.helperService.formatReqMessagesString(
-          "company.companyApprovalSuccess",
-          []
-        )
+          'company.companyApprovalSuccess',
+          [],
+        ),
       );
     }
     throw new HttpException(
       this.helperService.formatReqMessagesString(
-        "company.companyApprovalFailed",
-        []
+        'company.companyApprovalFailed',
+        [],
       ),
-      HttpStatus.INTERNAL_SERVER_ERROR
+      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
-
 
   async reject(
     companyId: number,
     user: User,
     remarks: string,
-    abilityCondition: string
+    abilityCondition: string,
   ): Promise<any> {
-    this.logger.verbose("approve company", companyId);
+    this.logger.verbose('approve company', companyId);
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
-        `"companyId" = '${companyId}' and state = '2' ${abilityCondition
-          ? " AND (" +
-          this.helperService.parseMongoQueryToSQL(abilityCondition) +
-          ")"
-          : ""
-        }`
+        `"companyId" = '${companyId}' and state = '2' ${
+          abilityCondition
+            ? ' AND (' +
+              this.helperService.parseMongoQueryToSQL(abilityCondition) +
+              ')'
+            : ''
+        }`,
       )
       .getOne();
     if (!company) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
-          "company.noPendingCompany",
-          []
+          'company.noPendingCompany',
+          [],
         ),
-        HttpStatus.UNAUTHORIZED
+        HttpStatus.UNAUTHORIZED,
       );
     }
     const result = await this.companyRepo
@@ -374,7 +501,7 @@ export class CompanyService {
         },
         {
           state: CompanyState.REJECTED,
-        }
+        },
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -382,17 +509,16 @@ export class CompanyService {
       });
 
     if (result.affected > 0) {
-
-      const hostAddress = this.configService.get("host");
+      const hostAddress = this.configService.get('host');
       const templateData = {
         name: company.name,
-        countryName: this.configService.get("systemCountryName"),
+        countryName: this.configService.get('systemCountryName'),
         organisationRole:
           company.companyRole === CompanyRole.PROGRAMME_DEVELOPER
-            ? "Programme Developer"
+            ? 'Programme Developer'
             : company.companyRole,
         remarks: remarks,
-        systemName: this.configService.get("systemName"),
+        systemName: this.configService.get('systemName'),
         home: hostAddress,
       };
 
@@ -402,14 +528,14 @@ export class CompanyService {
           emailType: EmailTemplates.ORGANISATION_REGISTRATION_REJECTED.id,
           sender: company.email,
           subject: this.helperService.getEmailTemplateMessage(
-            EmailTemplates.ORGANISATION_REGISTRATION_REJECTED["subject"],
+            EmailTemplates.ORGANISATION_REGISTRATION_REJECTED['subject'],
             templateData,
-            true
+            true,
           ),
           emailBody: this.helperService.getEmailTemplateMessage(
-            EmailTemplates.ORGANISATION_REGISTRATION_REJECTED["html"],
+            EmailTemplates.ORGANISATION_REGISTRATION_REJECTED['html'],
             templateData,
-            false
+            false,
           ),
         },
       };
@@ -418,41 +544,44 @@ export class CompanyService {
       return new BasicResponseDto(
         HttpStatus.OK,
         this.helperService.formatReqMessagesString(
-          "company.companyRejectionSuccess",
-          []
-        )
+          'company.companyRejectionSuccess',
+          [],
+        ),
       );
     }
     throw new HttpException(
       this.helperService.formatReqMessagesString(
-        "company.companyRejectionFailed",
-        []
+        'company.companyRejectionFailed',
+        [],
       ),
-      HttpStatus.INTERNAL_SERVER_ERROR
+      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
-  
 
-  async query(query: QueryDto, abilityCondition: string, companyRole: string): Promise<any> {
+  async query(
+    query: QueryDto,
+    abilityCondition: string,
+    companyRole: string,
+  ): Promise<any> {
     let filterWithCompanyStatesIn: number[];
 
     if (companyRole === CompanyRole.GOVERNMENT) {
-      filterWithCompanyStatesIn = [0, 1, 2, 3]
+      filterWithCompanyStatesIn = [0, 1, 2, 3];
     } else {
-      filterWithCompanyStatesIn = [0, 1]
+      filterWithCompanyStatesIn = [0, 1];
     }
 
     if (query.filterAnd) {
       query.filterAnd.push({
-        key: "state",
-        operation: "in",
+        key: 'state',
+        operation: 'in',
         value: filterWithCompanyStatesIn,
       });
     } else {
       const filterAnd: FilterEntry[] = [];
       filterAnd.push({
-        key: "state",
-        operation: "in",
+        key: 'state',
+        operation: 'in',
         value: filterWithCompanyStatesIn,
       });
       query.filterAnd = filterAnd;
@@ -463,17 +592,17 @@ export class CompanyService {
       .where(
         this.helperService.generateWhereSQL(
           query,
-          this.helperService.parseMongoQueryToSQL(abilityCondition)
-        )
+          this.helperService.parseMongoQueryToSQL(abilityCondition),
+        ),
       )
       .orderBy(
         query?.sort?.key && `"${query?.sort?.key}"`,
         query?.sort?.order,
         query?.sort?.nullFirst !== undefined
           ? query?.sort?.nullFirst === true
-            ? "NULLS FIRST"
-            : "NULLS LAST"
-          : undefined
+            ? 'NULLS FIRST'
+            : 'NULLS LAST'
+          : undefined,
       )
       .offset(query.size * query.page - query.size)
       .limit(query.size)
@@ -481,19 +610,187 @@ export class CompanyService {
 
     return new DataListResponseDto(
       resp.length > 0 ? resp[0] : undefined,
-      resp.length > 1 ? resp[1] : undefined
+      resp.length > 1 ? resp[1] : undefined,
     );
   }
 
+  async download(
+    queryData: DataExportQueryDto,
+    abilityCondition: string,
+    companyRole: string,
+  ) {
+    const queryDto = new QueryDto();
+    queryDto.filterAnd = queryData.filterAnd;
+    queryDto.filterOr = queryData.filterOr;
+    queryDto.sort = queryData.sort;
+
+    let filterWithCompanyStatesIn: number[];
+
+    if (companyRole === CompanyRole.GOVERNMENT) {
+      filterWithCompanyStatesIn = [0, 1, 2, 3];
+    } else {
+      filterWithCompanyStatesIn = [0, 1];
+    }
+
+    if (queryDto.filterAnd) {
+      queryDto.filterAnd.push({
+        key: 'state',
+        operation: 'in',
+        value: filterWithCompanyStatesIn,
+      });
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: 'state',
+        operation: 'in',
+        value: filterWithCompanyStatesIn,
+      });
+      queryDto.filterAnd = filterAnd;
+    }
+
+    queryDto.filterAnd.push({
+      key: 'companyRole',
+      operation: '!=',
+      value: 'API',
+    });
+
+    const resp = await this.companyRepo
+      .createQueryBuilder()
+      .where(
+        this.helperService.generateWhereSQL(
+          queryDto,
+          this.helperService.parseMongoQueryToSQL(abilityCondition),
+        ),
+      )
+      .orderBy(
+        queryDto?.sort?.key && `"${queryDto?.sort?.key}"`,
+        queryDto?.sort?.order,
+        queryDto?.sort?.nullFirst !== undefined
+          ? queryDto?.sort?.nullFirst === true
+            ? 'NULLS FIRST'
+            : 'NULLS LAST'
+          : undefined,
+      )
+      .getMany();
+
+    if (resp.length > 0) {
+      const prepData = this.prepareCompanyDataForExport(resp);
+      let headers: string[] = [];
+      const titleKeys = Object.keys(prepData[0]);
+      for (const key of titleKeys) {
+        headers.push(
+          this.helperService.formatReqMessagesString(
+            'companyExport.' + key,
+            [],
+          ),
+        );
+      }
+      const path = await this.dataExportService.generateCsv(
+        prepData,
+        headers,
+        this.helperService.formatReqMessagesString(
+          'companyExport.organisations',
+          [],
+        ),
+      );
+      return path;
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        'companyExport.nothingToExport',
+        [],
+      ),
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  private prepareCompanyDataForExport(companies: any) {
+    const exportData: DataExportCompanyDto[] = [];
+
+    for (const company of companies) {
+      const dto = new DataExportCompanyDto();
+
+      let orgSectoralScopeKey;
+      if (company.sectoralScope && company.sectoralScope.length > 0) {
+        orgSectoralScopeKey = company.sectoralScope
+          .map((sectoralScope) => {
+            return Object.keys(SectoralScope).find(
+              (key) => SectoralScope[key] === sectoralScope,
+            );
+          })
+          .join(', ');
+      }
+
+      const orgStateKey = Object.keys(CompanyState).find(
+        (key) => CompanyState[key] === company.state,
+      );
+
+      const secondaryAccountBalanceLocal =
+        (company.secondaryAccountBalance?.local?.total ?? 0) +
+        (company.secondaryAccountBalance?.account?.total ?? 0);
+
+      dto.companyId = company.companyId;
+      dto.taxId = company.taxId;
+      dto.paymentId = company.paymentId;
+      dto.name = company.name;
+      dto.email = company.email;
+      dto.phoneNo = company.phoneNo;
+      dto.website = company.website;
+      dto.address = company.address;
+      dto.country = company.country;
+      dto.companyRole = company.companyRole;
+      dto.state = orgStateKey;
+      dto.creditBalance = company.creditBalance;
+      dto.secondaryAccountBalanceLocal = secondaryAccountBalanceLocal
+        ? secondaryAccountBalanceLocal
+        : '';
+      dto.secondaryAccountBalanceInternational =
+        company.secondaryAccountBalance?.international?.total;
+      dto.secondaryAccountBalanceOmge =
+        company.secondaryAccountBalance?.omge?.total;
+      dto.programmeCount = company.programmeCount;
+      dto.lastUpdateVersion = company.lastUpdateVersion;
+      dto.creditTxTime = this.helperService.formatTimestamp(
+        company.creditTxTime,
+      );
+      dto.remarks = company.remarks;
+      dto.createdTime = this.helperService.formatTimestamp(company.createdTime);
+      dto.geographicalLocationCordintes = company.geographicalLocationCordintes;
+      dto.regions = company.regions;
+      dto.nameOfMinister = company.nameOfMinister;
+      dto.sectoralScope = orgSectoralScopeKey;
+      exportData.push(dto);
+    }
+
+    return exportData;
+  }
+
   async queryNames(query: QueryDto, abilityCondition: string): Promise<any> {
+    if (query.filterAnd) {
+      query.filterAnd.push({
+        key: 'state',
+        operation: 'in',
+        value: [1],
+      });
+    } else {
+      const filterAnd: FilterEntry[] = [];
+      filterAnd.push({
+        key: 'state',
+        operation: 'in',
+        value: [1],
+      });
+      query.filterAnd = filterAnd;
+    }
+
     const resp = await this.companyRepo
       .createQueryBuilder()
       .select(['"companyId"', '"name"', '"state"', '"taxId"'])
       .where(
         this.helperService.generateWhereSQL(
           query,
-          this.helperService.parseMongoQueryToSQL(abilityCondition)
-        )
+          this.helperService.parseMongoQueryToSQL(abilityCondition),
+        ),
       )
       .orderBy(query?.sort?.key && `"${query?.sort?.key}"`, query?.sort?.order)
       .offset(query.size * query.page - query.size)
@@ -534,12 +831,12 @@ export class CompanyService {
   }
 
   async findByCompanyIds(
-    req: FindOrganisationQueryDto
+    req: FindOrganisationQueryDto,
   ): Promise<Company[] | undefined> {
     const data: Company[] = [];
 
-    if (!(req.companyIds instanceof Array)) { 
-      throw new HttpException("Invalid companyId list", HttpStatus.BAD_REQUEST);
+    if (!(req.companyIds instanceof Array)) {
+      throw new HttpException('Invalid companyId list', HttpStatus.BAD_REQUEST);
     }
     for (let i = 0; i < req.companyIds.length; i++) {
       const companies = await this.companyRepo.find({
@@ -563,11 +860,11 @@ export class CompanyService {
   }
 
   async create(companyDto: OrganisationDto): Promise<Company | undefined> {
-    this.logger.verbose("Company create received", companyDto.email);
+    this.logger.verbose('Company create received', companyDto.email);
 
     if (!companyDto.companyId) {
       companyDto.companyId = parseInt(
-        await this.counterService.incrementCount(CounterType.COMPANY, 3)
+        await this.counterService.incrementCount(CounterType.COMPANY, 3),
       );
     }
 
@@ -577,10 +874,10 @@ export class CompanyService {
           case PG_UNIQUE_VIOLATION:
             throw new HttpException(
               this.helperService.formatReqMessagesString(
-                "company.companyTaxIdExist",
-                []
+                'company.companyTaxIdExist',
+                [],
               ),
-              HttpStatus.BAD_REQUEST
+              HttpStatus.BAD_REQUEST,
             );
         }
       }
@@ -590,27 +887,27 @@ export class CompanyService {
 
   async update(
     companyUpdateDto: OrganisationUpdateDto,
-    abilityCondition: string
+    abilityCondition: string,
   ): Promise<DataResponseDto | undefined> {
     const company = await this.companyRepo
       .createQueryBuilder()
       .where(
         `"companyId" = '${companyUpdateDto.companyId}' ${
           abilityCondition
-            ? " AND (" +
+            ? ' AND (' +
               this.helperService.parseMongoQueryToSQL(abilityCondition) +
-              ")"
-            : ""
-        }`
+              ')'
+            : ''
+        }`,
       )
       .getOne();
     if (!company) {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
-          "company.noActiveCompany",
-          []
+          'company.noActiveCompany',
+          [],
         ),
-        HttpStatus.BAD_REQUEST
+        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -619,7 +916,7 @@ export class CompanyService {
         `profile_images/${
           companyUpdateDto.companyId
         }_${new Date().getTime()}.png`,
-        companyUpdateDto.logo
+        companyUpdateDto.logo,
       );
 
       if (response) {
@@ -627,33 +924,40 @@ export class CompanyService {
       } else {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
-            "company.companyUpdateFailed",
-            []
+            'company.companyUpdateFailed',
+            [],
           ),
-          HttpStatus.INTERNAL_SERVER_ERROR
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
     }
 
-    if(companyUpdateDto.regions){
-      companyUpdateDto.geographicalLocationCordintes = await this.locationService
-      .getCoordinatesForRegion(companyUpdateDto.regions)
-      .then((response: any) => {
-        console.log("response from forwardGeoCoding function -> ", response);
-        return  [...response];
-      });
+    if (companyUpdateDto.regions) {
+      companyUpdateDto.geographicalLocationCordintes =
+        await this.locationService
+          .getCoordinatesForRegion(companyUpdateDto.regions)
+          .then((response: any) => {
+            console.log(
+              'response from forwardGeoCoding function -> ',
+              response,
+            );
+            return [...response];
+          });
     }
 
-    const { companyId, nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
-    if (!companyUpdateFields.hasOwnProperty("website")) {
-      companyUpdateFields["website"] = "";
+    const { companyId, nationalSopValue, ...companyUpdateFields } =
+      companyUpdateDto;
+    if (!companyUpdateFields.hasOwnProperty('website')) {
+      companyUpdateFields['website'] = '';
     }
     const result = await this.companyRepo
       .update(
         {
           companyId: company.companyId,
         },
-        this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
+        this.configService.get('systemType') !== SYSTEM_TYPE.CARBON_REGISTRY
+          ? { ...companyUpdateFields, nationalSopValue }
+          : { ...companyUpdateFields },
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -663,16 +967,16 @@ export class CompanyService {
     if (result.affected > 0) {
       return new DataResponseDto(
         HttpStatus.OK,
-        await this.findByCompanyId(company.companyId)
+        await this.findByCompanyId(company.companyId),
       );
     }
 
     throw new HttpException(
       this.helperService.formatReqMessagesString(
-        "company.companyUpdateFailed",
-        []
+        'company.companyUpdateFailed',
+        [],
       ),
-      HttpStatus.INTERNAL_SERVER_ERROR
+      HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
 
@@ -686,11 +990,11 @@ export class CompanyService {
         txTime: new Date().getTime(),
       })
       .where(
-        "(fromCompanyId = :companyId OR toCompanyId = :companyId) AND status = :status",
+        '(fromCompanyId = :companyId OR toCompanyId = :companyId) AND status = :status',
         {
           companyId: companyId,
           status: TransferStatus.PENDING,
-        }
+        },
       )
       .execute()
       .catch((err: any) => {
@@ -714,7 +1018,7 @@ export class CompanyService {
         },
         {
           programmeCount: programmeCount,
-        }
+        },
       )
       .catch((err: any) => {
         this.logger.error(err);
@@ -727,10 +1031,12 @@ export class CompanyService {
   async getSectoralScopeMinistry(sectorId: any) {
     const resp = await this.companyRepo
       .createQueryBuilder()
-      .where(`"companyRole" = 'Ministry' AND :sectorId = ANY("sectoralScope")`,
-      {
-        sectorId: sectorId,
-      })
+      .where(
+        `"companyRole" = 'Ministry' AND :sectorId = ANY("sectoralScope")`,
+        {
+          sectorId: sectorId,
+        },
+      )
       .getMany();
 
     return resp;
@@ -738,15 +1044,57 @@ export class CompanyService {
 
   async getMinistries() {
     const result = await this.companyRepo
-      .createQueryBuilder("company")
-      .where("company.companyRole= :companyRole AND company.state= :activeState", {
-        companyRole: CompanyRole.MINISTRY,
-        activeState: CompanyState.ACTIVE
-      })
-      .select(["company.name", "company.companyId"])
+      .createQueryBuilder('company')
+      .where(
+        'company.companyRole= :companyRole AND company.state= :activeState',
+        {
+          companyRole: CompanyRole.MINISTRY,
+          activeState: CompanyState.ACTIVE,
+        },
+      )
+      .select(['company.name', 'company.companyId'])
       .getRawMany();
 
     return result;
   }
 
+  public async checkCompanyExistOnOtherSystem(
+    organisationDuplicateCheckDto: OrganisationDuplicateCheckDto
+  ) {
+    console.log('check if organisation already exist in other system with taxId, paymentId or email', organisationDuplicateCheckDto)
+    const resp = await this.httpUtilService.sendHttp("/national/organisation/exists", organisationDuplicateCheckDto);
+    if (typeof resp === 'boolean') {
+      return resp;
+    } else {
+      console.log('Successfully requested and response received for ', organisationDuplicateCheckDto);
+      return resp.data;
+    }
+  }
+
+  async findCompanyByTaxIdPaymentIdOrEmail(
+    orgDuplicateCheckDto: OrganisationDuplicateCheckDto
+  ): Promise<Company | undefined> {
+    console.log("INSIDE findCompanyByTaxIdPaymentIdOrEmail", orgDuplicateCheckDto.taxId, orgDuplicateCheckDto.paymentId, orgDuplicateCheckDto.email);
+    const company = await this.companyRepo.createQueryBuilder('company')
+      .where('company.taxId = :taxId OR company.paymentId = :paymentId OR company.email = :email', {
+        taxId: orgDuplicateCheckDto.taxId,
+        paymentId: orgDuplicateCheckDto.paymentId,
+        email: orgDuplicateCheckDto.email
+      })
+      .getOne();
+    console.log("INSIDE findCompanyByTaxIdPaymentIdOrEmail company", company);
+    return company;
+  }
+  
+  async checkForCompanyDuplicates(email: any, taxId: any, paymentId: any) {
+    const companies = await this.companyRepo.find({
+      where: [
+        { email: email },
+        { taxId: taxId },
+        { paymentId: paymentId }
+      ]
+    });
+
+    return companies && companies.length > 0 ? companies[0] : undefined;
+  }
 }

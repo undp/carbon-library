@@ -28,7 +28,7 @@ import {
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { ProgrammeManagementColumns } from "../../../Definitions/Enums/programme.management.columns.enum";
 import { Action } from "../../../Definitions/Enums/action.enum";
-import { PlusOutlined } from "@ant-design/icons";
+import { DownloadOutlined, PlusOutlined } from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import {
   ProgrammeEntity,
@@ -36,14 +36,14 @@ import {
   ProgrammeStageMRV,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
+
 const { Search } = Input;
 
 export const ProgrammeManagementComponent = (props: any) => {
   const {
     t,
     visibleColumns,
-    useUserContext,
-    useConnection,
     onNavigateToProgrammeView,
     onClickAddProgramme,
     enableAddProgramme,
@@ -66,6 +66,7 @@ export const ProgrammeManagementComponent = (props: any) => {
     useState<boolean>(false);
   const { userInfoState } = useUserContext();
   const ability = useAbilityContext();
+  const [dataQuery, setDataQuery] = useState<any>();
 
   const stageObject = enableAddProgramme ? ProgrammeStageMRV : ProgrammeStageR;
 
@@ -307,7 +308,7 @@ export const ProgrammeManagementComponent = (props: any) => {
       filter.push({
         key: "title",
         operation: "like",
-        value: `${search}%`,
+        value: `%${search}%`,
       });
     }
 
@@ -346,6 +347,11 @@ export const ProgrammeManagementComponent = (props: any) => {
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
       setLoading(false);
+      setDataQuery({
+        filterAnd: filter,
+        filterOr: filterOr?.length > 0 ? filterOr : undefined,
+        sort: sort,
+      })
     } catch (error: any) {
       console.log("Error in getting programme", error);
       message.open({
@@ -384,6 +390,38 @@ export const ProgrammeManagementComponent = (props: any) => {
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);
+      setLoading(false);
+    }
+  };
+
+  const downloadProgrammeData = async () => {
+    setLoading(true);
+
+    try {
+      const response: any = await post("national/programme/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting programmes", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };
@@ -488,7 +526,7 @@ export const ProgrammeManagementComponent = (props: any) => {
                 <Checkbox
                   className="label"
                   onChange={(v) => {
-                    if (userInfoState.companyRole === CompanyRole.MINISTRY) {
+                    if (userInfoState?.companyRole === CompanyRole.MINISTRY) {
                       if (v.target.checked) {
                         setMinistryLevelFilter(true);
                       } else {
@@ -507,7 +545,7 @@ export const ProgrammeManagementComponent = (props: any) => {
                     }
                   }}
                 >
-                  {userInfoState.companyRole === CompanyRole.MINISTRY
+                  {userInfoState?.companyRole === CompanyRole.MINISTRY
                     ? t("view:ministryLevel")
                     : t("view:seeMine")}
                 </Checkbox>
@@ -526,6 +564,16 @@ export const ProgrammeManagementComponent = (props: any) => {
                   onSearch={setSearch}
                   style={{ width: 265 }}
                 />
+              </div>
+              <div className="download-data-btn">
+                <a onClick={downloadProgrammeData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
               </div>
             </div>
           </Col>

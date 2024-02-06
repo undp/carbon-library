@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { EllipsisOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EllipsisOutlined } from "@ant-design/icons";
 import {
   Row,
   Checkbox,
@@ -47,6 +47,11 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { Role } from "../../../Definitions/Enums/role.enum";
 import { PlusOutlined } from "@ant-design/icons";
+import {
+  useConnection,
+  useUserContext,
+  useSettingsContext,
+} from "../../../Context";
 
 type PopupInfo = {
   title: string;
@@ -60,12 +65,9 @@ type PopupInfo = {
 export const InvestmentManagementComponent = (props: any) => {
   const {
     translator,
-    useConnection,
     onNavigateToProgrammeView,
-    useUserContext,
-    useSettingsContext,
     onClickAddOwnership,
-    enableAddOwnership
+    enableAddOwnership,
   } = props;
 
   const t = translator.t;
@@ -100,6 +102,8 @@ export const InvestmentManagementComponent = (props: any) => {
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
   const [ministryLevelFilter, setMinistryLevelFilter] =
     useState<boolean>(false);
+  const [dataQuery, setDataQuery] = useState<any>();
+
 
   const onStatusQuery = async (checkedValues: CheckboxValueType[]) => {
     console.log(checkedValues);
@@ -142,7 +146,7 @@ export const InvestmentManagementComponent = (props: any) => {
         {
           key: "programmeTitle",
           operation: "like",
-          value: `${search}%`,
+          value: `%${search}%`,
         },
       ];
       if (!isNaN(Number(search))) {
@@ -196,9 +200,47 @@ export const InvestmentManagementComponent = (props: any) => {
       console.log(response);
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
+      setDataQuery({
+        filterAnd: filter,
+        filterOr: dataFilter,
+        sort: sort,
+        filterBy: filterBy,
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting programme investment", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      setLoading(false);
+    }
+  };
+
+  const downloadInvestmentData = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/programme/investments/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+        filterBy: dataQuery.filterBy,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting investments", error);
       message.open({
         type: "error",
         content: error.message,
@@ -451,7 +493,10 @@ export const InvestmentManagementComponent = (props: any) => {
       sorter: true,
       align: "left" as const,
       render: (item: any) => {
-        return <span className="clickable">{item}</span>;
+        if (item) {
+          return <span className="clickable">{item}</span>;
+        }
+        return <span>-</span>;
       },
       onCell: (record: any, rowIndex: any) => {
         return {
@@ -563,6 +608,12 @@ export const InvestmentManagementComponent = (props: any) => {
       key: "programmeSector",
       sorter: true,
       align: "left" as const,
+      render: (item: any) => {
+        if (item) {
+          return <span>{item}</span>;
+        }
+        return <span>-</span>;
+      },
     },
     {
       title: t("programme:investor"),
@@ -682,8 +733,8 @@ export const InvestmentManagementComponent = (props: any) => {
       sorter.order === "ascend"
         ? "ASC"
         : sorter.order === "descend"
-          ? "DESC"
-          : undefined
+        ? "DESC"
+        : undefined
     );
     setSortField(sorter.columnKey);
     // setCurrentPage(1);
@@ -694,24 +745,26 @@ export const InvestmentManagementComponent = (props: any) => {
       <div className="investment-title-bar">
         <div className="title-bar">
           <div className="body-title">{t("programme:investmentTitle")}</div>
-          <div className="body-sub-title">
-            {t("programme:investmentDesc")}
-          </div>
+          <div className="body-sub-title">{t("programme:investmentDesc")}</div>
         </div>
         <div className="actions">
-          {enableAddOwnership && (
-            <div className="action-bar">
-              <Button
-                type="primary"
-                size="large"
-                block
-                icon={<PlusOutlined />}
-                onClick={onClickAddOwnership}
-              >
-                {t("programme:addOwnership")}
-              </Button>
-            </div>
-          )}
+          {enableAddOwnership &&
+            (userInfoState?.companyRole == CompanyRole.MINISTRY ||
+              userInfoState?.companyRole == CompanyRole.GOVERNMENT ||
+              userInfoState?.companyRole == CompanyRole.PROGRAMME_DEVELOPER) &&
+            userInfoState.userRole != Role.ViewOnly && (
+              <div className="action-bar">
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  icon={<PlusOutlined />}
+                  onClick={onClickAddOwnership}
+                >
+                  {t("programme:addOwnership")}
+                </Button>
+              </div>
+            )}
         </div>
       </div>
       <div className="content-card">
@@ -769,6 +822,16 @@ export const InvestmentManagementComponent = (props: any) => {
                   style={{ width: 265 }}
                 />
               </div>
+              <div className="download-data-btn">
+                <a onClick={downloadInvestmentData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
+              </div>
             </div>
           </Col>
         </Row>
@@ -797,7 +860,7 @@ export const InvestmentManagementComponent = (props: any) => {
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description={
                         tableData.length === 0
-                          ? t("creditTransfer:noTransfer")
+                          ? t("programme:noInvestmentData")
                           : null
                       }
                     />

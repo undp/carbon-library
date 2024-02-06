@@ -2,35 +2,23 @@
 @import "../../../Styles/colors.role.scss";
 @import "../../../Styles/variables.scss";
 
-.ant-tabs-tab-btn {
-    padding: 5px 30px;
-    text-align: center;
-    font-weight: 600;
-    color: rgba(58, 53, 65, 0.5);
+.emission-tab-container {
+    .ant-tabs-tab-btn {
+        padding: 5px 30px;
+        text-align: center;
+        font-weight: 600;
+        color: rgba(58, 53, 65, 0.5);
+    }
+    .anticon-lock {
+        margin-right: 0 !important;
+    }
 }
 
-// .add-new-year-picker-popup {
-//     .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
-//         width: 65px !important;
-//             height: 32px !important;
-//             text-align: center !important;
-//             border-radius: 50px !important;
-//             background: $primary-color !important;
-//             line-height: 30px !important;
-//     }
-    
-//     .ant-picker-cell-disabled::before {
-//         width: 65px !important;
-//         height: 32px !important;
-//         text-align: center !important;
-//         border-radius: 50px !important;
-//         line-height: 30px !important;
-//     }
-    
-//     .ant-picker-cell::before {
-//         left: 11px;
-//     }
-// }
+.empty-emission-container {
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
 
 .emission-tab-container .add-emission {
     display: flex;
@@ -55,8 +43,8 @@
     }
 
     .ant-picker {
-        border-radius: 5px !important;
-        height: 50px !important;
+        border-radius: 4px !important;
+        height: 40px !important;
         width: 80%;
     }
 
@@ -64,7 +52,7 @@
         display: flex;
         flex: none;
         align-items: center;
-        height: 50px;
+        height: 40px;
     
         button {
             border: none;
@@ -87,37 +75,39 @@
 
     .add-new-upload-file-name-input {
         input {
-            height: 50px;
+            height: 40px;
             color: $primary-color;
+            border-radius: 4px !important;
         }
     }
 
     .add-new-upload-file-inner-col {
         button {
-            height: 50px;
+            height: 40px;
             font-size: 12px;
             width: 120px;
             color: #8C8C8C;
-            border-radius: 4px;
+            border-radius: 4px !important;
         }
     }
 
     .view-download-file-name-input {
         input {
-            height: 50px;
+            height: 40px;
             color: #8C8C8C;
+            border-radius: 4px !important;
         }
     }
 
     .view-download-file-inner-col {
         button {
-            height: 50px;
+            height: 40px;
             font-size: 12px;
             font-weight: 400;
             width: 135px;
             margin-left: 5px;
             color: #8C8C8C;
-            border-radius: 4px;
+            border-radius: 4px !important;
         }
     }
 
@@ -129,7 +119,7 @@
         .table-heading-col {
             text-align: center;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             color: #28282899;
         }
     }
@@ -139,8 +129,8 @@
         margin-left: 30px !important;
 
         span {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: #3A3541CC;
         }
         .total-emission-value-col {
@@ -150,7 +140,7 @@
     }
 
     .panel-header-col {
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 600;
         color: #3A3541CC;
     }
@@ -172,7 +162,7 @@
         margin-top: 35px;
 
         .panel-header-col {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             color: #3A3541CC;
         }
@@ -185,9 +175,9 @@
     }
 
     .ant-collapse-expand-icon {
-        margin-top: 5px;
+        margin-top: 3px;
         svg {
-            font-size: 20px;
+            font-size: 16px;
             color: $primary-color;
         }
         
@@ -200,8 +190,8 @@
     .co2-total-pill {
         border-radius: 20px;
         background-color: rgba(#9155FD66, 0.4);
-        padding: 4px 15px;
-        height: 28px;
+        padding: 5px 15px;
+        height: 30px;
         color: #5B5B5B;
         font-size: 12px;
         font-weight: 900;
@@ -216,8 +206,8 @@
     .ch4-total-pill {
         border-radius: 20px;
         background-color: rgba(#D9D9D999, 0.6);
-        padding: 4px 15px;
-        height: 28px;
+        padding: 5px 15px;
+        height: 30px;
         color: #5B5B5B;
         font-size: 12px;
         font-weight: 900;
@@ -232,8 +222,8 @@
     .n2o-total-pill {
         border-radius: 20px;
         background-color: rgba(#B9E2F466, 0.4);
-        padding: 4px 15px;
-        height: 28px;
+        padding: 5px 15px;
+        height: 30px;
         color: #5B5B5B;
         font-size: 12px;
         font-weight: 900;
@@ -248,8 +238,8 @@
     .co2eq-total-pill {
         border-radius: 20px;
         background-color: rgba(#FFA6A699, 0.6);
-        padding: 4px 15px;
-        height: 28px;
+        padding: 5px 15px;
+        height: 30px;
         color: #5B5B5B;
         font-size: 12px;
         font-weight: 900;
@@ -268,8 +258,8 @@
         align-items: center;
 
         .panel-content-title {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 400;
             color: #3A3541CC;
         }
 
@@ -292,7 +282,7 @@
     .total-co2-without-land-row {
         margin-left: 40px !important;
         align-items: center;
-        margin-top: 50px;
+        margin-top: 10px;
 
         .total-co2-without-land-title {
             font-size: 16px;
