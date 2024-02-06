@@ -93,7 +93,8 @@ export const AddNewCompanyComponent = (props: any) => {
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList([t("national"), ...regionNames]);
+        const uniqueRegionNames: any = Array.from(new Set(regionNames))
+        setRegionsList([t("national"), ...uniqueRegionNames]);
       }
     } catch (error: any) {
       console.log("Error in getting regions list", error);
@@ -157,7 +158,7 @@ export const AddNewCompanyComponent = (props: any) => {
     };
     setLoading(true);
     try {
-      if (requestData.phoneNo) {
+      if (requestData.phoneNo && requestData.phoneNo.length > 4) {
         requestData.phoneNo = formatPhoneNumberIntl(requestData.phoneNo);
       } else {
         requestData.phoneNo = undefined;
@@ -359,7 +360,9 @@ export const AddNewCompanyComponent = (props: any) => {
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`${t("addCompany:name")} ${t("isRequired")}`);
+                            throw new Error(
+                              `${t("addCompany:name")} ${t("isRequired")}`
+                            );
                           }
                         },
                       },
@@ -388,7 +391,11 @@ export const AddNewCompanyComponent = (props: any) => {
                                   value === null ||
                                   value === undefined
                                 ) {
-                                  throw new Error(`${t("addCompany:taxId")} ${t("isRequired")}`);
+                                  throw new Error(
+                                    `${t("addCompany:taxId")} ${t(
+                                      "isRequired"
+                                    )}`
+                                  );
                                 }
                               },
                             },
@@ -420,7 +427,9 @@ export const AddNewCompanyComponent = (props: any) => {
                                   value === undefined
                                 ) {
                                   throw new Error(
-                                    `${t("addCompany:paymentId")} ${t("isRequired")}`
+                                    `${t("addCompany:paymentId")} ${t(
+                                      "isRequired"
+                                    )}`
                                   );
                                 }
                               },
@@ -448,7 +457,9 @@ export const AddNewCompanyComponent = (props: any) => {
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`${t("addCompany:email")} ${t("isRequired")}`);
+                            throw new Error(
+                              `${t("addCompany:email")} ${t("isRequired")}`
+                            );
                           } else {
                             const val = value.trim();
                             const reg =
@@ -457,7 +468,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               ? val.match(reg)
                               : [];
                             if (matches.length === 0) {
-                              throw new Error(`${t("addCompany:email")} ${t("isInvalid")}`);
+                              throw new Error(
+                                `${t("addCompany:email")} ${t("isInvalid")}`
+                              );
                             }
                           }
                         },
@@ -482,7 +495,9 @@ export const AddNewCompanyComponent = (props: any) => {
                             value !== undefined
                           ) {
                             if (value && !validator.isURL("https://" + value))
-                              throw new Error(`${t("addCompany:website")} ${t("isInvalid")}`);
+                              throw new Error(
+                                `${t("addCompany:website")} ${t("isInvalid")}`
+                              );
                           }
                         },
                       },
@@ -505,12 +520,16 @@ export const AddNewCompanyComponent = (props: any) => {
                           if (file === null || file === undefined) {
                             if (!state?.record?.logo)
                               throw new Error(
-                                `${t("addCompany:companyLogo")} ${t("isRequired")}`
+                                `${t("addCompany:companyLogo")} ${t(
+                                  "isRequired"
+                                )}`
                               );
                           } else {
                             if (file.length === 0) {
                               throw new Error(
-                                `${t("addCompany:companyLogo")} ${t("isRequired")}`
+                                `${t("addCompany:companyLogo")} ${t(
+                                  "isRequired"
+                                )}`
                               );
                             } else {
                               let isCorrectFormat = false;
@@ -565,7 +584,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               value === null ||
                               value === undefined
                             ) {
-                              throw new Error(`${t("addCompany:addresss")} ${t("isRequired")}`);
+                              throw new Error(
+                                `${t("addCompany:addresss")} ${t("isRequired")}`
+                              );
                             }
                           },
                         },
@@ -685,7 +706,7 @@ export const AddNewCompanyComponent = (props: any) => {
                                 className="certifier"
                                 value="Certifier"
                               >
-                              <SafetyOutlined className="role-icons" />
+                                <SafetyOutlined className="role-icons" />
                                 {t("addCompany:certifier")}
                               </Radio.Button>
                             </Tooltip>
@@ -710,7 +731,7 @@ export const AddNewCompanyComponent = (props: any) => {
                                 className="dev"
                                 value="ProgrammeDeveloper"
                               >
-                              <ExperimentOutlined className="role-icons" />
+                                <ExperimentOutlined className="role-icons" />
                                 {t("addCompany:programmeDeveleper")}
                               </Radio.Button>
                             </Tooltip>
@@ -727,7 +748,7 @@ export const AddNewCompanyComponent = (props: any) => {
                                     className="minister"
                                     value="Ministry"
                                   >
-                                  <AuditOutlined className="role-icons" />
+                                    <AuditOutlined className="role-icons" />
                                     {t("addCompany:min")}
                                   </Radio.Button>
                                 </Tooltip>
@@ -756,7 +777,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               value === undefined
                             ) {
                               throw new Error(
-                                `${t("addCompany:ministerName")} ${t("isRequired")}`
+                                `${t("addCompany:ministerName")} ${t(
+                                  "isRequired"
+                                )}`
                               );
                             }
                           },
@@ -773,7 +796,9 @@ export const AddNewCompanyComponent = (props: any) => {
                       rules={[
                         {
                           required: true,
-                          message: `${t("addCompany:sectoralScope")} ${t("isRequired")}`,
+                          message: `${t("addCompany:sectoralScope")} ${t(
+                            "isRequired"
+                          )}`,
                         },
                       ]}
                       initialValue={state?.record?.sectoralScope}
@@ -809,7 +834,9 @@ export const AddNewCompanyComponent = (props: any) => {
                             value === null ||
                             value === undefined
                           ) {
-                            throw new Error(`${t("addCompany:phoneNo")} ${t("isRequired")}`);
+                            throw new Error(
+                              `${t("addCompany:phoneNo")} ${t("isRequired")}`
+                            );
                           } else {
                             const phoneNo = formatPhoneNumber(String(value));
                             if (String(value).trim() !== "") {
@@ -819,7 +846,9 @@ export const AddNewCompanyComponent = (props: any) => {
                                 phoneNo === undefined
                               ) {
                                 throw new Error(
-                                  `${t("addCompany:phoneNo")} ${t("isRequired")}`
+                                  `${t("addCompany:phoneNo")} ${t(
+                                    "isRequired"
+                                  )}`
                                 );
                               }
                             }
@@ -879,7 +908,9 @@ export const AddNewCompanyComponent = (props: any) => {
                               value === null ||
                               value === undefined
                             ) {
-                              throw new Error(`${t("addCompany:addresss")} ${t("isRequired")}`);
+                              throw new Error(
+                                `${t("addCompany:addresss")} ${t("isRequired")}`
+                              );
                             }
                           },
                         },
@@ -919,7 +950,9 @@ export const AddNewCompanyComponent = (props: any) => {
                                     value === undefined
                                   ) {
                                     throw new Error(
-                                      `${t("addCompany:omgePercentage")}  ${t("isRequired")}`
+                                      `${t("addCompany:omgePercentage")}  ${t(
+                                        "isRequired"
+                                      )}`
                                     );
                                   }
                                 },
@@ -929,9 +962,11 @@ export const AddNewCompanyComponent = (props: any) => {
                             <InputNumber
                               style={{ width: "100%" }}
                               size="large"
-                              min={1}
+                              min={0}
                               max={99}
-                              formatter={(value) => `${Math.round(value)}%`}
+                              formatter={(value) =>
+                                `${value ? Math.round(value) : ""}%`
+                              }
                               parser={(value: any) => value.replace("%", "")}
                             />
                           </Form.Item>
@@ -1000,7 +1035,9 @@ export const AddNewCompanyComponent = (props: any) => {
                           value === null ||
                           value === undefined
                         ) {
-                          throw new Error(`${t("addCompany:name")} ${t("isRequired")}`);
+                          throw new Error(
+                            `${t("addCompany:name")} ${t("isRequired")}`
+                          );
                         }
                       },
                     },
@@ -1046,14 +1083,18 @@ export const AddNewCompanyComponent = (props: any) => {
                           value === null ||
                           value === undefined
                         ) {
-                          throw new Error(`${t("addCompany:email")} ${t("isRequired")}`);
+                          throw new Error(
+                            `${t("addCompany:email")} ${t("isRequired")}`
+                          );
                         } else {
                           const val = value.trim();
                           const reg =
                             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                           const matches = val.match(reg) ? val.match(reg) : [];
                           if (matches.length === 0) {
-                            throw new Error(`${t("addCompany:email")} ${t("isInvalid")}`);
+                            throw new Error(
+                              `${t("addCompany:email")} ${t("isInvalid")}`
+                            );
                           }
                         }
                       },
