@@ -8,6 +8,7 @@ import { chartStatsRequestDto } from "../dto/chartStats.request.dto";
 import { ConfigService } from "@nestjs/config";
 import { I18nService } from "nestjs-i18n";
 import { programmeStatusRequestDto } from "../dto/programmeStatus.request.dto";
+import { Integer } from "ion-js/dist/commonjs/es6/dom";
 
 @Injectable()
 export class HelperService {
@@ -38,6 +39,17 @@ export class HelperService {
       text += i > 0 && sup == i ? "0" : possible.charAt(sup);
     }
     return Number(text);
+  }
+
+  public halfUpToPrecision(value:number,precision:number=2){
+    if(precision>0)
+    {
+      return parseFloat((value*(10**precision)).toFixed(0))/(10**precision)
+    }
+    else if(precision==0){
+      return parseFloat(value.toFixed(0))
+    }
+    return value
   }
   
   private prepareValue(value: any, table?: string, toLower?: boolean) {
@@ -461,6 +473,25 @@ export class HelperService {
       return `${this.configService.get("email.getemailprefix")} Carbon Registry: ${template}`;
     else 
       return template;
+}
+
+public formatTimestamp(timestamp: any) {
+  if (timestamp) {
+    const parsedTimestamp = Number(timestamp);
+
+    if (!isNaN(parsedTimestamp)) {
+      const date = new Date(parsedTimestamp);
+
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+  }
+  
 }
 
   // public async uploadCompanyLogoS3(companyId: number, companyLogo: string) {

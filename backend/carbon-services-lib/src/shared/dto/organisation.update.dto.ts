@@ -101,5 +101,16 @@ export class OrganisationUpdateDto {
   @Min(0)
   @Max(99)
   @ApiProperty()
+  omgePercentage: number;
+
+  @ValidateIf(
+    (c) => CompanyRole.GOVERNMENT==c.companyRole
+  )
+  @IsNotEmpty()
+  @IsNumber()
+  @IsInt()
+  @Min(0)
+  @Max(99)
+  @ApiProperty()
   nationalSopValue: number;
 }

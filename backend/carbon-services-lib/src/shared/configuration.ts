@@ -44,7 +44,7 @@ export default () => ({
     adresss: process.env.HOST_ADDRESS || "Address <br>Region, Country Zipcode"
   },
   s3CommonBucket: {
-    name: "carbon-common-" + (process.env.NODE_ENV || "dev"),
+    name: process.env.S3_COMMON_BUCKET || "carbon-common-dev",
   },
   host: process.env.HOST || "https://test.carbreg.org",
   backendHost: process.env.BACKEND_HOST || "http://localhost:3000",

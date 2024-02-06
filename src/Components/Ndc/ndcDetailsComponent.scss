@@ -1,5 +1,5 @@
-@import '../../Styles/colors.role.scss';
-@import '../../Styles/variables.scss';
+@import "../../Styles/colors.role.scss";
+@import "../../Styles/variables.scss";
 
 .ndc-steps-actions {
   display: flex;
@@ -19,5 +19,31 @@
   }
   .mg-left-1 {
     margin-left: 1rem;
+  }
+}
+
+.ndc-details {
+  // .ant-table-expanded-row {
+  //   .ant-table-cell {
+  //     padding-left: 33px;
+  //   }
+  // }
+  .ant-input-number-input-wrap {
+    margin-right: 10px;
+  }
+
+  tbody {
+    vertical-align: top;
+  }
+
+  td {
+    .ant-space-item {
+      margin-top: 5px;
+    }
+  }
+
+  .btn-danger {
+    color: $danger-btn !important;
+    border-color: $danger-btn-border !important;
   }
 }

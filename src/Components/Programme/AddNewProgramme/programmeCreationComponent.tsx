@@ -33,6 +33,7 @@ import {
 } from "../../../Definitions";
 
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
+import { useConnection, useUserContext } from "../../../Context";
 
 type SizeType = Parameters<typeof Form>[0]["size"];
 
@@ -68,8 +69,6 @@ const sectoralScopes: any = {
 
 export const ProgrammeCreationComponent = (props: any) => {
   const {
-    useUserContext,
-    useConnection,
     useLocation,
     onNavigateToProgrammeView,
     translator,
@@ -167,7 +166,8 @@ export const ProgrammeCreationComponent = (props: any) => {
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList(["National", ...regionNames]);
+        const uniqueRegionNames: any = Array.from(new Set(regionNames))
+        setRegionsList(["National", ...uniqueRegionNames]);
       }
     } catch (error: any) {
       console.log("Error in getting regions list", error);

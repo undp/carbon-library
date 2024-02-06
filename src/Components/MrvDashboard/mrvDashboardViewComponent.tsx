@@ -17,20 +17,19 @@ import { MrvPieChartsStatComponent } from "./mrvPieChartStatComponent";
 import { getChartOptions } from "./mrvChartOptions";
 import { ListWidgetComponent } from "./listWidgetComponent";
 import { MapStatsComponent } from "./mapStatsComponent";
+import { useConnection, useUserContext } from "../../Context";
 
 const { RangePicker } = DatePicker;
 
 export const MrvDashboardComponent = (props: any) => {
   const {
-    useConnection,
-    useUserContext,
     Link,
     Chart,
     t,
     ButtonGroup,
     isMultipleDashboardsVisible = false,
   } = props;
-  const { get, post, delete: del } = useConnection();
+  const { get, post, delete: del, statServerUrl } = useConnection();
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
   const { userInfoState } = useUserContext();
@@ -58,7 +57,7 @@ export const MrvDashboardComponent = (props: any) => {
     "#ff9900",
   ];
 
-  const colorsStatus = ["#C6A7FE", "#FF8183", "#CDCDCD", "#7FEABF", "#B7A4FE"];
+  const colorsStatus = ["#6ACDFF", "#CDCDCD", "#FF8183", "#B7A4FE", "#B7A4FE"];
 
   const TTSuffix =
     userInfoState?.companyRole === CompanyRole.PROGRAMME_DEVELOPER ? "My" : "";
@@ -597,7 +596,7 @@ export const MrvDashboardComponent = (props: any) => {
         "stats/programme/agg",
         genPayload(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       console.log("Response", response);
       const newd: any = {};
@@ -744,6 +743,9 @@ export const MrvDashboardComponent = (props: any) => {
             <Button type="primary" className="mrvprimary">
               Transparency System
             </Button>
+            <Link to="/dashboard/ghg">
+              <Button className="mrvdefault-right">GHG Inventory</Button>
+            </Link>
           </ButtonGroup>
         </div>
       )}

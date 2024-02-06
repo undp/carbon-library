@@ -46,24 +46,28 @@
   margin-top: 1rem;
 }
 
-.ant-tooltip-inner {
-  border-radius: 5px;
-  background-color: $primary-purple;
-}
+// .ant-tooltip-inner {
+//   border-radius: 5px;
+//   background-color: $primary-color;
+// }
 
-.ant-tooltip-arrow-content {
-  --antd-arrow-background-color: linear-gradient(
-    to right bottom,
-    #9155fd,
-    #9155fd
-  ) !important;
-}
+// .ant-tooltip-arrow-content {
+//   --antd-arrow-background-color: linear-gradient(
+//     to right bottom,
+//     $primary-color,
+//     $primary-color
+//   ) !important;
+// }
 
 .ant-btn.mrvdefault {
   border-radius: 5px 0px 0px 5px !important;
 }
-.ant-btn.mrvprimary {
+
+.ant-btn.mrvdefault-right {
   border-radius: 0px 5px 5px 0px !important;
+}
+.ant-btn.mrvprimary {
+  border-radius: 0px 0px 0px 0px !important;
 }
 
 .cards-title {
@@ -208,6 +212,7 @@
             justify-content: space-between;
             width: 100%;
             padding: 1rem 1rem 0 1rem;
+            flex-wrap: wrap;
 
             .title {
               font-family: "Inter";
@@ -228,7 +233,7 @@
             }
           }
 
-          .total-programme-details {
+          .mrv-total-programme-details {
             display: flex;
             flex-direction: row;
             align-items: center;
