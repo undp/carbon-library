@@ -1060,7 +1060,7 @@ export const AddNewCompanyComponent = (props: any) => {
                         const phoneNo = formatPhoneNumber(String(value));
                         if (String(value).trim() !== "") {
                           if (
-                            (String(value).trim() !== "" &&
+                            ((String(value).trim() !== "" &&
                             String(value).trim() !== undefined &&
                             value !== null &&
                             value !== undefined) && 
@@ -1068,7 +1068,7 @@ export const AddNewCompanyComponent = (props: any) => {
                               phoneNo !== "" &&
                               phoneNo !== undefined) && 
                               !isPossiblePhoneNumber(String(value))
-                              ) {
+                              ) || value?.length > 17) {
                             throw new Error(
                               `${t("addCompany:phoneNo")} ${t("isInvalid")}`
                             );
