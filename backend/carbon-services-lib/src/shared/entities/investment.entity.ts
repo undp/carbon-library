@@ -18,7 +18,7 @@ export class Investment implements EntitySubject {
   @Column({nullable: true})
   programmeId: string;
 
-  @Column()
+  @Column({type: 'double precision'})
   amount: number;
 
   @Column({
