@@ -229,15 +229,20 @@ export class RegistryClientService {
   }
 
   private createNDCReq(ndc: NDCAction | NDCActionDto) {
+    let prop = {}
+    if (ndc.creditCalculationProperties) {
+      prop = ndc.creditCalculationProperties
+    }
+    prop['methodology'] =  ndc?.methodology ? ndc?.methodology : '-'
     return {
         typeOfMitigation: ndc.typeOfMitigation,
         subTypeOfMitigation: ndc.subTypeOfMitigation,
         userEstimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
-        methodology: ndc?.methodology ? ndc?.methodology : '-',
+        methodology: ndc?.methodology ? ndc?.methodology : '-', // TODO: Remove this
         systemEstimatedCredits: ndc.ndcFinancing?.systemEstimatedCredits ? ndc.ndcFinancing?.systemEstimatedCredits : 0,
         actionId: ndc.id,
         constantVersion: '' + ndc.constantVersion,
-        properties: (ndc.creditCalculationProperties ? ndc.creditCalculationProperties : undefined)
+        properties: prop
     };
   }
 }
