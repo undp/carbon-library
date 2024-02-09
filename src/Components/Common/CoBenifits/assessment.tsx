@@ -125,7 +125,11 @@ const Assessment = (props: any) => {
             document: values,
           }));
         } else {
-          changedValues[changedField.name[0]] = changedField.value;
+          if (changedField.value && changedField.value?.length > 0) {
+            changedValues[changedField.name[0]] = changedField.value;
+          } else {
+            changedValues[changedField.name[0]] = undefined;
+          }
         }
       });
 
@@ -157,6 +161,29 @@ const Assessment = (props: any) => {
       setIsPersonListedDetailsVisible(true);
     } else {
       setIsPersonListedDetailsVisible(false);
+    }
+  };
+
+  const onAssesmentDocument = async (e: any) => {
+    if (e?.fileList.length > 0 && e?.fileList[0]?.name) {
+      const base64Value = await getBase64(
+        e.fileList[0].originFileObj as RcFile
+      );
+      const values = base64Value;
+
+      setCobenefitsAssessmentDetails((pre: any) => ({
+        ...pre,
+        document: values,
+      }));
+    } else {
+      setCobenefitsAssessmentDetails((pre: any) => {
+        const { document, ...rest } = pre;
+        if (Object.keys(rest).length === 0) {
+          return undefined;
+        } else {
+          return { ...rest };
+        }
+      });
     }
   };
 
@@ -821,6 +848,7 @@ const Assessment = (props: any) => {
                       listType="picture"
                       multiple={false}
                       maxCount={1}
+                      onChange={onAssesmentDocument}
                     >
                       <Button
                         className="upload-doc"

@@ -308,7 +308,7 @@ const Economic = (props: any) => {
                           required: field?.required,
                           message:
                             field?.required &&
-                            `${t(field?.name)} ${t("isRequired")}`,
+                            `${t(field?.name)} ${t("coBenifits:isRequired")}`,
                         },
                       ]}
                     >
