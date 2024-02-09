@@ -1,15 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { LedgerReplicatorInterface } from './replicator-interface.service';
-import { Pool } from 'pg';
-import { plainToClass } from 'class-transformer';
-import { ProcessEventService } from './process.event.service';
-import { Counter } from '../shared/entities/counter.entity';
-import { CounterType } from '../shared/util/counter.type.enum';
-import { Programme } from '../shared/entities/programme.entity';
-import { CreditOverall } from '../shared/entities/credit.overall.entity';
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { ConfigService } from "@nestjs/config";
+import { LedgerReplicatorInterface } from "./replicator-interface.service";
+import { Pool } from "pg";
+import { plainToClass } from "class-transformer";
+import { ProcessEventService } from "./process.event.service";
+import { Counter } from "../shared/entities/counter.entity";
+import { CounterType } from "../shared/util/counter.type.enum";
+import { Programme } from "../shared/entities/programme.entity";
+import { CreditOverall } from "../shared/entities/credit.overall.entity";
+import { DataImporterService } from "../data-importer/data-importer.service";
 
 @Injectable()
 export class PgSqlReplicatorService implements LedgerReplicatorInterface {
@@ -18,8 +19,9 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
     @InjectRepository(Counter) private counterRepo: Repository<Counter>,
     private configService: ConfigService,
     private eventProcessor: ProcessEventService,
+    private dataImportService : DataImporterService
   ) {}
-
+  
   async replicate(event): Promise<any> {
     this.logger.log('Start received', JSON.stringify(event));
 
@@ -120,8 +122,27 @@ export class PgSqlReplicatorService implements LedgerReplicatorInterface {
           replicateActions;
         }
       }
-      setTimeout(replicateActions, 1000);
-    };
-    await replicateActions();
+
+      if(this.configService.get('ITMOSystem.enable')){
+        const date = new Date(); 
+        const year = String(date.getFullYear());
+        const diff = Number(date) - Number(new Date(date.getFullYear(), 0, 0));
+        const dayOfYear = String(Math.floor(diff / (1000 * 60 * 60 * 24)));
+        const today = Number(year+dayOfYear)
+        const lastItmoseq = await this.counterRepo.findOneBy({
+          id: CounterType.ITMO_SYSTEM,
+        });
+        let lastDate = 0
+        if (lastItmoseq) {
+          lastDate = lastItmoseq.counter;
+        }
+        if(today>lastDate){
+          await this.dataImportService.importData({importTypes:"ITMO_SYSTEM"})
+          await this.counterRepo.save({ id: CounterType.ITMO_SYSTEM, counter:  today})
+        }
+      }
+      setTimeout( replicateActions , 1000)
+    }
+    await replicateActions()
   }
 }

@@ -1131,7 +1131,7 @@ export class ProgrammeService {
           await this.asyncOperationsInterface.AddAction({
             actionType: AsyncActionType.CADTUpdateProgramme,
             actionProps: {
-              programme: program
+                programme: program
             },
           });
         }
@@ -5548,7 +5548,7 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, programme);
   }
 
-  async approveProgramme(req: ProgrammeApprove, user: User) {
+  async approveProgramme(req: ProgrammeApprove, user: User, auth_letter?:string ) {
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`,
     );
@@ -5656,7 +5656,22 @@ export class ProgrammeService {
       let formattedDate = `${date} ${month} ${year}`;
 
       updated.company.forEach(async (company) => {
+        auth_letter?
         await this.emailHelperService.sendEmailToOrganisationAdmins(
+          company.companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: updated.title,
+            authorisedDate: formattedDate,
+            serialNumber: updated.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view/${updated.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'AUTHORISATION_LETTER.pdf',
+            path: auth_letter
+          }
+        ):await this.emailHelperService.sendEmailToOrganisationAdmins(
           company.companyId,
           EmailTemplates.PROGRAMME_AUTHORISATION,
           {
@@ -6354,6 +6369,22 @@ export class ProgrammeService {
     });
   }
 
+  async itmoProjectApprove(program: Programme) {
+    if(program) {
+      await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+      if (program.cadtId) {
+        program.currentStage = ProgrammeStage.APPROVED;
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+              programme: program
+          },
+        });
+      }
+    }
+  }
+}
+
   async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
     if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
       throw new HttpException(
@@ -6505,7 +6536,7 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    
     if (ndcAction.status === NdcDetailsActionStatus.Approved || user.role === Role.ViewOnly) {
       throw new HttpException(
         this.helperService.formatReqMessagesString("programme.unAuth", []),
