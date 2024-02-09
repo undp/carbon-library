@@ -215,7 +215,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
                 : undefined
             }
             viewOnly={viewOnly || false}
-            translator={translator}
+            translator={t}
           />
         </>
       ),
