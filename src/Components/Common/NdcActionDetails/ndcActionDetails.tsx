@@ -90,7 +90,8 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
     ? parseInt(process.env.REACT_APP_MAXIMUM_FILE_SIZE)
     : 5000000;
 
-  const ghgEmissionsGas = ["CO2", "CH4", "N20", "HFCs", "PFCs", "SF6"];
+  //changing value to N2O. Previously it was N20(N-Two-Zero)
+  const ghgEmissionsGas = ["CO2", "CH4", "N2O", "HFCs", "PFCs", "SF6"];
 
   useEffect(() => {
     if (programmeDetails) {
