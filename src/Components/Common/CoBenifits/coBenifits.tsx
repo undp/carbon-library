@@ -46,10 +46,27 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
   };
 
   const onGenderParityFormSubmit = (genderParityDetails: any) => {
-    setCoBenefitDetails((pre: any) => ({
-      ...pre,
-      genderPariy: genderParityDetails,
-    }));
+    if (genderParityDetails) {
+      const values = Object.values(genderParityDetails).filter(
+        (val: any) =>
+          (val !== undefined &&
+            typeof val != "boolean" &&
+            val.trim().length === 0) ||
+          val === undefined
+      );
+      const keys = Object.keys(genderParityDetails);
+      if (keys.length === values.length) {
+        setCoBenefitDetails((pre: any) => ({
+          ...pre,
+          genderPariy: undefined,
+        }));
+      } else {
+        setCoBenefitDetails((pre: any) => ({
+          ...pre,
+          genderPariy: genderParityDetails,
+        }));
+      }
+    }
   };
 
   const onEnvironmentalFormSubmit = (environmentalsDetails: any) => {
@@ -67,13 +84,29 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
     coBenefitsAssessmentDetails: any,
     isFormValid: boolean
   ) => {
-    setCoBenefitDetails((pre: any) => ({
-      ...pre,
-      assessmentDetails: coBenefitsAssessmentDetails,
-    }));
-    setIsAssessmentFormValid(isFormValid);
+    if (coBenefitsAssessmentDetails) {
+      const values = Object.values(coBenefitsAssessmentDetails).filter(
+        (val: any) =>
+          (val !== undefined &&
+            typeof val != "boolean" &&
+            val.trim().length === 0) ||
+          val === undefined
+      );
+      const keys = Object.keys(coBenefitsAssessmentDetails);
+      if (keys.length === values.length) {
+        setCoBenefitDetails((pre: any) => ({
+          ...pre,
+          assessmentDetails: undefined,
+        }));
+      } else {
+        setCoBenefitDetails((pre: any) => ({
+          ...pre,
+          assessmentDetails: coBenefitsAssessmentDetails,
+        }));
+      }
+      setIsAssessmentFormValid(isFormValid);
+    }
   };
-
   const onSafeguardFormSubmit = (safeguardDetails: any) => {
     setCoBenefitDetails((pre: any) => ({
       ...pre,
@@ -149,21 +182,28 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
       label: t("coBenifits:unfcccSdTool"),
       key: "4",
       children: (
-        <><Environmental
-          onFormSubmit={onEnvironmentalFormSubmit}
-          environmentalViewData={viewOnly
-            ? coBenifitsViewDetails?.environmental
-              ? coBenifitsViewDetails?.environmental
-              : {}
-            : undefined}
-          viewOnly={viewOnly || false}
-          translator={t} />
+        <>
+          <Environmental
+            onFormSubmit={onEnvironmentalFormSubmit}
+            environmentalViewData={
+              viewOnly
+                ? coBenifitsViewDetails?.environmental
+                  ? coBenifitsViewDetails?.environmental
+                  : {}
+                : undefined
+            }
+            viewOnly={viewOnly || false}
+            translator={translator}
+          />
           <Social
             onFormSubmit={onSocialFormSubmit}
-            socialViewData={(viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
-              (!viewOnly && coBenefitsDetails?.socialValueDetails)}
+            socialViewData={
+              (viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
+              (!viewOnly && coBenefitsDetails?.socialValueDetails)
+            }
             viewOnly={viewOnly || false}
-            translator={t} />
+            translator={translator}
+          />
 
           <Economic
             onFormSubmit={onEconomicFormSubmit}

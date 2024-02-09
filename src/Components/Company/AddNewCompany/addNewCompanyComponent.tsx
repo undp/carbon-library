@@ -682,7 +682,7 @@ export const AddNewCompanyComponent = (props: any) => {
                             ) : (
                               <BankOutlined className="role-icons" />
                             )}
-                            {companyRole}
+                            {(companyRole === CompanyRole.PROGRAMME_DEVELOPER) ? "Developer" : companyRole}
                           </Radio.Button>
                         </div>
                       ) : (

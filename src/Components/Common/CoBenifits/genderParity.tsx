@@ -98,12 +98,15 @@ const GenderParity = (props: any) => {
           value: genderParityViewData[field.name],
         }));
 
-      const updatedGenderParityFormTwoFields = genderParityFormTwoFields
-        .filter((field) => genderParityViewData.hasOwnProperty(field.name))
-        .map((field) => ({
+      const updatedGenderParityFormTwoFields = genderParityFormTwoFields.map(
+        (field) => ({
           ...field,
-          value: genderParityViewData[field.name],
-        }));
+          value:
+            genderParityViewData[field.name]?.length > 0
+              ? genderParityViewData[field.name]
+              : "-",
+        })
+      );
       setGenderParityFormOneFields(updatedGenderParityFormOneFields);
       setGenderParityFormTwoFields(updatedGenderParityFormTwoFields);
       if (updatedGenderParityFormTwoFields?.length > 0) {
@@ -198,19 +201,37 @@ const GenderParity = (props: any) => {
                     label={genderDetail?.label}
                     className="form-item"
                     name={genderDetail?.name}
-                    initialValue={
-                      genderParityViewData ? genderDetail?.value : undefined
-                    }
                     rules={[
                       {
                         required: false,
                       },
                     ]}
                   >
-                    <Input
-                      disabled={genderParityViewData && true}
-                      size="large"
-                    />
+                    {genderParityViewData ? (
+                      <Input
+                        disabled={genderParityViewData && true}
+                        size="large"
+                        defaultValue={
+                          genderDetail?.value
+                            ? genderDetail?.value
+                            : !genderParityViewData
+                            ? undefined
+                            : undefined
+                        }
+                      />
+                    ) : (
+                      <Input
+                        disabled={genderParityViewData && true}
+                        size="large"
+                        defaultValue={
+                          genderDetail?.value
+                            ? genderDetail?.value
+                            : !genderParityViewData
+                            ? undefined
+                            : undefined
+                        }
+                      />
+                    )}
                   </Form.Item>
                 </Col>
               ))}
