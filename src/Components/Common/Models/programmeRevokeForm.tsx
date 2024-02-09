@@ -9,7 +9,7 @@ import {
   Row,
   Select,
 } from "antd";
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Programme } from "../../../Definitions/Definitions/programme.definitions";
 
 export interface ProgrammeRevokeFormProps {
@@ -35,8 +35,25 @@ export const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (
     translator,
   } = props;
   const t = translator.t;
+  const [form] = Form.useForm();
   const [popupError, setPopupError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
+  const [remarks, setRemarks] = useState<boolean>(false);
+
+  const onRemarkValues = async () => {
+      const comment = form.getFieldValue("comment");
+      if (comment === undefined || comment === "") {
+        setRemarks(false);
+      }
+      else{
+        setRemarks(true);
+      }
+
+  };
+
+  useEffect(() => {
+    onRemarkValues();
+  });
 
   return (
     <div className="transfer-form">
@@ -55,6 +72,8 @@ export const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (
               : undefined,
         }}
         onChange={() => setPopupError(undefined)}
+        onValuesChange={onRemarkValues}
+        form={form}
         onFinish={async (d) => {
           setLoading(true);
           const res = await onFinish(d);
@@ -125,6 +144,7 @@ export const ProgrammeRevokeForm: FC<ProgrammeRevokeFormProps> = (
             type="primary"
             htmlType="submit"
             loading={loading}
+            disabled={!remarks}
           >
             {actionBtnText}
           </Button>
