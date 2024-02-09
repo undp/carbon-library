@@ -19,6 +19,7 @@ import { EmailHelperService } from "../../shared/email-helper/email-helper.servi
 import { AuthorizationLetterGen } from "../../shared/util/authorisation.letter.gen";
 import { DataListResponseDto } from "../../shared/dto/data.list.response";
 import { SYSTEM_TYPE } from "../../shared/enum/system.names.enum";
+import { DocumentStatus } from "../../shared/enum/document.status";
 
 function flatten(ary) {
   if (!ary) {
@@ -233,6 +234,8 @@ export class ITMOSystemImporter implements ImporterInterface {
                           projectDetails.id,
                           undefined,
                           programmeMaterials,
+                          new Date().getTime(),
+                          DocumentStatus.ACCEPTED,
                           undefined,
                           undefined,
                           undefined
@@ -278,6 +281,8 @@ export class ITMOSystemImporter implements ImporterInterface {
                         projectDetails.id,
                         undefined,
                         authLetterUrl,
+                        new Date().getTime(),
+                        DocumentStatus.ACCEPTED,
                         undefined,
                         undefined,
                         undefined

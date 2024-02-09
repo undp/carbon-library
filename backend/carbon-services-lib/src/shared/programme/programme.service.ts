@@ -6383,7 +6383,6 @@ export class ProgrammeService {
       }
     }
   }
-}
 
   async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
     if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
