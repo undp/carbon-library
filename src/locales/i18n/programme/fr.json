@@ -13,5 +13,6 @@
   "gettingProgrammeError": "Erreur lors de l'obtention du programme",
   "all": "Tous",
   "searchByName": "Rechercher par nom de programme",
-  "environmentalImpactAssessment": "Évaluation de l'Impact Environnemental"
+  "environmentalImpactAssessment": "Évaluation de l'Impact Environnemental",
+  "noinvestment": "Aucun financement disponible"
 }
