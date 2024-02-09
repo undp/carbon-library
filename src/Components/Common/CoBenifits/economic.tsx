@@ -4,166 +4,166 @@ import { RadioButtonStatus } from "../../../Definitions";
 
 const Economic = (props: any) => {
   const { onFormSubmit, economicViewData, viewOnly, translator } = props;
-  const t = translator;
+  const t = translator.t;
   const economicDetailsInitial: any[] = [
     {
-      section: t("coBenifits:growth"),
+      section: t("unfcccSdTool:growth"),
       fields: [
         {
           name: "growthQ1",
-          label: t("coBenifits:growthQ1"),
+          label: t("unfcccSdTool:growthQ1"),
           hide: false,
           required: false,
         },
         {
           name: "growthQ2",
-          label: t("coBenifits:growthQ2"),
+          label: t("unfcccSdTool:growthQ2"),
           hide: true,
           required: true,
         },
         {
           name: "growthQ3",
-          label: t("coBenifits:growthQ3"),
+          label: t("unfcccSdTool:growthQ3"),
           hide: true,
           required: true,
         },
         {
           name: "growthQ4",
-          label: t("coBenifits:growthQ4"),
+          label: t("unfcccSdTool:growthQ4"),
           hide: true,
           required: true,
         },
         {
           name: "growthQ5",
-          label: t("coBenifits:growthQ5"),
+          label: t("unfcccSdTool:growthQ5"),
           hide: true,
           required: true,
         },
         {
           name: "growthQ6",
-          label: t("coBenifits:growthQ6"),
+          label: t("unfcccSdTool:growthQ6"),
           hide: true,
           required: true,
         },
         {
           name: "growthQ7",
-          label: t("coBenifits:growthQ7"),
+          label: t("unfcccSdTool:growthQ7"),
           hide: true,
           required: true,
         },
         {
           name: "growthQ8",
-          label: t("coBenifits:growthQ8"),
+          label: t("unfcccSdTool:growthQ8"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:energy"),
+      section: t("unfcccSdTool:energy"),
       fields: [
         {
           name: "energyQ1",
-          label: t("coBenifits:energyQ1"),
+          label: t("unfcccSdTool:energyQ1"),
           hide: false,
           required: false,
         },
         {
           name: "energyQ2",
-          label: t("coBenifits:energyQ2"),
+          label: t("unfcccSdTool:energyQ2"),
           hide: true,
           required: true,
         },
         {
           name: "energyQ3",
-          label: t("coBenifits:energyQ3"),
+          label: t("unfcccSdTool:energyQ3"),
           hide: true,
           required: true,
         },
         {
           name: "energyQ4",
-          label: t("coBenifits:energyQ4"),
+          label: t("unfcccSdTool:energyQ4"),
           hide: true,
           required: true,
         },
         {
           name: "energyQ5",
-          label: t("coBenifits:energyQ5"),
+          label: t("unfcccSdTool:energyQ5"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:techTransfer"),
+      section: t("unfcccSdTool:techTransfer"),
       fields: [
         {
           name: "techTransferQ1",
-          label: t("coBenifits:techTransferQ1"),
+          label: t("unfcccSdTool:techTransferQ1"),
           hide: false,
           required: false,
         },
         {
           name: "techTransferQ2",
-          label: t("coBenifits:techTransferQ2"),
+          label: t("unfcccSdTool:techTransferQ2"),
           hide: true,
           required: true,
         },
         {
           name: "techTransferQ3",
-          label: t("coBenifits:techTransferQ3"),
+          label: t("unfcccSdTool:techTransferQ3"),
           hide: true,
           required: true,
         },
         {
           name: "techTransferQ4",
-          label: t("coBenifits:techTransferQ4"),
+          label: t("unfcccSdTool:techTransferQ4"),
           hide: true,
           required: true,
         },
         {
           name: "techTransferQ5",
-          label: t("coBenifits:techTransferQ5"),
+          label: t("unfcccSdTool:techTransferQ5"),
           hide: true,
           required: true,
         },
         {
           name: "techTransferQ6",
-          label: t("coBenifits:techTransferQ6"),
+          label: t("unfcccSdTool:techTransferQ6"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:balanceOfPayments"),
+      section: t("unfcccSdTool:balanceOfPayments"),
       fields: [
         {
           name: "balanceOfPaymentsQ1",
-          label: t("coBenifits:balanceOfPaymentsQ1"),
+          label: t("unfcccSdTool:balanceOfPaymentsQ1"),
           hide: false,
           required: false,
         },
         {
           name: "balanceOfPaymentsQ2",
-          label: t("coBenifits:balanceOfPaymentsQ2"),
+          label: t("unfcccSdTool:balanceOfPaymentsQ2"),
           hide: true,
           required: true,
         },
         {
           name: "balanceOfPaymentsQ3",
-          label: t("coBenifits:balanceOfPaymentsQ3"),
+          label: t("unfcccSdTool:balanceOfPaymentsQ3"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:furtherInfo"),
+      section: t("unfcccSdTool:furtherInfo"),
       fields: [
         {
           name: "furtherInfoQ1",
-          label: t("coBenifits:furtherInfoQ1"),
+          label: t("unfcccSdTool:furtherInfoQ1"),
           hide: false,
           required: false,
         },
@@ -182,9 +182,9 @@ const Economic = (props: any) => {
       const sectionName = changedFieldName.replace(/\d/g, "").replace("Q", "");
       const updatedEconomicDetails = [...economicDetails];
       const sectionIndex = updatedEconomicDetails.findIndex(
-        (section) => section.section === t(`coBenifits:${sectionName}`)
+        (section) => section.section === t("unfcccSdTool:"+sectionName)
       );
-
+      
       updatedEconomicDetails[sectionIndex].fields.forEach((field: any) => {
         if (field.name !== changedFieldName) {
           field.hide = changedFieldValue !== RadioButtonStatus.YES;
@@ -207,38 +207,38 @@ const Economic = (props: any) => {
     if (economicViewData && viewOnly === true) {
       const updatedEconomicData: any[] = [
         {
-          section: t("coBenifits:growth"),
+          section: t("unfcccSdTool:growth"),
           fields: [],
         },
         {
-          section: t("coBenifits:energy"),
+          section: t("unfcccSdTool:energy"),
           fields: [],
         },
         {
-          section: t("coBenifits:techTransfer"),
+          section: t("unfcccSdTool:techTransfer"),
           fields: [],
         },
         {
-          section: t("coBenifits:balanceOfPayments"),
+          section: t("unfcccSdTool:balanceOfPayments"),
           fields: [],
         },
         {
-          section: t("coBenifits:furtherInfo"),
+          section: t("unfcccSdTool:furtherInfo"),
           fields: [],
         },
       ];
       for (const key in economicViewData) {
         let section = "";
         if (String(key).includes("growth")) {
-          section = t("coBenifits:growth");
+          section = t("unfcccSdTool:growth");
         } else if (String(key).includes("energy")) {
-          section = t("coBenifits:energy");
+          section = t("unfcccSdTool:energy");
         } else if (String(key).includes("techTransfer")) {
-          section = t("coBenifits:techTransfer");
+          section = t("unfcccSdTool:techTransfer");
         } else if (String(key).includes("balanceOfPayments")) {
-          section = t("coBenifits:balanceOfPayments");
+          section = t("unfcccSdTool:balanceOfPayments");
         } else if (String(key).includes("furtherInfo")) {
-          section = t("coBenifits:furtherInfo");
+          section = t("unfcccSdTool:furtherInfo");
         }
 
         const economicItem = updatedEconomicData.find(
@@ -248,7 +248,7 @@ const Economic = (props: any) => {
         if (economicItem) {
           economicItem.fields.push({
             name: key,
-            label: t(key),
+            label: t("unfcccSdTool:"+key),
             hide: false,
             value: economicViewData[key],
           });
@@ -283,7 +283,7 @@ const Economic = (props: any) => {
               </Col>
               <Col span={24} className="unfcccSdTool-section-title">
                 <span>
-                  {t("coBenifits:economic")}
+                  {t("unfcccSdTool:economic")}
                 </span>
               </Col>
             </Row>
@@ -325,7 +325,7 @@ const Economic = (props: any) => {
                                   className="yes-no-radio"
                                   value={RadioButtonStatus.YES}
                                 >
-                                  {t("coBenifits:yes")}
+                                  {t("unfcccSdTool:yes")}
                                 </Radio.Button>
                               </div>
                             )}
@@ -335,7 +335,7 @@ const Economic = (props: any) => {
                                   className="yes-no-radio"
                                   value={RadioButtonStatus.NO}
                                 >
-                                  {t("coBenifits:no")}
+                                  {t("unfcccSdTool:no")}
                                 </Radio.Button>
                               </div>
                             )}
@@ -345,7 +345,7 @@ const Economic = (props: any) => {
                                   className="yes-no-radio"
                                   value={RadioButtonStatus.NA}
                                 >
-                                  {t("coBenifits:na")}
+                                  {t("unfcccSdTool:na")}
                                 </Radio.Button>
                               </div>
                             )}
@@ -357,7 +357,7 @@ const Economic = (props: any) => {
                                 className="yes-no-radio"
                                 value={RadioButtonStatus.YES}
                               >
-                                {t("coBenifits:yes")}
+                                {t("unfcccSdTool:yes")}
                               </Radio.Button>
                             </div>
                             <div className="yes-no-radio-container">
@@ -365,7 +365,7 @@ const Economic = (props: any) => {
                                 className="yes-no-radio"
                                 value={RadioButtonStatus.NO}
                               >
-                                {t("coBenifits:no")}
+                                {t("unfcccSdTool:no")}
                               </Radio.Button>
                             </div>
                             <div className="yes-no-radio-container">
@@ -373,7 +373,7 @@ const Economic = (props: any) => {
                                 className="yes-no-radio"
                                 value={RadioButtonStatus.NA}
                               >
-                                {t("coBenifits:na")}
+                                {t("unfcccSdTool:na")}
                               </Radio.Button>
                             </div>
                           </>
