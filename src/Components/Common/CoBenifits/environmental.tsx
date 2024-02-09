@@ -4,203 +4,203 @@ import { RadioButtonStatus } from "../../../Definitions";
 
 const Environmental = (props: any) => {
   const { onFormSubmit, environmentalViewData, viewOnly, translator } = props;
-  const t = translator;
+  const t = translator.t;
   const environmentalDetailsInitial: any[] = [
     {
-      section: t("coBenifits:air"),
+      section: t("unfcccSdTool:air"),
       fields: [
         {
           name: "airQ1",
-          label: t("coBenifits:airQ1"),
+          label: t("unfcccSdTool:airQ1"),
           hide: false,
           required: false,
         },
         {
           name: "airQ2",
-          label: t("coBenifits:airQ2"),
+          label: t("unfcccSdTool:airQ2"),
           hide: true,
           required: true,
         },
         {
           name: "airQ3",
-          label: t("coBenifits:airQ3"),
+          label: t("unfcccSdTool:airQ3"),
           hide: true,
           required: true,
         },
         {
           name: "airQ4",
-          label: t("coBenifits:airQ4"),
+          label: t("unfcccSdTool:airQ4"),
           hide: true,
           required: true,
         },
         {
           name: "airQ5",
-          label: t("coBenifits:airQ5"),
+          label: t("unfcccSdTool:airQ5"),
           hide: true,
           required: true,
         },
         {
           name: "airQ6",
-          label: t("coBenifits:airQ6"),
+          label: t("unfcccSdTool:airQ6"),
           hide: true,
           required: true,
         },
         {
           name: "airQ7",
-          label: t("coBenifits:airQ7"),
+          label: t("unfcccSdTool:airQ7"),
           hide: true,
           required: true,
         },
         {
           name: "airQ8",
-          label: t("coBenifits:airQ8"),
+          label: t("unfcccSdTool:airQ8"),
           hide: true,
           required: true,
         },
         {
           name: "airQ9",
-          label: t("coBenifits:airQ9"),
+          label: t("unfcccSdTool:airQ9"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:land"),
+      section: t("unfcccSdTool:land"),
       fields: [
         {
           name: "landQ1",
-          label: t("coBenifits:landQ1"),
+          label: t("unfcccSdTool:landQ1"),
           hide: false,
           required: false,
         },
         {
           name: "landQ2",
-          label: t("coBenifits:landQ2"),
+          label: t("unfcccSdTool:landQ2"),
           hide: true,
           required: true,
         },
         {
           name: "landQ3",
-          label: t("coBenifits:landQ3"),
+          label: t("unfcccSdTool:landQ3"),
           hide: true,
           required: true,
         },
         {
           name: "landQ4",
-          label: t("coBenifits:landQ4"),
+          label: t("unfcccSdTool:landQ4"),
           hide: true,
           required: true,
         },
         {
           name: "landQ5",
-          label: t("coBenifits:landQ5"),
+          label: t("unfcccSdTool:landQ5"),
           hide: true,
           required: true,
         },
         {
           name: "landQ6",
-          label: t("coBenifits:landQ6"),
+          label: t("unfcccSdTool:landQ6"),
           hide: true,
           required: true,
         },
         {
           name: "landQ7",
-          label: t("coBenifits:landQ7"),
+          label: t("unfcccSdTool:landQ7"),
           hide: true,
           required: true,
         },
         {
           name: "landQ8",
-          label: t("coBenifits:landQ8"),
+          label: t("unfcccSdTool:landQ8"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:water"),
+      section: t("unfcccSdTool:water"),
       fields: [
         {
           name: "waterQ1",
-          label: t("coBenifits:waterQ1"),
+          label: t("unfcccSdTool:waterQ1"),
           hide: false,
           required: false,
         },
         {
           name: "waterQ2",
-          label: t("coBenifits:waterQ2"),
+          label: t("unfcccSdTool:waterQ2"),
           hide: true,
           required: true,
         },
         {
           name: "waterQ3",
-          label: t("coBenifits:waterQ3"),
+          label: t("unfcccSdTool:waterQ3"),
           hide: true,
           required: true,
         },
         {
           name: "waterQ4",
-          label: t("coBenifits:waterQ4"),
+          label: t("unfcccSdTool:waterQ4"),
           hide: true,
           required: true,
         },
         {
           name: "waterQ5",
-          label: t("coBenifits:waterQ5"),
+          label: t("unfcccSdTool:waterQ5"),
           hide: true,
           required: true,
         },
         {
           name: "waterQ6",
-          label: t("coBenifits:waterQ6"),
+          label: t("unfcccSdTool:waterQ6"),
           hide: true,
           required: true,
         },
         {
           name: "waterQ7",
-          label: t("coBenifits:waterQ7"),
+          label: t("unfcccSdTool:waterQ7"),
           hide: true,
           required: true,
         },
       ],
     },
     {
-      section: t("coBenifits:naturalResource"),
+      section: t("unfcccSdTool:naturalResource"),
       fields: [
         {
           name: "naturalResourceQ1",
-          label: t("coBenifits:naturalResourceQ1"),
+          label: t("unfcccSdTool:naturalResourceQ1"),
           hide: false,
           required: false,
         },
         {
           name: "naturalResourceQ2",
-          label: t("coBenifits:naturalResourceQ2"),
+          label: t("unfcccSdTool:naturalResourceQ2"),
           hide: true,
           required: true,
         },
         {
           name: "naturalResourceQ3",
-          label: t("coBenifits:naturalResourceQ3"),
+          label: t("unfcccSdTool:naturalResourceQ3"),
           hide: true,
           required: true,
         },
         {
           name: "naturalResourceQ4",
-          label: t("coBenifits:naturalResourceQ4"),
+          label: t("unfcccSdTool:naturalResourceQ4"),
           hide: true,
           required: true,
         },
         {
           name: "naturalResourceQ5",
-          label: t("coBenifits:naturalResourceQ5"),
+          label: t("unfcccSdTool:naturalResourceQ5"),
           hide: true,
           required: true,
         },
         {
           name: "naturalResourceQ6",
-          label: t("coBenifits:naturalResourceQ6"),
+          label: t("unfcccSdTool:naturalResourceQ6"),
           hide: true,
           required: true,
         },
@@ -222,7 +222,7 @@ const Environmental = (props: any) => {
       const sectionName = changedFieldName.replace(/\d/g, "").replace("Q", "");
       const updatedEnvironmentalDetails = [...environmentalDetails];
       const sectionIndex = updatedEnvironmentalDetails.findIndex(
-        (section) => section.section === t(`coBenifits:${sectionName}`)
+        (section) => section.section === t("unfcccSdTool:"+sectionName)
       );
 
       updatedEnvironmentalDetails[sectionIndex].fields.forEach((field: any) => {
@@ -247,32 +247,32 @@ const Environmental = (props: any) => {
     if (environmentalViewData && viewOnly === true) {
       const updatedEnvironmentalData: any[] = [
         {
-          section: t("coBenifits:air"),
+          section: t("unfcccSdTool:air"),
           fields: [],
         },
         {
-          section: t("coBenifits:land"),
+          section: t("unfcccSdTool:land"),
           fields: [],
         },
         {
-          section: t("coBenifits:water"),
+          section: t("unfcccSdTool:water"),
           fields: [],
         },
         {
-          section: t("coBenifits:naturalResource"),
+          section: t("unfcccSdTool:naturalResource"),
           fields: [],
         },
       ];
       for (const key in environmentalViewData) {
         let section = "";
         if (String(key).includes("air")) {
-          section = t("coBenifits:air");
+          section = t("unfcccSdTool:air");
         } else if (String(key).includes("land")) {
-          section = t("coBenifits:land");
+          section = t("unfcccSdTool:land");
         } else if (String(key).includes("water")) {
-          section = t("coBenifits:water");
+          section = t("unfcccSdTool:water");
         } else if (String(key).includes("naturalResource")) {
-          section = t("coBenifits:naturalResource");
+          section = t("unfcccSdTool:naturalResource");
         }
 
         const environmentalItem = updatedEnvironmentalData.find(
@@ -282,7 +282,7 @@ const Environmental = (props: any) => {
         if (environmentalItem) {
           environmentalItem.fields.push({
             name: key,
-            label: t(key),
+            label: t("unfcccSdTool:"+key),
             hide: false,
             value: environmentalViewData[key],
           });
@@ -321,7 +321,7 @@ const Environmental = (props: any) => {
                     target="_blank"
                     href="https://www4.unfccc.int/sites/sdcmicrosite/Pages/Create-a-report.aspx"
                   >
-                    {t("coBenifits:unfcccSdToolTitle")}
+                    {t("unfcccSdTool:unfcccSdToolTitle")}
                   </a>
                 </span>
               </Col>
@@ -329,7 +329,7 @@ const Environmental = (props: any) => {
                 <div className="unfccSdTool-section-divider" />
               </Col>
               <Col span={24} className="unfcccSdTool-section-title">
-                <span>{t("coBenifits:environmental")}</span>
+                <span>{t("unfcccSdTool:environmental")}</span>
               </Col>
               <Col span={24}>
                 <div
@@ -359,7 +359,7 @@ const Environmental = (props: any) => {
                           required: field?.required,
                           message:
                             field?.required &&
-                            `${t(field?.name)} ${t("coBenifits:isRequired")}`,
+                            `${t(field?.name)} ${t("unfcccSdTool:isRequired")}`,
                         },
                       ]}
                     >
@@ -376,7 +376,7 @@ const Environmental = (props: any) => {
                                   className="yes-no-radio"
                                   value={RadioButtonStatus.YES}
                                 >
-                                  {t("coBenifits:yes")}
+                                  {t("unfcccSdTool:yes")}
                                 </Radio.Button>
                               </div>
                             )}
@@ -386,7 +386,7 @@ const Environmental = (props: any) => {
                                   className="yes-no-radio"
                                   value={RadioButtonStatus.NO}
                                 >
-                                  {t("coBenifits:no")}
+                                  {t("unfcccSdTool:no")}
                                 </Radio.Button>
                               </div>
                             )}
@@ -396,7 +396,7 @@ const Environmental = (props: any) => {
                                   className="yes-no-radio"
                                   value={RadioButtonStatus.NA}
                                 >
-                                  {t("coBenifits:na")}
+                                  {t("unfcccSdTool:na")}
                                 </Radio.Button>
                               </div>
                             )}
@@ -408,7 +408,7 @@ const Environmental = (props: any) => {
                                 className="yes-no-radio"
                                 value={RadioButtonStatus.YES}
                               >
-                                {t("coBenifits:yes")}
+                                {t("unfcccSdTool:yes")}
                               </Radio.Button>
                             </div>
                             <div className="yes-no-radio-container">
@@ -416,7 +416,7 @@ const Environmental = (props: any) => {
                                 className="yes-no-radio"
                                 value={RadioButtonStatus.NO}
                               >
-                                {t("coBenifits:no")}
+                                {t("unfcccSdTool:no")}
                               </Radio.Button>
                             </div>
                             <div className="yes-no-radio-container">
@@ -424,7 +424,7 @@ const Environmental = (props: any) => {
                                 className="yes-no-radio"
                                 value={RadioButtonStatus.NA}
                               >
-                                {t("coBenifits:na")}
+                                {t("unfcccSdTool:na")}
                               </Radio.Button>
                             </div>
                           </>
