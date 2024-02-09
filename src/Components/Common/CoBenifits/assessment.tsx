@@ -114,18 +114,7 @@ const Assessment = (props: any) => {
     const changedValues: any = {};
     if (info.changedFields && info.changedFields.length > 0) {
       info.changedFields.map(async (changedField: any) => {
-        if (changedField.name[0] === "document") {
-          const base64Value = await getBase64(
-            changedField.value[0].originFileObj as RcFile
-          );
-          console.log("FEAsibility document : ", base64Value);
-          const values = base64Value;
-
-          setCobenefitsAssessmentDetails((pre: any) => ({
-            ...pre,
-            document: values,
-          }));
-        } else {
+        if (changedField.name[0] !== "document") {
           changedValues[changedField.name[0]] = changedField.value;
         }
       });
@@ -158,6 +147,29 @@ const Assessment = (props: any) => {
       setIsPersonListedDetailsVisible(true);
     } else {
       setIsPersonListedDetailsVisible(false);
+    }
+  };
+
+  const onAssesmentDocument = async (e: any) => {
+    if (e?.fileList.length > 0 && e?.fileList[0]?.name) {
+      const base64Value = await getBase64(
+        e.fileList[0].originFileObj as RcFile
+      );
+      const values = base64Value;
+
+      setCobenefitsAssessmentDetails((pre: any) => ({
+        ...pre,
+        document: values,
+      }));
+    } else {
+      setCobenefitsAssessmentDetails((pre: any) => {
+        const { document, ...rest } = pre;
+        if (Object.keys(rest).length === 0) {
+          return undefined;
+        } else {
+          return { ...rest };
+        }
+      });
     }
   };
 
@@ -822,6 +834,7 @@ const Assessment = (props: any) => {
                       listType="picture"
                       multiple={false}
                       maxCount={1}
+                      onChange={onAssesmentDocument}
                     >
                       <Button
                         className="upload-doc"

@@ -622,9 +622,7 @@ export const AddNewCompanyComponent = (props: any) => {
                                   value === undefined
                                 ) {
                                   throw new Error(
-                                    `${t("addCompany:nationalSopValue")} s${t(
-                                      "isRequired"
-                                    )}`
+                                    `${t("addCompany:nationalSopValue")} ${t("isRequired")}`
                                   );
                                 }
                               },

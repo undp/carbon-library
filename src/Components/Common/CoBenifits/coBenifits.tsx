@@ -157,13 +157,13 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
               : {}
             : undefined}
           viewOnly={viewOnly || false}
-          translator={translator} />
+          translator={t} />
           <Social
             onFormSubmit={onSocialFormSubmit}
             socialViewData={(viewOnly && coBenifitsViewDetails?.socialValueDetails) ||
               (!viewOnly && coBenefitsDetails?.socialValueDetails)}
             viewOnly={viewOnly || false}
-            translator={translator} />
+            translator={t} />
 
           <Economic
             onFormSubmit={onEconomicFormSubmit}
@@ -175,7 +175,7 @@ export const CoBenifitsComponent = (props: CoBenefitProps) => {
                 : undefined
             }
             viewOnly={viewOnly || false}
-            translator={translator}
+            translator={t}
           />
         </>
       ),
