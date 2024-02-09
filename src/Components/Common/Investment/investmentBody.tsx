@@ -8,6 +8,7 @@ import {
   FlagOutlined,
   GlobalOutlined,
   LineChartOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 
 import moment from "moment";
@@ -52,6 +53,12 @@ export const InvestmentBody: FC<InvestmentBodyProps> = (
               <CheckCircleOutlined
                 className="common-progress-icon"
                 style={{ color: "#5DC380" }}
+              />
+            )}
+            {investmentData?.status === InvestmentStatus.REJECTED && (
+              <ExclamationCircleOutlined
+                className="common-progress-icon"
+                style={{ color: "#FD6F70" }}
               />
             )}
           </div>
