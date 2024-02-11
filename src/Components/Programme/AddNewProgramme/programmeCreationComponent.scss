@@ -58,7 +58,7 @@
               .ant-radio-button-wrapper-disabled
             ) {
             color: $dark-text-color !important;
-            border-color: $primary-purple !important;
+            border-color: $primary-purple;
             box-shadow: none;
           }
         }
@@ -185,7 +185,7 @@
                 .ant-radio-button-wrapper-disabled
               ) {
               color: $dark-text-color !important;
-              border-color: $primary-purple !important;
+              border-color: $primary-purple;
               border-radius: 4px;
               box-shadow: none;
             }
@@ -263,7 +263,7 @@
                 .ant-radio-button-wrapper-disabled
               ) {
               color: $dark-text-color !important;
-              border-color: $primary-purple !important;
+              border-color: $primary-purple;
               box-shadow: none;
               border-radius: 4px;
             }

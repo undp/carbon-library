@@ -21,6 +21,8 @@ import { NDCAction } from "../entities/ndc.action.entity";
 import { NDCActionDto } from "../dto/ndc.action.dto";
 import { EmailHelperService } from "../email-helper/email-helper.service";
 import { EmailTemplates } from "../email-helper/email.template";
+import { InvestmentSyncDto } from "../dto/investment.sync.dto";
+import { HttpUtilService } from "../util/http.util.service";
 
 @Injectable()
 export class RegistryClientService {
@@ -32,58 +34,12 @@ export class RegistryClientService {
     @InjectRepository(ProgrammeDocument)
     private documentRepo: Repository<ProgrammeDocument>,
     private emailHelperService: EmailHelperService,
+    private httpUtilService: HttpUtilService,
 ) {}
 
-  private async sendHttp(endpoint: string, data: any) {
-    if (!this.configService.get("registry.syncEnable")) {
-      this.logger.debug("Company created ignored due to registry sync disable");
-      return;
-    }
-
-    return await axios
-      .post(this.configService.get("registry.endpoint") + endpoint, data, {
-        headers: {
-          api_key: `${this.configService.get("registry.apiToken")}`,
-        },
-      })
-      .catch((ex) => {
-        console.log("Exception", ex.response?.data?.message);
-        if (
-          ex.response?.data?.statusCode == 400 &&
-          ex.response?.data?.message?.indexOf("already exist") >= 0
-        ) {
-          return true;
-        }
-        throw ex;
-      });
-  }
-
-  private async sendHttpPut(endpoint: string, data: any) {
-    if (!this.configService.get("registry.syncEnable")) {
-      this.logger.debug("Company created ignored due to registry sync disable");
-      return;
-    }
-
-    return await axios
-      .put(this.configService.get("registry.endpoint") + endpoint, data, {
-        headers: {
-          api_key: `${this.configService.get("registry.apiToken")}`,
-        },
-      })
-      .catch((ex) => {
-        console.log("Exception", ex.response?.data?.statusCode);
-        if (
-          ex.response?.data?.statusCode == 400 &&
-          ex.response?.data?.message?.indexOf("already exist") >= 0
-        ) {
-          return true;
-        }
-        throw ex;
-      });
-  }
 
   public async createCompany(userDto: UserDto) {
-    const resp = await this.sendHttp("/national/user/add", userDto);
+    const resp = await this.httpUtilService.sendHttp("/national/user/sync", userDto);
     console.log(
       "Successfully create company on MRV",
       userDto.company.name
@@ -176,7 +132,7 @@ export class RegistryClientService {
       return
     }
     else if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_REGISTRY){
-      const resp = await this.sendHttpPut("/national/programme/authProgramme", actionProps);
+      const resp = await this.httpUtilService.sendHttpPut("/national/programme/authProgramme", actionProps);
       console.log(
         "Successfully authoirised programme on MRV",
         actionProps
@@ -186,7 +142,7 @@ export class RegistryClientService {
   }
 
   public async rejectProgramme(reject) {
-    const resp = await this.sendHttpPut("/national/programme/rejectProgramme", reject);
+    const resp = await this.httpUtilService.sendHttpPut("/national/programme/rejectProgramme", reject);
     console.log(
       "Successfully rejected programme on MRV",
       reject
@@ -196,7 +152,7 @@ export class RegistryClientService {
 
 
   public async issueCredit(issue) {
-    const resp = await this.sendHttpPut("/national/programme/issueCredit", issue);
+    const resp = await this.httpUtilService.sendHttpPut("/national/programme/issueCredit", issue);
     console.log(
       "Successfully issued programme on MRV",
       issue
@@ -206,14 +162,14 @@ export class RegistryClientService {
 
   public async programmeAccept(document: any) {
     console.log('programme accept on registry', document)
-    const resp = await this.sendHttp("/national/programme/acceptProgramme", document);
+    const resp = await this.httpUtilService.sendHttp("/national/programme/acceptProgramme", document);
     console.log('Successfully programme accepted on registry', document.actionId)
     return resp;
   }
 
   public async addDocument(document: ProgrammeDocumentDto) {
     console.log('adding document on registry', document)
-    const resp = await this.sendHttp("/national/programme/addDocument", document);
+    const resp = await this.httpUtilService.sendHttp("/national/programme/addDocument", document);
     console.log('Successfully create document on registry', document.actionId)
     return resp;
   }
@@ -241,7 +197,7 @@ export class RegistryClientService {
         programmeReq["mitigationActions"] = [this.createNDCReq(programme.ndcAction)]
     }
     console.log('Creating programme', JSON.stringify(programmeReq))
-    const resp = await this.sendHttp("/national/programme/create", programmeReq);
+    const resp = await this.httpUtilService.sendHttp("/national/programme/create", programmeReq);
 
     this.logger.log('Successfully create programme on registry', resp)
     return resp;
@@ -250,7 +206,7 @@ export class RegistryClientService {
   public async updateOwnership(req: any) {
 
     console.log('creating ownership update on registry', req)
-    const resp = await this.sendHttp("/national/programme/updateOwnership", req);
+    const resp = await this.httpUtilService.sendHttp("/national/programme/updateOwnership", req);
     console.log('Successfully create updated ownership on registry')
     return resp;
   }
@@ -258,7 +214,7 @@ export class RegistryClientService {
   public async addMitigation(ndc: NDCAction) {
     const mitigationReq = this.createNDCReq(ndc);
     console.log('creating mitigation action on registry', ndc, mitigationReq)
-    const resp = await this.sendHttp("/national/programme/addMitigation", {
+    const resp = await this.httpUtilService.sendHttp("/national/programme/addMitigation", {
         "mitigation": mitigationReq,
         "externalId": ndc.externalId
     });
@@ -266,16 +222,28 @@ export class RegistryClientService {
     return resp;
   }
 
+  public async addNationalInvestment(investment:InvestmentSyncDto){
+    console.log('creating national Investment on registry', investment)
+    const resp = await this.httpUtilService.sendHttp("/national/organisation/addInvestment", investment);
+    console.log('Successfully create national Investment on registry')
+    return resp;
+  }
+
   private createNDCReq(ndc: NDCAction | NDCActionDto) {
+    let prop = {}
+    if (ndc.creditCalculationProperties) {
+      prop = ndc.creditCalculationProperties
+    }
+    prop['methodology'] =  ndc?.methodology ? ndc?.methodology : '-'
     return {
         typeOfMitigation: ndc.typeOfMitigation,
         subTypeOfMitigation: ndc.subTypeOfMitigation,
         userEstimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
-        methodology: ndc?.methodology ? ndc?.methodology : '-',
+        methodology: ndc?.methodology ? ndc?.methodology : '-', // TODO: Remove this
         systemEstimatedCredits: ndc.ndcFinancing?.systemEstimatedCredits ? ndc.ndcFinancing?.systemEstimatedCredits : 0,
         actionId: ndc.id,
         constantVersion: '' + ndc.constantVersion,
-        properties: (ndc.creditCalculationProperties ? ndc.creditCalculationProperties : undefined)
+        properties: prop
     };
   }
 }

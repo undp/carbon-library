@@ -121,6 +121,7 @@ import { NdcDetailsPeriodDto } from "../dto/ndc.details.period.dto";
 import { MitigationProperties } from "../dto/mitigation.properties";
 import { ProgrammeMitigationIssue } from "../dto/programme.mitigation.issue";
 import { mitigationIssueProperties } from "../dto/mitigation.issue.properties";
+import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
 import { NdcDetailsActionDto } from "../dto/ndc.details.action.dto";
 import { NdcDetailsActionStatus } from "../enum/ndc.details.action.status.enum";
 import { NdcDetailsActionType } from "../enum/ndc.details.action.type.enum";
@@ -210,6 +211,7 @@ export class ProgrammeService {
     user: string,
     programme: Programme,
     investor: Company,
+    nationalInvestment?:Investment
   ) {
     const companyIndex = programme.companyId
       .map((e) => Number(e))
@@ -234,13 +236,18 @@ export class ProgrammeService {
       programme.creditOwnerPercentage[companyIndex] -= transfer.percentage;
       programme.proponentPercentage[companyIndex] -= transfer.percentage;
     }
+    if(nationalInvestment)nationalInvestment.amount-=transfer.amount
 
     let ownerTaxId;
     if (programme.proponentTaxVatId.length > companyIndex) {
       ownerTaxId = programme.proponentTaxVatId[companyIndex];
     }
     if (programme.article6trade==true || programme.article6trade==undefined) {
-      await this.asyncOperationsInterface.AddAction({
+      let nationalProps={}
+    if(nationalInvestment){
+      nationalProps['investmentRequestId']=nationalInvestment.requestId
+    }
+    await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.OwnershipUpdate,
         actionProps: {
           proponentTaxVatId: programme.proponentTaxVatId,
@@ -249,7 +256,9 @@ export class ProgrammeService {
           investorTaxId: investor.taxId,
           shareFromOwner: transfer.shareFromOwner,
           ownerTaxId: ownerTaxId,
-        },
+          amount:transfer.amount,
+        ...nationalProps
+      },
       });
   }
 
@@ -264,6 +273,8 @@ export class ProgrammeService {
         transfer.fromCompanyId,
         transfer.shareFromOwner,
         user,
+        transfer.amount,
+        nationalInvestment?nationalInvestment.requestId:undefined
       );
     }
 
@@ -276,13 +287,32 @@ export class ProgrammeService {
           },
           {
             status: InvestmentStatus.APPROVED,
-            txTime: new Date().getTime(),
-          },
-        );
-        if (
-          this.configService.get('systemType') ==
-          SYSTEM_TYPE.CARBON_TRANSPARENCY
-        ) {
+            txTime: new Date().getTime()
+          }
+        )
+        if(nationalInvestment){
+          await em.update(
+            Investment,
+            {
+              requestId: nationalInvestment.requestId
+            }, {
+              txTime: new Date().getTime(),
+              amount:nationalInvestment.amount,
+            }
+          )
+        }
+        (await this.checkPendingInvestmentValidity(programme,transfer,nationalInvestment)).map(async(toRejectId)=>{
+          await em.update(
+            Investment,
+            {
+              requestId: toRejectId
+            }, {
+              txTime: new Date().getTime(),
+              status: InvestmentStatus.CANCELLED,
+            }
+          )
+        })
+        if(this.configService.get('systemType')==SYSTEM_TYPE.CARBON_TRANSPARENCY){
           return await em.update(
             Programme,
             {
@@ -416,6 +446,8 @@ export class ProgrammeService {
       ownerCompanyId,
       update.shareFromOwner,
       `${investorCompanyId}#${investorCompanyName}#${ownerCompanyId}#${ownerCompanyName}`,
+      update.amount,
+      update.investmentRequestId?update.investmentRequestId:undefined
     );
 
     if (resp) this.checkPendingTransferValidity(resp);
@@ -571,6 +603,54 @@ export class ProgrammeService {
       );
     }
 
+    let nationalInvestment:any
+    if(req.nationalInvestmentId){
+        nationalInvestment = await this.investmentRepo.findOneBy({
+        requestId: req.nationalInvestmentId,
+      });
+  
+      if (!nationalInvestment) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.nationalInvestmentDoesNotExist",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      if(nationalInvestment.category!==InvestmentCategoryEnum.National){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.investmentNotAnNationalInvestment",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      if(nationalInvestment.fromCompanyId!==requester.companyId && requester.companyRole !== CompanyRole.GOVERNMENT && requester.companyRole !== CompanyRole.MINISTRY){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.cannotInvestOnOthersNationalInvestment",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      
+      if(nationalInvestment.amount<req.amount){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "programme.nationalInvestmentAmount<projectInvestmentAmount",
+            []
+          ),
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+    }
+
     if (!req.fromCompanyIds) {
       req.fromCompanyIds = programme.companyId;
     }
@@ -662,6 +742,7 @@ export class ProgrammeService {
         (req.amount * req.percentage[j]) / percSum,
       );
       investment.status = InvestmentStatus.PENDING;
+      investment.nationalInvestmentId = req.nationalInvestmentId? req.nationalInvestmentId : null
       if (requester.companyId == fromCompanyId) {
         autoApproveInvestmentList.push(investment);
       }
@@ -690,6 +771,8 @@ export class ProgrammeService {
             .join('#'),
           programme,
           toCompany,
+          nationalInvestment
+
         )
       ).data;
     }
@@ -1372,10 +1455,19 @@ export class ProgrammeService {
   async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
     this.logger.log('Add Registry Document triggered')
 
-    const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
-
     const sqlProgram = await this.findByExternalId(documentDto.externalId);
-    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, certifierId);
+    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, undefined);
+    if(documentDto.certifierTaxId){
+    const certifier = await this.companyService.findByTaxId(documentDto.certifierTaxId);
+    const updateCert = await this.programmeLedger.updateCertifier(
+      sqlProgram.programmeId,
+      certifier.companyId,
+      true,
+      certifier ? `${certifier.companyId}#${certifier.name}` : '',
+      undefined,)
+
+      this.logger.log('Certifying the programme', updateCert)
+    }
 
     console.log('Add document on registry', sqlProgram, resp, documentDto)
 
@@ -1650,7 +1742,7 @@ export class ProgrammeService {
     ndcAction && ndcAction.typeOfMitigation
     ){
       const certifierId = (await this.companyService.findByTaxId(req.certifierTaxId))?.companyId;
-      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, certifierId);
+      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, undefined);
     }
   }
 
@@ -3596,8 +3688,44 @@ export class ProgrammeService {
     );
   }
 
-  private checkPendingTransferValidity = async (programme: Programme) => {
-    const hostAddress = this.configService.get('host');
+  private async checkPendingInvestmentValidity(programme:Programme,toDoInvestment:Investment,nationalInvestment?:Investment){
+    let invalidInvestments = []
+    const projectInvestments = await this.investmentRepo.find({
+      where: {
+        programmeId: programme.programmeId,
+        category: InvestmentCategoryEnum.Project,
+        status: InvestmentStatus.PENDING,
+      },
+    });
+    for (var investment of projectInvestments){
+      if(toDoInvestment.requestId!==investment.requestId){
+        const ownerIndex = programme.companyId.map(e => Number(e)).indexOf(Number(investment.fromCompanyId))
+        if(investment.percentage>programme.proponentPercentage[ownerIndex]){
+          invalidInvestments.push(investment.requestId)
+        }
+      }
+    }
+    if(nationalInvestment){
+      const investmentsByNational = await this.investmentRepo.find({
+        where: {
+          nationalInvestmentId: nationalInvestment.requestId,
+          category: InvestmentCategoryEnum.Project,
+          status: InvestmentStatus.PENDING,
+        },
+      });
+      for(var investment of investmentsByNational){
+        if(toDoInvestment.requestId!==investment.requestId){
+          if(investment.amount>nationalInvestment.amount){
+            invalidInvestments.push(investment.requestId)
+          }
+        }
+      }
+    }
+    return invalidInvestments.length?[... new Set(invalidInvestments)]:[]
+  }
+
+  private checkPendingTransferValidity = async(programme:Programme) => {
+    const hostAddress = this.configService.get("host");
     const transfers = await this.programmeTransferRepo.find({
       where: {
         programmeId: programme.programmeId,
@@ -4138,11 +4266,19 @@ export class ProgrammeService {
 
   async programmeAccept(accept: ProgrammeAcceptedDto): Promise<DataResponseDto | undefined> {
     this.logger.log('Add accept triggered', accept.type)
-    const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
-
     const sqlProgram = await this.findByExternalId(accept.externalId);
-    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, certifierId);
-    
+    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, undefined);
+    if(accept.certifierTaxId){
+      const certifier = await this.companyService.findByTaxId(accept.certifierTaxId);
+      const updateCert = await this.programmeLedger.updateCertifier(
+        sqlProgram.programmeId,
+        certifier.companyId,
+        true,
+        certifier ? `${certifier.companyId}#${certifier.name}`  : '',
+        undefined,)
+  
+        this.logger.log('Certifying the programme', updateCert)
+      }
     console.log('Add accept on registry', sqlProgram, resp, accept)
 
     if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
@@ -5468,7 +5604,7 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, programme);
   }
 
-  async approveProgramme(req: ProgrammeApprove, user: User) {
+  async approveProgramme(req: ProgrammeApprove, user: User, auth_letter?:string ) {
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`,
     );
@@ -5586,7 +5722,22 @@ export class ProgrammeService {
       let formattedDate = `${date} ${month} ${year}`;
 
       updated.company.forEach(async (company) => {
+        auth_letter?
         await this.emailHelperService.sendEmailToOrganisationAdmins(
+          company.companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: updated.title,
+            authorisedDate: formattedDate,
+            serialNumber: updated.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view/${updated.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'AUTHORISATION_LETTER.pdf',
+            path: auth_letter
+          }
+        ):await this.emailHelperService.sendEmailToOrganisationAdmins(
           company.companyId,
           EmailTemplates.PROGRAMME_AUTHORISATION,
           {
@@ -6224,6 +6375,30 @@ export class ProgrammeService {
       );
     }
 
+    let nationalInvestment = investment.nationalInvestmentId? await this.investmentRepo.findOneBy({
+      requestId: investment.nationalInvestmentId,
+    }):null
+
+    if (investment.nationalInvestmentId && !nationalInvestment) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.nationalInvestmentDoesNotExist",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    if(nationalInvestment && nationalInvestment.category!==InvestmentCategoryEnum.National){
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "programme.investmentNotAnNationalInvestment",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
     const receiver = await this.companyService.findByCompanyId(
       investment.toCompanyId,
     );
@@ -6236,6 +6411,13 @@ export class ProgrammeService {
     );
 
     const programme = await this.findById(investment.programmeId);
+    console.log('shareFromOwner prev',investment.shareFromOwner)
+    const propPerMap = {}
+    for (const i in programme.companyId) {
+      propPerMap[programme.companyId[i]] = programme.proponentPercentage[i];
+    }
+    investment.shareFromOwner = parseFloat((investment.percentage * 100 / propPerMap[investment.fromCompanyId]).toFixed(6))
+    console.log('shareFromOwner prev',investment.shareFromOwner)
 
     const transferResult = await this.doInvestment(
       investment,
@@ -6244,6 +6426,7 @@ export class ProgrammeService {
         .join('#'),
       programme,
       receiver,
+      nationalInvestment
     );
 
     return transferResult;
@@ -6260,6 +6443,21 @@ export class ProgrammeService {
         deleted: false
       }
     });
+  }
+
+  async itmoProjectApprove(program: Programme) {
+    if(program) {
+      await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+      if (program.cadtId) {
+        program.currentStage = ProgrammeStage.APPROVED;
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+              programme: program
+          },
+        });
+      }
+    }
   }
 
   async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
@@ -6413,7 +6611,7 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    
     if (ndcAction.status === NdcDetailsActionStatus.Approved || user.role === Role.ViewOnly) {
       throw new HttpException(
         this.helperService.formatReqMessagesString("programme.unAuth", []),

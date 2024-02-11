@@ -60,8 +60,8 @@ export const getStageTagType = (
       return "error";
     case ProgrammeStageR.Authorised:
       return "processing";
-    // case ProgrammeStageR.Transferred:
-    //   return 'success';
+    case ProgrammeStageR.Approved:
+      return 'purple';
     default:
       return "default";
   }

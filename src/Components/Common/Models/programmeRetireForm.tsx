@@ -101,7 +101,7 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
           {
             key: "name",
             operation: "like",
-            value: newValue.charAt(0).toUpperCase() + newValue.slice(1) + "%",
+            value: "%" + newValue.charAt(0).toUpperCase() + newValue.slice(1) + "%",
           },
         ],
         sort: {
@@ -228,7 +228,7 @@ export const ProgrammeRetireForm: FC<ProgrammeRetireFormProps> = (
             // programme.companyId.map((n) => Number(n));
             // d.companyCredit = d.companyCredit.map((n: any) => (n === undefined ? 0 : n));
             d.toCompanyMeta = {
-              name: d.company,
+              name: (d.company !== "" && d.company !== null && d.company !== undefined) ? d.company : undefined,
               country: d.country,
             };
           }

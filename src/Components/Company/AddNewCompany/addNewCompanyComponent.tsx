@@ -366,7 +366,8 @@ export const AddNewCompanyComponent = (props: any) => {
       });
       if (response.data) {
         const regionNames = response.data.map((item: any) => item.regionName);
-        setRegionsList([t("national"), ...regionNames]);
+        const uniqueRegionNames: any = Array.from(new Set(regionNames))
+        setRegionsList([t("national"), ...uniqueRegionNames]);
       }
     } catch (error: any) {
       console.log("Error in getting regions list", error);
@@ -477,7 +478,7 @@ export const AddNewCompanyComponent = (props: any) => {
     };
     setLoading(true);
     try {
-      if (requestData.phoneNo) {
+      if (requestData.phoneNo && requestData.phoneNo.length > 4) {
         requestData.phoneNo = formatPhoneNumberIntl(requestData.phoneNo);
       } else {
         requestData.phoneNo = undefined;
@@ -1127,7 +1128,7 @@ export const AddNewCompanyComponent = (props: any) => {
                             ) : (
                               <BankOutlined className="role-icons" />
                             )}
-                            {companyRole}
+                            {(companyRole === CompanyRole.PROGRAMME_DEVELOPER) ? "Developer" : companyRole}
                           </Radio.Button>
                         </div>
                       ) : (
@@ -1457,9 +1458,11 @@ export const AddNewCompanyComponent = (props: any) => {
                             <InputNumber
                               style={{ width: "100%" }}
                               size="large"
-                              min={1}
+                              min={0}
                               max={99}
-                              formatter={(value) => `${Math.round(value)}%`}
+                              formatter={(value) =>
+                                `${value ? Math.round(value) : ""}%`
+                              }
                               parser={(value: any) => value.replace("%", "")}
                             />
                           </Form.Item>
@@ -1528,7 +1531,9 @@ export const AddNewCompanyComponent = (props: any) => {
                           value === null ||
                           value === undefined
                         ) {
-                          throw new Error(`${t("addCompany:name")} ${t("isRequired")}`);
+                          throw new Error(
+                            `${t("addCompany:name")} ${t("isRequired")}`
+                          );
                         }
                       },
                     },
@@ -1574,14 +1579,18 @@ export const AddNewCompanyComponent = (props: any) => {
                           value === null ||
                           value === undefined
                         ) {
-                          throw new Error(`${t("addCompany:email")} ${t("isRequired")}`);
+                          throw new Error(
+                            `${t("addCompany:email")} ${t("isRequired")}`
+                          );
                         } else {
                           const val = value.trim();
                           const reg =
                             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                           const matches = val.match(reg) ? val.match(reg) : [];
                           if (matches.length === 0) {
-                            throw new Error(`${t("addCompany:email")} ${t("isInvalid")}`);
+                            throw new Error(
+                              `${t("addCompany:email")} ${t("isInvalid")}`
+                            );
                           }
                         }
                       },
