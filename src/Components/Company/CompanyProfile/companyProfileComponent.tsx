@@ -13,6 +13,7 @@ import {
   addCommSep,
   CarbonSystemType,
   CompanyState,
+  GovDepartment,
   SectoralScope,
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";

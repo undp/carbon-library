@@ -1,6 +1,7 @@
 {
     "rootCreatesRoot": "There can be only one root user",
     "createUserSuccess": "The user has been created successfully",
+    "MinistryDepartmentAlreadyExist": "Government Department Already Exist",
     "createOrganisationSuccess": "The organisation has been created successfully",
     "createExistingUser": "This user already exists",
     "createExistingUserInRegistry": "User already exists in the Carbon Registry System with the given email",
@@ -15,6 +16,7 @@
     "addUserToUnRegisteredCompany": "The Organisation has not been registered with the Carbon Registry",
     "createManagerOrViewerAsInitialUserOfACompany": "The initial user must be an admin",
     "createUserUnAuthorized": "This action is unauthorised",
+    "wrongMinistryAndGovDep": "Invalid Government Department Selected",
     "createUserToOtherCompaniesUnAuth": "This action is unauthorised",
     "companyCreateUserShouldbeAdmin": "The initial user must be an admin",
     "governmentUserAlreadyExist": "Government already exist for the country code {}",
