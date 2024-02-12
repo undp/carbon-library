@@ -1131,7 +1131,7 @@ export class ProgrammeService {
           await this.asyncOperationsInterface.AddAction({
             actionType: AsyncActionType.CADTUpdateProgramme,
             actionProps: {
-              programme: program
+                programme: program
             },
           });
         }
@@ -1449,10 +1449,19 @@ export class ProgrammeService {
   async addDocumentRegistry(documentDto:ProgrammeDocumentRegistryDto){
     this.logger.log('Add Registry Document triggered')
 
-    const certifierId = (await this.companyService.findByTaxId(documentDto.certifierTaxId))?.companyId;
-
     const sqlProgram = await this.findByExternalId(documentDto.externalId);
-    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, certifierId);
+    const resp = await this.programmeLedger.addDocument(documentDto.externalId, documentDto.actionId, documentDto.data, documentDto.txTime, documentDto.status, documentDto.type, 0, undefined);
+    if(documentDto.certifierTaxId){
+    const certifier = await this.companyService.findByTaxId(documentDto.certifierTaxId);
+    const updateCert = await this.programmeLedger.updateCertifier(
+      sqlProgram.programmeId,
+      certifier.companyId,
+      true,
+      certifier ? `${certifier.companyId}#${certifier.name}` : '',
+      undefined,)
+
+      this.logger.log('Certifying the programme', updateCert)
+    }
 
     console.log('Add document on registry', sqlProgram, resp, documentDto)
 
@@ -1724,7 +1733,7 @@ export class ProgrammeService {
     ndcAction && ndcAction.typeOfMitigation
     ){
       const certifierId = (await this.companyService.findByTaxId(req.certifierTaxId))?.companyId;
-      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, certifierId);
+      await this.programmeLedger.addDocument(req.externalId, req.actionId, req.data, req.txTime,req.status, req.type, 0, undefined);
     }
   }
 
@@ -4204,11 +4213,19 @@ export class ProgrammeService {
 
   async programmeAccept(accept: ProgrammeAcceptedDto): Promise<DataResponseDto | undefined> {
     this.logger.log('Add accept triggered', accept.type)
-    const certifierId = (await this.companyService.findByTaxId(accept.certifierTaxId))?.companyId;
-
     const sqlProgram = await this.findByExternalId(accept.externalId);
-    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, certifierId);
-    
+    const resp = await this.programmeLedger.addDocument(accept.externalId, undefined, accept.data, accept.txTime,accept.status, accept.type, accept.creditEst, undefined);
+    if(accept.certifierTaxId){
+      const certifier = await this.companyService.findByTaxId(accept.certifierTaxId);
+      const updateCert = await this.programmeLedger.updateCertifier(
+        sqlProgram.programmeId,
+        certifier.companyId,
+        true,
+        certifier ? `${certifier.companyId}#${certifier.name}`  : '',
+        undefined,)
+  
+        this.logger.log('Certifying the programme', updateCert)
+      }
     console.log('Add accept on registry', sqlProgram, resp, accept)
 
     if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
@@ -5531,7 +5548,7 @@ export class ProgrammeService {
     return new DataResponseDto(HttpStatus.OK, programme);
   }
 
-  async approveProgramme(req: ProgrammeApprove, user: User) {
+  async approveProgramme(req: ProgrammeApprove, user: User, auth_letter?:string ) {
     this.logger.log(
       `Programme ${req.programmeId} approve. Comment: ${req.comment}`,
     );
@@ -5639,7 +5656,22 @@ export class ProgrammeService {
       let formattedDate = `${date} ${month} ${year}`;
 
       updated.company.forEach(async (company) => {
+        auth_letter?
         await this.emailHelperService.sendEmailToOrganisationAdmins(
+          company.companyId,
+          EmailTemplates.PROGRAMME_AUTHORISATION,
+          {
+            programmeName: updated.title,
+            authorisedDate: formattedDate,
+            serialNumber: updated.serialNo,
+            programmePageLink:
+              hostAddress + `/programmeManagement/view/${updated.programmeId}`,
+          },undefined,undefined,undefined,
+          {
+            filename: 'AUTHORISATION_LETTER.pdf',
+            path: auth_letter
+          }
+        ):await this.emailHelperService.sendEmailToOrganisationAdmins(
           company.companyId,
           EmailTemplates.PROGRAMME_AUTHORISATION,
           {
@@ -6337,6 +6369,21 @@ export class ProgrammeService {
     });
   }
 
+  async itmoProjectApprove(program: Programme) {
+    if(program) {
+      await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
+      if (program.cadtId) {
+        program.currentStage = ProgrammeStage.APPROVED;
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+              programme: program
+          },
+        });
+      }
+    }
+  }
+
   async addNdcDetailsPeriod(ndcDetailsPeriod: NdcDetailsPeriodDto, abilityCondition: any, user: User) {
     if (user.companyRole !== CompanyRole.GOVERNMENT || user.role === Role.ViewOnly) {
       throw new HttpException(
@@ -6488,7 +6535,7 @@ export class ProgrammeService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    
     if (ndcAction.status === NdcDetailsActionStatus.Approved || user.role === Role.ViewOnly) {
       throw new HttpException(
         this.helperService.formatReqMessagesString("programme.unAuth", []),
