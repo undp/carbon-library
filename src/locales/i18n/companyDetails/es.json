@@ -12,5 +12,7 @@
   "programmeCount": "Número de Programas",
   "remarks": "Observaciones",
   "ministerName": "Nombre del Ministro",
-  "sectoralScope": "Ámbito Sectorial"
+  "sectoralScope": "Ámbito Sectorial",
+  "govDep": "Departamento",
+  "ministry": "Ministerio"
 }

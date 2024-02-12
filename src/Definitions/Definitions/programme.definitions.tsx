@@ -177,6 +177,7 @@ export interface Programme {
   geographicalLocationCordintes: any;
   mitigationActions: any;
   environmentalAssessmentRegistrationNo: any;
+  article6trade: boolean
 }
 
 export interface ProgrammeR extends Programme {

@@ -208,6 +208,8 @@ export * from './shared/enum/system.action.type'
 export * from './shared/enum/transform.status.enum'
 export * from './shared/enum/txtype.enum'
 export * from './shared/enum/typeofmitigation.enum'
+export * from './shared/enum/govDep.enum'
+export * from './shared/enum/ministry.enum'
 //from transparency
 export * from './shared/enum/document.status'
 export * from './shared/enum/document.type'

@@ -1,7 +1,7 @@
 import { BankOutlined, UserOutlined } from "@ant-design/icons";
 import { Col, Card, Skeleton, Row } from "antd";
 import React from "react";
-import { CompanyRole, addCommSep, CarbonSystemType, SectoralScope } from "../../../Definitions";
+import { CompanyRole, addCommSep, CarbonSystemType, SectoralScope, GovDepartment } from "../../../Definitions";
 import CompanyRoleIcon from "../../Common/CompanyRoleIcon/companyRoleIcon";
 import "./companyDetailsComponent.scss";
 
@@ -46,6 +46,33 @@ export const CompanyDetailsComponent = (props: any) => {
               {companyDetails.name ? companyDetails.name : "-"}
             </Col>
           </Row>
+          {(companyDetails?.companyRole === CompanyRole.GOVERNMENT ||
+            companyDetails?.companyRole === CompanyRole.MINISTRY) && (
+            <>
+              <Row className="field">
+                <Col span={12} className="field-key">
+                  {t("companyDetails:ministry")}
+                </Col>
+                <Col span={12} className="field-value">
+                  {companyDetails.ministry ? companyDetails.ministry : "-"}
+                </Col>
+              </Row>
+              <Row className="field">
+                <Col span={12} className="field-key">
+                  {t("companyDetails:govDep")}
+                </Col>
+                <Col span={12} className="field-value">
+                  {companyDetails?.govDep
+                    ? Object.keys(GovDepartment)[
+                        Object.values(GovDepartment).indexOf(
+                          companyDetails?.govDep as GovDepartment
+                        )
+                      ]
+                    : "-"}
+                </Col>
+              </Row>
+            </>
+          )}
           <Row className="field">
             <Col span={12} className="field-key">
               {t("companyDetails:taxId")}
