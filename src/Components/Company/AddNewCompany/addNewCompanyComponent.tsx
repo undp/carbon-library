@@ -17,6 +17,7 @@ import {
 import PhoneInput, {
   formatPhoneNumber,
   formatPhoneNumberIntl,
+  isPossiblePhoneNumber,
 } from "react-phone-number-input";
 import {
   AuditOutlined,
@@ -1344,8 +1345,16 @@ export const AddNewCompanyComponent = (props: any) => {
                                     "isRequired"
                                   )}`
                                 );
+                              } else {
+                                if (!isPossiblePhoneNumber(String(value))) {
+                                  throw new Error(
+                                    `${t("addCompany:phoneNo")} ${t("isInvalid")}`
+                                  );
+                                }
                               }
+                              
                             }
+                            
                           }
                         },
                       },
