@@ -422,12 +422,12 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           ? {
                               color: "#3F3A47",
                               cursor: "pointer",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                           : {
                               color: "#cacaca",
                               cursor: "default",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                       }
                       onClick={() => {
@@ -512,12 +512,12 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           ? {
                               color: "#3F3A47",
                               cursor: "pointer",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                           : {
                               color: "#cacaca",
                               cursor: "default",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                       }
                       onClick={() => {
@@ -666,12 +666,12 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           ? {
                               color: "#3F3A47",
                               cursor: "pointer",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                           : {
                               color: "#cacaca",
                               cursor: "default",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                       }
                       onClick={() => {
@@ -761,12 +761,12 @@ export const NdcActionBody: FC<NdcActionBodyProps> = (
                           ? {
                               color: "#3F3A47",
                               cursor: "pointer",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                           : {
                               color: "#cacaca",
                               cursor: "default",
-                              margin: "0px 0px 2.5px 0px",
+                              margin: "0px 0px 1.5px 0px",
                             }
                       }
                       onClick={() => {

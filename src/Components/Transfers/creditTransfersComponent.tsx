@@ -419,7 +419,7 @@ export const CreditTransferComponent = (props: any) => {
               style: "color-primary",
               click: () => {
                 showModalOnAction(record, {
-                  title: t("creditTransfer:acceptTitle"),
+                  title: t("creditTransfer:acceptCreditTransferTitle"),
                   icon: <Icon.ClipboardCheck />,
                   actionBtnText: t("creditTransfer:proceed"),
                   okAction: (requestId: any, comment: any) =>
@@ -913,7 +913,7 @@ export const CreditTransferComponent = (props: any) => {
                       }
                     }}
                   >
-                    {t("ndcAction:ministryLevel")}
+                    {t("view:ministryLevel")}
                   </Checkbox>
                 )}
               </div>
