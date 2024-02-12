@@ -10,6 +10,7 @@ import { SectoralScope, addCommSep } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { useConnection, useUserContext } from "../../../Context";
 import { CompanyDetailsComponent } from "../../Company/CompanyDetails/companyDetailsComponent";
+import { GovDepartment } from "../../../Definitions";
 
 export const UserProfileComponent = (props: any) => {
   const {

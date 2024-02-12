@@ -18,6 +18,8 @@ import {
   max,
 } from "class-validator";
 import { CompanyRole } from "../enum/company.role.enum";
+import { GovDepartment } from "../enum/govDep.enum";
+import { Ministry } from "../enum/ministry.enum";
 
 export class OrganisationUpdateDto {
   @IsNotEmpty()
@@ -73,6 +75,22 @@ export class OrganisationUpdateDto {
   @IsString()
   @ApiPropertyOptional()
   address: string;
+
+  @ValidateIf((c) => [CompanyRole.GOVERNMENT, CompanyRole.MINISTRY].includes(c.companyRole))
+  @ApiProperty({ enum: GovDepartment })
+  @IsNotEmpty()
+  @IsEnum(GovDepartment, {
+      message: 'Invalid Government Department. Supported following Departments:' + Object.values(GovDepartment)
+  })
+  govDep: GovDepartment;
+  
+  @ValidateIf((c) => [CompanyRole.GOVERNMENT, CompanyRole.MINISTRY].includes(c.companyRole))
+  @ApiProperty({ enum: Ministry })
+  @IsNotEmpty()
+  @IsEnum(Ministry, {
+      message: 'Invalid sector. Supported following sector:' + Object.values(Ministry)
+  })
+  ministry: Ministry;  
 
   @IsNotEmpty()
   @ApiProperty({ enum: CompanyRole })

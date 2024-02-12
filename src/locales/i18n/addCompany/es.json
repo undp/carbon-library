@@ -37,5 +37,9 @@
   "companyRegisteredSuccess": "La solicitud de registro de usuario ha sido enviada",
   "errorInAddUser": "Error al agregar usuario!",
   "errorInUpdatingCompany": "Error al actualizar la empresa!",
-  "nationalSopValue": "Participación Nacional en los Ingresos"
+  "nationalSopValue": "Participación Nacional en los Ingresos",
+  "allmincreated":"Todos los ministerios han sido implementados",
+  "govdepnotexist": "El departamento no existe en el Ministerio Seleccionado",
+  "govdep": "Departamento",
+  "ministry": "Ministerio"
 }

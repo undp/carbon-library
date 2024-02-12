@@ -14,5 +14,7 @@
     "companyApprovalSuccess": "Successfully approved the company",
     "companyRejectionFailed": "Company rejection failed. Please try again",
     "companyRejectionSuccess": "Successfully rejected the company",
-    "nationalSopValue": "National Share of Proceeds"
+    "nationalSopValue": "National Share of Proceeds",
+    "wrongMinistryAndGovDep": "Invalid Government Department Selected",
+    "MinistryDepartmentAlreadyExist": "Government Department Already Exist"
 }
