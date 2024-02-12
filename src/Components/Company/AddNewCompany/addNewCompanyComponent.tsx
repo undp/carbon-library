@@ -740,7 +740,7 @@ export const AddNewCompanyComponent = (props: any) => {
                             },
                           ]}
                         >
-                          <Input size="large" />
+                          <Input disabled={isUpdate} size="large" />
                         </Form.Item>
                       )
                     : null}

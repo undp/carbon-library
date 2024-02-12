@@ -55,6 +55,7 @@ import { InvestmentCategoryEnum } from '../enum/investment.category.enum';
 import { InvestmentSyncDto } from '../dto/investment.sync.dto';
 import { HttpUtilService } from "../util/http.util.service";
 import { OrganisationDuplicateCheckDto } from "../dto/organisation.duplicate.check.dto";
+import { OrganisationSyncRequestDto } from '../dto/organisation.sync.request.dto';
 
 @Injectable()
 export class CompanyService {
@@ -924,6 +925,19 @@ export class CompanyService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    if (company.companyRole !== CompanyRole.GOVERNMENT && 
+      company.companyRole !== CompanyRole.MINISTRY && 
+      company.taxId !== companyUpdateDto.taxId) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'company.companyTaxIdCannotUpdate',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     if (
       company.companyRole == CompanyRole.MINISTRY ||
       company.companyRole == CompanyRole.GOVERNMENT
@@ -964,6 +978,7 @@ export class CompanyService {
         );
       }
     }
+
     if (companyUpdateDto.logo) {
       const response: any = await this.fileHandler.uploadFile(
         `profile_images/${
@@ -1012,6 +1027,109 @@ export class CompanyService {
         this.configService.get('systemType') !== SYSTEM_TYPE.CARBON_REGISTRY
           ? { ...companyUpdateFields, nationalSopValue }
           : { ...companyUpdateFields },
+      )
+      .catch((err: any) => {
+        this.logger.error(err);
+        return err;
+      });
+
+    if (result.affected > 0) {
+
+      const organisationSyncRequestDto: OrganisationSyncRequestDto = {
+        organizationIdentifierId: company.taxId,
+        organisationUpdateDto: companyUpdateDto
+      }
+
+      const companySyncAction: AsyncAction = {
+        actionType: AsyncActionType.CompanyUpdate,
+        actionProps: organisationSyncRequestDto,
+      };
+      await this.asyncOperationsInterface.AddAction(
+        companySyncAction
+      );
+
+      return new DataResponseDto(
+        HttpStatus.OK,
+        await this.findByCompanyId(company.companyId)
+      );
+    }
+
+    throw new HttpException(
+      this.helperService.formatReqMessagesString(
+        "company.companyUpdateFailed",
+        []
+      ),
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+
+  async sync(
+    organisationSyncRequest: OrganisationSyncRequestDto,
+    abilityCondition: string
+  ): Promise<DataResponseDto | undefined> {
+    const {organizationIdentifierId, organisationUpdateDto:companyUpdateDto} = organisationSyncRequest;
+    const company = await this.companyRepo
+      .createQueryBuilder()
+      .where(
+        `"taxId" = '${organizationIdentifierId}' ${
+          abilityCondition
+            ? " AND (" +
+              this.helperService.parseMongoQueryToSQL(abilityCondition) +
+              ")"
+            : ""
+        }`
+      )
+      .getOne();
+    if (!company) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          "company.noActiveCompany",
+          []
+        ),
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    if (companyUpdateDto.logo) {
+      const response: any = await this.fileHandler.uploadFile(
+        `profile_images/${
+          company.companyId
+        }_${new Date().getTime()}.png`,
+        companyUpdateDto.logo
+      );
+
+      if (response) {
+        companyUpdateDto.logo = response;
+      } else {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            "company.companyUpdateFailed",
+            []
+          ),
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
+
+    if(companyUpdateDto.regions){
+      companyUpdateDto.geographicalLocationCordintes = await this.locationService
+      .getCoordinatesForRegion(companyUpdateDto.regions)
+      .then((response: any) => {
+        console.log("response from forwardGeoCoding function -> ", response);
+        return  [...response];
+      });
+    }
+
+    const { nationalSopValue, ...companyUpdateFields } = companyUpdateDto;
+    if (!companyUpdateFields.hasOwnProperty("website")) {
+      companyUpdateFields["website"] = "";
+    }
+    const result = await this.companyRepo
+      .update(
+        {
+          taxId: company.taxId,
+        },
+        this.configService.get('systemType')!==SYSTEM_TYPE.CARBON_REGISTRY?{...companyUpdateFields,nationalSopValue}:{...companyUpdateFields}
       )
       .catch((err: any) => {
         this.logger.error(err);
