@@ -4,176 +4,175 @@ import { FormElementType, RadioButtonStatus2 } from "../../../Definitions";
 
 const Safeguards = (props: any) => {
   const { onFormSubmit, safeGuardViewData, viewOnly, translator } = props;
-  translator.setDefaultNamespace("safeguards");
   const t = translator.t;
   const [safeguardDetails, setSafeguardDetails] = useState();
   const [form] = Form.useForm();
   const initialFormElementList = [
     {
       type: FormElementType.Label,
-      label: t("humanRights"),
+      label: t("safeguards:humanRights"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("isRespectHumanRights"),
+          label: t("safeguards:isRespectHumanRights"),
           name: "isRespectHumanRights",
         },
         {
           type: FormElementType.Radio,
-          label: t("isProjectdiscriminate"),
+          label: t("safeguards:isProjectdiscriminate"),
           name: "isProjectdiscriminate",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("genderEquality"),
+      label: t("safeguards:genderEquality"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("genderEqualityQ1"),
+          label: t("safeguards:genderEqualityQ1"),
           name: "genderEqualityQ1",
         },
         {
           type: FormElementType.Radio,
-          label: t("genderEqualityQ2"),
+          label: t("safeguards:genderEqualityQ2"),
           name: "genderEqualityQ2",
         },
         {
           type: FormElementType.Radio,
-          label: t("genderEqualityQ3"),
+          label: t("safeguards:genderEqualityQ3"),
           name: "genderEqualityQ3",
         },
         {
           type: FormElementType.Radio,
-          label: t("genderEqualityQ4"),
+          label: t("safeguards:genderEqualityQ4"),
           name: "genderEqualityQ4",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("communityHealth"),
+      label: t("safeguards:communityHealth"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("communityHealthQ1"),
+          label: t("safeguards:communityHealthQ1"),
           name: "communityHealthQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("historicHeritage"),
+      label: t("safeguards:historicHeritage"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("historicHeritageQ1"),
+          label: t("safeguards:historicHeritageQ1"),
           name: "historicHeritageQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("forcedEviction"),
+      label: t("safeguards:forcedEviction"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("forcedEvictionQ1"),
+          label: t("safeguards:forcedEvictionQ1"),
           name: "forcedEvictionQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("landTenure"),
+      label: t("safeguards:landTenure"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("landTenureQ1"),
+          label: t("safeguards:landTenureQ1"),
           name: "landTenureQ1",
         },
         {
           type: FormElementType.Radio,
-          label: t("landTenureQ2"),
+          label: t("safeguards:landTenureQ2"),
           name: "landTenureQ2",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("indegenousPeople"),
+      label: t("safeguards:indegenousPeople"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("indegenousPeopleQ1"),
+          label: t("safeguards:indegenousPeopleQ1"),
           name: "indegenousPeopleQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("corruption"),
+      label: t("safeguards:corruption"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("corruptionQ1"),
+          label: t("safeguards:corruptionQ1"),
           name: "corruptionQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("labourRights"),
+      label: t("safeguards:labourRights"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("labourRightsQ1"),
+          label: t("safeguards:labourRightsQ1"),
           name: "labourRightsQ1",
         },
         {
           type: FormElementType.Radio,
-          label: t("labourRightsQ2"),
+          label: t("safeguards:labourRightsQ2"),
           name: "labourRightsQ2",
         },
         {
           type: FormElementType.Label,
-          label: t("labourRightsSubLabel"),
+          label: t("safeguards:labourRightsSubLabel"),
           className: "mg-left-2",
           items: [
             {
               type: FormElementType.Radio,
-              label: t("labourRightsSubQ1"),
+              label: t("safeguards:labourRightsSubQ1"),
               name: "labourRightsSubQ1",
               className: "mg-left-4",
             },
             {
               type: FormElementType.Radio,
-              label: t("labourRightsSubQ2"),
+              label: t("safeguards:labourRightsSubQ2"),
               name: "labourRightsSubQ2",
               className: "mg-left-4",
             },
             {
               type: FormElementType.Radio,
-              label: t("labourRightsSubQ3"),
+              label: t("safeguards:labourRightsSubQ3"),
               name: "labourRightsSubQ3",
               className: "mg-left-4",
             },
             {
               type: FormElementType.Radio,
-              label: t("labourRightsSubQ4"),
+              label: t("safeguards:labourRightsSubQ4"),
               name: "labourRightsSubQ4",
               className: "mg-left-4",
             },
             {
               type: FormElementType.Radio,
-              label: t("labourRightsSubQ5"),
+              label: t("safeguards:labourRightsSubQ5"),
               name: "labourRightsSubQ5",
               className: "mg-left-4",
             },
             {
               type: FormElementType.Radio,
-              label: t("labourRightsSubQ6"),
+              label: t("safeguards:labourRightsSubQ6"),
               name: "labourRightsSubQ6",
               className: "mg-left-4",
             },
@@ -181,198 +180,198 @@ const Safeguards = (props: any) => {
         },
         {
           type: FormElementType.Radio,
-          label: t("labourRightsQ3"),
+          label: t("safeguards:labourRightsQ3"),
           name: "labourRightsQ3",
         },
         {
           type: FormElementType.Radio,
-          label: t("labourRightsQ4"),
+          label: t("safeguards:labourRightsQ4"),
           name: "labourRightsQ4",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("economicConsequences"),
+      label: t("safeguards:economicConsequences"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("economicConsequencesQ1"),
+          label: t("safeguards:economicConsequencesQ1"),
           name: "economicConsequencesQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("emissions"),
+      label: t("safeguards:emissions"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("emissionsQ1"),
+          label: t("safeguards:emissionsQ1"),
           name: "emissionsQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("energySupply"),
+      label: t("safeguards:energySupply"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("energySupplyQ1"),
+          label: t("safeguards:energySupplyQ1"),
           name: "energySupplyQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("waterPattern"),
+      label: t("safeguards:waterPattern"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("waterPatternQ1"),
+          label: t("safeguards:waterPatternQ1"),
           name: "waterPatternQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("erosoin"),
+      label: t("safeguards:erosoin"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("erosoinQ1"),
+          label: t("safeguards:erosoinQ1"),
           name: "erosoinQ1",
         },
         {
           type: FormElementType.Radio,
-          label: t("erosoinQ2"),
+          label: t("safeguards:erosoinQ2"),
           name: "erosoinQ2",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("landscape"),
+      label: t("safeguards:landscape"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("landscapeQ1"),
+          label: t("safeguards:landscapeQ1"),
           name: "landscapeQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("naturalDisaster"),
+      label: t("safeguards:naturalDisaster"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("naturalDisasterQ1"),
+          label: t("safeguards:naturalDisasterQ1"),
           name: "naturalDisasterQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("genetic"),
+      label: t("safeguards:genetic"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("geneticQ1"),
+          label: t("safeguards:geneticQ1"),
           name: "geneticQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("pollutants"),
+      label: t("safeguards:pollutants"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("pollutantsQ1"),
+          label: t("safeguards:pollutantsQ1"),
           name: "pollutantsQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("hazardousWaste"),
+      label: t("safeguards:hazardousWaste"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("hazardousWasteQ1"),
+          label: t("safeguards:hazardousWasteQ1"),
           name: "hazardousWasteQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("pesticides"),
+      label: t("safeguards:pesticides"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("pesticidesQ1"),
+          label: t("safeguards:pesticidesQ1"),
           name: "pesticidesQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("harvestForests"),
+      label: t("safeguards:harvestForests"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("harvestForestsQ1"),
+          label: t("safeguards:harvestForestsQ1"),
           name: "harvestForestsQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("food"),
+      label: t("safeguards:food"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("foodQ1"),
+          label: t("safeguards:foodQ1"),
           name: "foodQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("animalHusbandry"),
+      label: t("safeguards:animalHusbandry"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("animalHusbandryQ1"),
+          label: t("safeguards:animalHusbandryQ1"),
           name: "animalHusbandryQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("criticalHabitats"),
+      label: t("safeguards:criticalHabitats"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("criticalHabitatsQ1"),
+          label: t("safeguards:criticalHabitatsQ1"),
           name: "criticalHabitatsQ1",
         },
       ],
     },
     {
       type: FormElementType.Label,
-      label: t("endangeredSpecies"),
+      label: t("safeguards:endangeredSpecies"),
       items: [
         {
           type: FormElementType.Radio,
-          label: t("endangeredSpeciesQ1"),
+          label: t("safeguards:endangeredSpeciesQ1"),
           name: "endangeredSpeciesQ1",
         },
         {
           type: FormElementType.Radio,
-          label: t("endangeredSpeciesQ2"),
+          label: t("safeguards:endangeredSpeciesQ2"),
           name: "endangeredSpeciesQ2",
         },
       ],
@@ -452,7 +451,7 @@ const Safeguards = (props: any) => {
                     target="_blank"
                     href="https://www4.unfccc.int/sites/sdcmicrosite/Pages/Create-a-report.aspx"
                   >
-                    {t("undpSespTitle")}
+                    {t("safeguards:undpSespTitle")}
                   </a>
                 </span>
               </Col>
@@ -506,7 +505,7 @@ const Safeguards = (props: any) => {
                                     className="radio"
                                     value={RadioButtonStatus2.YES}
                                   >
-                                    {t("yes")}
+                                    {t("safeguards:yes")}
                                   </Radio.Button>
                                 </div>
                                 <div className="radio-container">
@@ -514,7 +513,7 @@ const Safeguards = (props: any) => {
                                     className="radio"
                                     value={RadioButtonStatus2.MAYBE}
                                   >
-                                    {t("maybe")}
+                                    {t("safeguards:maybe")}
                                   </Radio.Button>
                                 </div>
                                 <div className="radio-container">
@@ -522,7 +521,7 @@ const Safeguards = (props: any) => {
                                     className="radio"
                                     value={RadioButtonStatus2.NO}
                                   >
-                                    {t("no")}
+                                    {t("safeguards:no")}
                                   </Radio.Button>
                                 </div>
                               </Radio.Group>
@@ -586,7 +585,7 @@ const Safeguards = (props: any) => {
                                           className="radio"
                                           value={RadioButtonStatus2.YES}
                                         >
-                                          {t("yes")}
+                                          {t("safeguards:yes")}
                                         </Radio.Button>
                                       </div>
                                       <div className="radio-container">
@@ -594,7 +593,7 @@ const Safeguards = (props: any) => {
                                           className="radio"
                                           value={RadioButtonStatus2.MAYBE}
                                         >
-                                          {t("maybe")}
+                                          {t("safeguards:maybe")}
                                         </Radio.Button>
                                       </div>
                                       <div className="radio-container">
@@ -602,7 +601,7 @@ const Safeguards = (props: any) => {
                                           className="radio"
                                           value={RadioButtonStatus2.NO}
                                         >
-                                          {t("no")}
+                                          {t("safeguards:no")}
                                         </Radio.Button>
                                       </div>
                                     </Radio.Group>

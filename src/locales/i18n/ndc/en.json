@@ -11,14 +11,14 @@
     "enterNewPlanTxt": "Please add the Programmes",
     "addSubNdcAction": "+ Add Sub NDC Action",
     "delete": "DELETE",
-    "finalize": "FINALIZE",
+    "finalize": "FINALISE",
     "ndcColumnsMinistry": "Government Department",
     "ndcColumnsStatus": "Status",
     "approve": "Approve",
     "reject": "Reject",
     "actionApproveTitle": "Are you sure you want to approve this NDC Action?",
     "rejectApproveTitle": "Are you sure you want to reject this NDC Action?",
-    "finalizeApproveTitle": "Are you sure you want to finalize the NDC Actions for this period?",
+    "finalizeApproveTitle": "Are you sure you want to finalise the NDC Actions for this period?",
     "finalizeApproveSubTitle": "You can’t undo this action",
     "periodDeleteConfirmTitle" : "Are you sure you want to delete the NDC Actions for this period?",
     "finalizeErrorText": "Cannot finalise the period due to pending Sub NDC Actions",
@@ -35,5 +35,6 @@
     "kpiGreaterThanZero": "KPI value must be greater than 0",
     "kpiMaxLength": "KPI cannot exceed 10000000",
     "sameStartEndDates": "Start year must be earlier than the end year",
-    "ndcUnauthorisedMsg": "This action is unauthorised"
+    "ndcUnauthorisedMsg": "This action is unauthorised",
+    "invalidYearsSelected": "Entered start year and/or end year is invalid"
 }
