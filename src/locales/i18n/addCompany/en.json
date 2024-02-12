@@ -41,5 +41,9 @@
     "region": "Region",
     "national": "National",
     "nationalSopValue": "National Share of Proceeds",
-    "omgePercentage":"Overall Mitigation in Global Emissions (OMGE) Account"
+    "omgePercentage":"Overall Mitigation in Global Emissions (OMGE) Account",
+    "allmincreated":"All ministries have been implemented",
+    "govdepnotexist": "Department not exist in Selected Ministry",
+    "govdep": "Department",
+    "ministry": "Ministry"
 }

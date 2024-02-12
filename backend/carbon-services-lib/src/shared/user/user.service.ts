@@ -59,6 +59,8 @@ import { FilterEntry } from "../dto/filter.entry";
 import { EmailHelperService } from '../email-helper/email-helper.service';
 import { HttpUtilService } from "../util/http.util.service";
 import { SYSTEM_TYPE } from "../enum/system.names.enum";
+import { GovDepartment, ministryOrgs } from "../enum/govDep.enum";
+import { Ministry } from "../enum/ministry.enum";
 
 @Injectable()
 export class UserService {
@@ -615,6 +617,34 @@ export class UserService {
       }
     }
     if (company) {
+      if (
+        company.companyRole == CompanyRole.MINISTRY ||
+        company.companyRole == CompanyRole.GOVERNMENT
+      ) {
+        const ministrykey =
+          Object.keys(Ministry)[
+            Object.values(Ministry).indexOf(company.ministry as Ministry)
+          ];
+        if (
+          (company.companyRole == CompanyRole.MINISTRY ||
+            company.companyRole == CompanyRole.GOVERNMENT) &&
+          !ministryOrgs[ministrykey].includes(
+            Object.keys(GovDepartment)[
+              Object.values(GovDepartment).indexOf(
+                company.govDep as GovDepartment,
+              )
+            ],
+          )
+        ) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              'user.wrongMinistryAndGovDep',
+              [],
+            ),
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
       if (companyRole != CompanyRole.GOVERNMENT && companyRole != CompanyRole.API && companyRole !== CompanyRole.MINISTRY && !isRegistrationValue) {
         throw new HttpException(
           this.helperService.formatReqMessagesString("user.userUnAUth", []),
@@ -665,6 +695,23 @@ export class UserService {
             this.helperService.formatReqMessagesString(
               "user.governmentUserAlreadyExist",
               [company.country]
+            ),
+            HttpStatus.BAD_REQUEST
+          );
+        }
+      }
+
+      if (company.companyRole == CompanyRole.MINISTRY) {
+        
+        company.taxId = "00000"+this.configService.get("systemCountry")+"-"+company.ministry+"-"+company.govDep
+        const ministry = await this.companyService.findMinistryByDepartment(
+          company.govDep
+        );
+        if ((company.companyRole == CompanyRole.MINISTRY || company.companyRole == CompanyRole.GOVERNMENT) && ministry && ministry.ministry==company.ministry && ministry.govDep==company.govDep) {
+          throw new HttpException(
+            this.helperService.formatReqMessagesString(
+              "user.MinistryDepartmentAlreadyExist",
+              []
             ),
             HttpStatus.BAD_REQUEST
           );

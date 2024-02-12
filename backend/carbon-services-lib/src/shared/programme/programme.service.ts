@@ -242,24 +242,25 @@ export class ProgrammeService {
     if (programme.proponentTaxVatId.length > companyIndex) {
       ownerTaxId = programme.proponentTaxVatId[companyIndex];
     }
-
-    let nationalProps={}
+    if (programme.article6trade==true || programme.article6trade==undefined) {
+      let nationalProps={}
     if(nationalInvestment){
       nationalProps['investmentRequestId']=nationalInvestment.requestId
     }
     await this.asyncOperationsInterface.AddAction({
-      actionType: AsyncActionType.OwnershipUpdate,
-      actionProps: {
-        proponentTaxVatId: programme.proponentTaxVatId,
-        proponentPercentage: programme.proponentPercentage,
-        externalId: programme.externalId,
-        investorTaxId: investor.taxId,
-        shareFromOwner: transfer.shareFromOwner,
-        ownerTaxId: ownerTaxId,
-        amount:transfer.amount,
+        actionType: AsyncActionType.OwnershipUpdate,
+        actionProps: {
+          proponentTaxVatId: programme.proponentTaxVatId,
+          proponentPercentage: programme.proponentPercentage,
+          externalId: programme.externalId,
+          investorTaxId: investor.taxId,
+          shareFromOwner: transfer.shareFromOwner,
+          ownerTaxId: ownerTaxId,
+          amount:transfer.amount,
         ...nationalProps
       },
-    });
+      });
+  }
 
     let resp: any;
     if (this.configService.get('systemType') == SYSTEM_TYPE.CARBON_UNIFIED) {
@@ -1033,29 +1034,32 @@ export class ProgrammeService {
     ndc: NDCAction,
   ) {
     if (d.type == DocType.METHODOLOGY_DOCUMENT) {
-      await this.queueDocument(AsyncActionType.ProgrammeAccept, {
-        type: this.helperService.enumToString(DocType, d.type),
-        data: d.url,
-        txTime: d.txTime,
-        status: d.status,
-        externalId: d.externalId,
-        creditEst: Number(pr.creditEst)
-      }, ndc, d.type, certifierId, pr);
+      if (pr.article6trade==true || pr.article6trade==undefined) {
+        await this.queueDocument(AsyncActionType.ProgrammeAccept, {
+          type: this.helperService.enumToString(DocType, d.type),
+          data: d.url,
+          txTime: d.txTime,
+          status: d.status,
+          externalId: d.externalId,
+          creditEst: Number(pr.creditEst)
+        }, ndc, d.type, certifierId, pr);
+    }
     } else {
       if (d.type == DocType.VERIFICATION_REPORT) {
         if (ndc) {
           ndc.status = NDCStatus.APPROVED;
         }
       }
-
-      await this.queueDocument(AsyncActionType.DocumentUpload, {
-        type: this.helperService.enumToString(DocType, d.type),
-        data: d.url,
-        txTime: d.txTime,
-        status: d.status,
-        externalId: d.externalId,
-        actionId: d.actionId
-      },ndc, d.type, certifierId, pr);
+      if (pr.article6trade==true || pr.article6trade==undefined) {
+        await this.queueDocument(AsyncActionType.DocumentUpload, {
+          type: this.helperService.enumToString(DocType, d.type),
+          data: d.url,
+          txTime: d.txTime,
+          status: d.status,
+          externalId: d.externalId,
+          actionId: d.actionId
+        },ndc, d.type, certifierId, pr);
+      }
     }
     return ndc;
   }
@@ -1128,12 +1132,14 @@ export class ProgrammeService {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
         if (program.cadtId) {
           program.currentStage = ProgrammeStage.APPROVED;
-          await this.asyncOperationsInterface.AddAction({
-            actionType: AsyncActionType.CADTUpdateProgramme,
-            actionProps: {
+          if (program.article6trade==true || program.article6trade==undefined) {
+            await this.asyncOperationsInterface.AddAction({
+              actionType: AsyncActionType.CADTUpdateProgramme,
+              actionProps: {
                 programme: program
-            },
-          });
+              },
+            });
+          }
         }
       }
       if(program && d.type == DocType.VERIFICATION_REPORT) {
@@ -1469,12 +1475,14 @@ export class ProgrammeService {
       resp.cadtId = sqlProgram.cadtId;
       resp.blockBounds = sqlProgram.blockBounds;
       console.log('Add action', resp)
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTUpdateProgramme,
-        actionProps: {
-          programme: resp
-        },
-      });
+      if (sqlProgram.article6trade==true || sqlProgram.article6trade==undefined) {
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+            programme: resp
+          },
+        });
+      }
     }
     
     return new DataResponseDto(HttpStatus.OK, resp);
@@ -1708,17 +1716,18 @@ export class ProgrammeService {
         actionProps: req,
       });
 
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.DocumentUpload,
-        actionProps: {
-          type: this.helperService.enumToString(DocType, dr.type),
-          data: dr.url,
-          txTime: dr.txTime,
-          status: dr.status,
-          externalId: dr.externalId
-        },
-      });
-
+      if((programme.article6trade==true || programme.article6trade==undefined)){
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.DocumentUpload,
+          actionProps: {
+            type: this.helperService.enumToString(DocType, dr.type),
+            data: dr.url,
+            txTime: dr.txTime,
+            status: dr.status,
+            externalId: dr.externalId
+          },
+        });
+      }  
       return;
     }
 
@@ -1747,7 +1756,7 @@ export class ProgrammeService {
     this.logger.verbose("Programme  create", JSON.stringify(programme));
 
     const govProfile = await this.companyService.findGovByCountry(this.configService.get("systemCountry"))
-    if(Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId) && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY){
+    if(programmeDto.article6trade==true && Number(govProfile.nationalSopValue)!==0 && !programmeDto.proponentTaxVatId.includes(govProfile.taxId) && this.configService.get('systemType')!=SYSTEM_TYPE.CARBON_REGISTRY){
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           "programme.govermentOwnershipOfProgramme",
@@ -1893,7 +1902,7 @@ export class ProgrammeService {
         );
       }
 
-      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER && projectCompany.companyRole != CompanyRole.GOVERNMENT) {
+      if (projectCompany.companyRole != CompanyRole.PROGRAMME_DEVELOPER && projectCompany.companyRole != CompanyRole.GOVERNMENT && projectCompany.companyRole != CompanyRole.MINISTRY) {
         throw new HttpException(
           this.helperService.formatReqMessagesString(
             "programme.proponentIsNotAProgrammeDevOrGov ",
@@ -1903,20 +1912,51 @@ export class ProgrammeService {
         );
       }
 
+      if (programmeDto.article6trade === false && projectCompany.companyRole === CompanyRole.PROGRAMME_DEVELOPER){
+        throw new HttpException(
+          this.helperService.formatReqMessagesString('user.userUnAUth', []),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
       companyIds.push(projectCompany.companyId);
       companyNames.push(projectCompany.name);
     }
 
     if (
-      user.companyRole === CompanyRole.PROGRAMME_DEVELOPER &&
-      !companyIds.includes(user.companyId)
+      (user.companyRole === CompanyRole.PROGRAMME_DEVELOPER &&
+      !companyIds.includes(user.companyId)) || (programmeDto.article6trade == false && user.companyRole === CompanyRole.MINISTRY &&
+        !companyIds.includes(user.companyId))
     ) {
       throw new HttpException(
         this.helperService.formatReqMessagesString('user.userUnAUth', []),
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (programmeDto.article6trade == false){
+      const implementingUser = await this.companyService.findByTaxId(programmeDto.implementinguser)
+      const supportingUsers = [];
+      if (
+        programmeDto.supportingowners &&
+        programmeDto.supportingowners.length > 0
+      ) {
+        for (const taxId of programmeDto.supportingowners) {
+          const supportCompany = await this.companyService.findByTaxId(taxId);
+          supportingUsers.push(supportCompany.companyId);
+        }
+      } 
+      programme.implementinguser = implementingUser.companyId
+      programme.supportingowners = supportingUsers
 
+      if(user.companyRole === CompanyRole.MINISTRY){
+        if(user.companyId !== implementingUser.companyId){
+          throw new HttpException(
+            this.helperService.formatReqMessagesString('user.userUnAUth', []),
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+    }
     programme.programmeId = await this.counterService.incrementCount(
       CounterType.PROGRAMME,
       3,
@@ -2041,10 +2081,12 @@ export class ProgrammeService {
           programmeDto.environmentalImpactAssessment;
       }
 
-      await this.asyncOperationsInterface.AddAction({
+      if(programmeDto.article6trade){
+        await this.asyncOperationsInterface.AddAction({
         actionType: AsyncActionType.ProgrammeCreate,
         actionProps: programmeDto,
       });
+       }
 
       if (
         [
@@ -2063,22 +2105,23 @@ export class ProgrammeService {
             `Approving design document since the user is ${user.companyRole}`,
           );
           dr.status = DocumentStatus.ACCEPTED;
-          await this.queueDocument(
-            AsyncActionType.DocumentUpload,
-            {
-            type: this.helperService.enumToString(DocType, dr.type),
-            data: dr.url,
-            txTime: dr.txTime,
-            status: dr.status,
-            externalId: dr.externalId,
-              actionId: dr.actionId,
-            },
-            ndcAc,
-            dr.type,
-            certifierId,
-            programme,
-          );
-
+          if(programmeDto.article6trade){
+            await this.queueDocument(
+              AsyncActionType.DocumentUpload,
+              {
+              type: this.helperService.enumToString(DocType, dr.type),
+              data: dr.url,
+              txTime: dr.txTime,
+              status: dr.status,
+              externalId: dr.externalId,
+                actionId: dr.actionId,
+              },
+              ndcAc,
+              dr.type,
+              certifierId,
+              programme,
+            );
+          }
           if (certifierId) {
             programme.certifierId = [certifierId];
           }
@@ -2094,15 +2137,16 @@ export class ProgrammeService {
           if (certifierId) {
             programme.certifierId = [certifierId];
           }
-
-          await this.queueDocument(AsyncActionType.DocumentUpload, {
-            type: this.helperService.enumToString(DocType, monitoringReport.type),
-            data: monitoringReport.url,
-            txTime: monitoringReport.txTime,
-            status: monitoringReport.status,
-            externalId: monitoringReport.externalId,
-            actionId: monitoringReport.actionId
-          },ndcAc, monitoringReport.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
+          if (programmeDto.article6trade==true) {
+            await this.queueDocument(AsyncActionType.DocumentUpload, {
+              type: this.helperService.enumToString(DocType, monitoringReport.type),
+              data: monitoringReport.url,
+              txTime: monitoringReport.txTime,
+              status: monitoringReport.status,
+              externalId: monitoringReport.externalId,
+              actionId: monitoringReport.actionId
+            },ndcAc, monitoringReport.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
+          }
         }
 
         if (environmentalImpactAssessmentDoc) {
@@ -2110,15 +2154,16 @@ export class ProgrammeService {
             `Approving environmentalImpactAssessment report since the user is ${user.companyRole}`,
           );
           environmentalImpactAssessmentDoc.status = DocumentStatus.ACCEPTED;
-
-          await this.queueDocument(AsyncActionType.DocumentUpload, {
-            type: this.helperService.enumToString(DocType, environmentalImpactAssessmentDoc.type),
-            data: environmentalImpactAssessmentDoc.url,
-            txTime: environmentalImpactAssessmentDoc.txTime,
-            status: environmentalImpactAssessmentDoc.status,
-            externalId: environmentalImpactAssessmentDoc.externalId,
-            actionId: environmentalImpactAssessmentDoc.actionId
-          },undefined, environmentalImpactAssessmentDoc.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
+          if (programmeDto.article6trade==true) {  
+            await this.queueDocument(AsyncActionType.DocumentUpload, {
+              type: this.helperService.enumToString(DocType, environmentalImpactAssessmentDoc.type),
+              data: environmentalImpactAssessmentDoc.url,
+              txTime: environmentalImpactAssessmentDoc.txTime,
+              status: environmentalImpactAssessmentDoc.status,
+              externalId: environmentalImpactAssessmentDoc.externalId,
+              actionId: environmentalImpactAssessmentDoc.actionId
+            },undefined, environmentalImpactAssessmentDoc.type, user.companyRole === CompanyRole.CERTIFIER ? Number(user.companyId): undefined, programme);
+          }
         }
       }
 
@@ -2177,10 +2222,12 @@ export class ProgrammeService {
       !pr
     ) {
       savedProgramme = await this.programmeLedger.createProgramme(programme);
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTProgrammeCreate,
-        actionProps: programme,
-      });
+      if (programmeDto.article6trade==true) {  
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTProgrammeCreate,
+          actionProps: programme,
+        });
+      }
     }
 
     if (savedProgramme || pr) {
@@ -2418,10 +2465,12 @@ export class ProgrammeService {
         };
         await this.programmeLedger.addMitigation(program.externalId, addMitigationLedger);
       }else{
-        await this.asyncOperationsInterface.AddAction({
-          actionType: AsyncActionType.AddMitigation,
-          actionProps: ndcAction,
-        });
+        if((program.article6trade==true || program.article6trade==undefined)){
+          await this.asyncOperationsInterface.AddAction({
+            actionType: AsyncActionType.AddMitigation,
+            actionProps: ndcAction,
+          });
+        }
       }
     }
 
@@ -2456,14 +2505,16 @@ export class ProgrammeService {
         // if (certifierId) {
         //   await this.programmeLedger.updateCertifier(program.programmeId, certifierId, true, user.name)
         // }
-        await this.queueDocument(AsyncActionType.DocumentUpload, {
-          type: this.helperService.enumToString(DocType, dr.type),
-          data: dr.url,
-          txTime: dr.txTime,
-          status: dr.status,
-          externalId: dr.externalId,
-          actionId: dr.actionId
-        }, ndcAction, dr.type, certifierId, program);
+        if (program.article6trade==true || program.article6trade == undefined) {
+          await this.queueDocument(AsyncActionType.DocumentUpload, {
+            type: this.helperService.enumToString(DocType, dr.type),
+            data: dr.url,
+            txTime: dr.txTime,
+            status: dr.status,
+            externalId: dr.externalId,
+            actionId: dr.actionId
+          }, ndcAction, dr.type, certifierId, program);
+        }
       }
     }
     const saved = await this.entityManager
@@ -3593,13 +3644,15 @@ export class ProgrammeService {
       programme.cadtId = sqlProgram.cadtId;
       programme.blockBounds = sqlProgram.blockBounds;
       console.log('Add action', programme)
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTTransferCredit,
-        actionProps: {
-          programme: programme,
-          transfer: transfer
-        },
-      });
+      if (programme.article6trade==true || programme.article6trade == undefined) {
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTTransferCredit,
+          actionProps: {
+            programme: programme,
+            transfer: transfer
+          },
+        });
+      }
     }
 
     this.logger.log("Programme updated");
@@ -4233,12 +4286,14 @@ export class ProgrammeService {
       resp.blockBounds = sqlProgram.blockBounds;
 
       console.log('Add action', resp)
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTUpdateProgramme,
-        actionProps: {
-          programme: resp
-        },
-      });
+      if (sqlProgram.article6trade==true || sqlProgram.article6trade == undefined) {
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.CADTUpdateProgramme,
+          actionProps: {
+            programme: resp
+          },
+        });
+      }
     }
     return new DataResponseDto(HttpStatus.OK, resp);
   }
@@ -5501,18 +5556,19 @@ export class ProgrammeService {
       dr.txTime = new Date().getTime();
       dr.url = authLetterUrl;
       await this.documentRepo.save(dr);
-
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.DocumentUpload,
-        actionProps: {
-          type: this.helperService.enumToString(DocType, dr.type),
-          data: dr.url,
-          txTime: dr.txTime,
-          status: dr.status,
-          externalId: dr.externalId
-        },
-      });
-
+      
+      if (programme.article6trade==true || programme.article6trade == undefined) {
+        await this.asyncOperationsInterface.AddAction({
+          actionType: AsyncActionType.DocumentUpload,
+          actionProps: {
+            type: this.helperService.enumToString(DocType, dr.type),
+            data: dr.url,
+            txTime: dr.txTime,
+            status: dr.status,
+            externalId: dr.externalId
+          },
+        });
+      }
       const hostAddress = this.configService.get('host');
       let authDate = new Date(t);
       let date = authDate.getDate().toString().padStart(2, '0');
@@ -5559,6 +5615,16 @@ export class ProgrammeService {
       throw new HttpException(
         this.helperService.formatReqMessagesString(
           'programme.programmeNotExist',
+          [],
+        ),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (program.article6trade==false) {
+      throw new HttpException(
+        this.helperService.formatReqMessagesString(
+          'programme.programmeCannotbeAuthorized',
           [],
         ),
         HttpStatus.BAD_REQUEST,
@@ -5708,6 +5774,16 @@ export class ProgrammeService {
         );
       }
 
+      if (programme.article6trade==false) {
+        throw new HttpException(
+          this.helperService.formatReqMessagesString(
+            'programme.programmeCannotbeReject',
+            [],
+          ),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      
       if (programme && user.companyRole === CompanyRole.MINISTRY) {
         const permission = await this.findPermissionForMinistryUser(
           user,
