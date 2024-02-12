@@ -419,7 +419,7 @@ export const InvestmentManagementComponent = (props: any) => {
               style: "color-primary",
               click: () => {
                 showModalOnAction(record, {
-                  title: t("creditTransfer:acceptTitle"),
+                  title: t("creditTransfer:acceptFinancingTitle"),
                   icon: <Icon.ClipboardCheck />,
                   actionBtnText: t("creditTransfer:proceed"),
                   okAction: (requestId: any, comment: any) =>
@@ -860,7 +860,7 @@ export const InvestmentManagementComponent = (props: any) => {
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description={
                         tableData.length === 0
-                          ? t("programme:noInvestmentData")
+                          ? t("programme:noinvestment")
                           : null
                       }
                     />

@@ -91,7 +91,7 @@
     "LumpSum":"LUMP SUM",
     "Upfront":"UPFRONT",
     "Annual":"ANNUAL",
+    "noinvestment": "No Financings Available",
     "existingInvestmentSource":"Source",
     "noInvestmentData":"No financing information available"
-
 }

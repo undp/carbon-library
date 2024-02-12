@@ -21,6 +21,8 @@ import { NDCAction } from "../entities/ndc.action.entity";
 import { NDCActionDto } from "../dto/ndc.action.dto";
 import { EmailHelperService } from "../email-helper/email-helper.service";
 import { EmailTemplates } from "../email-helper/email.template";
+import { OrganisationUpdateDto } from "../dto/organisation.update.dto";
+import { OrganisationSyncRequestDto } from "../dto/organisation.sync.request.dto";
 import { InvestmentSyncDto } from "../dto/investment.sync.dto";
 import { HttpUtilService } from "../util/http.util.service";
 
@@ -45,6 +47,12 @@ export class RegistryClientService {
       userDto.company.name
     );
     return resp;
+  }
+
+  public async CompanyUpdate(organisationSyncRequestDto: OrganisationSyncRequestDto) {
+    const response = await this.httpUtilService.sendHttpPut("/national/organisation/sync", organisationSyncRequestDto);
+    console.log( "Successfully called organisation sync request", response );
+    return response;
   }
 
   public async authProgramme(actionProps:any) {
@@ -189,6 +197,7 @@ export class RegistryClientService {
         "proponentPercentage": programme.proponentPercentage,
         "programmeProperties": props,
         "creditEst": programme.creditEst,
+        "article6trade": true,
         "environmentalAssessmentRegistrationNo": programme.environmentalAssessmentRegistrationNo
       }
 
@@ -229,15 +238,20 @@ export class RegistryClientService {
   }
 
   private createNDCReq(ndc: NDCAction | NDCActionDto) {
+    let prop = {}
+    if (ndc.creditCalculationProperties) {
+      prop = ndc.creditCalculationProperties
+    }
+    prop['methodology'] =  ndc?.methodology ? ndc?.methodology : '-'
     return {
         typeOfMitigation: ndc.typeOfMitigation,
         subTypeOfMitigation: ndc.subTypeOfMitigation,
         userEstimatedCredits: ndc.ndcFinancing?.userEstimatedCredits,
-        methodology: ndc?.methodology ? ndc?.methodology : '-',
+        methodology: ndc?.methodology ? ndc?.methodology : '-', // TODO: Remove this
         systemEstimatedCredits: ndc.ndcFinancing?.systemEstimatedCredits ? ndc.ndcFinancing?.systemEstimatedCredits : 0,
         actionId: ndc.id,
         constantVersion: '' + ndc.constantVersion,
-        properties: (ndc.creditCalculationProperties ? ndc.creditCalculationProperties : undefined)
+        properties: prop
     };
   }
 }
