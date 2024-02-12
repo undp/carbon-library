@@ -42,6 +42,17 @@
     }
   }
 
+  .ant-table-pagination.ant-pagination {
+    margin-top: 16px;
+    margin-right: 0px;
+    margin-left: 24px;
+    margin-bottom: 0px;
+  }
+
+  .ndc-button-row {
+    margin-top: 16px;
+  }
+
   .btn-danger {
     color: $danger-btn !important;
     border-color: $danger-btn-border !important;

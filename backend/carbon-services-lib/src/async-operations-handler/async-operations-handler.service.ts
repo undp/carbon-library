@@ -39,6 +39,8 @@ export class AsyncOperationsHandlerService {
           return this.registryClient.updateOwnership(dataObject);
         case AsyncActionType.AddMitigation.toString():
           return this.registryClient.addMitigation(dataObject);
+        case AsyncActionType.NationalInvestment.toString():
+          return this.registryClient.addNationalInvestment(dataObject)
 
         case AsyncActionType.CADTProgrammeCreate.toString():
           return this.cadtService.createProgramme(dataObject)

@@ -56,13 +56,13 @@
     "comments": "Comments",
     "paymentPerMetric": "Payment Per Metric",
     "esgType": "ESG Classification",
-    "investmentCreationSuccess": "The financing has been added successfully",
+    "investmentCreationSuccess": "The finance has been added successfully",
     "total": "Total Ownership",
     "ClimateFinance": "Climate Finance",
     "CarbonMarket": "Carbon Market",
     "rejectTip": "Request Adjustments",
     "invalidFileFormat": "Unsupported file format",
-    "investmentReqApproved": "The financing request has been accepted.",
+    "investmentReqApproved": "The financing request has been accepted",
     "designDocNotApproved": "The design document needs to be approved to upload this document",
     "programmeNotAuth": "The project has to be authorised to upload this document",
     "monitoringRepNotApproved": "The monitoring report has to be approved to upload this document",
@@ -90,6 +90,8 @@
     "startOfPayback":"Start of Payback", 
     "LumpSum":"LUMP SUM",
     "Upfront":"UPFRONT",
-    "Annual":"ANNUAL"
-
+    "Annual":"ANNUAL",
+    "noinvestment": "No Financings Available",
+    "existingInvestmentSource":"Source",
+    "noInvestmentData":"No financing information available"
 }

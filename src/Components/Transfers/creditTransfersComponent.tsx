@@ -149,7 +149,7 @@ export const CreditTransferComponent = (props: any) => {
         {
           key: "programmeTitle",
           operation: "like",
-          value: `${search}%`,
+          value: `%${search}%`,
         },
       ];
       if (!isNaN(Number(search))) {
@@ -419,7 +419,7 @@ export const CreditTransferComponent = (props: any) => {
               style: "color-primary",
               click: () => {
                 showModalOnAction(record, {
-                  title: t("creditTransfer:acceptTitle"),
+                  title: t("creditTransfer:acceptCreditTransferTitle"),
                   icon: <Icon.ClipboardCheck />,
                   actionBtnText: t("creditTransfer:proceed"),
                   okAction: (requestId: any, comment: any) =>
@@ -502,7 +502,7 @@ export const CreditTransferComponent = (props: any) => {
                       requestId,
                       comment,
                       "transferReject",
-                      `${t("creditTransfer:internationalTranferReqAccepted")}`
+                      `${t("creditTransfer:internationalTransferReqRejected")}`
                     ),
                   type: "danger",
                   remarkRequired: true,
@@ -913,7 +913,7 @@ export const CreditTransferComponent = (props: any) => {
                       }
                     }}
                   >
-                    {t("ndcAction:ministryLevel")}
+                    {t("view:ministryLevel")}
                   </Checkbox>
                 )}
               </div>
