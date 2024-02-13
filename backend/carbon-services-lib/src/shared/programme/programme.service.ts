@@ -749,7 +749,7 @@ export class ProgrammeService {
       allInvestmentList.push(investment);
     }
     const results = await this.investmentRepo.insert(allInvestmentList);
-    console.log(results);
+    // console.log(results);
     for (const i in allInvestmentList) {
       allInvestmentList[i].requestId = results.identifiers[i].requestId;
     }
@@ -3174,7 +3174,7 @@ export class ProgrammeService {
 
     if (resp && resp.length > 0) {
       for (const e of resp[0]) {
-        console.log(e);
+        // console.log(e);
         e.certifier =
           e.certifier.length > 0 && e.certifier[0] === null ? [] : e.certifier;
         if (
@@ -4177,7 +4177,7 @@ export class ProgrammeService {
       allTransferList.push(transfer);
     }
     const results = await this.programmeTransferRepo.insert(allTransferList);
-    console.log(results);
+    // console.log(results);
     for (const i in allTransferList) {
       allTransferList[i].requestId = results.identifiers[i].requestId;
     }
@@ -5052,7 +5052,7 @@ export class ProgrammeService {
       allTransferList.push(transfer);
     }
     const results = await this.programmeTransferRepo.insert(allTransferList);
-    console.log(results);
+    // console.log(results);
     for (const i in allTransferList) {
       allTransferList[i].requestId = results.identifiers[i].requestId;
     }

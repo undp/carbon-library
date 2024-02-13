@@ -128,10 +128,10 @@ export const PoliciesGuardEx = (
         for (const key in obj) {
           const possible = [];
           if (obj[key] instanceof Array) {
-            console.log(obj[key]);
+            // console.log(obj[key]);
             for (const en of obj[key]) {
               for (const key2 in en) {
-                console.log(action, en, key2);
+                // console.log(action, en, key2);
                 if (ability.can(action, plainToClass(Stat, en), key2)) {
                   possible.push(en);
                 }
@@ -157,7 +157,7 @@ export const PoliciesGuardEx = (
       if (policyHandlers.length == 0 && action && subject && !onlyInject) {
         const obj = Object.assign(new subject(), body);
         let abilityCan: boolean = true;
-        console.log(obj);
+        // console.log(obj);
         if (action == Action.Update) {
           if (obj instanceof User && obj.companyId == undefined) {
             obj.companyId = user.companyId;
