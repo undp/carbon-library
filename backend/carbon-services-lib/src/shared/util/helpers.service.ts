@@ -306,7 +306,7 @@ export class HelperService {
     } else if (extraSQL) {
       sql = extraSQL;
     }
-    console.log(sql);
+    // console.log(sql);
 
     return sql;
   }
@@ -384,7 +384,7 @@ export class HelperService {
     } else if (extraSQL) {
       sql = extraSQL;
     }
-    console.log(sql);
+    // console.log(sql);
 
     return sql;
   }
