@@ -15,7 +15,7 @@
     "companyRejectionFailed": "Company rejection failed. Please try again",
     "companyRejectionSuccess": "Successfully rejected the company",
     "nationalSopValue": "National Share of Proceeds",
-    "companyTaxIdCannotUpdate": "Company Tax ID cannot be updated"
+    "companyTaxIdCannotUpdate": "Company Tax ID cannot be updated",
     "wrongMinistryAndGovDep": "Invalid Government Department Selected",
     "MinistryDepartmentAlreadyExist": "Government Department Already Exist"
 }
