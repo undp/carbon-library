@@ -21,7 +21,7 @@ export class DataExportService {
     const seconds = currentDate.getSeconds().toString().padStart(2, '0');
 
     const formattedDateTime = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-    console.log(formattedDateTime); // Output: 2023-12-08_14-04-20
+    // console.log(formattedDateTime); // Output: 2023-12-08_14-04-20
 
     const csvFile = fileName + '_' + formattedDateTime + '.csv';
 

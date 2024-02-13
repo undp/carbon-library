@@ -47,6 +47,14 @@ body {
   .ant-input-group .ant-input {
     width: 99% !important;
   }
+
+  .ant-select-selector {
+    border-radius: 5px !important;
+  }
+
+  .ant-upload-list-item {
+    border-radius: 5px !important;
+  }
   
   // .ant-tooltip-inner {
   //   border-radius: 5px !important;
@@ -739,5 +747,9 @@ body {
     margin-left: 15px;
   }
   
+}
+
+.border-radius-5 {
+  border-radius: 5px !important;
 }
 

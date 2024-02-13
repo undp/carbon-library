@@ -47,7 +47,7 @@ export class CountryService {
             .limit(query.size)
             .getRawMany();
             
-            console.log(resp)
+            // console.log(resp)
             return new DataListResponseDto(
             resp,
             undefined
@@ -84,7 +84,7 @@ export class CountryService {
         .limit(query.size)
         .getRawMany();
         
-        console.log(resp)
+        // console.log(resp)
         return new DataListResponseDto(
         resp,
         undefined

@@ -117,7 +117,7 @@ const Assessment = (props: any) => {
           const base64Value = await getBase64(
             changedField.value[0].originFileObj as RcFile
           );
-          console.log("FEAsibility document : ", base64Value);
+          // console.log("FEAsibility document : ", base64Value);
           const values = base64Value;
 
           setCobenefitsAssessmentDetails((pre: any) => ({
