@@ -126,6 +126,12 @@
     color: #949599 !important;
   }
 
+  .ant-select-disabled {
+    .ant-select-arrow {
+      display: none;
+    }
+  }
+
   .label-heading {
     font-family: 'Inter';
     font-style: normal;

@@ -166,6 +166,8 @@ export class ITMOSystemImporter implements ImporterInterface {
                       phoneNo: "00",
                       nameOfMinister:undefined,
                       sectoralScope:undefined,
+                      govDep:undefined,
+                      ministry:undefined,
                       website: undefined,
                       address: this.configService.get("systemCountryName"),
                       logo: undefined,
@@ -206,6 +208,9 @@ export class ITMOSystemImporter implements ImporterInterface {
                 ),
                 proponentTaxVatId: [taxId],
                 proponentPercentage: [100],
+                article6trade: true,
+                supportingowners:undefined,
+                implementinguser:undefined,
                 creditUnit: this.configService.get("defaultCreditUnit"),
                 programmeProperties: {
                   geographicalLocation: [projectDetails.country.name],

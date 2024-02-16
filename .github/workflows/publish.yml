@@ -2,6 +2,10 @@ name: Publish to NPM
 on:
   workflow_dispatch:
   push:
+    branches:
+      - 'main'
+      - 'CARBON-Sprint-*'
+      - 'hotfix-*'
     # paths:
     #   - backend/carbon-services-lib/**
 jobs:
@@ -130,18 +134,12 @@ jobs:
               workflow_id: 'service-lib-update.yml',
               ref: 'develop'
             })
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'xeptagondev',
-              repo: 'carbon-registry',
-              workflow_id: 'service-lib-update.yml',
-              ref: 'unified'
-            })
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'xeptagondev',
-              repo: 'carbon-transparency',
-              workflow_id: 'service-lib-update.yml',
-              ref: 'develop'
-            })
+#            await github.rest.actions.createWorkflowDispatch({
+#              owner: 'xeptagondev',
+#              repo: 'carbon-transparency',
+#              workflow_id: 'service-lib-update.yml',
+#              ref: 'develop'
+#            })
       - run: yarn install --frozen-lockfile
         name: Carbon UI Lib Install
         if: steps.changes.outputs.frontend-changes == 'true'
@@ -185,18 +183,12 @@ jobs:
               workflow_id: 'web-lib-update.yml',
               ref: 'develop'
             })
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'xeptagondev',
-              repo: 'carbon-registry',
-              workflow_id: 'web-lib-update.yml',
-              ref: 'unified'
-            })
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'xeptagondev',
-              repo: 'carbon-transparency',
-              workflow_id: 'web-lib-update.yml',
-              ref: 'develop'
-            })
+       #     await github.rest.actions.createWorkflowDispatch({
+       #       owner: 'xeptagondev',
+       #       repo: 'carbon-transparency',
+       #       workflow_id: 'web-lib-update.yml',
+       #       ref: 'develop'
+       #     })
       - run: yarn install --frozen-lockfile
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.calculator-changes == 'true'
         working-directory: backend/carbon-credit-calculator

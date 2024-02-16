@@ -152,6 +152,10 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
       form.setFieldsValue({
         methodologyEstimatedCredits: 0,
       });
+      handleNdcActionChange(NdcActionTypes.Mitigation.valueOf());
+      form.setFieldsValue({
+        ndcActionType: NdcActionTypes.Mitigation
+      })
     }
   }, []);
 
@@ -522,6 +526,8 @@ const NdcActionDetails = (props: NdcActionDetailsProps) => {
                 }}
                 dropdownStyle={{ color: "red" }}
                 options={ndcActionTypeListFiltered}
+                disabled
+                defaultValue={NdcActionTypes.Mitigation.valueOf()}
               />
             </Form.Item>
           </Col>

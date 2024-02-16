@@ -154,7 +154,7 @@ export class CaslAbilityFactory {
       if (user.role == Role.Admin && user.companyRole == CompanyRole.API) {
         can([Action.Create, Action.Read, Action.Update], Programme);
         can([Action.Create, Action.Read], User);
-        can([Action.Create, Action.Read], Company);
+        can([Action.Create, Action.Read, Action.Update], Company);
       } else if (user.companyRole == CompanyRole.CERTIFIER) {
         can(Action.Read, Programme, {
           currentStage: { $in: [ProgrammeStage.AUTHORISED] },

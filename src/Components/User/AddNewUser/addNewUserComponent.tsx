@@ -10,7 +10,7 @@ import {
   Tooltip,
   Skeleton,
 } from "antd";
-import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
+import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "./addNewUserComponent.scss";
 import "../../../Styles/app.scss";
@@ -441,6 +441,27 @@ export const AddNewUserComponent = (props: any) => {
                       rules={[
                         {
                           required: false,
+                        },
+                        {
+                          validator: async (rule: any, value: any) => {
+                            const phoneNo = formatPhoneNumber(String(value));
+                            if (String(value).trim() !== "") {
+                              if (
+                                ((String(value).trim() !== "" &&
+                                String(value).trim() !== undefined &&
+                                value !== null &&
+                                value !== undefined) && 
+                                (phoneNo !== null &&
+                                  phoneNo !== "" &&
+                                  phoneNo !== undefined) && 
+                                  !isPossiblePhoneNumber(String(value))
+                                ) || value?.length > 17) {
+                                throw new Error(
+                                  `${t("addUser:phoneNo")} ${t("isInvalid")}`
+                                );
+                              }
+                            }
+                          },
                         },
                       ]}
                     >
