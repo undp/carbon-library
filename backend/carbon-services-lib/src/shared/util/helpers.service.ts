@@ -93,6 +93,8 @@ export class HelperService {
         "externalId",
         "serialNo",
         "programmeTitle",
+        "programmeName",
+        "id"
       ].includes(key)
     )
       return true;
