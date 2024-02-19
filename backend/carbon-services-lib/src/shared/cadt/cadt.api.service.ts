@@ -112,7 +112,7 @@ export class CadtApiService {
     });
 
     if (!program){
-      throw Error("Programme not created yet")
+      throw new Error("Programme not created yet")
     }
 
     const companies = await this.companyService.findByCompanyIds({
