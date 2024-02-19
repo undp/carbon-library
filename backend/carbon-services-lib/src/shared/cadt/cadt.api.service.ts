@@ -115,13 +115,13 @@ export class CadtApiService {
     console.log('Comp', companies, pd);
 
     let methodology = "Pending";
-    if (programme.mitigationActions?.length > 0){
-      if (programme.mitigationActions[0].properties.methodology) {
-        methodology = programme.mitigationActions[0].properties.methodology
-      } else if (programme.mitigationActions[0]['methodology']) {
-        methodology = programme.mitigationActions[0]['methodology']
-      }
-    }
+    // if (programme.mitigationActions?.length > 0){
+    //   if (programme.mitigationActions[0].properties.methodology) {
+    //     methodology = programme.mitigationActions[0].properties.methodology
+    //   } else if (programme.mitigationActions[0]['methodology']) {
+    //     methodology = programme.mitigationActions[0]['methodology']
+    //   }
+    // }
 
     const p = await this.sendHttpPost('v1/projects', {
       projectId: programme.programmeId,
