@@ -114,6 +114,15 @@ export class CadtApiService {
 
     console.log('Comp', companies, pd);
 
+    let methodology = "Pending";
+    if (programme.mitigationActions?.length > 0){
+      if (programme.mitigationActions[0].properties.methodology) {
+        methodology = programme.mitigationActions[0].properties.methodology
+      } else if (programme.mitigationActions[0]['methodology']) {
+        methodology = programme.mitigationActions[0]['methodology']
+      }
+    }
+
     const p = await this.sendHttpPost('v1/projects', {
       projectId: programme.programmeId,
       originProjectId: programme.programmeId,
@@ -136,10 +145,7 @@ export class CadtApiService {
       projectStatus: this.getMapToCADTStatus(programme.currentStage),
       projectStatusDate: this.getProjectDate(programme.startTime * 1000),
       unitMetric: 'tCO2e',
-      methodology:
-        programme.mitigationActions?.length > 0
-          ? programme.mitigationActions[0].properties.methodology
-          : 'Pending',
+      methodology: methodology,
       estimations: [{
         unitCount: programme.creditEst,
         creditingPeriodStart: this.getProjectDate(programme.startTime * 1000),
@@ -180,6 +186,16 @@ export class CadtApiService {
 
     const pd = companies?.map((c) => c.name)?.join(', ');
 
+    let methodology = "Pending";
+    if (programme.mitigationActions?.length > 0){
+      if (programme.mitigationActions[0].properties.methodology) {
+        methodology = programme.mitigationActions[0].properties.methodology
+      } else if (programme.mitigationActions[0]['methodology']) {
+        methodology = programme.mitigationActions[0]['methodology']
+      }
+    }
+
+
     const auth = await this.sendHttpPut('v1/projects', {
       warehouseProjectId: String(programme.cadtId),
       projectId: programme.programmeId,
@@ -203,10 +219,7 @@ export class CadtApiService {
       projectStatus: this.getMapToCADTStatus(programme.currentStage),
       projectStatusDate: this.getProjectDate(programme.startTime * 1000),
       unitMetric: 'tCO2e',
-      methodology:
-        programme.mitigationActions?.length > 0
-          ? programme.mitigationActions[0].properties.methodology
-          : 'Pending',
+      methodology: methodology,
     });
     
     await await this.sendHttpPost('v1/staging/commit', undefined);
