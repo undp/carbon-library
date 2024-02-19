@@ -106,6 +106,15 @@ export class CadtApiService {
 
   
   public async createProgramme(programme: Programme) {
+
+    const program = await this.programmeRepo.findOneBy({
+      programmeId: programme.programmeId,
+    });
+
+    if (!program){
+      throw Error("Programme not created yet")
+    }
+
     const companies = await this.companyService.findByCompanyIds({
       companyIds: programme.companyId,
     });
@@ -115,13 +124,13 @@ export class CadtApiService {
     console.log('Comp', companies, pd);
 
     let methodology = "Pending";
-    // if (programme.mitigationActions?.length > 0){
-    //   if (programme.mitigationActions[0].properties.methodology) {
-    //     methodology = programme.mitigationActions[0].properties.methodology
-    //   } else if (programme.mitigationActions[0]['methodology']) {
-    //     methodology = programme.mitigationActions[0]['methodology']
-    //   }
-    // }
+    if (programme.mitigationActions?.length > 0){
+      if (programme.mitigationActions[0].properties.methodology) {
+        methodology = programme.mitigationActions[0].properties.methodology
+      } else if (programme.mitigationActions[0]['methodology']) {
+        methodology = programme.mitigationActions[0]['methodology']
+      }
+    }
 
     const p = await this.sendHttpPost('v1/projects', {
       projectId: programme.programmeId,
@@ -187,13 +196,13 @@ export class CadtApiService {
     const pd = companies?.map((c) => c.name)?.join(', ');
 
     let methodology = "Pending";
-    // if (programme.mitigationActions?.length > 0){
-    //   if (programme.mitigationActions[0].properties?.methodology) {
-    //     methodology = programme.mitigationActions[0].properties.methodology
-    //   } else if (programme.mitigationActions[0]['methodology']) {
-    //     methodology = programme.mitigationActions[0]['methodology']
-    //   }
-    // }
+    if (programme.mitigationActions?.length > 0){
+      if (programme.mitigationActions[0].properties?.methodology) {
+        methodology = programme.mitigationActions[0].properties.methodology
+      } else if (programme.mitigationActions[0]['methodology']) {
+        methodology = programme.mitigationActions[0]['methodology']
+      }
+    }
 
 
     const auth = await this.sendHttpPut('v1/projects', {

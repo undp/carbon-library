@@ -67,7 +67,7 @@ export class AsyncOperationsDatabaseHandlerService
           }
         }
       }
-      setTimeout(doActions, 5000);
+      setTimeout(doActions, 10000);
     };
 
     await doActions();
