@@ -1130,17 +1130,16 @@ export class ProgrammeService {
       } 
       if(program && d.type == DocType.METHODOLOGY_DOCUMENT) {
         await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
-        if (program.cadtId) {
-          program.currentStage = ProgrammeStage.APPROVED;
-          if (program.article6trade==true || program.article6trade==undefined) {
-            await this.asyncOperationsInterface.AddAction({
-              actionType: AsyncActionType.CADTUpdateProgramme,
-              actionProps: {
-                programme: program
-              },
-            });
-          }
+        program.currentStage = ProgrammeStage.APPROVED;
+        if (program.article6trade==true || program.article6trade==undefined) {
+          await this.asyncOperationsInterface.AddAction({
+            actionType: AsyncActionType.CADTUpdateProgramme,
+            actionProps: {
+              programme: program
+            },
+          });
         }
+        
       }
       if(program && d.type == DocType.VERIFICATION_REPORT) {
         const eventData = {
@@ -1471,9 +1470,7 @@ export class ProgrammeService {
 
     console.log('Add document on registry', sqlProgram, resp, documentDto)
 
-    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
-      resp.cadtId = sqlProgram.cadtId;
-      resp.blockBounds = sqlProgram.blockBounds;
+    if (sqlProgram.currentStage != resp.currentStage) {
       console.log('Add action', resp)
       if (sqlProgram.article6trade==true || sqlProgram.article6trade==undefined) {
         await this.asyncOperationsInterface.AddAction({
@@ -3630,24 +3627,17 @@ export class ProgrammeService {
       isRetirement,
     );
 
-    const sqlProgram = await this.findById(programme.programmeId);
-  
-    console.log('Add transfer', sqlProgram)
-
-    if (sqlProgram.cadtId) {
-      programme.cadtId = sqlProgram.cadtId;
-      programme.blockBounds = sqlProgram.blockBounds;
-      console.log('Add action', programme)
-      if (programme.article6trade==true || programme.article6trade == undefined) {
-        await this.asyncOperationsInterface.AddAction({
-          actionType: AsyncActionType.CADTTransferCredit,
-          actionProps: {
-            programme: programme,
-            transfer: transfer
-          },
-        });
-      }
+    console.log('Add action', programme)
+    if (programme.article6trade==true || programme.article6trade == undefined) {
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTTransferCredit,
+        actionProps: {
+          programme: programme,
+          transfer: transfer
+        },
+      });
     }
+    
 
     this.logger.log("Programme updated");
     const result = await this.programmeTransferRepo
@@ -4275,10 +4265,7 @@ export class ProgrammeService {
       }
     console.log('Add accept on registry', sqlProgram, resp, accept)
 
-    if (sqlProgram.cadtId && sqlProgram.currentStage != resp.currentStage) {
-      resp.cadtId = sqlProgram.cadtId;
-      resp.blockBounds = sqlProgram.blockBounds;
-
+    if (sqlProgram.currentStage != resp.currentStage) {
       console.log('Add action', resp)
       if (sqlProgram.article6trade==true || sqlProgram.article6trade == undefined) {
         await this.asyncOperationsInterface.AddAction({
@@ -5213,20 +5200,19 @@ export class ProgrammeService {
       
     })
 
+    // const sqlProgram = await this.findById(program.programmeId);
+    // if (sqlProgram.cadtId) {
+    //   program.cadtId = sqlProgram.cadtId;
+    //   program.blockBounds = sqlProgram.blockBounds;
 
-    const sqlProgram = await this.findById(program.programmeId);
-    if (sqlProgram.cadtId) {
-      program.cadtId = sqlProgram.cadtId;
-      program.blockBounds = sqlProgram.blockBounds;
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTCreditIssue,
-        actionProps: {
-          programme: program,
-          amount: req.issueAmount,
-        },
-      });
-    }
-
+    await this.asyncOperationsInterface.AddAction({
+      actionType: AsyncActionType.CADTCreditIssue,
+      actionProps: {
+        programme: program,
+        amount: req.issueAmount,
+      },
+    });
+    
     const hostAddress = this.configService.get('host');
     updated.companyId.forEach(async (companyId) => {
       await this.emailHelperService.sendEmailToOrganisationAdmins(
@@ -5673,18 +5659,13 @@ export class ProgrammeService {
       );
     }
 
-    const sqlProgram = await this.findById(program.programmeId);
-    if (sqlProgram.cadtId) {
-      updated.cadtId = sqlProgram.cadtId;
-      updated.blockBounds = sqlProgram.blockBounds;
-      await this.asyncOperationsInterface.AddAction({
-        actionType: AsyncActionType.CADTUpdateProgramme,
-        actionProps: {
-          programme: updated
-        },
-      });
-    }
-
+    await this.asyncOperationsInterface.AddAction({
+      actionType: AsyncActionType.CADTUpdateProgramme,
+      actionProps: {
+        programme: updated
+      },
+    });
+    
     const authRe: AsyncAction = {
       actionType: AsyncActionType.AuthProgramme,
       actionProps: {
@@ -5807,15 +5788,14 @@ export class ProgrammeService {
         );
       }
 
-      if (programme.cadtId) {
-        programme.currentStage = ProgrammeStage.REJECTED;
-        await this.asyncOperationsInterface.AddAction({
-          actionType: AsyncActionType.CADTUpdateProgramme,
-          actionProps: {
-            programme: programme
-          },
-        });
-      }
+      programme.currentStage = ProgrammeStage.REJECTED;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+          programme: programme
+        },
+      });
+      
   
       const authRe: AsyncAction = {
         actionType: AsyncActionType.RejectProgramme,
@@ -6442,15 +6422,14 @@ export class ProgrammeService {
   async itmoProjectApprove(program: Programme) {
     if(program) {
       await this.programmeLedger.updateProgrammeStatus(program.programmeId, ProgrammeStage.APPROVED, ProgrammeStage.AWAITING_AUTHORIZATION, "TODO");
-      if (program.cadtId) {
-        program.currentStage = ProgrammeStage.APPROVED;
-        await this.asyncOperationsInterface.AddAction({
-          actionType: AsyncActionType.CADTUpdateProgramme,
-          actionProps: {
-              programme: program
-          },
-        });
-      }
+      program.currentStage = ProgrammeStage.APPROVED;
+      await this.asyncOperationsInterface.AddAction({
+        actionType: AsyncActionType.CADTUpdateProgramme,
+        actionProps: {
+            programme: program
+        },
+      });
+      
     }
   }
 

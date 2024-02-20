@@ -103,7 +103,6 @@ export class CadtApiService {
     const d = new Date(date);
     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   }
-
   
   public async createProgramme(programme: Programme) {
 
@@ -184,6 +183,14 @@ export class CadtApiService {
   }
 
   public async updateProgramme(programme: Programme) {
+
+    const sqlProgram = await this.programmeRepo.findOneBy({
+      programmeId: programme.programmeId,
+    });
+
+    programme.cadtId = sqlProgram.cadtId;
+    programme.blockBounds = sqlProgram.blockBounds;
+
     if (!programme.cadtId) {
         this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId} ${programme.currentStage}`)
         return;
@@ -249,8 +256,15 @@ export class CadtApiService {
     issueAmounts: any[]
   ) {
 
+    const sqlProgram = await this.programmeRepo.findOneBy({
+      programmeId: programme.programmeId,
+    });
+
+    programme.cadtId = sqlProgram.cadtId;
+    programme.blockBounds = sqlProgram.blockBounds;
+
     if (!programme.cadtId) {
-        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
+        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId} ${programme.currentStage}`)
         return;
     }
 
@@ -342,11 +356,18 @@ export class CadtApiService {
     transfer: ProgrammeTransfer
   ) {
 
+    const sqlProgram = await this.programmeRepo.findOneBy({
+      programmeId: programme.programmeId,
+    });
+
+    programme.cadtId = sqlProgram.cadtId;
+    programme.blockBounds = sqlProgram.blockBounds;
+
     if (!programme.cadtId) {
-        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId}`)
+        this.logger.log(`Programme does not have cad trust id. Dropping record ${programme.programmeId} ${programme.currentStage}`)
         return;
     }
-
+    
     const programBlockBounds = programme.blockBounds[transfer.fromCompanyId];
     if (!programBlockBounds) {
       this.logger.log(`Programme block bounds does not exist. Dropping record ${programme.programmeId}`)
