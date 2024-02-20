@@ -7,6 +7,8 @@ import { Programme } from "../shared/entities/programme.entity";
 import { CreditOverall } from "../shared/entities/credit.overall.entity";
 import { LocationInterface } from "../shared/location/location.interface";
 import { CompanyRole } from "../shared/enum/company.role.enum";
+import { AsyncOperationsInterface } from "../shared/async-operations/async-operations.interface";
+import { AsyncActionType } from "../shared/enum/async.action.type.enum";
 
 @Injectable()
 export class ProcessEventService {
@@ -14,6 +16,7 @@ export class ProcessEventService {
     private logger: Logger,
     @InjectRepository(Programme) private programmeRepo: Repository<Programme>,
     @InjectRepository(Company) private companyRepo: Repository<Company>,
+    private asyncOperationsInterface: AsyncOperationsInterface,
     private locationService: LocationInterface,
   ) {}
 
@@ -53,6 +56,13 @@ export class ProcessEventService {
                   programme.geographicalLocationCordintes = [...response];
                 }
               );
+
+              if (programme.article6trade==true) {  
+                await this.asyncOperationsInterface.AddAction({
+                  actionType: AsyncActionType.CADTProgrammeCreate,
+                  actionProps: programme,
+                });
+              }
             } else if (
               programme.txType === TxType.CERTIFY ||
               programme.txType === TxType.REVOKE

@@ -21,7 +21,7 @@ export class AsyncOperationsDatabaseHandlerService
 
   async asyncHandler(event: any): Promise<any> {
     this.logger.log('database asyncHandler started', JSON.stringify(event));
-
+  
     const seqObj = await this.counterRepo.findOneBy({
       id: CounterType.ASYNC_OPERATIONS,
     });
@@ -30,46 +30,50 @@ export class AsyncOperationsDatabaseHandlerService
       lastSeq = seqObj.counter;
     }
     let retryCount = 0;
-    const retryLimit = 10;
+    const retryLimit = 50;
+    const baseDelay = 5000; // Initial delay for exponential backoff
+  
     const doActions = async () => {
       console.log('lastSeq', lastSeq, 'retryCount', retryCount);
       const notExecutedActions = await this.asyncActionRepo
         .createQueryBuilder('asyncAction')
-        .where('asyncAction.actionId > :lastExecuted', {
-          lastExecuted: lastSeq,
-        })
+        .where('asyncAction.actionId > :lastExecuted', { lastExecuted: lastSeq })
         .orderBy('"actionId"', 'ASC')
         .select(['"actionId"', '"actionType"', '"actionProps"'])
         .getRawMany();
+  
       if (notExecutedActions.length !== 0) {
         try {
-          for (const action of notExecutedActions) {
+            for (const action of notExecutedActions) {
             console.log('Action start', action.actionType, action.actionId);
             await this.asyncOperationsHandlerService.handler(
               action.actionType,
               JSON.parse(action.actionProps),
             );
-            lastSeq = action.actionId; //ref
+            lastSeq = action.actionId;
             await this.counterRepo.save({
               id: CounterType.ASYNC_OPERATIONS,
               counter: lastSeq,
             });
-            retryCount = 0; //ref
+            retryCount = 0; // Reset retry count after a successful execution
           }
         } catch (exception) {
           this.logger.log('database asyncHandler failed', exception);
-          if (retryCount > retryLimit) {
+          if (retryCount >= retryLimit) {
             this.logger.log('database asyncHandler terminated');
             return;
-          } else {
-            retryCount += 1; //ref
-            doActions;
           }
+          const delay = baseDelay * Math.pow(2, retryCount); // Exponential backoff
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          retryCount++;
+          return doActions(); // Retry the operation
         }
       }
-      setTimeout(doActions, 10000);
+      // Schedule the next execution after a fixed delay regardless of success or failure
+      setTimeout(doActions, baseDelay);
     };
-
+  
     await doActions();
   }
 }

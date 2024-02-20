@@ -13,6 +13,7 @@ import { Counter } from '../shared/entities/counter.entity';
 import { LocationModule } from '../shared/location/location.module';
 import { LedgerType } from '../shared/enum/ledger.type';
 import { DataImporterModule } from '../data-importer/data-importer.module';
+import { AsyncOperationsModule } from '../shared/async-operations/async-operations.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { DataImporterModule } from '../data-importer/data-importer.module';
     }),
     TypeOrmModule.forFeature([Programme, Company, Counter]),
     LocationModule,
-    DataImporterModule
+    DataImporterModule,
+    AsyncOperationsModule,
   ],
   providers: [{
     provide: LedgerReplicatorInterface,

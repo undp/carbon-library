@@ -2222,12 +2222,6 @@ export class ProgrammeService {
       !pr
     ) {
       savedProgramme = await this.programmeLedger.createProgramme(programme);
-      if (programmeDto.article6trade==true) {  
-        await this.asyncOperationsInterface.AddAction({
-          actionType: AsyncActionType.CADTProgrammeCreate,
-          actionProps: programme,
-        });
-      }
     }
 
     if (savedProgramme || pr) {
