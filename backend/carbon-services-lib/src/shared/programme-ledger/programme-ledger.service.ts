@@ -230,25 +230,24 @@ export class ProgrammeLedgerService {
 
           for (const i in programme.creditOwnerPercentage) {
             if (programme.companyId[i] == transfer.fromCompanyId) {
-              percentages.push(
-                (programme.creditBalance - transfer.creditAmount )!= 0
-                  ? this.helperService.halfUpToPrecision((
-                    ((currentCredit[transfer.fromCompanyId] -
-                      transfer.creditAmount) *
-                      100) /
-                    (programme.creditBalance - transfer.creditAmount)
-                  ), 6 )
-                  : 0
-              );
+              const creditOwnerPercentage = (programme.creditBalance - transfer.creditAmount )!= 0
+              ? this.helperService.halfUpToPrecision((
+                ((currentCredit[transfer.fromCompanyId] -
+                  transfer.creditAmount) *
+                  100) /
+                (programme.creditBalance - transfer.creditAmount)
+              ), 6 )
+              : 0;
+              percentages.push((creditOwnerPercentage > 100) ? 100 : creditOwnerPercentage);
             } else {
-              percentages.push(
-                (programme.creditBalance - transfer.creditAmount) != 0
-                  ? this.helperService.halfUpToPrecision((
-                    (currentCredit[programme.companyId[i]] * 100) /
-                    (programme.creditBalance - transfer.creditAmount)
-                  ), 6 )
-                  : 0
-              );
+              const creditOwnerPercentage = 
+              (programme.creditBalance - transfer.creditAmount) != 0
+              ? this.helperService.halfUpToPrecision((
+                (currentCredit[programme.companyId[i]] * 100) /
+                (programme.creditBalance - transfer.creditAmount)
+                ), 6 )
+              : 0
+              percentages.push((creditOwnerPercentage > 100) ? 100 : creditOwnerPercentage);
             }
           }
           programme.creditOwnerPercentage = percentages;

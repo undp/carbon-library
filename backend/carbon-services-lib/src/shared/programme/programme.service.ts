@@ -462,6 +462,13 @@ export class ProgrammeService {
       } received ${JSON.stringify(req)}`,
     );
 
+    if(req.percentage){
+      for(const i in req.percentage){
+        req.percentage[i]=this.helperService.halfUpToPrecision(req.percentage[i]);
+      }
+    }
+    req.amount=this.helperService.halfUpToPrecision(req.amount);
+
     if(req.period && (req.period.length!=2 || req.period[0]>=req.period[1])){
       throw new HttpException(
         this.helperService.formatReqMessagesString(
@@ -738,7 +745,7 @@ export class ProgrammeService {
       investment.shareFromOwner = parseFloat(
         ((investment.percentage * 100) / propPerMap[fromCompanyId]).toFixed(6),
       );
-      investment.amount = Math.round(
+      investment.amount = this.helperService.halfUpToPrecision(
         (req.amount * req.percentage[j]) / percSum,
       );
       investment.status = InvestmentStatus.PENDING;
@@ -952,7 +959,7 @@ export class ProgrammeService {
           }
           try {
             const crdts = await calculateCredit(req);
-            ndcAction.ndcFinancing.systemEstimatedCredits = crdts;
+            ndcAction.ndcFinancing.systemEstimatedCredits = this.helperService.halfUpToPrecision(crdts);
           } catch (err) {
             this.logger.log(`Credit calculate failed ${err.message}`);
             ndcAction.ndcFinancing.systemEstimatedCredits = 0;
@@ -1748,6 +1755,11 @@ export class ProgrammeService {
     user: User,
   ): Promise<Programme | undefined> {
     this.logger.verbose('ProgrammeDTO received', JSON.stringify(programmeDto));
+    if(programmeDto.proponentPercentage){
+      for(const i in programmeDto.proponentPercentage){
+        programmeDto.proponentPercentage[i]=this.helperService.halfUpToPrecision(programmeDto.proponentPercentage[i])
+      }
+    }
     const programme: Programme = this.toProgramme(programmeDto);
     if(programme.creditEst)programme.creditEst=this.helperService.halfUpToPrecision(programme.creditEst)
     this.logger.verbose("Programme  create", JSON.stringify(programme));
@@ -1959,13 +1971,13 @@ export class ProgrammeService {
       3,
     );
     programme.countryCodeA2 = this.configService.get('systemCountry');
-
-    programme.programmeProperties.carbonPriceUSDPerTon = parseFloat(
-      (
+    programme.programmeProperties.estimatedProgrammeCostUSD = this.helperService.halfUpToPrecision(programme.programmeProperties.estimatedProgrammeCostUSD)
+    programme.programmeProperties.carbonPriceUSDPerTon = 
+      this.helperService.halfUpToPrecision(
         programme.programmeProperties.estimatedProgrammeCostUSD /
         programme.creditEst
-      ).toFixed(PRECISION),
-    );
+      )
+    
     programme.programmeProperties.creditYear = new Date(
       programme.startTime * 1000,
     ).getFullYear();
@@ -2416,8 +2428,56 @@ export class ProgrammeService {
     }
 
     ndcAction.coBenefitsProperties = ndcActionDto.coBenefitsProperties;
-    if(ndcAction.ndcFinancing.userEstimatedCredits){
+    if(ndcAction.ndcFinancing?.userEstimatedCredits){
       ndcAction.ndcFinancing.userEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.userEstimatedCredits)
+    }
+    if(ndcAction.ndcFinancing?.systemEstimatedCredits){
+      ndcAction.ndcFinancing.systemEstimatedCredits=this.helperService.halfUpToPrecision(ndcAction.ndcFinancing.systemEstimatedCredits)
+    }
+    if(ndcAction.solarProperties?.energyGeneration){
+      ndcAction.solarProperties.energyGeneration=this.helperService.halfUpToPrecision(ndcAction.solarProperties.energyGeneration)
+    }
+    if(ndcAction.creditCalculationProperties?.energyGeneration){
+      ndcAction.creditCalculationProperties.energyGeneration=this.helperService.halfUpToPrecision(ndcAction.creditCalculationProperties.energyGeneration)
+    }
+    if(ndcAction.agricultureProperties?.landArea){
+      ndcAction.agricultureProperties.landArea=this.helperService.halfUpToPrecision(ndcAction.agricultureProperties.landArea)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsAvoided?.CO2){
+      ndcAction.adaptationProperties.ghgEmissionsAvoided.CO2=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsAvoided.CO2)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsAvoided?.CH4){
+      ndcAction.adaptationProperties.ghgEmissionsAvoided.CH4=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsAvoided.CH4)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsAvoided?.N2O){
+      ndcAction.adaptationProperties.ghgEmissionsAvoided.N2O=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsAvoided.N2O)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsAvoided?.HFCs){
+      ndcAction.adaptationProperties.ghgEmissionsAvoided.HFCs=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsAvoided.HFCs)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsAvoided?.PFCs){
+      ndcAction.adaptationProperties.ghgEmissionsAvoided.PFCs=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsAvoided.PFCs)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsAvoided?.SF6){
+      ndcAction.adaptationProperties.ghgEmissionsAvoided.SF6=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsAvoided.SF6)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsReduced?.CO2){
+      ndcAction.adaptationProperties.ghgEmissionsReduced.CO2=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsReduced.CO2)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsReduced?.CH4){
+      ndcAction.adaptationProperties.ghgEmissionsReduced.CH4=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsReduced.CH4)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsReduced?.N2O){
+      ndcAction.adaptationProperties.ghgEmissionsReduced.N2O=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsReduced.N2O)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsReduced?.HFCs){
+      ndcAction.adaptationProperties.ghgEmissionsReduced.HFCs=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsReduced.HFCs)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsReduced?.PFCs){
+      ndcAction.adaptationProperties.ghgEmissionsReduced.PFCs=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsReduced.PFCs)
+    }
+    if(ndcAction.adaptationProperties?.ghgEmissionsReduced?.SF6){
+      ndcAction.adaptationProperties.ghgEmissionsReduced.SF6=this.helperService.halfUpToPrecision(ndcAction.adaptationProperties.ghgEmissionsReduced.SF6)
     }
     await this.checkTotalUserEstimatedCredits(ndcAction, program);
     await this.calcCreditNDCAction(ndcAction, program);
@@ -3759,7 +3819,7 @@ export class ProgrammeService {
               transfer.fromCompanyId,
               EmailTemplates.CREDIT_RETIREMENT_CANCEL_SYS_TO_INITIATOR,
               {
-                credits: transfer.creditAmount - omgeCredits,
+                credits: this.helperService.halfUpToPrecision(transfer.creditAmount - omgeCredits),
                 serialNumber: programme.serialNo,
                 programmeName: programme.title,
                 country: countryName,
@@ -3771,7 +3831,7 @@ export class ProgrammeService {
             await this.emailHelperService.sendEmailToGovernmentAdmins(
               EmailTemplates.CREDIT_RETIREMENT_CANCEL_SYS_TO_GOV,
               {
-                credits: transfer.creditAmount - omgeCredits,
+                credits: this.helperService.halfUpToPrecision(transfer.creditAmount - omgeCredits),
                 serialNumber: programme.serialNo,
                 programmeName: programme.title,
                 pageLink: hostAddress + '/creditTransfers/viewAll',
@@ -3881,7 +3941,7 @@ export class ProgrammeService {
         await this.emailHelperService.sendEmailToGovernmentAdmins(
           EmailTemplates.CREDIT_RETIREMENT_CANCEL,
           {
-            credits: transfer.creditAmount - omgeCredits,
+            credits: this.helperService.halfUpToPrecision(transfer.creditAmount - omgeCredits),
             organisationName: initiatorCompanyDetails.name,
             country: countryName,
             omgeCredits:omgeCredits
@@ -4993,7 +5053,7 @@ export class ProgrammeService {
         await this.emailHelperService.sendEmailToGovernmentAdmins(
           EmailTemplates.CREDIT_RETIREMENT_BY_DEV,
           {
-            credits: transfer.creditAmount - omgeCredits,
+            credits: this.helperService.halfUpToPrecision(transfer.creditAmount - omgeCredits),
             programmeName: programme.title,
             serialNumber: programme.serialNo,
             organisationName: fromCompany.name,
@@ -5014,7 +5074,7 @@ export class ProgrammeService {
           fromCompany.companyId,
           EmailTemplates.CREDIT_RETIREMENT_BY_GOV,
           {
-            credits: transfer.creditAmount - omgeCredits,
+            credits: this.helperService.halfUpToPrecision(transfer.creditAmount - omgeCredits),
             programmeName: programme.title,
             serialNumber: programme.serialNo,
             government: toCompany.name,
