@@ -8,6 +8,9 @@ import {
   PaginationProps,
   Row,
   Table,
+  Popover,
+  List,
+  Typography,
   Tag,
   Tooltip,
 } from "antd";
@@ -28,7 +31,7 @@ import {
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { ProgrammeManagementColumns } from "../../../Definitions/Enums/programme.management.columns.enum";
 import { Action } from "../../../Definitions/Enums/action.enum";
-import { DownloadOutlined, PlusOutlined } from "@ant-design/icons";
+import { DownloadOutlined, PlusOutlined ,EllipsisOutlined} from "@ant-design/icons";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import {
   ProgrammeEntity,
@@ -37,6 +40,8 @@ import {
 } from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { useConnection, useUserContext } from "../../../Context";
+import * as Icon from "react-bootstrap-icons";
+
 
 const { Search } = Input;
 
@@ -123,6 +128,33 @@ export const ProgrammeManagementComponent = (props: any) => {
     onStatusQuery(nw);
   };
 
+  const actionMenu = (record: any) => {
+      return(
+        <List
+          className="action-menu"
+          size="small"
+          dataSource={[
+            {
+              text: t("creditTransfer:view"),
+              icon: <Icon.InfoCircle />,
+              click: () => {
+                onNavigateToProgrammeView(record);
+              },
+            },
+          ]}
+          renderItem={(item: any) => (
+            <List.Item onClick={item.click}>
+              <Typography.Text className="action-icon color-primary">
+                {item.icon}
+              </Typography.Text>
+              <span>{item.text}</span>
+            </List.Item>
+          )}
+        />
+      )
+  };
+
+
   const columns = [
     {
       title: t("programme:title"),
@@ -130,16 +162,6 @@ export const ProgrammeManagementComponent = (props: any) => {
       key: ProgrammeManagementColumns.title,
       sorter: true,
       align: "left" as const,
-      render: (item: any) => {
-        return <span className="clickable">{item}</span>;
-      },
-      onCell: (record: any, rowIndex: any) => {
-        return {
-          onClick: (ev: any) => {
-            onNavigateToProgrammeView(record);
-          },
-        };
-      },
     },
     {
       title: t("common:company"),
@@ -289,6 +311,23 @@ export const ProgrammeManagementComponent = (props: any) => {
       dataIndex: "serialNo",
       key: ProgrammeManagementColumns.serialNo,
       align: "left" as const,
+    },
+    {
+      title: t(""),
+      width: 6,
+      align: "right" as const,
+      key: ProgrammeManagementColumns.action,
+      render: (_: any, record: any) => {
+        const menu = actionMenu(record);
+        return menu && (
+          <Popover placement="bottomRight" content={menu} trigger="click">
+            <EllipsisOutlined
+              rotate={90}
+              style={{ fontWeight: 600, fontSize: "1rem", cursor: "pointer" }}
+            />
+          </Popover>
+        ) 
+      },
     },
   ].filter((column) => visibleColumns.includes(column.key));
 

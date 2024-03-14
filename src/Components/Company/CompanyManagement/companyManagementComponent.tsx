@@ -6,6 +6,7 @@ import {
   FilterOutlined,
   PlusOutlined,
   SafetyOutlined,
+  EllipsisOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -18,6 +19,9 @@ import {
   PaginationProps,
   Radio,
   Row,
+  List,
+  Typography,
+  Popover,
   Select,
   Space,
   Table,
@@ -46,6 +50,7 @@ import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { CompanyState } from "../../../Definitions";
 import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
 import { useConnection } from "../../../Context";
+import * as Icon from "react-bootstrap-icons";
 
 const { Search } = Input;
 
@@ -145,6 +150,32 @@ export const CompanyManagementComponent = (props: any) => {
     setFilterVisible(true);
   };
 
+  const actionMenu = (record: any) => {
+    return(
+      <List
+        className="action-menu"
+        size="small"
+        dataSource={[
+          {
+            text: t("creditTransfer:view"),
+            icon: <Icon.InfoCircle />,
+            click: () => {
+              onNavigateToCompanyProfile(record);
+            },
+          },
+        ]}
+        renderItem={(item: any) => (
+          <List.Item onClick={item.click}>
+            <Typography.Text className="action-icon color-primary">
+              {item.icon}
+            </Typography.Text>
+            <span>{item.text}</span>
+          </List.Item>
+        )}
+      />
+    )
+};
+
   const columns = [
     {
       title: "",
@@ -174,18 +205,10 @@ export const CompanyManagementComponent = (props: any) => {
         return (
           <div
             style={{ display: "flex", alignItems: "center" }}
-            className="clickable"
           >
             <div style={{ fontWeight: 600 }}>{item}</div>
           </div>
         );
-      },
-      onCell: (record: any, rowIndex: any) => {
-        return {
-          onClick: (ev: any) => {
-            onNavigateToCompanyProfile(record);
-          },
-        };
       },
     },
     {
@@ -236,6 +259,23 @@ export const CompanyManagementComponent = (props: any) => {
       align: "center" as const,
       render: (item: any) => {
         return getCompanyStateComponent(item);
+      },
+    },
+    {
+      title: t(""),
+      width: 6,
+      align: "right" as const,
+      key: CompanyManagementColumns.action,
+      render: (_: any, record: any) => {
+        const menu = actionMenu(record);
+        return menu && (
+          <Popover placement="bottomRight" content={menu} trigger="click">
+            <EllipsisOutlined
+              rotate={90}
+              style={{ fontWeight: 600, fontSize: "1rem", cursor: "pointer" }}
+            />
+          </Popover>
+        ) 
       },
     },
   ].filter((column) => visibleColumns.includes(column.key));

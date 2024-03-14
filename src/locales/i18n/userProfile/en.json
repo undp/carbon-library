@@ -22,6 +22,7 @@
     "deleteConfirmHeaderText": "Are you sure you want to permanently delete this user?",
     "deleteConfirmText": "You can’t undo this action",
     "cancel": "Cancel",
+    "view": "View",
     "remarks": "Remarks",
     "creditBalance": "Credit Balance",
     "programmeCount": "Number of Projects",

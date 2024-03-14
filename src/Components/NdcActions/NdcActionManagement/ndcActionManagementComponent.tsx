@@ -6,7 +6,10 @@ import {
   PaginationProps,
   Row,
   Table,
+  Popover,
   Tag,
+  List,
+  Typography,
   Tooltip,
   message,
 } from "antd";
@@ -27,7 +30,8 @@ import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
 import { useConnection, useUserContext } from "../../../Context";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined ,EllipsisOutlined} from "@ant-design/icons";
+import * as Icon from "react-bootstrap-icons";
 
 export const NdcActionManagementComponent = (props: any) => {
   const {
@@ -108,6 +112,32 @@ export const NdcActionManagementComponent = (props: any) => {
     }
   };
 
+  const actionMenu = (record: any) => {
+    return(
+      <List
+        className="action-menu"
+        size="small"
+        dataSource={[
+          {
+            text: t("creditTransfer:view"),
+            icon: <Icon.InfoCircle />,
+            click: () => {
+              onNavigateToNdcManagementView(record);
+            },
+          },
+        ]}
+        renderItem={(item: any) => (
+          <List.Item onClick={item.click}>
+            <Typography.Text className="action-icon color-primary">
+              {item.icon}
+            </Typography.Text>
+            <span>{item.text}</span>
+          </List.Item>
+        )}
+      />
+    )
+};
+
   const columns: any = [
     {
       title: t("ndcAction:ndcColumnsActionId"),
@@ -115,16 +145,6 @@ export const NdcActionManagementComponent = (props: any) => {
       key: "id",
       align: "left" as const,
       sorter: true,
-      render: (item: any) => {
-        return <span className="clickable">{item}</span>;
-      },
-      onCell: (record: any, rowIndex: any) => {
-        return {
-          onClick: (ev: any) => {
-            onNavigateToNdcManagementView(record);
-          },
-        };
-      },
     },
     {
       title: t("ndcAction:ndcColumnsDate"),
@@ -205,6 +225,23 @@ export const NdcActionManagementComponent = (props: any) => {
             </Tag>
           </Tooltip>
         );
+      },
+    },
+    {
+      title: t(""),
+      width: 6,
+      align: "right" as const,
+      key: "action",
+      render: (_: any, record: any) => {
+        const menu = actionMenu(record);
+        return menu && (
+          <Popover placement="bottomRight" content={menu} trigger="click">
+            <EllipsisOutlined
+              rotate={90}
+              style={{ fontWeight: 600, fontSize: "1rem", cursor: "pointer" }}
+            />
+          </Popover>
+        ) 
       },
     },
   ];
