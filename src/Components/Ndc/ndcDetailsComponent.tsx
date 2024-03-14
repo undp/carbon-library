@@ -1065,7 +1065,6 @@ export const NdcDetailsComponent = (props: any) => {
         <Row justify="space-between" align="middle">
           <Col span={20}>
             <div className="body-title">{t("ndc:ndcTitle")}</div>
-            <div className="body-sub-title">{t("ndc:ndcSubTitle")}</div>
           </Col>
         </Row>
       </div>

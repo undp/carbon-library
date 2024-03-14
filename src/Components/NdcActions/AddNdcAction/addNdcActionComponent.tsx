@@ -282,7 +282,6 @@ export const AddNdcActionComponent = (props: any) => {
     <div className="add-ndc-main-container">
       <div className="title-container">
         <div className="main">{t("ndcAction:addNdcTitle")}</div>
-        <div className="sub">{t("ndcAction:addNdcSubTitle")}</div>
       </div>
       <div className="adding-section">
         <div className="form-section">
