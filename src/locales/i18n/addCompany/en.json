@@ -33,6 +33,7 @@
     "companyDetailsTitle": "Organisation Details",
     "companyAdminDetailsTitle": "Organisation Admin Details",
     "cancel": "CANCEL",
+    "view": "View",
     "companyAddedSuccess": "The organisation has been created successfully",
     "companyUpdatedSuccess": "The organisation has been updated successfully ",
     "companyRegisteredSuccess": "User registration request has been sent",

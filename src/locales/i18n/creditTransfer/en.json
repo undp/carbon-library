@@ -1,6 +1,6 @@
 {
   "viewCreditsTransfers": "Transfers",
-  "desc": "View the transfers in the Carbon Registry based on your permissions",
+  "desc": "",
   "requestID": "REQUEST ID",
   "certifier": "CERTIFIER",
   "initiator": "INITIATOR",
@@ -19,6 +19,7 @@
   "acceptCreditTransferTitle": "Accept Transfer Request",
   "proceed": "Proceed",
   "cancel": "Cancel",
+  "view": "View",
   "reject": "Reject",
   "recognise": "Recognise",
   "notrecognise": "Not Recognise",
