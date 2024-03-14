@@ -96,5 +96,6 @@
   "viewIncludedInNAP": "Included in NAP",
   "allowOnlyNumericValue": "Allow only numeric value",
   "allowOnlyNumericValueAndDecimal": "Allow only numeric value and decimal",
-  "allowOnlyIntegerValue": "Allow only numeric value and integer"
+  "allowOnlyIntegerValue": "Allow only numeric value and integer",
+  "view": "View"
 }

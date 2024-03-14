@@ -157,7 +157,7 @@ export const CompanyManagementComponent = (props: any) => {
         size="small"
         dataSource={[
           {
-            text: t("creditTransfer:view"),
+            text: t("company:view"),
             icon: <Icon.InfoCircle />,
             click: () => {
               onNavigateToCompanyProfile(record);
@@ -205,10 +205,18 @@ export const CompanyManagementComponent = (props: any) => {
         return (
           <div
             style={{ display: "flex", alignItems: "center" }}
+            className="clickable"
           >
             <div style={{ fontWeight: 600 }}>{item}</div>
           </div>
         );
+      },
+      onCell: (record: any, rowIndex: any) => {
+        return {
+          onClick: (ev: any) => {
+            onNavigateToCompanyProfile(record);
+          },
+        };
       },
     },
     {

@@ -20,5 +20,6 @@
   "searchName": "Search by name",
   "min": "Ministry",
   "nationalSopValue": "National Share of Proceeds",
-  "omgePercentage":"Overall Mitigation in Global Emissions (OMGE) Account"
+  "omgePercentage":"Overall Mitigation in Global Emissions (OMGE) Account",
+  "view": "View"
 }

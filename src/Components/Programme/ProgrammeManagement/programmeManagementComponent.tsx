@@ -135,7 +135,7 @@ export const ProgrammeManagementComponent = (props: any) => {
           size="small"
           dataSource={[
             {
-              text: t("creditTransfer:view"),
+              text: t("programme:view"),
               icon: <Icon.InfoCircle />,
               click: () => {
                 onNavigateToProgrammeView(record);
@@ -162,6 +162,16 @@ export const ProgrammeManagementComponent = (props: any) => {
       key: ProgrammeManagementColumns.title,
       sorter: true,
       align: "left" as const,
+      render: (item: any) => {
+        return <span className="clickable">{item}</span>;
+      },
+      onCell: (record: any, rowIndex: any) => {
+        return {
+          onClick: (ev: any) => {
+            onNavigateToProgrammeView(record);
+          },
+        };
+      },
     },
     {
       title: t("common:company"),

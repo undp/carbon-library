@@ -93,5 +93,6 @@
     "Annual":"ANNUAL",
     "noinvestment": "No Financings Available",
     "existingInvestmentSource":"Source",
-    "noInvestmentData":"No financing information available"
+    "noInvestmentData":"No financing information available",
+    "view": "View"
 }

@@ -119,7 +119,7 @@ export const NdcActionManagementComponent = (props: any) => {
         size="small"
         dataSource={[
           {
-            text: t("creditTransfer:view"),
+            text: t("ndcAction:view"),
             icon: <Icon.InfoCircle />,
             click: () => {
               onNavigateToNdcManagementView(record);
@@ -145,6 +145,16 @@ export const NdcActionManagementComponent = (props: any) => {
       key: "id",
       align: "left" as const,
       sorter: true,
+      render: (item: any) => {
+        return <span className="clickable">{item}</span>;
+      },
+      onCell: (record: any, rowIndex: any) => {
+        return {
+          onClick: (ev: any) => {
+            onNavigateToNdcManagementView(record);
+          },
+        };
+      },
     },
     {
       title: t("ndcAction:ndcColumnsDate"),
