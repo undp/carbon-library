@@ -705,7 +705,6 @@ export const UserManagementComponent = (props: any) => {
     <div className="content-container">
       <div className="title-bar">
         <div className="body-title">{t("user:viewUsers")}</div>
-        <div className="body-sub-title">{t("user:viewDesc")}</div>
       </div>
       <div className="content-card">
         <Row className="table-actions-section">

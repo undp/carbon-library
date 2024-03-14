@@ -501,7 +501,6 @@ export const CompanyManagementComponent = (props: any) => {
     <div className="content-container">
       <div className="title-bar">
         <div className="body-title">{t("company:viewCompanies")}</div>
-        <div className="body-sub-title">{t("company:viewDesc")}</div>
       </div>
       <div className="content-card">
         <Row className="table-actions-section">

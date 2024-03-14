@@ -250,11 +250,6 @@ export const AddNewUserComponent = (props: any) => {
           <div className="main">
             {isUpdate ? t("addUser:editUser") : t("addUser:addNewUser")}
           </div>
-          <div className="sub">
-            {state?.record?.name
-              ? t("addUser:editUserSub")
-              : t("addUser:addUserSub")}
-          </div>
         </div>
         {isUpdate &&
           !ability.can(

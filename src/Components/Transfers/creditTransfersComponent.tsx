@@ -827,7 +827,6 @@ export const CreditTransferComponent = (props: any) => {
             <div className="body-title">
               {t("creditTransfer:viewCreditsTransfers")}
             </div>
-            <div className="body-sub-title">{t("creditTransfer:desc")}</div>
           </Col>
           <Col span={4}>
             {((userInfoState?.companyRole === CompanyRole.GOVERNMENT &&

@@ -527,7 +527,6 @@ export const ProgrammeManagementComponent = (props: any) => {
       <div className="programme-title-bar">
         <div className="title-bar">
           <div className="body-title">{t("programme:viewProgrammes")}</div>
-          <div className="body-sub-title">{t("programme:desc")}</div>
         </div>
         <div className="actions">
           {ability.can(Action.Manage, ProgrammeEntity) &&

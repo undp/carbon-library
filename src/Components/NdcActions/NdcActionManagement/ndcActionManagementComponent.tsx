@@ -479,7 +479,6 @@ export const NdcActionManagementComponent = (props: any) => {
         <Row justify="space-between" align="middle">
           <Col span={20}>
             <div className="body-title">{t("ndcAction:NdcTitle")}</div>
-            <div className="body-sub-title">{t("ndcAction:NdcSubTitle")}</div>
           </Col>
         </Row>
       </div>
