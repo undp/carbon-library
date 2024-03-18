@@ -56,7 +56,6 @@ export const UserProfileComponent = (props: any) => {
           <div className="title-bar">
             <div>
               <div className="body-title">{t("userProfile:title")}</div>
-              <div className="body-sub-title">{t("userProfile:subTitle")}</div>
             </div>
           </div>
         </Col>

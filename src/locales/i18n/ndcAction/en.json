@@ -1,5 +1,5 @@
 {
-  "addNdcTitle": "Add Activity",
+  "addNdcTitle": "Add Project Activity",
   "addNdcSubTitle": "",
   "NdcTitle": "Project Activities",
   "NdcSubTitle": "",
@@ -73,8 +73,8 @@
   "searchByProgrammeName": "Search by project name",
   "seeMine": "Mine Only",
   "NdcCreditChartTitle": "Emissions Reductions (tCo2E)",
-  "ndcSuccessfullyCreated": "The Project Activity has been created successfully",
-  "ndcCreationFailed": "The Project Activity creation failed",
+  "ndcSuccessfullyCreated": "The project activity has been created successfully",
+  "ndcCreationFailed": "The project activity creation failed",
   "methodologyEstimatedCreditsInvalid": "Methodology Estimated Credits should be greater than 0",
   "userEstimatedCreditsInvalid": "Estimated Credits for the Project Activity cannot be greater than the Estimated Credits for the project",
   "coBenefitsSubTitle": "Co-Benefits",
