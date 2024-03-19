@@ -821,7 +821,7 @@ export const CreditTransferComponent = (props: any) => {
 
   return (
     <div className="credit-transfer-management content-container">
-      <div className="title-bar">
+      <div className="title-bar title-bar-transfer">
         <Row justify="space-between" align="middle">
           <Col span={20}>
             <div className="body-title">
