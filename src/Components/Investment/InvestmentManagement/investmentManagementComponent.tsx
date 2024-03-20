@@ -745,7 +745,6 @@ export const InvestmentManagementComponent = (props: any) => {
       <div className="investment-title-bar">
         <div className="title-bar">
           <div className="body-title">{t("programme:investmentTitle")}</div>
-          <div className="body-sub-title">{t("programme:investmentDesc")}</div>
         </div>
         <div className="actions">
           {enableAddOwnership &&

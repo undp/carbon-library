@@ -778,11 +778,6 @@ export const ProgrammeCreationComponent = (props: any) => {
             ? t("addProgramme:editProgramme")
             : t("addProgramme:addProgramme")}
         </div>
-        <div className="sub">
-          {isUpdate
-            ? t("addProgramme:editProgrammeSub")
-            : t("addProgramme:addProgrammeSub")}
-        </div>
       </div>
       <div className="adding-section">
         <div className="form-section">

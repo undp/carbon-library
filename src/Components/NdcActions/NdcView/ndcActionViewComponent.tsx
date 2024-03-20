@@ -453,9 +453,6 @@ export const NdcActionViewComponent = (props: any) => {
             {t("ndcAction:NdcDetailsViewTitle")}{" "}
             {getNdcActionNames(ndcActionDetails?.action as NdcActionTypes)}
           </div>
-          <div className="body-sub-title">
-            {t("ndcAction:NdcDetailsViewSubTitle")}
-          </div>
         </div>
       </div>
       <div className="content-body">

@@ -645,9 +645,6 @@ export const SupportManagementComponent = (props: any) => {
       <div className="support-title-bar">
         <div className="title-bar">
           <div className="body-title">{t("programme:supportTitle")}</div>
-          <div className="body-sub-title">
-            {t("programme:supportDesc")}
-          </div>
         </div>
         <div className="actions">
           {enableAddSupport && (

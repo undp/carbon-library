@@ -268,7 +268,6 @@ export const CompanyProfileComponent = (props: any) => {
       <div className="title-bar">
         <div>
           <div className="body-title">{t("companyProfile:title")}</div>
-          <div className="body-sub-title">{t("companyProfile:subTitle")}</div>
         </div>
         <div className="flex-display">
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
