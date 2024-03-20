@@ -12,7 +12,7 @@
 .mapboxgl-popup-close-button,
 .mapboxgl-popup-close-button:hover {
   display: none;
-  // z-index: -1 !important;
+  // z-index: -1 !important; 
 }
 
 .total-container {
@@ -55,6 +55,11 @@
 .ant-btn.rgdefault {
   border-radius: 0px 5px 5px 0px !important;
 }
+
+.ant-btn.mid-default-btn {
+  border-radius: 0px 0px 0px 0px !important;
+}
+
 .cards-title {
   font-family: "Inter";
   align-items: flex-start;
@@ -155,7 +160,7 @@
 
     .apexcharts-legend-series {
       display: flex !important;
-      width: 38%;
+      width: 42%;
     }
   }
 

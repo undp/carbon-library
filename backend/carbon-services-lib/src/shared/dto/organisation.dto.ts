@@ -17,6 +17,8 @@ import { CompanyRole } from "../enum/company.role.enum";
 import { IsValidCountry } from "../util/validcountry.decorator";
 import { SectoralScope } from "@undp/serial-number-gen";
 import { CompanyState } from "../enum/company.state.enum";
+import { GovDepartment } from "../enum/govDep.enum";
+import { Ministry } from "../enum/ministry.enum";
 
 export class OrganisationDto {
   companyId: number;
@@ -69,7 +71,6 @@ export class OrganisationDto {
   @ValidateIf(
     (c) => ![CompanyRole.GOVERNMENT, CompanyRole.API].includes(c.companyRole)
   )
-  @IsNotEmpty()
   @IsUrl()
   @IsOptional()
   @ApiPropertyOptional()
@@ -107,6 +108,22 @@ export class OrganisationDto {
   @IsString()
   @ApiProperty()
   nameOfMinister: string;
+
+  @ValidateIf((c) => c.companyRole === CompanyRole.MINISTRY)
+  @ApiProperty({ enum: GovDepartment })
+  @IsNotEmpty()
+  @IsEnum(GovDepartment, {
+      message: 'Invalid Government Department. Supported following Departments:' + Object.values(GovDepartment)
+  })
+  govDep: GovDepartment;
+
+  @ValidateIf((c) => c.companyRole === CompanyRole.MINISTRY)
+  @ApiProperty({ enum: Ministry })
+  @IsNotEmpty()
+  @IsEnum(Ministry, {
+      message: 'Invalid sector. Supported following sector:' + Object.values(Ministry)
+  })
+  ministry: Ministry;  
 
   @ValidateIf((c) => c.companyRole === CompanyRole.MINISTRY)
   @IsArray()

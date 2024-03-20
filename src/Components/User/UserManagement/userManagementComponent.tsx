@@ -2,6 +2,7 @@ import {
   AuditOutlined,
   BankOutlined,
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   EllipsisOutlined,
   ExperimentOutlined,
@@ -63,6 +64,7 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import { UserManagementColumns } from "../../../Definitions/Enums/user.management.columns.enum";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
 
 const { Search } = Input;
 
@@ -70,11 +72,9 @@ export const UserManagementComponent = (props: any) => {
   const {
     t,
     useAbilityContext,
-    useConnection,
     visibleColumns,
     onNavigateToUpdateUser,
-    onClickAddUser,
-    userInfoState,
+    onClickAddUser
   } = props;
   const [formModal] = Form.useForm();
   const { post, delete: del } = useConnection();
@@ -98,7 +98,9 @@ export const UserManagementComponent = (props: any) => {
   const [errorMsg, setErrorMsg] = useState<any>("");
   const [openDeleteConfirmationModal, setOpenDeleteConfirmationModal] =
     useState(false);
+  const [dataQuery, setDataQuery] = useState<any>();
   const ability = useAbilityContext();
+  const { userInfoState } = useUserContext();
 
   document.addEventListener("mousedown", (event: any) => {
     const userFilterArea1 = document.querySelector(".filter-bar");
@@ -389,7 +391,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
       ];
     } else return undefined;
@@ -408,7 +410,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
         {
           key: "role",
@@ -432,7 +434,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
         {
           key: "role",
@@ -451,7 +453,7 @@ export const UserManagementComponent = (props: any) => {
         {
           key: searchByTermUser,
           operation: "like",
-          value: networksearchUsers + "%",
+          value: "%" + networksearchUsers + "%",
         },
         {
           key: "companyRole",
@@ -528,9 +530,46 @@ export const UserManagementComponent = (props: any) => {
         setTableData(availableUsers);
         setTotalUser(response?.response?.data?.total);
       }
+      setDataQuery({
+        filterAnd: filterAnd(),
+        filterOr: filterOr(),
+        sort: sort(),
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
+      setLoading(false);
+    }
+  };
+
+  const downloadUserData = async () => {
+    setLoading(true);
+    try {
+      const response: any = await post("national/user/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterOr: dataQuery.filterOr?.length > 0 ? dataQuery.filterOr : undefined,
+        sort: dataQuery.sort,
+      });
+
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting users", error);
       message.open({
         type: "error",
         content: error.message,
@@ -666,7 +705,6 @@ export const UserManagementComponent = (props: any) => {
     <div className="content-container">
       <div className="title-bar">
         <div className="body-title">{t("user:viewUsers")}</div>
-        <div className="body-sub-title">{t("user:viewDesc")}</div>
       </div>
       <div className="content-card">
         <Row className="table-actions-section">
@@ -727,6 +765,16 @@ export const UserManagementComponent = (props: any) => {
                     />
                   </a>
                 </Dropdown>
+              </div>
+              <div className="download-data-btn user-data-download">
+                <a onClick={downloadUserData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
               </div>
             </div>
           </Col>

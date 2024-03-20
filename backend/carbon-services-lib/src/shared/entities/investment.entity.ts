@@ -6,6 +6,8 @@ import { InvestmentLevel } from "../enum/investment.level";
 import { InvestmentStream } from "../enum/investment.stream";
 import { ESGType } from "../enum/esg.type";
 import { InvestmentStatus } from "../enum/investment.status";
+import { InvestmentCategoryEnum } from "../enum/investment.category.enum";
+import { GuaranteePayback, InsurancePayback } from "../enum/investment.payback.enum";
 
 @Entity()
 export class Investment implements EntitySubject {
@@ -13,10 +15,10 @@ export class Investment implements EntitySubject {
   @PrimaryGeneratedColumn()
   requestId: number;
 
-  @Column()
+  @Column({nullable: true})
   programmeId: string;
 
-  @Column()
+  @Column({type: 'double precision'})
   amount: number;
 
   @Column({
@@ -27,13 +29,13 @@ export class Investment implements EntitySubject {
   })
   instrument: Instrument[];
 
-  @Column({nullable: true})
+  @Column({nullable: true, type: 'double precision'})
   interestRate?: number;
 
   @Column({nullable: true})
   resultMetric?: string;
 
-  @Column({nullable: true})
+  @Column({nullable: true, type: 'double precision' })
   paymentPerMetric?: number;
 
   @Column({nullable: true})
@@ -46,6 +48,22 @@ export class Investment implements EntitySubject {
     nullable: true
   })
   type: InvestmentType;
+
+  @Column({
+    type: "enum",
+    enum: GuaranteePayback,
+    array: false,
+    nullable: true
+  })
+  guaranteePayback: GuaranteePayback;
+
+  @Column({
+    type: "enum",
+    enum: InsurancePayback,
+    array: false,
+    nullable: true
+  })
+  insurancePayback: InsurancePayback;
 
   @Column({
     type: "enum",
@@ -78,11 +96,17 @@ export class Investment implements EntitySubject {
   })
   status: InvestmentStatus;
 
-  @Column()
+  @Column({nullable: true})
   fromCompanyId: number;
 
-  @Column("real")
+  @Column("real",{nullable: true})
   percentage: number;
+
+  @Column({ type: "bigint", nullable: true })
+  startOfPayback: number;
+
+  @Column("bigint", { array: true, nullable: true })
+  period: number[];
 
   @Column("real", {nullable: true})
   shareFromOwner: number;
@@ -104,4 +128,21 @@ export class Investment implements EntitySubject {
 
   @Column({nullable: true})
   txRef: string;
+
+  @Column({
+    nullable: true,
+    default: InvestmentCategoryEnum.Project,
+    enum: InvestmentCategoryEnum
+  })
+  category: InvestmentCategoryEnum
+
+  @Column({
+    nullable: true,
+  })
+  investmentName:string
+
+  @Column({
+    nullable: true,
+  })
+  nationalInvestmentId:number
 }

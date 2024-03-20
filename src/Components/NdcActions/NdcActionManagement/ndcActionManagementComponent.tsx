@@ -6,7 +6,10 @@ import {
   PaginationProps,
   Row,
   Table,
+  Popover,
   Tag,
+  List,
+  Typography,
   Tooltip,
   message,
 } from "antd";
@@ -26,12 +29,13 @@ import React from "react";
 import { ProfileIcon } from "../../Common/ProfileIcon/profile.icon";
 import { TooltipColor } from "../../../Styles/role.color.constants";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection, useUserContext } from "../../../Context";
+import { DownloadOutlined ,EllipsisOutlined} from "@ant-design/icons";
+import * as Icon from "react-bootstrap-icons";
 
 export const NdcActionManagementComponent = (props: any) => {
   const {
     t,
-    useConnection,
-    useUserContext,
     onNavigateToNdcManagementView,
     onNavigateToProgrammeManagementView,
   } = props;
@@ -51,6 +55,7 @@ export const NdcActionManagementComponent = (props: any) => {
   const [ministrySectoralScope, setMinistrySectoralScope] = useState<any[]>([]);
   const [ministryLevelFilter, setMinistryLevelFilter] =
     useState<boolean>(false);
+  const [dataQuery, setDataQuery] = useState<any>();
 
   const { Search } = Input;
   const { post } = useConnection();
@@ -106,6 +111,32 @@ export const NdcActionManagementComponent = (props: any) => {
       }
     }
   };
+
+  const actionMenu = (record: any) => {
+    return(
+      <List
+        className="action-menu"
+        size="small"
+        dataSource={[
+          {
+            text: t("ndcAction:view"),
+            icon: <Icon.InfoCircle />,
+            click: () => {
+              onNavigateToNdcManagementView(record);
+            },
+          },
+        ]}
+        renderItem={(item: any) => (
+          <List.Item onClick={item.click}>
+            <Typography.Text className="action-icon color-primary">
+              {item.icon}
+            </Typography.Text>
+            <span>{item.text}</span>
+          </List.Item>
+        )}
+      />
+    )
+};
 
   const columns: any = [
     {
@@ -206,6 +237,23 @@ export const NdcActionManagementComponent = (props: any) => {
         );
       },
     },
+    {
+      title: t(""),
+      width: 6,
+      align: "right" as const,
+      key: "action",
+      render: (_: any, record: any) => {
+        const menu = actionMenu(record);
+        return menu && (
+          <Popover placement="bottomRight" content={menu} trigger="click">
+            <EllipsisOutlined
+              rotate={90}
+              style={{ fontWeight: 600, fontSize: "1rem", cursor: "pointer" }}
+            />
+          </Popover>
+        ) 
+      },
+    },
   ];
 
   const getNdcActionData = async () => {
@@ -224,14 +272,14 @@ export const NdcActionManagementComponent = (props: any) => {
         {
           key: "programmeName",
           operation: "like",
-          value: `${search}%`,
+          value: `%${search}%`,
         },
       ];
       if (!isNaN(Number(search))) {
         interFilterOr.push({
           key: "id",
           operation: "like",
-          value: `${search}`,
+          value: `%${search}%`,
         });
       }
       filter.push({
@@ -276,6 +324,11 @@ export const NdcActionManagementComponent = (props: any) => {
 
       setTableData(response.data);
       setTotalProgramme(response.response.data.total);
+      setDataQuery({
+        filterAnd: filter,
+        filterBy: filterBy,
+        sort: sort,
+      })
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting ndc actions", error);
@@ -315,6 +368,38 @@ export const NdcActionManagementComponent = (props: any) => {
       setLoading(false);
     } catch (error: any) {
       console.log("Error in getting users", error);
+      setLoading(false);
+    }
+  };
+
+  const downloadNdcData = async () => {
+    setLoading(true);
+
+    try {
+      const response: any = await post("national/programme/queryNdcActions/download", {
+        filterAnd: dataQuery.filterAnd,
+        filterBy: dataQuery.filterBy,
+        sort: dataQuery.sort,
+      });
+      if (response && response.data) {
+        const url = response.data.url;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.data.csvFile; // Specify the filename for the downloaded file
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Clean up the created <a> element
+        window.URL.revokeObjectURL(url);
+      }
+      setLoading(false);
+    } catch (error: any) {
+      console.log("Error in exporting NDC Actions", error);
+      message.open({
+        type: "error",
+        content: error.message,
+        duration: 3,
+        style: { textAlign: "right", marginRight: 15, marginTop: 10 },
+      });
       setLoading(false);
     }
   };
@@ -394,7 +479,6 @@ export const NdcActionManagementComponent = (props: any) => {
         <Row justify="space-between" align="middle">
           <Col span={20}>
             <div className="body-title">{t("ndcAction:NdcTitle")}</div>
-            <div className="body-sub-title">{t("ndcAction:NdcSubTitle")}</div>
           </Col>
         </Row>
       </div>
@@ -452,6 +536,17 @@ export const NdcActionManagementComponent = (props: any) => {
                   style={{ width: 265 }}
                 />
               </div>
+              <div className="download-data-btn">
+                <a onClick={downloadNdcData}>
+                  <DownloadOutlined
+                    style={{
+                      color: "rgba(58, 53, 65, 0.3)",
+                      fontSize: "20px",
+                    }}
+                  />
+                </a>
+              </div>
+
             </div>
           </Col>
         </Row>

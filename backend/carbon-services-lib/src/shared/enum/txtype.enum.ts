@@ -13,4 +13,5 @@ export enum TxType {
     ADD_MITIGATION = '11',
     OWNERSHIP_UPDATE = '12',
     APPROVE = '13',
+    ADD_INVESTMENT = '14'
 }

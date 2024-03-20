@@ -14,7 +14,7 @@ import {
 import type { MenuProps } from "antd";
 import "./dashboard.scss";
 import {
-  LinkOutlined,
+  BookOutlined,
   DownloadOutlined,
   CaretDownOutlined,
 } from "@ant-design/icons";
@@ -47,6 +47,7 @@ import {
   SystemNames,
   addCommSep,
   addRoundNumber,
+  getStageEnumVal,
 } from "../../Definitions";
 import {
   optionDonutPieA,
@@ -63,18 +64,17 @@ import { MapComponent } from "../Common/Maps/mapComponent";
 import { LegendItem } from "../Common/LegendItem/legendItem";
 import { RegistryBarChartsStatComponent } from "./registryBarChartStatsComponent";
 const { RangePicker } = DatePicker;
+import { useConnection, useUserContext } from "../../Context";
 
 export const RegistryDashboardComponent = (props: any) => {
   const {
-    useUserContext,
-    useConnection,
     Chart,
     t,
     ButtonGroup,
     Link,
     isMultipleDashboardsVisible = false,
   } = props;
-  const { get, post, delete: del } = useConnection();
+  const { get, post, delete: del, statServerUrl } = useConnection();
   const { userInfoState } = useUserContext();
   const [loadingWithoutTimeRange, setLoadingWithoutTimeRange] =
     useState<boolean>(false);
@@ -628,7 +628,7 @@ export const RegistryDashboardComponent = (props: any) => {
         "stats/programme/agg",
         getAllChartsParams(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       let programmesAggByStatus: any;
       let programmesAggBySector: any;
@@ -860,7 +860,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateTotalCreditsCertifiedEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -941,7 +941,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateTotalCreditsCertifiedEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -1096,7 +1096,7 @@ export const RegistryDashboardComponent = (props: any) => {
         "stats/programme/agg",
         getAllProgrammeAnalyticsStatsParamsWithoutTimeRange(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       const programmeByStatusAggregationResponse =
         response?.data?.stats?.AGG_PROGRAMME_BY_STATUS?.data;
@@ -1169,7 +1169,7 @@ export const RegistryDashboardComponent = (props: any) => {
       if (
         response?.data?.stats?.PENDING_TRANSFER_INIT?.all?.txTime &&
         String(response?.data?.stats?.PENDING_TRANSFER_INIT?.all?.txTime) !==
-          "0"
+        "0"
       ) {
         setLastUpdatePendingTransferSentEpoch(
           parseInt(response?.data?.stats?.PENDING_TRANSFER_INIT?.all?.txTime)
@@ -1252,7 +1252,7 @@ export const RegistryDashboardComponent = (props: any) => {
         "stats/programme/agg",
         getAllProgrammeAnalyticsStatsParams(),
         undefined,
-        process.env.REACT_APP_STAT_URL
+        statServerUrl
       );
       let programmeByStatusAggregationResponse: any;
       let programmeByStatusAuthAggregationResponse: any;
@@ -1362,7 +1362,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.AUTH_CERTIFIED_BY_ME_BY_STATE?.last &&
           String(response?.data?.stats?.AUTH_CERTIFIED_BY_ME_BY_STATE?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateProgrammesCreditsStatsEpoch(
             parseInt(response?.data?.stats?.AUTH_CERTIFIED_BY_ME_BY_STATE?.last)
@@ -1455,7 +1455,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateCertifiedCreditsStatsEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -1524,7 +1524,7 @@ export const RegistryDashboardComponent = (props: any) => {
         if (
           response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last &&
           String(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last) !==
-            "0"
+          "0"
         ) {
           setLastUpdateCertifiedCreditsStatsEpoch(
             parseInt(response?.data?.stats?.CERTIFIED_REVOKED_PROGRAMMES?.last)
@@ -1562,9 +1562,8 @@ export const RegistryDashboardComponent = (props: any) => {
               programmeByStatusAggregationResponse
             );
             if (
-              [ProgrammeStageR.AwaitingAuthorization].includes(
-                responseItem?.currentStage
-              )
+              ProgrammeStageR.AwaitingAuthorization ===
+              getStageEnumVal(responseItem?.currentStage)
             ) {
               totalProgrammes = totalProgrammes + parseInt(responseItem?.count);
               pendingProgrammesC = parseInt(responseItem?.count);
@@ -1863,9 +1862,9 @@ export const RegistryDashboardComponent = (props: any) => {
   const pending = ["all", ["==", ["get", "stage"], "AwaitingAuthorization"]];
   const authorised = ["all", ["==", ["get", "stage"], "Authorised"]];
   const rejected = ["all", ["==", ["get", "stage"], "Rejected"]];
-  const news = ["all", ["==", ["get", "stage"], "New"]];
+  const news = ["all", ["==", ["get", "stage"], "Approved"]];
 
-  const colors = ["#6ACDFF", "#FF8183", "#CDCDCD", "#B7A4FE"];
+  const colors = ["#6ACDFF", "#CDCDCD", "#FF8183", "#B7A4FE"];
 
   const donutSegment = (start: any, end: any, r: any, r0: any, color: any) => {
     if (end - start === 1) end -= 0.00001;
@@ -1878,13 +1877,10 @@ export const RegistryDashboardComponent = (props: any) => {
     const largeArc = end - start > 0.5 ? 1 : 0;
 
     // draw an SVG path
-    return `<path d="M ${r + r0 * x0} ${r + r0 * y0} L ${r + r * x0} ${
-      r + r * y0
-    } A ${r} ${r} 0 ${largeArc} 1 ${r + r * x1} ${r + r * y1} L ${
-      r + r0 * x1
-    } ${r + r0 * y1} A ${r0} ${r0} 0 ${largeArc} 0 ${r + r0 * x0} ${
-      r + r0 * y0
-    }" fill="${color}" />`;
+    return `<path d="M ${r + r0 * x0} ${r + r0 * y0} L ${r + r * x0} ${r + r * y0
+      } A ${r} ${r} 0 ${largeArc} 1 ${r + r * x1} ${r + r * y1} L ${r + r0 * x1
+      } ${r + r0 * y1} A ${r0} ${r0} 0 ${largeArc} 0 ${r + r0 * x0} ${r + r0 * y0
+      }" fill="${color}" />`;
   };
 
   // code for creating an SVG donut chart from feature properties
@@ -1987,12 +1983,12 @@ ${total}
             row.count < 2
               ? `#4da6ff`
               : row.count < 10
-              ? "#0080ff"
-              : row.count < 50
-              ? "#0059b3"
-              : row.count < 100
-              ? "#003366"
-              : "#000d1a";
+                ? "#0080ff"
+                : row.count < 50
+                  ? "#0059b3"
+                  : row.count < 100
+                    ? "#003366"
+                    : "#000d1a";
 
           matchExpression.push(row.country, color);
           txLocationMap[row.country] = row.count;
@@ -2083,9 +2079,8 @@ ${total}
       return;
     }
 
-    return `${feature.properties?.name_en} : ${
-      txLocationMapData[feature.properties?.iso_3166_1]
-    }`;
+    return `${feature.properties?.name_en} : ${txLocationMapData[feature.properties?.iso_3166_1]
+      }`;
   };
 
   // Use the same approach as above to indicate that the symbols are clickable
@@ -2097,7 +2092,7 @@ ${total}
     });
     map.getCanvas().style.cursor =
       features.length > 0 &&
-      txLocationMapData[features[0].properties?.iso_3166_1]
+        txLocationMapData[features[0].properties?.iso_3166_1]
         ? "pointer"
         : "";
   };
@@ -2149,7 +2144,7 @@ ${total}
         //   setSelectedurl(item?.url)
         // })
         // setFileList(responses.data[0] ?? [])
-       
+
         const initlist = [];
         for (let i = 0; i < data.length; i++) {
           const newreports = {
@@ -2197,18 +2192,21 @@ ${total}
 
   return (
     <div className="dashboard-main-container">
-      {isMultipleDashboardsVisible && (
+      {/* {isMultipleDashboardsVisible && (
         <div className="systemchange-container" style={{ marginLeft: `20px` }}>
           <ButtonGroup>
             <Button type="primary" className="rgprimary">
               Carbon Registry
             </Button>
             <Link to="/dashboard/mrv">
-              <Button className="rgdefault">Transparency System</Button>
+              <Button className="mid-default-btn">Transparency System</Button>
+            </Link>
+            <Link to="/dashboard/ghg">
+              <Button className="rgdefault">GHG Inventory</Button>
             </Link>
           </ButtonGroup>
         </div>
-      )}
+      )} */}
       <div className="stastics-cards-container" style={{ marginTop: `50px` }}>
         <Row gutter={[40, 40]} className="stastic-card-row">
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">
@@ -2221,14 +2219,14 @@ ${total}
                   ? transferRequestReceived
                   : programmesUnCertifed
               }
-              title={t(
+              title={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "programmesPending"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
                   ? "trasnferReqReceived"
                   : "programmesUnCertified"
-              )}
+              }
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdateProgrammesStats
@@ -2249,6 +2247,15 @@ ${total}
               }
               loading={loadingWithoutTimeRange}
               companyRole={userInfoState?.companyRole}
+              tooltip={t(
+                userInfoState?.companyRole === CompanyRole.GOVERNMENT
+                  ? "tTprogrammespendingGoverment"
+                  : userInfoState?.companyRole ===
+                    CompanyRole.PROGRAMME_DEVELOPER
+                  ? "tTTransferReqRecProgrammeDev"
+                  : "tTProgrammesUnCertiCertifier"
+              )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">
@@ -2261,14 +2268,14 @@ ${total}
                   ? transferRequestSent
                   : programmesCertifed
               }
-              title={t(
+              title={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "trasnferReqInit"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
                   ? "trasnferReqInit"
                   : "programmesCertified"
-              )}
+              }
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdatePendingTransferSent
@@ -2289,6 +2296,15 @@ ${total}
               }
               loading={loadingWithoutTimeRange}
               companyRole={userInfoState?.companyRole}
+              tooltip={t(
+                userInfoState?.companyRole === CompanyRole.GOVERNMENT
+                  ? "tTTransferReqSentGovernment"
+                  : userInfoState?.companyRole ===
+                    CompanyRole.PROGRAMME_DEVELOPER
+                  ? "tTTransferReqInitProgrammeDev"
+                  : "tTProgrammesCertiCertifier"
+              )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col">
@@ -2301,14 +2317,14 @@ ${total}
                   ? creditBalanceWithoutTimeRange
                   : creditCertiedBalanceWithoutTimeRange
               }
-              title={t(
+              title={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? "creditBal"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
                   ? "creditBal"
                   : "creditCertified"
-              )}
+              }
               updatedDate={
                 userInfoState?.companyRole === CompanyRole.GOVERNMENT
                   ? lastUpdateCreditBalance
@@ -2329,6 +2345,15 @@ ${total}
               }
               loading={loadingWithoutTimeRange}
               companyRole={userInfoState?.companyRole}
+              tooltip={t(
+                userInfoState?.companyRole === CompanyRole.GOVERNMENT
+                  ? "tTCreditBalanceGovernment"
+                  : userInfoState?.companyRole ===
+                    CompanyRole.PROGRAMME_DEVELOPER
+                  ? "tTCreditBalanceProgrammeDev"
+                  : "tTCreditCertifiedCertifier"
+              )}
+              t={t}
             />
           </Col>
         </Row>
@@ -2350,7 +2375,7 @@ ${total}
             {selectedurl.trim().length === 0 && (
               <Button className="annual-report-downloadbutton">
                 <Space>
-                  <LinkOutlined
+                  <BookOutlined
                     className="common-progress-icon"
                     style={{ color: "#3F3A47" }}
                   />
@@ -2366,7 +2391,7 @@ ${total}
               >
                 <Button className="annual-report-downloadbutton">
                   <Space>
-                    <LinkOutlined
+                    <BookOutlined
                       className="common-progress-icon"
                       style={{ color: "#3F3A47" }}
                     />
@@ -2419,11 +2444,12 @@ ${total}
                   ? "tTProgrammesGoverment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTProgrammesProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTProgrammesCertifierMine"
-                  : "tTProgrammesCertifierOverall"
+                    ? "tTProgrammesProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTProgrammesCertifierMine"
+                      : "tTProgrammesCertifierOverall"
               )}
+              t={t}
             />
           </Col>
           <Col xxl={8} xl={8} md={12} className="stastic-card-col pie">
@@ -2439,10 +2465,10 @@ ${total}
                   ? "tTCreditsGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTCreditsCertifierMine"
-                  : "tTCreditsCertifierOverall"
+                    ? "tTCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTCreditsCertifierMine"
+                      : "tTCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2460,10 +2486,10 @@ ${total}
                   ? "tTCertifiedCreditsGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTCertifiedCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTCertifiedCreditsCertifierMine"
-                  : "tTCertifiedCreditsCertifierOverall"
+                    ? "tTCertifiedCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTCertifiedCreditsCertifierMine"
+                      : "tTCertifiedCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2485,10 +2511,10 @@ ${total}
                   ? "tTTotalProgrammesGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalProgrammesProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalProgrammesCertifierMine"
-                  : "tTTotalProgrammesCertifierOverall"
+                    ? "tTTotalProgrammesProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalProgrammesCertifierMine"
+                      : "tTTotalProgrammesCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2506,10 +2532,10 @@ ${total}
                   ? "tTTotalProgrammesSectorGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalProgrammesSecProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalProgrammesSecCertifierMine"
-                  : "tTTotalProgrammesSecCertifierOverall"
+                    ? "tTTotalProgrammesSecProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalProgrammesSecCertifierMine"
+                      : "tTTotalProgrammesSecCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2531,10 +2557,10 @@ ${total}
                   ? "tTTotalCreditsGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalCreditsCertifierMine"
-                  : "tTTotalCreditsCertifierOverall"
+                    ? "tTTotalCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalCreditsCertifierMine"
+                      : "tTTotalCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2552,10 +2578,10 @@ ${total}
                   ? "tTTotalCreditsCertifiedGovernment"
                   : userInfoState?.companyRole ===
                     CompanyRole.PROGRAMME_DEVELOPER
-                  ? "tTTotalCertifiedCreditsProgrammeDev"
-                  : categoryType === "mine"
-                  ? "tTTotalCertifiedCreditsCertifierMine"
-                  : "tTTotalCertifiedCreditsCertifierOverall"
+                    ? "tTTotalCertifiedCreditsProgrammeDev"
+                    : categoryType === "mine"
+                      ? "tTTotalCertifiedCreditsCertifierMine"
+                      : "tTTotalCertifiedCreditsCertifierOverall"
               )}
               Chart={Chart}
             />
@@ -2582,10 +2608,10 @@ ${total}
                             ? "tTProgrammeLocationsGovernment"
                             : userInfoState?.companyRole ===
                               CompanyRole.PROGRAMME_DEVELOPER
-                            ? "tTProgrammeLocationsProgrammeDev"
-                            : categoryType === "mine"
-                            ? "tTProgrammeLocationsCertifierMine"
-                            : "tTProgrammeLocationsCertifierOverall"
+                              ? "tTProgrammeLocationsProgrammeDev"
+                              : categoryType === "mine"
+                                ? "tTProgrammeLocationsCertifierMine"
+                                : "tTProgrammeLocationsCertifierOverall"
                         )}
                       >
                         <InfoCircle color="#000000" size={17} />
@@ -2619,12 +2645,12 @@ ${total}
                         userInfoState?.companyRole === CompanyRole.CERTIFIER &&
                         categoryType === "mine"
                       ) && (
-                        <>
-                          <LegendItem text="Rejected" color="#FF8183" />
-                          <LegendItem text="Pending" color="#CDCDCD" />
-                          <LegendItem text="New" color="#B7A4FE" />
-                        </>
-                      )}
+                          <>
+                            <LegendItem text="Rejected" color="#CDCDCD" />
+                            <LegendItem text="Pending" color="#FF8183" />
+                            <LegendItem text="Approved" color="#B7A4FE" />
+                          </>
+                        )}
                     </div>
                     <div className="updated-on margin-top-1">
                       <div className="updated-moment-container">
@@ -2652,10 +2678,10 @@ ${total}
                           ? "tTTransferLocationsGovernment"
                           : userInfoState?.companyRole ===
                             CompanyRole.PROGRAMME_DEVELOPER
-                          ? "tTTrasnferLocationsProgrammeDev"
-                          : categoryType === "mine"
-                          ? "tTTrasnferLocationsCertifierMine"
-                          : "tTTrasnferLocationsCertifierOverall"
+                            ? "tTTrasnferLocationsProgrammeDev"
+                            : categoryType === "mine"
+                              ? "tTTrasnferLocationsCertifierMine"
+                              : "tTTrasnferLocationsCertifierOverall"
                       )}
                     >
                       <InfoCircle color="#000000" size={17} />

@@ -7,6 +7,8 @@ import { Programme } from "../shared/entities/programme.entity";
 import { CreditOverall } from "../shared/entities/credit.overall.entity";
 import { LocationInterface } from "../shared/location/location.interface";
 import { CompanyRole } from "../shared/enum/company.role.enum";
+import { AsyncOperationsInterface } from "../shared/async-operations/async-operations.interface";
+import { AsyncActionType } from "../shared/enum/async.action.type.enum";
 
 @Injectable()
 export class ProcessEventService {
@@ -14,6 +16,7 @@ export class ProcessEventService {
     private logger: Logger,
     @InjectRepository(Programme) private programmeRepo: Repository<Programme>,
     @InjectRepository(Company) private companyRepo: Repository<Company>,
+    private asyncOperationsInterface: AsyncOperationsInterface,
     private locationService: LocationInterface,
   ) {}
 
@@ -53,6 +56,13 @@ export class ProcessEventService {
                   programme.geographicalLocationCordintes = [...response];
                 }
               );
+
+              if (programme.article6trade==true) {  
+                await this.asyncOperationsInterface.AddAction({
+                  actionType: AsyncActionType.CADTProgrammeCreate,
+                  actionProps: programme,
+                });
+              }
             } else if (
               programme.txType === TxType.CERTIFY ||
               programme.txType === TxType.REVOKE
@@ -153,9 +163,10 @@ export class ProcessEventService {
             company.secondaryAccountBalance[account]["total"] = overall.credit;
             company.secondaryAccountBalance[account]["count"] += 1;
           } else {
-            company.secondaryAccountBalance = {
-              account: { total: overall.credit, count: 1 },
-            };
+            if(!company.secondaryAccountBalance){
+              company.secondaryAccountBalance={}
+            }
+            company.secondaryAccountBalance[account] ={ total: overall.credit, count: 1 }
           }
 
           updateObj = {
@@ -165,10 +176,7 @@ export class ProcessEventService {
         } else {
           updateObj = {
             creditBalance: overall.credit,
-            programmeCount:
-              company.companyRole === CompanyRole.GOVERNMENT
-                ? null
-                : Number(company.programmeCount) +
+            programmeCount:Number(company.programmeCount) +
                   (overall.txType == TxType.AUTH ? 1 : 0),
             lastUpdateVersion: version,
             creditTxTime: [

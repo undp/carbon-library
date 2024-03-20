@@ -60,8 +60,8 @@ export const getStageTagType = (
       return "error";
     case ProgrammeStageR.Authorised:
       return "processing";
-    // case ProgrammeStageR.Transferred:
-    //   return 'success';
+    case ProgrammeStageR.Approved:
+      return 'purple';
     default:
       return "default";
   }
@@ -177,6 +177,7 @@ export interface Programme {
   geographicalLocationCordintes: any;
   mitigationActions: any;
   environmentalAssessmentRegistrationNo: any;
+  article6trade: boolean
 }
 
 export interface ProgrammeR extends Programme {
@@ -203,7 +204,7 @@ export const getGeneralFields = (programme: Programme |ProgrammeU | ProgrammeR |
     title: programme.title,
     serialNo: programme.serialNo,
     currentStatus: programme.currentStage,
-    applicationType: "Programme Developer",
+    applicationType: "Project Developer",
     sector: programme.sector,
     sectoralScope:
       Object.keys(SectoralScope)[

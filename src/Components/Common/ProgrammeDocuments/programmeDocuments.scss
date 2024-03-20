@@ -23,6 +23,7 @@
     .label-container {
       display: flex;
       flex-direction: row;
+      align-items: start;
     }
 
     .label {
@@ -46,6 +47,9 @@
     .link {
       display: flex;
       flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
     }
   }
 

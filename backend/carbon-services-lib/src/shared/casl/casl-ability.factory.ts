@@ -28,6 +28,8 @@ import { InvestmentStatus } from "../enum/investment.status";
 import { ProgrammeDocumentViewEntity } from "../entities/document.view.entity";
 import { NDCActionViewEntity } from "../entities/ndc.view.entity";
 import { ProgrammeDocument } from "../entities/programme.document";
+import { Emission } from "../entities/emission.entity";
+import { Projection } from "../entities/projection.entity";
 
 type Subjects = InferSubjects<typeof EntitySubject> | "all";
 
@@ -134,9 +136,11 @@ export class CaslAbilityFactory {
           can(Action.Manage, DocumentAction);
           can(Action.Manage, Investment);
           can(Action.Manage, ProgrammeTransferRequest);
+          can(Action.Manage, ProgrammeTransfer);
         } else {
           can(Action.Read, Investment);
           can(Action.Read, Programme);
+          can(Action.Read, ProgrammeTransfer);
         }
       }
       
@@ -150,7 +154,7 @@ export class CaslAbilityFactory {
       if (user.role == Role.Admin && user.companyRole == CompanyRole.API) {
         can([Action.Create, Action.Read, Action.Update], Programme);
         can([Action.Create, Action.Read], User);
-        can([Action.Create, Action.Read], Company);
+        can([Action.Create, Action.Read, Action.Update], Company);
       } else if (user.companyRole == CompanyRole.CERTIFIER) {
         can(Action.Read, Programme, {
           currentStage: { $in: [ProgrammeStage.AUTHORISED] },
@@ -262,6 +266,19 @@ export class CaslAbilityFactory {
     if (user.companyRole == CompanyRole.GOVERNMENT || user.companyRole == CompanyRole.CERTIFIER || user.companyRole == CompanyRole.MINISTRY) {
       can([Action.Read], ProgrammeDocument);
     }
+
+    if (user.companyRole === CompanyRole.MINISTRY || user.companyRole === CompanyRole.GOVERNMENT) {
+      if (user.role !== Role.ViewOnly) {
+        can(Action.Create, Emission);
+        can(Action.Create, Projection);
+      }
+      can(Action.Read, Emission);
+      can(Action.Read, Projection);
+    } else {
+      can(Action.Read, Emission);
+      can(Action.Read, Projection);
+    }
+    
     return build({
       detectSubjectType: (item) =>
         item.constructor as ExtractSubjectType<Subjects>,

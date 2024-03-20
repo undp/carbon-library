@@ -23,6 +23,10 @@ import { ProgrammeDocumentViewEntity } from '../entities/document.view.entity';
 import { NDCAction } from '../entities/ndc.action.entity';
 import { FileHandlerModule } from '../file-handler/filehandler.module';
 import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
+import { CadtModule } from '../cadt/cadt.module';
+import { NdcDetailsPeriod } from '../entities/ndc.details.period.entity';
+import { NdcDetailsAction } from '../entities/ndc.details.action.entity';
+import { EventLog } from '../entities/event.log.entity';
 
 @Module({
   imports: [
@@ -41,6 +45,9 @@ import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
       Investment,
       InvestmentView,
       ProgrammeDocumentViewEntity,
+      NdcDetailsPeriod,
+      NdcDetailsAction,
+      EventLog
     ]),
     UtilModule,
     CompanyModule,
@@ -48,7 +55,7 @@ import { AuthorizationLetterGen } from '../util/authorisation.letter.gen';
     EmailHelperModule,
     LocationModule,
     AsyncOperationsModule,
-    FileHandlerModule
+    FileHandlerModule,
   ],
   providers: [Logger, ProgrammeService],
   exports: [ProgrammeService],

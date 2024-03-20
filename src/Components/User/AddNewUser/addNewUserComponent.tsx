@@ -10,7 +10,7 @@ import {
   Tooltip,
   Skeleton,
 } from "antd";
-import PhoneInput, { formatPhoneNumberIntl } from "react-phone-number-input";
+import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "./addNewUserComponent.scss";
 import "../../../Styles/app.scss";
@@ -22,19 +22,18 @@ import { Action } from "../../../Definitions/Enums/action.enum";
 import UserActionConfirmationModel from "../../Common/Models/userActionConfirmationModel";
 import ChangePasswordModel from "../../Common/Models/changePasswordModel";
 import { Role } from "../../../Definitions";
-
+import { useConnection, useUserContext } from "../../../Context";
 
 export const AddNewUserComponent = (props: any) => {
   const {
     t,
     onNavigateToUserManagement,
     onNavigateLogin,
-    useConnection,
-    useUserContext,
     useLocation,
     useAbilityContext,
     themeColor,
   } = props;
+
   const { post, put, delete: del, get } = useConnection();
   const [formOne] = Form.useForm();
   const { state } = useLocation();
@@ -79,7 +78,7 @@ export const AddNewUserComponent = (props: any) => {
   const onAddUser = async (values: any) => {
     setLoading(true);
     try {
-      if (values.phoneNo) {
+      if (values.phoneNo && values.phoneNo.length > 4) {
         values.phoneNo = formatPhoneNumberIntl(values.phoneNo);
       } else {
         values.phoneNo = undefined;
@@ -250,11 +249,6 @@ export const AddNewUserComponent = (props: any) => {
         <div className="titles">
           <div className="main">
             {isUpdate ? t("addUser:editUser") : t("addUser:addNewUser")}
-          </div>
-          <div className="sub">
-            {state?.record?.name
-              ? t("addUser:editUserSub")
-              : t("addUser:addUserSub")}
           </div>
         </div>
         {isUpdate &&
@@ -442,6 +436,27 @@ export const AddNewUserComponent = (props: any) => {
                       rules={[
                         {
                           required: false,
+                        },
+                        {
+                          validator: async (rule: any, value: any) => {
+                            const phoneNo = formatPhoneNumber(String(value));
+                            if (String(value).trim() !== "") {
+                              if (
+                                ((String(value).trim() !== "" &&
+                                String(value).trim() !== undefined &&
+                                value !== null &&
+                                value !== undefined) && 
+                                (phoneNo !== null &&
+                                  phoneNo !== "" &&
+                                  phoneNo !== undefined) && 
+                                  !isPossiblePhoneNumber(String(value))
+                                ) || value?.length > 17) {
+                                throw new Error(
+                                  `${t("addUser:phoneNo")} ${t("isInvalid")}`
+                                );
+                              }
+                            }
+                          },
                         },
                       ]}
                     >
