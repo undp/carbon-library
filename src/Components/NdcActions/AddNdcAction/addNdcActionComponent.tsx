@@ -8,10 +8,10 @@ import { InfoCircle } from "react-bootstrap-icons";
 import { CoBenifitsComponent } from "../../Common/CoBenifits/coBenifits";
 import { Programme, ProgrammeStageR, getBase64 } from "../../../Definitions";
 import { isValidateFileType } from "../../../Utils/DocumentValidator";
+import { useConnection } from "../../../Context";
 
 export const AddNdcActionComponent = (props: any) => {
   const {
-    useConnection,
     useLocation,
     onNavigateToProgrammeManagementView,
     onNavigateToProgrammeView,
@@ -150,7 +150,7 @@ export const AddNdcActionComponent = (props: any) => {
           <div className="step-count">01</div>
           <div className="title">{t("ndcAction:ndcActionDetailsTitle")}</div>
           <div className="info-container">
-            <Tooltip
+            {/* <Tooltip
               arrowPointAtCenter
               placement="right"
               trigger="hover"
@@ -158,7 +158,7 @@ export const AddNdcActionComponent = (props: any) => {
               overlayClassName="custom-tooltip"
             >
               <InfoCircle color="#000000" size={17} />
-            </Tooltip>
+            </Tooltip> */}
           </div>
         </div>
       ),
@@ -196,7 +196,6 @@ export const AddNdcActionComponent = (props: any) => {
             }
             loading={loading}
             sdgGoalImages={sdgGoalImages}
-            useConnection={useConnection}
             translator={translator}
           />
         </div>
@@ -283,7 +282,6 @@ export const AddNdcActionComponent = (props: any) => {
     <div className="add-ndc-main-container">
       <div className="title-container">
         <div className="main">{t("ndcAction:addNdcTitle")}</div>
-        <div className="sub">{t("ndcAction:addNdcSubTitle")}</div>
       </div>
       <div className="adding-section">
         <div className="form-section">

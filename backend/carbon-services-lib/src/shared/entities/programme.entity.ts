@@ -88,6 +88,15 @@ export class Programme implements EntitySubject {
   @Column("bigint", { array: true })
   companyId: number[];
 
+  @Column({type: "boolean", nullable: false, default: true})
+  article6trade: boolean;
+
+  @Column("bigint", { array: false, nullable:true })
+  implementinguser: number;
+
+  @Column("bigint", { array: true , nullable: true })
+  supportingowners: number[];
+
   @Column("real", { array: true, nullable: true })
   proponentPercentage: number[];
 
@@ -147,6 +156,19 @@ export class Programme implements EntitySubject {
     nullable: true,
   })
   geographicalLocationCordintes: any;
+
+  @Column({ nullable: true })
+  cadtId: string;
+
+  // @Column("string", { array: true, nullable: true  })
+  // cadtUnitId: string[];
+
+  @Column({
+    type: "jsonb",
+    array: false,
+    nullable: true,
+  })
+  blockBounds: any;
 
   @Column({ unique: true, nullable: true })
   environmentalAssessmentRegistrationNo: string;

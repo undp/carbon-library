@@ -5,6 +5,9 @@ export enum Instrument {
   EQUITY = 'Equity',
   GUARANTEE = 'Guarantee',
   INKIND = 'In-Kind',
+  CONLOAN='ConcessionalLoan',
+  NONCONLOAN='Non-ConcessionalLoan',
+  INSURANCE='Insurance',
   OTHER = 'Other',
   }
   

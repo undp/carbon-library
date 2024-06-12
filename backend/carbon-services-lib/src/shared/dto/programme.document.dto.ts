@@ -15,6 +15,15 @@ export class ProgrammeDocumentDto {
     programmeId: string;
 
     @IsOptional()
+    @ApiProperty()
+    txTime: number;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty()
+    status: string;
+
+    @IsOptional()
     @IsString()
     @ApiPropertyOptional()
     externalId: string;

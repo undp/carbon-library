@@ -66,7 +66,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
             },
           ]}
         >
-          <Input.Password placeholder="" />
+          <Input.Password placeholder="" className="border-radius-5"/>
         </Form.Item>
 
         <Form.Item
@@ -81,7 +81,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
             },
           ]}
         >
-          <Input.Password placeholder="" />
+          <Input.Password placeholder="" className="border-radius-5"/>
         </Form.Item>
 
         <Form.Item
@@ -109,7 +109,7 @@ const ChangePasswordModel: FC<ChangePasswordProps> = (
             }),
           ]}
         >
-          <Input.Password placeholder="" />
+          <Input.Password placeholder="" className="border-radius-5"/>
         </Form.Item>
 
         {errorMsg && (

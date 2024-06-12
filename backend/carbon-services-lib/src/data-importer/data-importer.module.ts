@@ -11,6 +11,9 @@ import { TypeOrmConfigService } from '../shared/typeorm.config.service';
 import { Company } from '../shared/entities/company.entity';
 import { ProgrammeDocument } from '../shared/entities/programme.document';
 import { AnnualReportModule } from '../shared/annualreport/annual-report.module';
+import { ProgrammeLedgerModule } from '../shared/programme-ledger/programme-ledger.module';
+import { EmailHelperModule } from '../shared/email-helper/email-helper.module';
+import { UtilModule } from '../shared/util/util.module';
 
 @Module({
   imports: [
@@ -30,9 +33,13 @@ import { AnnualReportModule } from '../shared/annualreport/annual-report.module'
     ProgrammeModule,
     CompanyModule,
     UserModule,
-    AnnualReportModule
+    AnnualReportModule,
+    ProgrammeLedgerModule,
+    EmailHelperModule,
+    UtilModule,
     
   ],
   providers: [Logger, DataImporterService],
+  exports: [DataImporterService]
 })
 export class DataImporterModule {}

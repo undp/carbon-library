@@ -12,6 +12,9 @@ import { Company } from '../shared/entities/company.entity';
 import { AnnualReportImport } from './importers/annual-report.service';
 import { ProgrammeDocument } from '../shared/entities/programme.document';
 import { AnnualReportGen } from '../shared/annualreport/annual.report.gen';
+import { ProgrammeLedgerService } from '../shared/programme-ledger/programme-ledger.service';
+import { EmailHelperService } from "../shared/email-helper/email-helper.service";
+import { AuthorizationLetterGen } from '../shared/util/authorisation.letter.gen';
 @Injectable()
 export class DataImporterService {
   constructor(
@@ -24,6 +27,9 @@ export class DataImporterService {
     private userService: UserService,
     private programmeService: ProgrammeService,
     private annualReportGen: AnnualReportGen,
+    private programmeLedger: ProgrammeLedgerService,
+    private emailHelperService: EmailHelperService,
+    private authLetter: AuthorizationLetterGen,
   ) {}
 
   private getImporter(type: string): ImporterInterface {
@@ -35,6 +41,9 @@ export class DataImporterService {
           this.companyService,
           this.userService,
           this.programmeService,
+          this.programmeLedger,
+          this.emailHelperService,
+          this.authLetter,
         );
         break;
       case 'CERTIFIER_SCRAPING':

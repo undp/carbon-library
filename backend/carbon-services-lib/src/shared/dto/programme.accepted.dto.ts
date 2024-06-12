@@ -8,6 +8,15 @@ export class ProgrammeAcceptedDto {
     @ApiProperty()
     data: string;
 
+    @IsOptional()
+    @ApiProperty()
+    txTime: number;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty()
+    status: string;
+
     @IsNotEmpty()
     @IsString()
     @ApiProperty()

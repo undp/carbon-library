@@ -23,9 +23,9 @@ export const getStatusTagType = (status: InvestmentStatus) => {
     case InvestmentStatus.REJECTED:
       return "error";
     case InvestmentStatus.PENDING:
-      return "processing";
-    case InvestmentStatus.APPROVED:
       return "success";
+    case InvestmentStatus.APPROVED:
+      return "processing";
     default:
       return "default";
   }
@@ -34,6 +34,16 @@ export const getStatusTagType = (status: InvestmentStatus) => {
 export enum InvestmentType {
   PUBLIC = "Public",
   PRIVATE = "Private",
+}
+
+export enum InvestmentCreationType {
+  EXISTING = "Existing",
+  NEW = "New",
+}
+
+export enum InvestmentOwnershipType {
+  PROJECT = "Project",
+  NATIONAL = "National"
 }
 
 export enum InvestmentStream {

@@ -18,6 +18,7 @@ import {
 } from "../../../Definitions/Definitions/programme.definitions";
 import { creditUnit } from "../../../Definitions/Definitions/common.definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
 
 export interface ProgrammeTransferFormProps {
   programme: Programme;
@@ -31,7 +32,6 @@ export interface ProgrammeTransferFormProps {
   userCompanyId: number | undefined;
   companyRole: string;
   translator: any;
-  useConnection: any;
   ministryLevelPermission?: boolean;
 }
 
@@ -50,7 +50,6 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
     userCompanyId,
     companyRole,
     translator,
-    useConnection,
     ministryLevelPermission = false,
   } = props;
   const t = translator.t;
@@ -72,12 +71,12 @@ export const ProgrammeTransferForm: FC<ProgrammeTransferFormProps> = (
           {
             key: "name",
             operation: "like",
-            value: newValue + "%",
+            value: "%" + newValue + "%",
           },
           {
             key: "companyRole",
-            operation: "!=",
-            value: "Certifier",
+            operation: "=",
+            value: CompanyRole.PROGRAMME_DEVELOPER,
           },
         ],
         sort: {

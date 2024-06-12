@@ -41,7 +41,7 @@
           text-align: center;
           .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
             color: $dark-text-color !important;
-            border-color: $primary-purple !important;
+            border-color: $primary-purple;
             box-shadow: none;
             border-radius: 4px;
           }
@@ -124,6 +124,12 @@
 
   .ant-select-selector {
     color: #949599 !important;
+  }
+
+  .ant-select-disabled {
+    .ant-select-arrow {
+      display: none;
+    }
   }
 
   .label-heading {

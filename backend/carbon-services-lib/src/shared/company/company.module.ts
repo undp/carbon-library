@@ -14,6 +14,7 @@ import { FileHandlerModule } from "../file-handler/filehandler.module";
 import { UserModule } from "../user/user.module";
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { LocationModule } from "../location/location.module";
+import { Investment } from "../entities/investment.entity";
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { LocationModule } from "../location/location.module";
       useClass: TypeOrmConfigService,
       imports: undefined,
     }),
-    TypeOrmModule.forFeature([Company, ProgrammeTransfer]),
+    TypeOrmModule.forFeature([Company, ProgrammeTransfer, Investment]),
     CaslModule,
     UtilModule,
     ProgrammeLedgerModule,

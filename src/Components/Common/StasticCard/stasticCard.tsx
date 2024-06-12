@@ -12,10 +12,13 @@ export interface StasticCardItemProps {
   icon: any;
   loading: boolean;
   companyRole: any;
+  tooltip: any;
+  t: any;
 }
 
 export const StasticCard: FC<StasticCardItemProps> = (props: StasticCardItemProps) => {
-  const { value, title, updatedDate, icon, loading, companyRole } = props;
+  const { value, title, updatedDate, icon, loading, companyRole, tooltip, t } =
+    props;
 
   return (
     <div className="stastic-card-main-container">
@@ -24,13 +27,13 @@ export const StasticCard: FC<StasticCardItemProps> = (props: StasticCardItemProp
       ) : (
         <>
           <div className="title-section">
-            <div className="title">{title}</div>
+            <div className="title">{t(title)}</div>
             <div className="info-container">
               <Tooltip
                 arrowPointAtCenter
                 placement="bottomRight"
                 trigger="hover"
-                title={toolTipTextGen(companyRole, title)}
+                title={tooltip}
               >
                 <InfoCircle color="#000000" size={17} />
               </Tooltip>
@@ -38,10 +41,10 @@ export const StasticCard: FC<StasticCardItemProps> = (props: StasticCardItemProp
           </div>
           <div className="values-section">
             <div className="values-and-unit">
-              {title.includes('Credit') && <div className="unit">ITMOs</div>}
+              {title.includes("credit") && <div className="unit">ITMOs</div>}
               <div className="value">
-                {title.includes('Credit')
-                  ? value === 0 || String(value) === 'NaN'
+                {title.includes("credit")
+                  ? value === 0 || String(value) === "NaN"
                     ? 0
                     : addCommSep(value)
                   : value}

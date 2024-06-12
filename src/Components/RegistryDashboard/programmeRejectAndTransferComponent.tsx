@@ -17,6 +17,7 @@ export interface ProgrammeRejectAndTransferCardItemProps {
   updatedDate: any;
   loading: boolean;
   toolTipText: string;
+  t: any;
 }
 
 export const ProgrammeRejectAndTransferComponent: FC<
@@ -30,6 +31,7 @@ export const ProgrammeRejectAndTransferComponent: FC<
     updatedDate,
     loading,
     toolTipText,
+    t
   } = props;
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export const ProgrammeRejectAndTransferComponent: FC<
       ) : (
         <>
           <div className="title-section">
-            <div className="title">Programmes</div>
+            <div className="title">{t("programmes")}</div>
             <div className="info-container">
               <Tooltip
                 arrowPointAtCenter

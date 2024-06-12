@@ -12,6 +12,7 @@ import { AsyncOperationType } from "../shared/enum/async.operation.type.enum";
 import { TypeOrmConfigService } from "../shared/typeorm.config.service";
 import { RegistryClientModule } from "../shared/registry-client/registry-client.module";
 import { EmailModule } from "../shared/email/email.module";
+import { CadtModule } from "../shared/cadt/cadt.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { EmailModule } from "../shared/email/email.module";
     TypeOrmModule.forFeature([AsyncActionEntity, Counter]),
     RegistryClientModule,
     EmailModule,
+    CadtModule,
   ],
   providers: [
     {

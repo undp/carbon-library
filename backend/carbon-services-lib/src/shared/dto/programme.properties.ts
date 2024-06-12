@@ -12,6 +12,7 @@ import {
   IsArray,
   IsUrl,
   IsBoolean,
+  ValidateIf,
 } from "class-validator";
 import { GHGs } from "../enum/ghgs.enum";
 import { SourceOfFunding } from "../enum/sourceoffinding.enum";
@@ -54,12 +55,14 @@ export class ProgrammeProperties {
 
   @ApiPropertyOptional()
   @IsPositive()
+  @ValidateIf(o => o.article6trade === true)
   @IsNumber()
   @IsOptional()
   carbonPriceUSDPerTon?: number;
 
   @ApiPropertyOptional()
   @IsString()
+  @ValidateIf(o => o.article6trade === true)
   @IsOptional()
   @IsNotEmpty()
   buyerCountryEligibility?: string;

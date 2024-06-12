@@ -175,6 +175,7 @@ export class CertifierScrapeService implements ImporterInterface {
               const company = new OrganisationDto();
               company.name = certifier.entity;
               company.taxId = certifier.entity;
+              company.paymentId= certifier.entity;
               company.logo = this.configService.get("CERTIFIER.image");
               company.email = 'nce.digital+'+intial+'@undp.org' ;
               company.phoneNo = number;

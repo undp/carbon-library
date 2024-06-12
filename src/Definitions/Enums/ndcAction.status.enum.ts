@@ -14,9 +14,9 @@ export const getNdcActionStatusEnumVal = (value: string) => {
 export const getNdcStatusTagType = (status: NdcActionStatus) => {
   switch (getNdcActionStatusEnumVal(status)) {
     case NdcActionStatus.PENDING:
-      return "processing";
-    case NdcActionStatus.APPROVED:
       return "success";
+    case NdcActionStatus.APPROVED:
+      return "processing";
     default:
       return "default";
   }

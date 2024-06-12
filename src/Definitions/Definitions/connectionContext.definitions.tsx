@@ -6,6 +6,8 @@ export type Methods = 'get' | 'post' | 'delete' | 'put' | 'patch';
 
 export type ConnectionContextProviderProps = {
   serverURL: string;
+  t: any;
+  statServerUrl?: string;
   children: ReactNode;
 };
 
@@ -32,4 +34,5 @@ export type ConnectionProps = {
   updateToken: (token?: string) => void;
   token?: string;
   removeToken: (tkn?: string) => void;
+  statServerUrl?: string;
 };

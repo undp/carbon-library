@@ -78,7 +78,7 @@ export const getChartOptions = (labels: string[], colors: string[]) => {
       offsetX: 0,
       offsetY: 5,
       labels: {
-        colors: colors,
+        colors: "#000000d9",
         useSeriesColors: false,
       },
       markers: {

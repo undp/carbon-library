@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
-
 import { Repository } from "typeorm";
 import { StatList } from "../shared/dto/stat.list.dto";
 import { StatType } from "../shared/enum/stat.type.enum";
@@ -14,7 +13,7 @@ import { Company } from "../shared/entities/company.entity";
 import { StatFilter } from "../shared/dto/stat.filter";
 import { ProgrammeStage } from "../shared/enum/programme-status.enum";
 import { Stat } from "../shared/dto/stat.dto";
-import { Sector } from "../shared/enum/sector.enum";
+import { Sector } from "../shared/enum/sector.enum"; 
 import { PRECISION } from "@undp/carbon-credit-calculator/dist/esm/calculator";
 import { HelperService } from "../shared/util/helpers.service";
 import { Programme } from "../shared/entities/programme.entity";
@@ -26,6 +25,10 @@ import { InvestmentView } from "../shared/entities/investment.view.entity";
 import { NDCActionViewEntity } from "../shared/entities/ndc.view.entity";
 import { InvestmentStatus } from "../shared/enum/investment.status";
 import { SYSTEM_TYPE } from "../shared/enum/system.names.enum";
+import { Emission } from "src/shared/entities/emission.entity";
+import { Projection } from "src/shared/entities/projection.entity";
+import { EventLog } from "src/shared/entities/event.log.entity";
+import { EmissionSubSectorsPathMap, EmissionSubSectorsToSectoralScopeMap } from "src/shared/enum/sectoral.scope.enum";
 
 @Injectable()
 export class AggregateAPIService {
@@ -50,7 +53,10 @@ export class AggregateAPIService {
     @InjectRepository(InvestmentView) private investmentRepo: Repository<InvestmentView>,
     @InjectRepository(NDCActionViewEntity) private ndcRepo: Repository<NDCActionViewEntity>,
     @InjectRepository(ProgrammeTransferViewEntityQuery)
-    private programmeTransferRepo: Repository<ProgrammeTransferViewEntityQuery>
+    private programmeTransferRepo: Repository<ProgrammeTransferViewEntityQuery>,
+    @InjectRepository(Emission) private emissionRepo: Repository<Emission>,
+    @InjectRepository(Projection) private projectionRepo: Repository<Projection>,
+    @InjectRepository(EventLog) private eventLogRepo: Repository<EventLog>,
   ) {}
 
   private getFilterAndByStatFilter(
@@ -1972,6 +1978,387 @@ export class AggregateAPIService {
     );
   }
 
+  calculateSumEmissions(obj: any, gasType: string) {
+    let sum = 0;
+    for (const key in obj) {
+      if (key === gasType) {
+        sum += obj[key];
+      } else if (
+        typeof obj[key] === 'object' &&
+        key !== 'totalCo2WithLand' &&
+        key !== 'totalCo2WithoutLand'
+      ) {
+        sum += this.calculateSumEmissions(obj[key], gasType);
+      }
+    }
+    return sum;
+  }
+
+  calculateSumEmissionsBySector(obj) {
+    let sum = 0;
+    for (const key in obj) {
+      if (
+        typeof obj[key] === 'object' &&
+        key !== 'totalCo2WithLand' &&
+        key !== 'totalCo2WithoutLand'
+      ) {
+        sum += this.calculateSumEmissionsBySector(obj[key]);
+      } else if (['ch4', 'co2', 'n2o', 'co2eq', 'bau', 'conditionalNdc', 'unconditionalNdc'].includes(key)) {
+        sum += obj[key];
+      }
+    }
+    return sum;
+  }
+
+  async getDataBySector(dataResult) {
+    const xLabels: string[] = [];
+    const agricultureForestryOtherLandUse: number[] = [];
+    const energyEmissions: number[] = [];
+    const industrialProcessesProductUse: number[] = [];
+    const other: number[] = [];
+    const waste: number[] = [];
+
+    dataResult.forEach(item => {
+      xLabels.push(item.year);
+      energyEmissions.push(this.calculateSumEmissionsBySector(item.energyEmissions));
+      agricultureForestryOtherLandUse.push(this.calculateSumEmissionsBySector(item.agricultureForestryOtherLandUse));
+      industrialProcessesProductUse.push(this.calculateSumEmissionsBySector(item.industrialProcessesProductUse));
+      other.push(this.calculateSumEmissionsBySector(item.other));
+      waste.push(this.calculateSumEmissionsBySector(item.waste));
+    });
+
+    const latestDate = this.getLatestUpdateTime(dataResult);
+
+    return {
+      data: { xLabels, agricultureForestryOtherLandUse, energyEmissions, industrialProcessesProductUse, other, waste },
+      last: latestDate
+    };
+  }
+
+  async getEmissionByGas(emissionResult) {
+    const xLabels: string[] = [];
+    const co2: number[] = [];
+    const ch4: number[] = [];
+    const n2o: number[] = [];
+    const co2eq: number[] = [];
+
+    emissionResult.forEach(emission => {
+      xLabels.push(emission.year);
+      co2.push(this.calculateSumEmissions(emission, 'co2'));
+      ch4.push(this.calculateSumEmissions(emission, 'ch4'));
+      n2o.push(this.calculateSumEmissions(emission, 'n2o'));
+      co2eq.push(this.calculateSumEmissions(emission, 'co2eq'));
+    });
+
+    const latestDate = this.getLatestUpdateTime(emissionResult);
+
+    return {
+      data: { xLabels, co2, ch4, n2o, co2eq },
+      last: latestDate
+    };
+  }
+
+  async calculateEstimatedCreditsBySubSector(startYear, endYear) {
+    const startTime = this.getFirstDayOfYear(startYear).getTime();
+    const endTime = this.getLastDayOfYear(endYear).getTime();
+    const estimatedCreditResult = await this.eventLogRepo
+      .createQueryBuilder('event_log')
+      .where('event_log.createdTime BETWEEN :startTime AND :endTime', { startTime, endTime })
+      .andWhere('event_log.type = :type', { type: 'ESTIMATED_CREDIT_ISSUE' })
+      .orderBy('event_log.createdTime', 'ASC')
+      .getMany();
+
+    let lastUpdate;
+
+    // Grouping EventLog items by sectoralScope
+    const groupedBySectoralScope = estimatedCreditResult.reduce((acc, log) => {
+      const sectoralScope = log.eventData.sectoralScope;
+      lastUpdate = log.createdTime;
+      if (!acc[sectoralScope]) {
+        acc[sectoralScope] = [];
+      }
+      acc[sectoralScope].push(log);
+      return acc;
+    }, {});
+
+    const creditTotals = {};
+
+    for (const key in EmissionSubSectorsToSectoralScopeMap) {
+      const sectoralScope = EmissionSubSectorsToSectoralScopeMap[key];
+      if (groupedBySectoralScope[sectoralScope]) {
+        const logs = groupedBySectoralScope[sectoralScope];
+        const totalCredits = logs.reduce((sum, log) => sum + log.eventData.estimatedCredits, 0);
+        creditTotals[key] = totalCredits;
+      } else {
+        creditTotals[key] = 0; // Set to 0 if no matching data found
+      }
+    }
+
+    return { creditTotals, lastUpdate };
+  }
+
+  async calculateIssuedCreditsBySubSector(startYear, endYear) {
+    const startTime = this.getFirstDayOfYear(startYear).getTime();
+    const endTime = this.getLastDayOfYear(endYear).getTime();
+    const issuedCreditResult = await this.eventLogRepo
+      .createQueryBuilder('event_log')
+      .where('event_log.createdTime BETWEEN :startTime AND :endTime', { startTime, endTime })
+      .andWhere('event_log.type = :type', { type: 'ACTUAL_CREDIT_ISSUE' })
+      .orderBy('event_log.createdTime', 'ASC')
+      .getMany();
+
+    let lastUpdate;
+
+    // Grouping EventLog items by sectoralScope
+    const groupedBySectoralScope = issuedCreditResult.reduce((acc, log) => {
+      const sectoralScope = log.eventData.sectoralScope;
+      lastUpdate = log.createdTime;
+      if (!acc[sectoralScope]) {
+        acc[sectoralScope] = [];
+      }
+      acc[sectoralScope].push(log);
+      return acc;
+    }, {});
+
+    const creditTotals = {};
+
+    for (const key in EmissionSubSectorsToSectoralScopeMap) {
+      const sectoralScope = EmissionSubSectorsToSectoralScopeMap[key];
+      if (groupedBySectoralScope[sectoralScope]) {
+        const logs = groupedBySectoralScope[sectoralScope];
+        const totalCredits = logs.reduce((sum, log) => sum + log.eventData.issuedCredits, 0);
+        creditTotals[key] = totalCredits;
+      } else {
+        creditTotals[key] = 0; // Set to 0 if no matching data found
+      }
+    }
+
+    return {creditTotals, lastUpdate};
+  }
+
+  async calculateProjectionBauBySubSector(projections) {
+    let totalBau = {};
+    projections.forEach((projection) => {
+      for (const key in EmissionSubSectorsPathMap) {
+        const path = EmissionSubSectorsPathMap[key];
+        let matchingValue;
+
+        if (path.includes('.')) {
+          // Handle paths with nested properties
+          const pathSegments = path.split('.');
+          matchingValue = pathSegments.reduce((obj, prop) => obj[prop], projection);
+        } else {
+          // Handle direct property access
+          matchingValue = projection[path];
+        }
+
+        const calculatedBau = this.calculateSumEmissions(matchingValue, 'bau');
+        if (totalBau[key]) {
+          totalBau[key] = totalBau[key] + calculatedBau;
+        } else {
+          totalBau[key] = calculatedBau;
+        }
+
+      }
+    })
+    const latestDate = this.getLatestUpdateTime(projections);
+    return {totalBau, latestDate};
+  }
+
+  async getEstimatedSubSectorData(projectionResult, startYear, endYear) {
+    const totalEstimatedCreditsPerSubSector = await this.calculateEstimatedCreditsBySubSector(startYear, endYear);
+    const totalIssuedCreditsPerSubSector = await this.calculateIssuedCreditsBySubSector(startYear, endYear);
+    const totalProjectedBauPerSubSector = await this.calculateProjectionBauBySubSector(projectionResult);
+    
+    const estimatePercentage = {};
+    const issuePercentage = {};
+
+    for (const key in EmissionSubSectorsToSectoralScopeMap) {
+      estimatePercentage[key] = totalEstimatedCreditsPerSubSector?.creditTotals[key] / totalProjectedBauPerSubSector?.totalBau[key];
+      issuePercentage[key] = totalIssuedCreditsPerSubSector?.creditTotals[key] / totalProjectedBauPerSubSector?.totalBau[key];
+
+    }
+
+    // Get keys of the original object
+    const estimatedKeys = Object.keys(estimatePercentage);
+    const issuedKeys = Object.keys(issuePercentage);
+
+    // Create an object to hold arrays for each key
+    const estimatedResultObject = {};
+    const issuedResultObject = {};
+
+    const xLabels: any[] = [
+      ['Fuel', 'Combustion', 'Activities'],
+      ['Fugitive', 'emissions', ' from', 'fuels'],
+      ['Carbon', 'dioxide', 'Transport', 'and', 'Storage'],
+      ['Mineral', 'Industry'],
+      ['Chemical', 'Industry'],
+      ['Metal', 'Industry'],
+      ['Non-Energy', 'Products', 'from', 'Fuels', 'and', 'Solvent', 'Use'],
+      ['Electronics', 'Industry'],
+      ['Product', 'Uses as', 'Substitutes', 'for', 'Ozone', 'Depleting', 'Substances'],
+      ['Other', 'Product', 'Manufacture', 'and', 'Use'],
+      ['Other', '(Industrial', 'Processes', '&', 'Product', 'Use)'],
+      'Livestock',
+      'Land',
+      ['Aggregate', 'sources', 'and', 'non-CO2', 'emissions', 'sources', 'on land'],
+      ['Other', '(Agriculture,', 'Forestry,', 'and', 'Other', 'Land', 'Use)'],
+      ['Solid', 'Waste', 'Disposal'],
+      ['Biological', 'Treatment', 'of', 'Solid', 'Waste'],
+      ['Incineration', 'and', 'Open', 'Burning', 'of', 'Waste'],
+      ['Wastewater', 'Treatment', 'and', 'Discharge'],
+      ['Other', '(Waste)'],
+      [
+          'Indirect',
+          'N2O',
+          'emissions',
+          'from',
+          'the',
+          'atmospheric',
+          'deposition',
+          'of nitrogen',
+          'in NOx',
+          'and NH3',
+      ],
+      'Other',
+  ];
+
+  estimatedResultObject['xLabels'] = xLabels;
+  issuedResultObject['xLabels'] = xLabels;
+
+    // Loop through the keys and assign values at corresponding index in arrays
+    estimatedKeys.forEach((key, index) => {
+      estimatedResultObject[key] = Array(estimatedKeys.length).fill(0);
+      estimatedResultObject[key][index] = estimatePercentage[key];
+    });
+
+    issuedKeys.forEach((key, index) => {
+      issuedResultObject[key] = Array(issuedKeys.length).fill(0);
+      issuedResultObject[key][index] = issuePercentage[key];
+    });
+    
+    return {
+      data: {
+        estimate: {
+          data: estimatedResultObject,
+          last: totalProjectedBauPerSubSector?.latestDate
+        },
+        actual : {
+          data: issuedResultObject,
+          last: totalProjectedBauPerSubSector?.latestDate
+        }
+      }
+    }
+
+  }
+
+  async getComparisonChartData(emissionResult, projectionResult) {
+    const xLabels: string[] = [];
+    const bau: number[] = [];
+    const conditionalNdc: number[] = [];
+    const unconditionalNdc: number[] = [];
+    const actual: number[] = [];
+    let last = 0;
+
+    projectionResult.forEach(projection => {
+      xLabels.push(projection.year);
+      bau.push(this.calculateSumEmissions(projection, 'bau'));
+      conditionalNdc.push(this.calculateSumEmissions(projection, 'conditionalNdc'));
+      unconditionalNdc.push(this.calculateSumEmissions(projection, 'unconditionalNdc'));
+      last = projection.updatedAt;
+
+      const emissionDataForYear = emissionResult.find(emission => emission.year === projection.year);
+      if (emissionDataForYear) {
+        actual.push(this.calculateSumEmissionsBySector(emissionDataForYear));
+        last = emissionDataForYear.updatedAt;
+      } else {
+        actual.push(0);
+      }
+    });
+
+    const latestEmissionDate = this.getLatestUpdateTime(emissionResult);
+    const latestProjectionDate = this.getLatestUpdateTime(projectionResult);
+
+    return {
+      data: { xLabels, bau, conditionalNdc, unconditionalNdc, actual },
+      last: latestEmissionDate > latestProjectionDate ? latestEmissionDate : latestProjectionDate
+    };
+  }
+
+  async calculateGhgStat(
+    stat: Stat,
+    results,
+    system: SYSTEM_TYPE
+  ) {
+    const key = stat.key ? stat.key : stat.type;
+
+    const startYear = (stat?.statFilter.startTime && stat?.statFilter.startTime !== 0) ? stat?.statFilter.startTime : new Date().getFullYear() - 10;
+    const endYear = (stat?.statFilter.endTime && stat?.statFilter.endTime !== 0) ? stat?.statFilter.endTime : new Date().getFullYear();
+    const emissionResult = await this.emissionRepo
+      .createQueryBuilder('emission')
+      .where('emission.year BETWEEN :startYear AND :endYear', { startYear, endYear })
+      .andWhere('emission.state = :status', { status: 'FINALIZED' })
+      .orderBy('emission.year', 'ASC')
+      .getMany();
+
+    const projectionResult = await this.projectionRepo
+      .createQueryBuilder('projection')
+      .where('projection.year BETWEEN :startYear AND :endYear', { startYear, endYear })
+      .andWhere('projection.state = :status', { status: 'FINALIZED' })
+      .orderBy('projection.year', 'ASC')
+      .getMany();
+
+    switch (system) {
+      case SYSTEM_TYPE.CARBON_TRANSPARENCY:
+        switch (stat.type) {
+          case StatType.AGG_EMISSIONS_BY_SECTOR:
+            results[key] = await this.getDataBySector(
+              emissionResult
+            );
+            break;
+          case StatType.AGG_EMISSIONS_BY_GAS:
+            results[key] = await this.getEmissionByGas(
+              emissionResult
+            );
+            break;
+          case StatType.AGG_EMISSIONS_MITIGATION_POTENTIAL_BY_SECTOR:
+            results[key] = await this.getDataBySector(
+              projectionResult
+            );
+            break;
+          case StatType.AGG_REDUCTION_PERCENT_BAU_BY_SECTOR:
+              results[key] = await this.getEstimatedSubSectorData(
+                projectionResult,
+                startYear,
+                endYear
+              );
+              break;
+          case StatType.AGG_EMISSIONS_COMPARISON:
+            results[key] = await this.getComparisonChartData(
+              emissionResult,
+              projectionResult
+            );
+            break;
+        }
+    }
+  }
+
+  async getGhgEmissionStats(
+    query: StatList,
+    system: SYSTEM_TYPE
+  ): Promise<DataCountResponseDto> {
+    let results = {};
+
+    for (const stat of query.stats) {
+      await this.calculateGhgStat(
+        stat,
+        results,
+        system
+      );
+    }
+    return new DataCountResponseDto(results);
+  }
+
   private groupByStatus(key: string, data: any) {
     const mapping = {};
     for (const d of data) {
@@ -1983,4 +2370,38 @@ export class AggregateAPIService {
 
     return data;
   }
+
+  private getLastDayOfYear(yearString) {
+    // Convert the year string to a number
+    const year = Number(yearString);
+  
+    // Create a Date object for the next year and set its day to 0 (last day of the current year)
+    const lastDayOfYear = new Date(year + 1, 0, 0);
+  
+    // Set the time to the last minute of the day
+    lastDayOfYear.setHours(23, 59, 59, 999);
+  
+    return lastDayOfYear;
+  }
+
+  private getFirstDayOfYear(yearString) {
+    // Convert the year string to a number
+    const year = Number(yearString);
+  
+    // Create a Date object for the given year and set the month and day to January 1st
+    const firstDayOfYear = new Date(year, 0, 1);
+  
+    // Set the time to the first minute of the day
+    firstDayOfYear.setHours(0, 0, 0, 0);
+  
+    return firstDayOfYear;
+  }
+
+  private getLatestUpdateTime(emissionDataArray) {
+    const updateTimeObjects = emissionDataArray.map(item => new Date(item.updatedAt));
+  
+    updateTimeObjects.sort((a, b) => b - a);
+  
+    return new Date(updateTimeObjects[0]).getTime(); // Return the latest timestamp
+  };
 }

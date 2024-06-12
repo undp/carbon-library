@@ -259,7 +259,7 @@ export class AnnualReportGen {
                 .fontSize(8)
                 .font('Times-Roman')
                 .text(cell, 30 + table.margin + columnIndex * 100, y, {
-                    link: `${host}/programmeManagement/view?id=${id}`,
+                    link: `${host}/programmeManagement/view/${id}`,
                     width: 90,
                     align: 'left',
                 });

@@ -3,6 +3,8 @@ import { CompanyRole } from "../enum/company.role.enum";
 import { CompanyState } from "../enum/company.state.enum";
 import { EntitySubject } from "./entity.subject";
 import { SectoralScope } from "@undp/serial-number-gen";
+import { Ministry } from "../enum/ministry.enum";
+import { GovDepartment } from "../enum/govDep.enum";
 
 @Entity()
 export class Company implements EntitySubject {
@@ -92,7 +94,29 @@ export class Company implements EntitySubject {
 
   @Column("varchar", { array: true, nullable: true })
   sectoralScope: SectoralScope[];
+
+  @Column({ type: "bigint", nullable: true})
+  omgePercentage: number;
+
+  @Column({ type: "bigint", nullable: true })
+  nationalSopValue: number;
   
+  @Column({
+    nullable: true,
+    type: "enum",
+    enum: Ministry,
+    array: false, 
+  })
+  ministry: Ministry;
+
+  @Column({
+    nullable: true,
+    type: "enum",
+    enum: GovDepartment,
+    array: false,
+  })
+  govDep: GovDepartment;
+
   @BeforeInsert()
   setDefaultState() {
     if (
@@ -110,6 +134,12 @@ export class Company implements EntitySubject {
       this.creditBalance = 0;
     } else if (this.companyRole === CompanyRole.CERTIFIER) {
       this.creditBalance = null;
+    }
+    if (this.companyRole === CompanyRole.GOVERNMENT){
+      this.omgePercentage=1;
+    }
+    if (this.companyRole === CompanyRole.GOVERNMENT){
+      this.nationalSopValue=0;
     }
   }
 }

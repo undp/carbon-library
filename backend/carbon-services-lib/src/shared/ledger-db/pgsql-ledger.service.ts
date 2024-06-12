@@ -190,7 +190,7 @@ export class PgSqlLedgerService implements LedgerDBInterface {
         },
       ])
     )[0]?.rows;
-    console.log("Results", x);
+    // console.log("Results", x);
     return x;
   }
 

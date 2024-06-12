@@ -9,18 +9,26 @@ import UserActionConfirmationModel from "../../Common/Models/userActionConfirmat
 import "./companyProfileComponent.scss";
 import * as Icon from "react-bootstrap-icons";
 import { OrganisationStatus } from "../../Common/OrganisationStatus/organisationStatus";
-import { addCommSep, CompanyState, SectoralScope } from "../../../Definitions";
+import {
+  addCommSep,
+  CarbonSystemType,
+  CompanyState,
+  GovDepartment,
+  SectoralScope,
+} from "../../../Definitions";
 import { CompanyRole } from "../../../Definitions/Enums/company.role.enum";
+import { useConnection } from "../../../Context";
+import { CompanyDetailsComponent } from "../CompanyDetails/companyDetailsComponent";
 
 export const CompanyProfileComponent = (props: any) => {
   const {
     t,
     useAbilityContext,
     useLocation,
-    useConnection,
     onNavigateToCompanyManagement,
     onNavigateToCompanyEdit,
     regionField,
+    systemType,
   } = props;
   const { get, put, post } = useConnection();
   const [companyDetails, setCompanyDetails] = useState<any>(undefined);
@@ -48,7 +56,7 @@ export const CompanyProfileComponent = (props: any) => {
         setCompanyDetails(response.data);
         setIsLoading(false);
       }
-    } catch (exception) {}
+    } catch (exception) { }
   };
 
   const getUserDetails = async (companyId: string) => {
@@ -89,7 +97,7 @@ export const CompanyProfileComponent = (props: any) => {
       setUserRole(userRoleValue);
       setCompanyRole(localStorage.getItem("companyRole") as string);
       if (state.record?.state == "2" || state.record?.state == "3") {
-        getUserDetails(state.record.companyId)
+        getUserDetails(state.record.companyId);
       }
     }
   }, []);
@@ -170,7 +178,6 @@ export const CompanyProfileComponent = (props: any) => {
   const onApproveOrgCanceled = () => {
     setOpenApproveModal(false);
   };
-
 
   const onRejectOrgConfirmed = async (remarks: string) => {
     try {
@@ -256,28 +263,16 @@ export const CompanyProfileComponent = (props: any) => {
     setOpenRejectModal(true);
   };
 
-  const getEnumKeysFromValues = (values: string[]): string[] => {
-    const enumKeys: string[] = [];
-    for (const key in SectoralScope) {
-      if (values.includes(SectoralScope[key as keyof typeof SectoralScope])) {
-        enumKeys.push(key);
-      }
-    }
-
-    return enumKeys;
-  };
-
   return (
     <div className="content-container company-profile">
       <div className="title-bar">
         <div>
           <div className="body-title">{t("companyProfile:title")}</div>
-          <div className="body-sub-title">{t("companyProfile:subTitle")}</div>
         </div>
         <div className="flex-display">
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
-          !isLoading &&
-          parseInt(companyDetails?.state) === 1 ? (
+            !isLoading &&
+            parseInt(companyDetails?.state) === 1 ? (
             <Button
               danger
               className="btn-danger"
@@ -290,8 +285,8 @@ export const CompanyProfileComponent = (props: any) => {
           )}
 
           {ability.can(Action.Delete, plainToClass(Company, companyDetails)) &&
-          !isLoading &&
-          parseInt(companyDetails?.state) === 0 ? (
+            !isLoading &&
+            parseInt(companyDetails?.state) === 0 ? (
             <Button className="btn-activate" onClick={onReActivateOrganisation}>
               {t("companyProfile:reActivate")}
             </Button>
@@ -310,19 +305,20 @@ export const CompanyProfileComponent = (props: any) => {
                 {t("common:edit")}
               </Button>
             )}
-          {(parseInt(companyDetails?.state) === 2) &&
+          {parseInt(companyDetails?.state) === 2 &&
             ability.can(Action.Reject, plainToClass(Company, companyDetails)) &&
             !isLoading &&
             companyDetails && (
-              <Button
-                className="btn-danger"
-                onClick={onRejectOrganisation}
-              >
+              <Button className="btn-danger" onClick={onRejectOrganisation}>
                 {t("common:reject")}
               </Button>
             )}
-          {(parseInt(companyDetails?.state) === 2 || parseInt(companyDetails?.state) === 3) &&
-            ability.can(Action.Approve, plainToClass(Company, companyDetails)) &&
+          {(parseInt(companyDetails?.state) === 2 ||
+            parseInt(companyDetails?.state) === 3) &&
+            ability.can(
+              Action.Approve,
+              plainToClass(Company, companyDetails)
+            ) &&
             !isLoading &&
             companyDetails && (
               <Button
@@ -368,209 +364,53 @@ export const CompanyProfileComponent = (props: any) => {
               </Card>
             </Col>
             <Col md={24} lg={16}>
-              <Card className="card-container">
-                <div className="info-view">
-                  <div className="title">
-                    <span className="title-icon">
-                      <BankOutlined />
-                    </span>
-                    <span className="title-text">
-                      {t("companyProfile:organisationDetailsHeading")}
-                    </span>
-                  </div>
-                  <Skeleton loading={isLoading} active>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:name")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {companyDetails.name ? companyDetails.name : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:taxId")}
-                      </Col>
-                      <Col span={12} className="field-value nextline-overflow">
-                        {companyDetails.taxId ? companyDetails.taxId : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:paymentId")}
-                      </Col>
-                      <Col span={12} className="field-value nextline-overflow">
-                        {companyDetails.paymentId ? companyDetails.paymentId : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:companyRole")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        <CompanyRoleIcon role={companyDetails.companyRole} />
-                      </Col>
-                    </Row>
-                    {companyDetails?.companyRole === CompanyRole.MINISTRY && (
-                      <>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("companyProfile:ministerName")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {companyDetails.nameOfMinister
-                              ? companyDetails.nameOfMinister
-                              : "-"}
-                          </Col>
-                        </Row>
-                        <Row className="field">
-                          <Col span={12} className="field-key">
-                            {t("companyProfile:sectoralScope")}
-                          </Col>
-                          <Col span={12} className="field-value">
-                            {companyDetails.sectoralScope
-                              ? getEnumKeysFromValues(
-                                  companyDetails.sectoralScope
-                                ).join(", ")
-                              : "-"}
-                          </Col>
-                        </Row>
-                      </>
-                    )}
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:email")}
-                      </Col>
-                      <Col span={12} className="field-value nextline-overflow">
-                        {companyDetails.email ? companyDetails.email : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:phoneNo")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {companyDetails.phoneNo ? companyDetails.phoneNo : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:website")}
-                      </Col>
-                      <Col span={12} className="field-value ellipsis-overflow">
-                        {companyDetails.website ? (
-                          <a target={"blank"} href={companyDetails.website}>
-                            {companyDetails.website}
-                          </a>
-                        ) : (
-                          "-"
-                        )}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:address")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {companyDetails.address ? companyDetails.address : "-"}
-                      </Col>
-                    </Row>
-                    {regionField && (
+              <CompanyDetailsComponent
+                t={t}
+                companyDetails={companyDetails}
+                userDetails={userDetails}
+                isLoading={isLoading}
+                regionField
+                systemType={systemType}
+              />
+              {(companyDetails?.state == "2" ||
+                companyDetails?.state == "3") && (
+                  <Card className="card-container">
+                    <div className="info-view">
+                      <div className="title">
+                        <span className="title-icon">
+                          <UserOutlined />
+                        </span>
+                        <span className="title-text">
+                          {t("companyProfile:adminDetailsHeading")}
+                        </span>
+                      </div>
                       <Row className="field">
                         <Col span={12} className="field-key">
-                          {t("companyProfile:region")}
+                          {t("companyProfile:adminName")}
                         </Col>
                         <Col span={12} className="field-value">
-                          {companyDetails.regions
-                            ? companyDetails.regions.join(", ")
-                            : "-"}
+                          {userDetails?.name ? userDetails?.name : "-"}
                         </Col>
                       </Row>
-                    )}
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:programmeCount")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {companyDetails.programmeCount
-                          ? companyDetails.programmeCount
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:creditBalance")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {companyDetails.creditBalance
-                          ? addCommSep(companyDetails.creditBalance)
-                          : "-"}
-                      </Col>
-                    </Row>
-                    {parseInt(companyDetails.state) === 0 ? (
                       <Row className="field">
                         <Col span={12} className="field-key">
-                          {t("companyProfile:remarks")}
+                          {t("companyProfile:adminEmail")}
                         </Col>
                         <Col span={12} className="field-value">
-                          {companyDetails.remarks
-                            ? companyDetails.remarks
-                            : "-"}
+                          {userDetails?.email ? userDetails?.email : "-"}
                         </Col>
                       </Row>
-                    ) : (
-                      ""
-                    )}
-                  </Skeleton>
-                </div>
-              </Card>
-              {(companyDetails?.state == "2" || companyDetails?.state == "3") &&
-                <Card className="card-container">
-                  <div className="info-view">
-                    <div className="title">
-                      <span className="title-icon">
-                        <UserOutlined />
-                      </span>
-                      <span className="title-text">
-                        {t("companyProfile:adminDetailsHeading")}
-                      </span>
+                      <Row className="field">
+                        <Col span={12} className="field-key">
+                          {t("companyProfile:adminPhone")}
+                        </Col>
+                        <Col span={12} className="field-value">
+                          {userDetails?.phoneNo ? userDetails?.phoneNo : "-"}
+                        </Col>
+                      </Row>
                     </div>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:adminName")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {userDetails?.name
-                          ? userDetails?.name
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:adminEmail")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {userDetails?.email
-                          ? userDetails?.email
-                          : "-"}
-                      </Col>
-                    </Row>
-                    <Row className="field">
-                      <Col span={12} className="field-key">
-                        {t("companyProfile:adminPhone")}
-                      </Col>
-                      <Col span={12} className="field-value">
-                        {userDetails?.phoneNo
-                          ? userDetails?.phoneNo
-                          : "-"}
-                      </Col>
-                    </Row>
-
-                  </div>
-
-                </Card>
-              }
-              
+                  </Card>
+                )}
             </Col>
           </Row>
         </div>

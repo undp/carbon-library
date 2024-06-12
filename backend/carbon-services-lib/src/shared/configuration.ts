@@ -31,7 +31,7 @@ export default () => ({
     companyTable: "company",
   },
   email: {
-    source: process.env.SOURCE_EMAIL || "info@xeptagon.com",
+    source: process.env.SOURCE_EMAIL || "info@xeptagon.com", 
     endpoint:
       process.env.SMTP_ENDPOINT ||
       "vpce-02cef9e74f152b675-b00ybiai.email-smtp.us-east-1.vpce.amazonaws.com",
@@ -44,7 +44,7 @@ export default () => ({
     adresss: process.env.HOST_ADDRESS || "Address <br>Region, Country Zipcode"
   },
   s3CommonBucket: {
-    name: "carbon-common-" + (process.env.NODE_ENV || "dev"),
+    name: process.env.S3_COMMON_BUCKET || "carbon-common-dev",
   },
   host: process.env.HOST || "https://test.carbreg.org",
   backendHost: process.env.BACKEND_HOST || "http://localhost:3000",
@@ -65,12 +65,13 @@ export default () => ({
     apiKey: process.env.ITMO_API_KEY,
     email: process.env.ITMO_EMAIL,
     password: process.env.ITMO_PASSWORD,
+    enable: process.env.ITMO_ENABLE === "true" ? true : false,
   },
   CERTIFIER:{
     image:process.env.CERTIFIER_IMAGE
   },
   registry: {
-    syncEnable: process.env.SYNC_ENABLE || false,
+    syncEnable: process.env.SYNC_ENABLE === "true" ? true : false,
     endpoint: process.env.SYNC_ENDPOINT || 'https://u4h9swxm8b.execute-api.us-east-1.amazonaws.com/dev',
     apiToken: process.env.SYNC_API_TOKEN
   },
@@ -80,6 +81,10 @@ export default () => ({
     ministryName: "Ministry of Environment, Forestry & Tourism",
     countryCapital: process.env.COUNTRY_CAPITAL || "Capital X",
     contactEmailForQuestions: process.env.CONTACT_EMAIL || "contactus@email.com"
+  },
+  cadTrust: {
+    enable: process.env.CADTRUST_ENABLE === "true" ? true : false,
+    endpoint: process.env.CADTRUST_ENDPOINT || "http://44.212.139.61:31310/"
   },
   systemType: process.env.SYSTEM_TYPE || "CARBON_UNIFIED_SYSTEM",
   systemName: process.env.SYSTEM_NAME || "SystemX",
